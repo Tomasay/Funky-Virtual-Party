@@ -10,7 +10,9 @@ public class ClientManager : MonoBehaviour
 {
     SocketManager manager;
     const string URI = "https://vrpartygame.herokuapp.com/socket.io/";
-    //const string URI = "https://socket-io-chat.now.sh/socket.io";
+
+    [SerializeField]
+    private GameObject player;
 
     // Start is called before the first frame update
     void Start()
@@ -23,11 +25,19 @@ public class ClientManager : MonoBehaviour
 
         //manager.Socket.On<string>("time", OnTime);
 
-        manager.Socket.On<string>("toUnity", OnInputReceived);
+        manager.Socket.On<int>("toUnity", OnInputReceived);
     }
 
-    private void OnInputReceived(string msg)
+    private void OnInputReceived(int input)
     {
-        Debug.Log("Input received: " + msg + "\n at " + DateTime.Now.ToString());
+        Debug.Log("Input received: " + input + "\n at " + GetTime());
+
+        player.transform.Translate(input, 0, 0);
+    }
+
+    private string GetTime()
+    {
+        DateTime now = DateTime.Now;
+        return now.Hour + ":" + now.Minute + ":" + now.Second + "." + now.Millisecond;
     }
 }
