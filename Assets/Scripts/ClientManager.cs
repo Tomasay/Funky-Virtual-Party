@@ -14,6 +14,9 @@ public class ClientManager : MonoBehaviour
     [SerializeField]
     private GameObject player;
 
+    private bool isHoldingLeft, isHoldingRight;
+    private int playerSpeed = 5;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -22,17 +25,40 @@ public class ClientManager : MonoBehaviour
         manager = new SocketManager(new Uri(URI));
 
         manager.Socket.Once("connect", () => Debug.Log("connected!"));
-
-        //manager.Socket.On<string>("time", OnTime);
-
         manager.Socket.On<int>("toUnity", OnInputReceived);
+    }
+
+    private void Update()
+    {
+        if(isHoldingLeft)
+        {
+            player.transform.Translate(-playerSpeed * Time.deltaTime, 0, 0);
+        }
+        if (isHoldingRight)
+        {
+            player.transform.Translate(playerSpeed * Time.deltaTime, 0, 0);
+        }
     }
 
     private void OnInputReceived(int input)
     {
-        Debug.Log("Input received: " + input + "\n at " + GetTime());
+        switch (input)
+        {
+            case -1:
+                isHoldingLeft = true;
+                break;
+            case 1:
+                isHoldingRight = true;
+                break;
+            case 0:
+                isHoldingLeft = false;
+                isHoldingRight = false;
+                break;
+            default:
+                break;
+        }
 
-        player.transform.Translate(input, 0, 0);
+        Debug.Log("Input received: " + input + "\n at " + GetTime());
     }
 
     private string GetTime()
