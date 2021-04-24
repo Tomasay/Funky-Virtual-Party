@@ -8,57 +8,68 @@ using BestHTTP.SocketIO3;
 
 public class ClientManager : MonoBehaviour
 {
+    [SerializeField]
+    GameObject playerPrefab;
+
+    Dictionary<string, GameObject> players;
+
+    private string unityClientID = "";
+
     SocketManager manager;
     const string URI = "https://vrpartygame.herokuapp.com/socket.io/";
-
-    [SerializeField]
-    private GameObject player;
 
     private bool isHoldingLeft, isHoldingRight;
     private int playerSpeed = 5;
 
+    Vector3 movement = Vector3.zero;
+
     // Start is called before the first frame update
     void Start()
     {
+        players = new Dictionary<string, GameObject>();
+
         Debug.Log("Attempting to connect to socket.io server: " + URI);
 
         manager = new SocketManager(new Uri(URI));
+        //manager.Socket.Emit("isUnity");
 
         manager.Socket.Once("connect", () => Debug.Log("connected!"));
-        manager.Socket.On<int>("toUnity", OnInputReceived);
+
+        //manager.Socket.On<int>("toUnity", OnInputReceived);
+        manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
+        manager.Socket.On<string, string>("clientConnect", OnClientConnect);
+        manager.Socket.On<string, string>("clientDisconnect", OnClientDisconnect);
+    }
+
+    private void OnClientConnect(string id, string ip)
+    {
+        Debug.Log("Client connected with ID: " + id + " at IP address: " + ip);
+
+        if (unityClientID == "")
+        {
+            unityClientID = id;
+            return;
+        }
+
+        players.Add(id, Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity));
+        players[id].GetComponent<ClientPlayer>().PlayerID = id;
+    }
+
+    private void OnClientDisconnect(string id, string ip)
+    {
+        Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
+
+        if(players.ContainsKey(id))
+            Destroy(players[id]);
     }
 
     private void Update()
     {
-        if(isHoldingLeft)
-        {
-            player.transform.Translate(-playerSpeed * Time.deltaTime, 0, 0);
-        }
-        if (isHoldingRight)
-        {
-            player.transform.Translate(playerSpeed * Time.deltaTime, 0, 0);
-        }
     }
 
-    private void OnInputReceived(int input)
+    private void OnInputReceived(int x, int y, string id)
     {
-        switch (input)
-        {
-            case -1:
-                isHoldingLeft = true;
-                break;
-            case 1:
-                isHoldingRight = true;
-                break;
-            case 0:
-                isHoldingLeft = false;
-                isHoldingRight = false;
-                break;
-            default:
-                break;
-        }
-
-        Debug.Log("Input received: " + input + "\n at " + GetTime());
+        players[id].GetComponent<ClientPlayer>().Move(x, y);
     }
 
     private string GetTime()
