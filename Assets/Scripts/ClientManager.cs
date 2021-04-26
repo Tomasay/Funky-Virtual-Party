@@ -23,6 +23,9 @@ public class ClientManager : MonoBehaviour
 
     Vector3 movement = Vector3.zero;
 
+    private const int PASSCODE_LENGTH = 6;
+    private string passcode;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +34,9 @@ public class ClientManager : MonoBehaviour
         Debug.Log("Attempting to connect to socket.io server: " + URI);
 
         manager = new SocketManager(new Uri(URI));
+        passcode = GenerateCode();
+        Debug.Log("PASSCODE: " + passcode);
+        manager.Socket.Emit("unityJoinRoom", passcode);
         //manager.Socket.Emit("isUnity");
 
         manager.Socket.Once("connect", () => Debug.Log("connected!"));
@@ -63,10 +69,6 @@ public class ClientManager : MonoBehaviour
             Destroy(players[id]);
     }
 
-    private void Update()
-    {
-    }
-
     private void OnInputReceived(int x, int y, string id)
     {
         players[id].GetComponent<ClientPlayer>().Move(x, y);
@@ -76,5 +78,20 @@ public class ClientManager : MonoBehaviour
     {
         DateTime now = DateTime.Now;
         return now.Hour + ":" + now.Minute + ":" + now.Second + "." + now.Millisecond;
+    }
+
+    private string GenerateCode()
+    {
+        string newCode = "";
+        for (int i = 0; i < PASSCODE_LENGTH; i++)
+        {
+            newCode += GetRandomLetter();
+        }
+        return newCode;
+    }
+
+    public static char GetRandomLetter()
+    {
+        return (char)UnityEngine.Random.Range(65, 91);
     }
 }
