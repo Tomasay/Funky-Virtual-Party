@@ -43,13 +43,13 @@ public class ClientManager : MonoBehaviour
 
         //manager.Socket.On<int>("toUnity", OnInputReceived);
         manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
-        manager.Socket.On<string, string>("connectToUnity", OnClientConnect);
+        manager.Socket.On<string, string, string>("connectToUnity", OnClientConnect);
         manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
 
         DontDestroyOnLoad(gameObject);
     }
 
-    private void OnClientConnect(string id, string ip)
+    private void OnClientConnect(string id, string ip, string name)
     {
         Debug.Log("Client connected with ID: " + id + " at IP address: " + ip);
 
@@ -63,7 +63,8 @@ public class ClientManager : MonoBehaviour
 
         players.Add(id, playerPrefab);
         players[id].GetComponent<ClientPlayer>().PlayerID = id;
-        players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
+        //players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
+        players[id].GetComponent<ClientPlayer>().SetPlayerName(name);
 
         ClientEvents.current.OnClientConnect(players[id]);
     }
