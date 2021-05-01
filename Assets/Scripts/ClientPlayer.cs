@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ClientPlayer : MonoBehaviour
 {
+    [SerializeField]
+    TMP_Text playerNameText;
+
     private string playerID;
     private Vector3 movement;
     private float speed = 5;
@@ -31,5 +35,10 @@ public class ClientPlayer : MonoBehaviour
     {
         movement = new Vector3((x / 100.0f) * speed, 0, (y / 100.0f) * speed);
         Debug.Log("SPEED: " + movement);
+    }
+
+    public void SetPlayerName(string name)
+    {
+        playerNameText.text = name;
     }
 }

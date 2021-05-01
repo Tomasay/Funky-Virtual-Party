@@ -27,7 +27,7 @@ public class ClientManager : MonoBehaviour
     private string passcode;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         players = new Dictionary<string, GameObject>();
 
@@ -43,30 +43,42 @@ public class ClientManager : MonoBehaviour
 
         //manager.Socket.On<int>("toUnity", OnInputReceived);
         manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
-        manager.Socket.On<string, string>("clientConnect", OnClientConnect);
-        manager.Socket.On<string, string>("clientDisconnect", OnClientDisconnect);
+        manager.Socket.On<string, string>("connectToUnity", OnClientConnect);
+        manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
+
+        DontDestroyOnLoad(gameObject);
     }
 
     private void OnClientConnect(string id, string ip)
     {
         Debug.Log("Client connected with ID: " + id + " at IP address: " + ip);
 
+        /* This was implemented because Unity was triggering as the first client connect. Seems to be unnecessary with the implementation of rooms
         if (unityClientID == "")
         {
             unityClientID = id;
             return;
         }
+        */
 
-        players.Add(id, Instantiate(playerPrefab, new Vector3(0, 1, 0), Quaternion.identity));
+        players.Add(id, playerPrefab);
         players[id].GetComponent<ClientPlayer>().PlayerID = id;
+        players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
+
+        ClientEvents.current.OnClientConnect(players[id]);
     }
 
     private void OnClientDisconnect(string id, string ip)
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
 
-        if(players.ContainsKey(id))
+        if (players.ContainsKey(id))
+        {
             Destroy(players[id]);
+            players.Remove(id);
+        }
+
+        ClientEvents.current.OnClientDisconnect(id, ip);
     }
 
     private void OnInputReceived(int x, int y, string id)
