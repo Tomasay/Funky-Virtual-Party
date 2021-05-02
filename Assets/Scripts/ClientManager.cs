@@ -68,7 +68,7 @@ public class ClientManager : MonoBehaviour
         players.Add(id, Instantiate(playerPrefab));
         players[id].GetComponent<ClientPlayer>().PlayerID = id;
         //players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
-        players[id].GetComponent<ClientPlayer>().SetPlayerName(name);
+        players[id].GetComponent<ClientPlayer>().PlayerName = name;
 
         if (onClientConnect != null)
         {
@@ -97,6 +97,27 @@ public class ClientManager : MonoBehaviour
     private void OnInputReceived(int x, int y, string id)
     {
         players[id].GetComponent<ClientPlayer>().Move(x, y);
+    }
+
+    public void SpawnPlayers(GameObject prefab, Transform[] locations)
+    {
+        int index = 0;
+        foreach (KeyValuePair<string, GameObject> p in players)
+        {
+            string playerName = players[p.Key].GetComponent<ClientPlayer>().PlayerName;
+            Color playerColor = players[p.Key].GetComponent<ClientPlayer>().PlayerColor;
+
+            Destroy(players[p.Key]);
+            players[p.Key] = Instantiate(prefab);
+            players[p.Key].GetComponent<ClientPlayer>().PlayerName = playerName;
+            players[p.Key].GetComponent<ClientPlayer>().PlayerColor = playerColor;
+
+            if (locations[index])
+            {
+                players[p.Key].transform.position = locations[index].position;
+            }
+            index++;
+        }
     }
 
     private string GetTime()

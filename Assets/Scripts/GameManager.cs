@@ -5,6 +5,11 @@ using UnityEngine.XR;
 
 public class GameManager : MonoBehaviour
 {
+    [SerializeField]
+    GameObject playerPrefab;
+
+    [SerializeField]
+    Transform[] playerSpawns;
 
     void Start()
     {
@@ -16,6 +21,8 @@ public class GameManager : MonoBehaviour
         {
             Display.displays[i].Activate();
         }
+
+        ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
     }
 
     // Update is called once per frame
