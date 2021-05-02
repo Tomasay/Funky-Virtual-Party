@@ -8,25 +8,28 @@ using BestHTTP.SocketIO3;
 
 public class ClientManager : MonoBehaviour
 {
+    public static ClientManager instance;
+
     [SerializeField]
-    GameObject playerPrefab;
+    private GameObject playerPrefab;
+    private Dictionary<string, GameObject> players;
 
-    Dictionary<string, GameObject> players;
-
-    private string unityClientID = "";
+    public Dictionary<string, GameObject> Players { get => players; }
 
     SocketManager manager;
-    const string URI = "https://vrpartygame.herokuapp.com/socket.io/";
-
-    private bool isHoldingLeft, isHoldingRight;
-    private int playerSpeed = 5;
-
-    Vector3 movement = Vector3.zero;
+    private string unityClientID = "";
+    private const string URI = "https://vrpartygame.herokuapp.com/socket.io/";
 
     private const int PASSCODE_LENGTH = 6;
     private string passcode;
+    public string Passcode { get => passcode;}
 
     // Start is called before the first frame update
+    private void Start()
+    {
+        instance = this;
+    }
+
     void Awake()
     {
         players = new Dictionary<string, GameObject>();
@@ -49,6 +52,7 @@ public class ClientManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public event Action<GameObject> onClientConnect;
     private void OnClientConnect(string id, string ip, string name)
     {
         Debug.Log("Client connected with ID: " + id + " at IP address: " + ip);
@@ -61,14 +65,19 @@ public class ClientManager : MonoBehaviour
         }
         */
 
-        players.Add(id, playerPrefab);
+        players.Add(id, Instantiate(playerPrefab));
         players[id].GetComponent<ClientPlayer>().PlayerID = id;
         //players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
         players[id].GetComponent<ClientPlayer>().SetPlayerName(name);
 
-        ClientEvents.current.OnClientConnect(players[id]);
+        if (onClientConnect != null)
+        {
+            onClientConnect(players[id]);
+        }
     }
 
+
+    public event Action<string> onClientDisonnect;
     private void OnClientDisconnect(string id, string ip)
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
@@ -79,7 +88,10 @@ public class ClientManager : MonoBehaviour
             players.Remove(id);
         }
 
-        ClientEvents.current.OnClientDisconnect(id, ip);
+        if (onClientDisonnect != null)
+        {
+            onClientDisonnect(id);
+        }
     }
 
     private void OnInputReceived(int x, int y, string id)
