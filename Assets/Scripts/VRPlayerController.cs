@@ -11,7 +11,7 @@ public class VRPlayerController : MonoBehaviour
 
     private Vector3 leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;
-    private float handMovementSpeed = 10;
+    private float handMovementSpeed = 20;
 
     public GameObject LeftHand { get => leftHand; set => leftHand = value; }
     public GameObject RightHand { get => rightHand; set => rightHand = value; }
@@ -27,7 +27,7 @@ public class VRPlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (handMovement)
+        if (handMovement && leftHand && rightHand)
         {
             handDistance = Vector3.Distance(leftHandPos, LeftHand.transform.localPosition) + Vector3.Distance(rightHandPos, RightHand.transform.localPosition);
 
