@@ -84,9 +84,9 @@ public class GameManager : MonoBehaviour
 
     private void SetPlayerMovement(bool canPlayerMove)
     {
-        foreach (KeyValuePair<string, GameObject> p in ClientManager.instance.Players)
+        foreach (ClientPlayer p in ClientManager.instance.Players)
         {
-            ClientManager.instance.Players[p.Key].GetComponent<ClientPlayer>().CanMove = canPlayerMove;
+            p.CanMove = canPlayerMove;
         }
     }
 }

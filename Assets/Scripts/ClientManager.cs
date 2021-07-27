@@ -12,9 +12,9 @@ public class ClientManager : MonoBehaviour
 
     [SerializeField]
     private GameObject playerPrefab;
-    private Dictionary<string, GameObject> players;
+    private List<ClientPlayer> players;
 
-    public Dictionary<string, GameObject> Players { get => players; }
+    public List<ClientPlayer> Players { get => players; }
 
     SocketManager manager;
     private string unityClientID = "";
@@ -32,7 +32,7 @@ public class ClientManager : MonoBehaviour
 
     void Awake()
     {
-        players = new Dictionary<string, GameObject>();
+        players = new List<ClientPlayer>();
 
         Debug.Log("Attempting to connect to socket.io server: " + URI);
 
@@ -52,6 +52,15 @@ public class ClientManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Update()
+    {
+        foreach (ClientPlayer cp in players)
+        {
+            if (cp == null)
+                Debug.Log("WE GOT A NULL");
+        }
+    }
+
     public event Action<GameObject> onClientConnect;
     private void OnClientConnect(string id, string ip, string name)
     {
@@ -65,14 +74,16 @@ public class ClientManager : MonoBehaviour
         }
         */
 
-        players.Add(id, Instantiate(playerPrefab));
-        players[id].GetComponent<ClientPlayer>().PlayerID = id;
+        ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
+
+        players.Add(newPlayer);
+        newPlayer.PlayerID = id;
         //players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
-        players[id].GetComponent<ClientPlayer>().PlayerName = name;
+        newPlayer.PlayerName = name;
 
         if (onClientConnect != null)
         {
-            onClientConnect(players[id]);
+            onClientConnect(newPlayer.gameObject);
         }
     }
 
@@ -82,10 +93,10 @@ public class ClientManager : MonoBehaviour
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
 
-        if (players.ContainsKey(id))
+        if (GetPlayerByID(id))
         {
-            Destroy(players[id]);
-            players.Remove(id);
+            Destroy(GetPlayerByID(id).gameObject);
+            players.Remove(GetPlayerByID(id));
         }
 
         if (onClientDisonnect != null)
@@ -96,27 +107,30 @@ public class ClientManager : MonoBehaviour
 
     private void OnInputReceived(int x, int y, string id)
     {
-        players[id].GetComponent<ClientPlayer>().Move(x, y);
+        if (GetPlayerByID(id))
+        {
+            GetPlayerByID(id).Move(x, y);
+        }
     }
 
     public void SpawnPlayers(GameObject prefab, Transform[] locations)
     {
-        int index = 0;
-        foreach (KeyValuePair<string, GameObject> p in players)
+        for (int i = 0; i < players.Count; i++)
         {
-            string playerName = players[p.Key].GetComponent<ClientPlayer>().PlayerName;
-            Color playerColor = players[p.Key].GetComponent<ClientPlayer>().PlayerColor;
+            string ID = players[i].PlayerID;
+            string playerName = players[i].PlayerName;
+            Color playerColor = players[i].PlayerColor;
 
-            Destroy(players[p.Key]);
-            players[p.Key] = Instantiate(prefab);
-            players[p.Key].GetComponent<ClientPlayer>().PlayerName = playerName;
-            players[p.Key].GetComponent<ClientPlayer>().PlayerColor = playerColor;
+            Destroy(players[i].gameObject);
+            players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
+            players[i].PlayerID = ID;
+            players[i].PlayerName = playerName;
+            players[i].PlayerColor = playerColor;
 
-            if (locations[index])
+            if (locations[i])
             {
-                players[p.Key].transform.position = locations[index].position;
+                players[i].transform.position = locations[i].position;
             }
-            index++;
         }
     }
 
@@ -139,5 +153,16 @@ public class ClientManager : MonoBehaviour
     public static char GetRandomLetter()
     {
         return (char)UnityEngine.Random.Range(65, 91);
+    }
+
+    private ClientPlayer GetPlayerByID(string id)
+    {
+        foreach (ClientPlayer p in players)
+        {
+            if (p.PlayerID.Equals(id))
+                return p;
+        }
+
+        return null;
     }
 }
