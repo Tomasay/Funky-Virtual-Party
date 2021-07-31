@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,15 +14,17 @@ public class GameManager : MonoBehaviour
     private const int COUNTDOWN_AMOUNT = 5;
     [SerializeField] private TMP_Text countdownText;
 
-    private enum GameState
+    public enum GameState
     {
         Countdown,
         GameLoop,
         PlayerCaptured,
-        TimeEnded
+        TimeEnded,
+        GameOver
     }
 
     private GameState state;
+    public GameState State { get => state; set => state = value; }
 
     void Start()
     {
@@ -36,7 +39,7 @@ public class GameManager : MonoBehaviour
 
         ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
 
-        state = GameState.Countdown;
+        State = GameState.Countdown;
         SetPlayerMovement(false);
         StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
     }
@@ -44,13 +47,14 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        switch (state)
+        switch (State)
         {
             case GameState.Countdown:
                 break;
             case GameState.GameLoop:
                 break;
             case GameState.PlayerCaptured:
+                StartCoroutine("GameOver", 2);
                 break;
             case GameState.TimeEnded:
                 break;
@@ -71,8 +75,19 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
 
-        state = GameState.GameLoop;
+        State = GameState.GameLoop;
         SetPlayerMovement(true);
+    }
+
+    IEnumerator GameOver(int countdown)
+    {
+        state = GameState.GameOver;
+
+        countdownText.enabled = true;
+        countdownText.text = "PLAYER\nCAPTURED";
+        yield return new WaitForSeconds(3);
+
+        SceneManager.LoadScene("MainMenu");
     }
 
     IEnumerator DisableMirroring()

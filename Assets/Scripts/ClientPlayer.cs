@@ -21,7 +21,7 @@ public class ClientPlayer : MonoBehaviour
     public bool CanMove { get => canMove; set => canMove = value; }
 
     // Start is called before the first frame update
-    void Start()
+    protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);
     }
@@ -44,7 +44,12 @@ public class ClientPlayer : MonoBehaviour
         if (canMove)
         {
             movement = new Vector3((x / 100.0f) * speed, 0, (y / 100.0f) * speed);
-            Debug.Log("SPEED: " + movement);
+            //Debug.Log("SPEED: " + movement);
         }
+    }
+
+    protected virtual void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
     }
 }
