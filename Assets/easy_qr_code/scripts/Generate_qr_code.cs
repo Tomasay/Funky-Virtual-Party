@@ -18,8 +18,15 @@ namespace epoching.easy_qr_code
 
         void OnEnable()
         {
-            this.raw_image_qr_code.gameObject.SetActive(false);
-            this.input_field.text = "";
+            if (raw_image_qr_code)
+            {
+                raw_image_qr_code.gameObject.SetActive(false);
+            }
+
+            if (input_field)
+            {
+                input_field.text = "";
+            }
         }
 
         private Color32[] encode_info(string textForEncoding, int width, int height)
@@ -42,7 +49,22 @@ namespace epoching.easy_qr_code
             var color32 = encode_info(text, encoded.width, encoded.height);
             encoded.SetPixels32(color32);
             encoded.Apply();
+            encoded = RemoveColor(Color.white, encoded);
             return encoded;
+        }
+
+        Texture2D RemoveColor(Color c, Texture2D imgs)
+        {
+            Color[] pixels = imgs.GetPixels(0, 0, imgs.width, imgs.height, 0);
+
+            for (int p = 0; p < pixels.Length; p++)
+            {
+                if (pixels[p] == c)
+                    pixels[p] = new Color(0, 0, 0, 0);
+            }
+            imgs.SetPixels(0, 0, imgs.width, imgs.height, pixels, 0);
+            imgs.Apply();
+            return imgs;
         }
 
         //event 
