@@ -22,7 +22,7 @@ public class MainMenu : MonoBehaviour
 
         if(qr != null)
         {
-            qrCode.texture = qr.generate_qr_code(ClientManager.instance.URL);
+            qrCode.texture = qr.generate_qr_code(ClientManager.instance.URL + "/?partyCode=" + ClientManager.instance.Passcode);
         }
     }
 
