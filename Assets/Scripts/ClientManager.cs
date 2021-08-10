@@ -18,11 +18,13 @@ public class ClientManager : MonoBehaviour
 
     SocketManager manager;
     private string unityClientID = "";
-    private const string URI = "https://vrpartygame.herokuapp.com/socket.io/";
+    private const string url = "https://vrpartygame.herokuapp.com/";
+    private const string socketUrl = url + "socket.io/";
 
     private const int PASSCODE_LENGTH = 6;
     private string passcode;
-    public string Passcode { get => passcode;}
+    public string URL { get => url; }
+    public string Passcode { get => passcode; }
 
     // Start is called before the first frame update
     private void Start()
@@ -34,9 +36,9 @@ public class ClientManager : MonoBehaviour
     {
         players = new List<ClientPlayer>();
 
-        Debug.Log("Attempting to connect to socket.io server: " + URI);
+        Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
 
-        manager = new SocketManager(new Uri(URI));
+        manager = new SocketManager(new Uri(socketUrl));
         passcode = GenerateCode();
         Debug.Log("PASSCODE: " + passcode);
         manager.Socket.Emit("unityJoinRoom", passcode);
