@@ -1,22 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Autohand;
 
 public class VRPlayerController : MonoBehaviour
 {
-    private GameObject leftHand, rightHand;
+    [SerializeField] private GameObject leftHand, rightHand;
 
     [SerializeField]
     GameObject forwardDirection;
 
     private Vector3 leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;
-    private float handMovementSpeed = 20;
+    [SerializeField] private float handMovementSpeed = 20;
 
     public GameObject LeftHand { get => leftHand; set => leftHand = value; }
     public GameObject RightHand { get => rightHand; set => rightHand = value; }
 
     private bool handMovement = true;
+
+    [SerializeField] AutoHandPlayer ahp = null;
 
     // Start is called before the first frame update
     void Start()
@@ -34,8 +37,15 @@ public class VRPlayerController : MonoBehaviour
             leftHandPos = LeftHand.transform.localPosition;
             rightHandPos = RightHand.transform.localPosition;
 
+
             if (handDistance < 1 && handDistance > 0)
-                transform.position -= forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime;
+            {
+                if(ahp == null)
+                    transform.position -= forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime;
+
+                else
+                    ahp.AddMove(-(forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime));
+            }
         }
     }
 }
