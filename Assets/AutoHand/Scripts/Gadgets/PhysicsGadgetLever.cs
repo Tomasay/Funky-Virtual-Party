@@ -31,6 +31,8 @@ public class PhysicsGadgetLever : PhysicsGadgetHingeAngleReader{
         if (GetValue() >= -threshold && min && !mid) {
             Mid();
         }
+
+            Debug.Log("VALUE: " + GetValue());
     }
 
 
