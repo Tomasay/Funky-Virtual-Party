@@ -46,6 +46,7 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     IEnumerator ExitWater()
     {
+        //TODO: Trigger water droplets particle effect
         yield return new WaitForSeconds(2);
         speed = startingSpeed;
     }
