@@ -6,6 +6,8 @@ public class ChaseGameClientPlayer : ClientPlayer
 {
     private GameManager gm;
 
+    bool isInWater;
+
     protected override void Start()
     {
         base.Start();
@@ -23,4 +25,28 @@ public class ChaseGameClientPlayer : ClientPlayer
             gm.State = GameManager.GameState.PlayerCaptured;
         }
     }
-}
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag.Equals("Water"))
+        {
+            isInWater = true;
+            speed = 0.5f * startingSpeed;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag.Equals("Water"))
+        {
+            isInWater = false;
+            StartCoroutine("ExitWater");
+        }
+    }
+
+    IEnumerator ExitWater()
+    {
+        yield return new WaitForSeconds(2);
+        speed = startingSpeed;
+    }
+ }

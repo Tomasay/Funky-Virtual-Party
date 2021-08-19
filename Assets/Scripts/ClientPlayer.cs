@@ -8,11 +8,11 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField]
     TMP_Text playerNameText;
 
-    private string playerID, playerName;
-    private Color playerColor = Color.clear;
-    private Vector3 movement;
-    private float speed = 5;
-    private bool canMove = true;
+    protected string playerID, playerName;
+    protected Color playerColor = Color.clear;
+    protected Vector3 movement;
+    protected float startingSpeed = 5, speed;
+    protected bool canMove = true;
 
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
@@ -20,7 +20,6 @@ public class ClientPlayer : MonoBehaviour
 
     public bool CanMove { get => canMove; set => canMove = value; }
 
-    // Start is called before the first frame update
     protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -31,10 +30,10 @@ public class ClientPlayer : MonoBehaviour
         if(playerColor == Color.clear)
             playerColor = Random.ColorHSV();
         PlayerColor = playerColor;
+        speed = startingSpeed;
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    protected virtual void Update()
     {
         transform.Translate(movement * Time.deltaTime);
     }
