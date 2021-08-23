@@ -5,18 +5,20 @@ using TMPro;
 
 public class ClientPlayer : MonoBehaviour
 {
-    [SerializeField]
-    TMP_Text playerNameText;
+    [SerializeField] TMP_Text playerNameText;
+    [SerializeField] SkinnedMeshRenderer smr;
+    [SerializeField] Animator anim;
 
     protected string playerID, playerName;
     protected Color playerColor = Color.clear;
     protected Vector3 movement;
+    protected Quaternion lookRotation;
     protected float startingSpeed = 5, speed;
     protected bool canMove = true;
 
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
-    public Color PlayerColor { get => playerColor; set{ playerColor = value; GetComponent<Renderer>().material.SetColor("_BaseColor", value); } }
+    public Color PlayerColor { get => playerColor; set{ playerColor = value; smr.material.SetColor("_BaseColor", value); } }
 
     public bool CanMove { get => canMove; set => canMove = value; }
 
@@ -36,6 +38,8 @@ public class ClientPlayer : MonoBehaviour
     protected virtual void Update()
     {
         transform.Translate(movement * Time.deltaTime);
+
+        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
     public void Move(int x, int y)
@@ -43,7 +47,14 @@ public class ClientPlayer : MonoBehaviour
         if (canMove)
         {
             movement = new Vector3((x / 100.0f) * speed, 0, (y / 100.0f) * speed);
-            //Debug.Log("SPEED: " + movement);
+
+            //Magnitude of movement for animations
+            float val = Mathf.Abs(new Vector2(x/100.0f, y/100.0f).magnitude);
+            anim.SetFloat("Speed", val);
+
+            //Update rotation
+            Vector3 lookDirection = new Vector3(x, 0, y);
+            lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
         }
     }
 
