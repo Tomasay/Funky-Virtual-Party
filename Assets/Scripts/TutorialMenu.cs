@@ -6,8 +6,8 @@ using TMPro;
 
 public class TutorialMenu : MonoBehaviour
 {
-    [SerializeField] GameObject playerIconPrefab;
-    [SerializeField] GameObject playerIconsParent;
+    [SerializeField] GameObject playerIconPrefab, playerIconsParent;
+    [SerializeField] GameManager manager;
 
     private Dictionary<string, GameObject> playerIcons;
 
@@ -38,5 +38,16 @@ public class TutorialMenu : MonoBehaviour
     private void ReadyUp(ClientPlayer p)
     {
         playerIcons[p.PlayerID].GetComponentInChildren<TMP_Text>().text = "READY";
+        playerIcons[p.PlayerID].GetComponent<Animator>().SetTrigger("Ready");
+        playerIcons.Remove(p.PlayerID);
+
+        //Check if every player is ready
+        if(playerIcons.Count > 0)
+        {
+            return;
+        }
+
+        manager.State = GameManager.GameState.Countdown;
+        this.gameObject.SetActive(false);
     }
 }

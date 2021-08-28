@@ -13,9 +13,11 @@ public class GameManager : MonoBehaviour
 
     private const int COUNTDOWN_AMOUNT = 5;
     [SerializeField] private TMP_Text countdownText;
+    private bool countingDown = false;
 
     public enum GameState
     {
+        Tutorial,
         Countdown,
         GameLoop,
         PlayerCaptured,
@@ -29,10 +31,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
-
-        State = GameState.Countdown;
-        SetPlayerMovement(false);
-        StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
+        State = GameState.Tutorial;
     }
 
     // Update is called once per frame
@@ -40,7 +39,14 @@ public class GameManager : MonoBehaviour
     {
         switch (State)
         {
+            case GameState.Tutorial:
+                SetPlayerMovement(false);
+                break;
             case GameState.Countdown:
+                if (!countingDown)
+                {
+                    StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
+                }
                 break;
             case GameState.GameLoop:
                 break;
@@ -56,6 +62,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
+        countingDown = true;
         for (int i = countdown; i > 0; i--)
         {
             countdownText.text = "" + i;
