@@ -50,6 +50,7 @@ public class ClientManager : MonoBehaviour
         manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
         manager.Socket.On<string, string, string>("connectToUnity", OnClientConnect);
         manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
+        manager.Socket.On<string>("readyUp", OnReadyUp);
 
         DontDestroyOnLoad(gameObject);
     }
@@ -89,7 +90,6 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-
     public event Action<string> onClientDisonnect;
     private void OnClientDisconnect(string id, string ip)
     {
@@ -112,6 +112,15 @@ public class ClientManager : MonoBehaviour
         if (GetPlayerByID(id))
         {
             GetPlayerByID(id).Move(x, y);
+        }
+    }
+
+    public event Action<ClientPlayer> onReadyUp;
+    private void OnReadyUp(string id)
+    {
+        if (onReadyUp != null)
+        {
+            onReadyUp(GetPlayerByID(id));
         }
     }
 
