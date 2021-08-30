@@ -30,6 +30,7 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         if (other.tag.Equals("Water"))
         {
+            Debug.Log("COLLIDING WITH WATER");
             isInWater = true;
             speed = 0.5f * startingSpeed;
         }
