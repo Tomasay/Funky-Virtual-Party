@@ -8,6 +8,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] TMP_Text playerNameText;
     [SerializeField] SkinnedMeshRenderer smr;
     [SerializeField] Animator anim;
+    [SerializeField] GameObject spineBone; //Used to change height of player
 
     protected string playerID, playerName;
     protected Color playerColor = Color.clear;
@@ -29,8 +30,8 @@ public class ClientPlayer : MonoBehaviour
 
     private void Awake()
     {
-        if(playerColor == Color.clear)
-            playerColor = Random.ColorHSV();
+        Customize();
+
         PlayerColor = playerColor;
         speed = startingSpeed;
     }
@@ -40,6 +41,31 @@ public class ClientPlayer : MonoBehaviour
         transform.Translate(movement * Time.deltaTime);
 
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+    }
+
+    protected void Customize()
+    {
+        //Color
+        if (playerColor == Color.clear)
+        {
+            playerColor = Random.ColorHSV();
+        }
+
+        //Head shapes
+        int headShapeIndex = Random.Range(-1, smr.sharedMesh.blendShapeCount);
+        Debug.Log("Head shape index: " + headShapeIndex);
+        if (headShapeIndex > -1) //if -1, keep base head shape
+        {
+            smr.SetBlendShapeWeight(headShapeIndex, 100);
+        }
+
+        //Height
+        if (spineBone)
+        {
+            Vector3 pos = spineBone.transform.localPosition;
+            pos.y += Random.Range(-0.2f, 2.0f);
+            spineBone.transform.localPosition = pos;
+        }
     }
 
     public void Move(int x, int y)
