@@ -64,6 +64,11 @@ public class ClientManager : MonoBehaviour
         }
     }
 
+    void OnApplicationQuit()
+    {
+        manager.Socket.Emit("unityCloseRoom", passcode);
+    }
+
     public event Action<GameObject> onClientConnect;
     private void OnClientConnect(string id, string ip, string name)
     {
