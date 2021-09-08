@@ -12,6 +12,9 @@ public class ClientPlayer : MonoBehaviour
 
     protected string playerID, playerName;
     protected Color playerColor = Color.clear;
+    protected int headType;
+    protected float height; //Between -0.2f anf 2.0f
+
     protected Vector3 movement;
     protected Quaternion lookRotation;
     protected float startingSpeed = 5, speed;
@@ -20,6 +23,8 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; smr.material.SetColor("_BaseColor", value); } }
+    public int PlayerHeadType { get => headType; set{ headType = value; smr.SetBlendShapeWeight(value, 100); } }
+    public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += Random.Range(-0.2f, 2.0f); spineBone.transform.localPosition = pos;} }
 
     public bool CanMove { get => canMove; set => canMove = value; }
 

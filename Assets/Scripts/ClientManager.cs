@@ -25,13 +25,6 @@ public class ClientManager : MonoBehaviour
     private static string passcode;
     public string URL { get => url; }
     public string Passcode { get => passcode; }
-
-    // Start is called before the first frame update
-    private void Start()
-    {
-        
-    }
-
     void Awake()
     {
         //Singleton instantiation
@@ -146,12 +139,16 @@ public class ClientManager : MonoBehaviour
             string ID = players[i].PlayerID;
             string playerName = players[i].PlayerName;
             Color playerColor = players[i].PlayerColor;
+            int playerHeadType = players[i].PlayerHeadType;
+            float playerHeight = players[i].PlayerHeight;
 
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
             players[i].PlayerID = ID;
             players[i].PlayerName = playerName;
             players[i].PlayerColor = playerColor;
+            players[i].PlayerHeadType = playerHeadType;
+            players[i].PlayerHeight = playerHeight;
 
             if (locations[i])
             {
