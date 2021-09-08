@@ -22,35 +22,47 @@ public class ClientManager : MonoBehaviour
     private const string socketUrl = url + "socket.io/";
 
     private const int PASSCODE_LENGTH = 6;
-    private string passcode;
+    private static string passcode;
     public string URL { get => url; }
     public string Passcode { get => passcode; }
 
     // Start is called before the first frame update
     private void Start()
     {
-        instance = this;
+        
     }
 
     void Awake()
     {
-        Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
+        //Singleton instantiation
+        if (!instance)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
 
-        manager = new SocketManager(new Uri(socketUrl));
-        passcode = GenerateCode();
-        Debug.Log("PASSCODE: " + passcode);
-        manager.Socket.Emit("unityJoinRoom", passcode);
-        //manager.Socket.Emit("isUnity");
+        if (passcode == null)
+        {
+            Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
 
-        manager.Socket.Once("connect", () => Debug.Log("connected!"));
+            manager = new SocketManager(new Uri(socketUrl));
+            passcode = GenerateCode();
+            Debug.Log("PASSCODE: " + passcode);
+            manager.Socket.Emit("unityJoinRoom", passcode);
+            //manager.Socket.Emit("isUnity");
 
-        //manager.Socket.On<int>("toUnity", OnInputReceived);
-        manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
-        manager.Socket.On<string, string, string>("connectToUnity", OnClientConnect);
-        manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-        manager.Socket.On<string>("readyUp", OnReadyUp);
+            manager.Socket.Once("connect", () => Debug.Log("connected!"));
 
-        DontDestroyOnLoad(gameObject);
+            manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
+            manager.Socket.On<string, string, string>("connectToUnity", OnClientConnect);
+            manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
+            manager.Socket.On<string>("readyUp", OnReadyUp);
+
+            DontDestroyOnLoad(gameObject);
+        }
     }
 
     private void Update()
