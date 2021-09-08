@@ -80,7 +80,10 @@ public class ClientPlayer : MonoBehaviour
 
             //Update rotation
             Vector3 lookDirection = new Vector3(x, 0, y);
-            lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            if (lookDirection != Vector3.zero)
+            {
+                lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+            }
         }
         else
         {

@@ -12,7 +12,7 @@ public class ClientManager : MonoBehaviour
 
     [SerializeField]
     private GameObject playerPrefab;
-    private List<ClientPlayer> players;
+    private static List<ClientPlayer> players = new List<ClientPlayer>();
 
     public List<ClientPlayer> Players { get => players; }
 
@@ -34,8 +34,6 @@ public class ClientManager : MonoBehaviour
 
     void Awake()
     {
-        players = new List<ClientPlayer>();
-
         Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
 
         manager = new SocketManager(new Uri(socketUrl));

@@ -14,9 +14,13 @@ public class MainMenu : MonoBehaviour
     [SerializeField] Generate_qr_code qr = null;
     [SerializeField] RawImage qrCode;
 
+    [SerializeField] GameObject playerPrefab;
+
     // Start is called before the first frame update
     void Start()
     {
+        ClientManager.instance.SpawnPlayers(playerPrefab, playerPositions);
+
         ClientManager.instance.onClientConnect += SpawnPlayer;
         SetPartyCodeText(ClientManager.instance.Passcode);
 
