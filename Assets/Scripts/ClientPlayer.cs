@@ -9,7 +9,7 @@ public class ClientPlayer : MonoBehaviour
     private static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] TMP_Text playerNameText;
     [SerializeField] SkinnedMeshRenderer smr;
-    [SerializeField] Animator anim;
+    [SerializeField] protected Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player
 
     protected string playerID, playerName;
@@ -68,21 +68,23 @@ public class ClientPlayer : MonoBehaviour
     protected void Customize()
     {
         //Color
-        Mesh mesh = smr.sharedMesh;
-        Vector3[] vertices = mesh.vertices;
-
-        Color[] colors = new Color[vertices.Length];
-        Color newCol = availableColors[Random.Range(0, availableColors.Count)];
-        for (int i = 0; i < vertices.Length; i++)
+        if (playerColor != Color.white)
         {
-            colors[i] = newCol;
-            availableColors.Remove(newCol);
+            Mesh mesh = smr.sharedMesh;
+            Vector3[] vertices = mesh.vertices;
+
+            Color[] colors = new Color[vertices.Length];
+            Color newCol = availableColors[Random.Range(0, availableColors.Count)];
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                colors[i] = newCol;
+                availableColors.Remove(newCol);
+            }
+            mesh.colors = colors;
         }
-        mesh.colors = colors;
 
         //Head shapes
         int headShapeIndex = Random.Range(-1, smr.sharedMesh.blendShapeCount);
-        Debug.Log("Head shape index: " + headShapeIndex);
         if (headShapeIndex > -1) //if -1, keep base head shape
         {
             smr.SetBlendShapeWeight(headShapeIndex, 100);
@@ -119,6 +121,11 @@ public class ClientPlayer : MonoBehaviour
             movement = Vector3.zero;
             anim.SetFloat("Speed", 0);
         }
+    }
+
+    public virtual void Action()
+    {
+
     }
 
     protected virtual void OnCollisionEnter(Collision collision)
