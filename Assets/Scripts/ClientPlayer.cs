@@ -5,13 +5,15 @@ using TMPro;
 
 public class ClientPlayer : MonoBehaviour
 {
+    [SerializeField] Texture2D colorPalette;
+    private static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] TMP_Text playerNameText;
     [SerializeField] SkinnedMeshRenderer smr;
     [SerializeField] Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player
 
     protected string playerID, playerName;
-    protected Color playerColor = Color.clear;
+    protected Color playerColor = Color.white;
     protected int headType;
     protected float height; //Between -0.2f anf 2.0f
 
@@ -35,6 +37,21 @@ public class ClientPlayer : MonoBehaviour
 
     private void Awake()
     {
+        //Instantiate list of available colors from palette
+        if(availableColors == null)
+        {
+            availableColors = new List<Color>();
+            for (int i = 0; i < colorPalette.width; i++)
+            {
+                availableColors.Add(colorPalette.GetPixel(i, 0));
+            }
+        }
+
+        //smr only uses shared mesh. Have to instantiate individual mesh so they can have unique vertex colors
+        Mesh m = smr.sharedMesh;
+        Mesh m2 = Instantiate(m);
+        smr.sharedMesh = m2;
+
         Customize();
 
         PlayerColor = playerColor;
@@ -51,10 +68,17 @@ public class ClientPlayer : MonoBehaviour
     protected void Customize()
     {
         //Color
-        if (playerColor == Color.clear)
+        Mesh mesh = smr.sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+
+        Color[] colors = new Color[vertices.Length];
+        Color newCol = availableColors[Random.Range(0, availableColors.Count)];
+        for (int i = 0; i < vertices.Length; i++)
         {
-            playerColor = Random.ColorHSV();
+            colors[i] = newCol;
+            availableColors.Remove(newCol);
         }
+        mesh.colors = colors;
 
         //Head shapes
         int headShapeIndex = Random.Range(-1, smr.sharedMesh.blendShapeCount);
