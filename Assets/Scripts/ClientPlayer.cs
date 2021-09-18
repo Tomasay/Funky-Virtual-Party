@@ -24,7 +24,7 @@ public class ClientPlayer : MonoBehaviour
 
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
-    public Color PlayerColor { get => playerColor; set{ playerColor = value; smr.material.SetColor("_BaseColor", value); } }
+    public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; smr.SetBlendShapeWeight(value, 100); } }
     public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += Random.Range(-0.2f, 2.0f); spineBone.transform.localPosition = pos;} }
 
@@ -68,19 +68,10 @@ public class ClientPlayer : MonoBehaviour
     protected void Customize()
     {
         //Color
-        if (playerColor != Color.white)
+        if (playerColor == Color.white)
         {
-            Mesh mesh = smr.sharedMesh;
-            Vector3[] vertices = mesh.vertices;
-
-            Color[] colors = new Color[vertices.Length];
             Color newCol = availableColors[Random.Range(0, availableColors.Count)];
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                colors[i] = newCol;
-                availableColors.Remove(newCol);
-            }
-            mesh.colors = colors;
+            ChangeColor(newCol);
         }
 
         //Head shapes
@@ -97,6 +88,20 @@ public class ClientPlayer : MonoBehaviour
             pos.y += Random.Range(-0.2f, 2.0f);
             spineBone.transform.localPosition = pos;
         }
+    }
+
+    private void ChangeColor(Color col)
+    {
+        Mesh mesh = smr.sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+
+        Color[] colors = new Color[vertices.Length];
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            colors[i] = col;
+            availableColors.Remove(col);
+        }
+        mesh.colors = colors;
     }
 
     public void Move(int x, int y)
