@@ -11,9 +11,10 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Transform[] playerSpawns;
 
-    private const int COUNTDOWN_AMOUNT = 5;
-    [SerializeField] private TMP_Text countdownText;
+    private const int COUNTDOWN_AMOUNT = 5, GAME_TIME_AMOUNT = 180;
+    [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
+    private float timeRemaining;
 
     public enum GameState
     {
@@ -32,6 +33,8 @@ public class GameManager : MonoBehaviour
     {
         ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
         State = GameState.Tutorial;
+        timeRemaining = GAME_TIME_AMOUNT;
+        gameTimeText.text = FormatTime(timeRemaining);
     }
 
     // Update is called once per frame
@@ -49,11 +52,18 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             case GameState.GameLoop:
+                timeRemaining -= Time.deltaTime;
+                gameTimeText.text = FormatTime(timeRemaining);
+                if(timeRemaining <= 0)
+                {
+                    State = GameState.TimeEnded;
+                }
                 break;
             case GameState.PlayerCaptured:
-                StartCoroutine("GameOver", 2);
+                StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
                 break;
             case GameState.TimeEnded:
+                StartCoroutine(GameOver(2, "TIMES UP!"));
                 break;
             default:
                 break;
@@ -77,12 +87,12 @@ public class GameManager : MonoBehaviour
         SetPlayerMovement(true);
     }
 
-    IEnumerator GameOver(int countdown)
+    IEnumerator GameOver(int countdown, string txt)
     {
         state = GameState.GameOver;
 
         countdownText.enabled = true;
-        countdownText.text = "PLAYER\nCAPTURED";
+        countdownText.text = txt;
         yield return new WaitForSeconds(3);
 
         SceneManager.LoadScene("MainMenu");
@@ -101,5 +111,12 @@ public class GameManager : MonoBehaviour
         {
             p.CanMove = canPlayerMove;
         }
+    }
+
+    public string FormatTime(float time)
+    {
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes*60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }
