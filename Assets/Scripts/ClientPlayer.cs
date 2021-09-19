@@ -85,7 +85,7 @@ public class ClientPlayer : MonoBehaviour
         if (spineBone)
         {
             Vector3 pos = spineBone.transform.localPosition;
-            pos.y += Random.Range(-0.2f, 2.0f);
+            pos.y += Random.Range(-0.2f, 0.75f);
             spineBone.transform.localPosition = pos;
         }
     }
@@ -135,6 +135,6 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
+        //Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
     }
 }
