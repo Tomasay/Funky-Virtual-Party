@@ -50,8 +50,6 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     public override void Action()
     {
-        base.Action();
-
         anim.SetTrigger("Tackle");
         canMove = false;
         StartCoroutine("TackleEnd", 2);

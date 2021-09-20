@@ -129,9 +129,11 @@ public class ClientPlayer : MonoBehaviour
         }
     }
 
+    //Default action, dance of course
     public virtual void Action()
     {
-
+        int dance = Random.Range(1, 3);
+        anim.SetTrigger("Dance" + dance);
     }
 
     protected virtual void OnCollisionEnter(Collision collision)
