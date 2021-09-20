@@ -99,9 +99,10 @@ public class ClientPlayer : MonoBehaviour
         for (int i = 0; i < vertices.Length; i++)
         {
             colors[i] = col;
-            availableColors.Remove(col);
         }
+        availableColors.Remove(col);
         mesh.colors = colors;
+        playerColor = col;
     }
 
     public void Move(int x, int y)
