@@ -15,6 +15,8 @@ public class TutorialMenu : MonoBehaviour
 
     void Start()
     {
+        GetComponent<Canvas>().enabled = true;
+
         playerIcons = new Dictionary<string, GameObject>();
         cm = ClientManager.instance;
         SpawnPlayerIcons();

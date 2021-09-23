@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Transform[] playerSpawns;
 
-    private const int COUNTDOWN_AMOUNT = 5, GAME_TIME_AMOUNT = 180;
+    private const int COUNTDOWN_AMOUNT = 5, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
