@@ -7,7 +7,7 @@ public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] Texture2D colorPalette;
     private static List<Color> availableColors; //Colors not used from the available palette
-    [SerializeField] TMP_Text playerNameText;
+    [SerializeField] TMP_Text playerNameText, playerNameTextBack;
     [SerializeField] SkinnedMeshRenderer smr;
     [SerializeField] protected Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player
@@ -23,7 +23,7 @@ public class ClientPlayer : MonoBehaviour
     protected bool canMove = true;
 
     public string PlayerID { get => playerID; set => playerID = value; }
-    public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
+    public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; smr.SetBlendShapeWeight(value, 100); } }
     public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += Random.Range(-0.2f, 2.0f); spineBone.transform.localPosition = pos;} }
