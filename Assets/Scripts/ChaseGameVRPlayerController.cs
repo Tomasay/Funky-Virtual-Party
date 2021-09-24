@@ -5,7 +5,7 @@ using Autohand;
 
 public class ChaseGameVRPlayerController : VRPlayerController
 {
-    private Vector3 leftHandPos, rightHandPos; //Used to store previous frame hand positions
+    private Vector3 movement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;
     [SerializeField] private float handMovementSpeed = 20;
 
@@ -20,14 +20,10 @@ public class ChaseGameVRPlayerController : VRPlayerController
             leftHandPos = ahp.handLeft.transform.localPosition;
             rightHandPos = ahp.handRight.transform.localPosition;
 
-
             if (handDistance < 1 && handDistance > 0)
             {
-                if (ahp == null)
-                    transform.position -= forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime;
-
-                else
-                    ahp.AddMove(-(forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime));
+                movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime), 5 * Time.deltaTime);
+                ahp.AddMove(movement);
             }
         }
     }
