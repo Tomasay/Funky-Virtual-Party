@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 2bd8959f5fbd3644aa33af1a155fc147, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -2091,14 +2091,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 949211873}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adba2da96c0f0a64e862299ad1483815, type: 3}
+  m_Script: {fileID: 11500000, guid: d9cb056324afa3f4392cfd0e8207ce42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftHand: {fileID: 2145230012}
-  rightHand: {fileID: 1756185737}
   forwardDirection: {fileID: 1368638409}
-  handMovementSpeed: 75
   ahp: {fileID: 1894628339}
+  handMovementSpeed: 100
 --- !u!1001 &952057933
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2807,6 +2805,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 6707951067419483808, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: moveSpeed
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_RootOrder
       value: 11
@@ -2923,11 +2925,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3169798642402021585, guid: bd835e44f502bf540b6cc7ea7a7a7c00, type: 3}
   m_PrefabInstance: {fileID: 1671420093}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1756185737 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1639125108242449863, guid: a5226a72c9553294abfe172a458b5805, type: 3}
-  m_PrefabInstance: {fileID: 1632617371}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1775579319 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100008, guid: ce816f2e6abb0504092c23ed9b970dfd, type: 3}
@@ -2945,10 +2942,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adba2da96c0f0a64e862299ad1483815, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftHand: {fileID: 0}
-  rightHand: {fileID: 0}
   forwardDirection: {fileID: 839741831}
-  handMovementSpeed: 20
   ahp: {fileID: 0}
 --- !u!1 &1792326234
 GameObject:
@@ -3374,8 +3368,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 3.9415236, y: 1, z: 14.79615}
   m_Center: {x: -0.64216185, y: 0, z: -0.062145233}
---- !u!1 &2145230012 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1639125106728771988, guid: a5226a72c9553294abfe172a458b5805, type: 3}
-  m_PrefabInstance: {fileID: 1632617371}
-  m_PrefabAsset: {fileID: 0}

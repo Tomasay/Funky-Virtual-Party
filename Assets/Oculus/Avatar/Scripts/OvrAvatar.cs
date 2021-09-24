@@ -383,8 +383,6 @@ public class OvrAvatar : MonoBehaviour
             CAPI.ovrAvatarComponent_Get(leftHandComponnet.renderComponent, FetchName, ref dummyComponent);
             AddAvatarComponent(ref HandLeft, dummyComponent);
             HandLeft.isLeftHand = true;
-
-            player.LeftHand = HandLeft.gameObject;
         }
 
         if (CAPI.ovrAvatarPose_GetRightHandComponent(sdkAvatar, ref rightHandComponnet))
@@ -392,8 +390,6 @@ public class OvrAvatar : MonoBehaviour
             CAPI.ovrAvatarComponent_Get(rightHandComponnet.renderComponent, FetchName, ref dummyComponent);
             AddAvatarComponent(ref HandRight, dummyComponent);
             HandRight.isLeftHand = false;
-
-            player.RightHand = HandRight.gameObject;
         }
 
         if (CAPI.ovrAvatarPose_GetBodyComponent(sdkAvatar, ref bodyComponent))
