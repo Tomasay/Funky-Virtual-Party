@@ -8,6 +8,7 @@ public class TutorialMenu : MonoBehaviour
 {
     [SerializeField] GameObject playerIconPrefab, playerIconsParent;
     [SerializeField] GameManager manager;
+    [SerializeField] Button VrPlayerReady;
 
     private Dictionary<string, GameObject> playerIcons;
 
@@ -20,8 +21,16 @@ public class TutorialMenu : MonoBehaviour
         playerIcons = new Dictionary<string, GameObject>();
         cm = ClientManager.instance;
         SpawnPlayerIcons();
+        if (VrPlayerReady != null)
+        {
+            SpawnVRPlayerIcon();
+        }
 
         cm.onReadyUp += ReadyUp;
+        if(VrPlayerReady != null )
+        {
+            VrPlayerReady.onClick.AddListener(ReadyUpVR);
+        }
     }
 
     private void SpawnPlayerIcons()
@@ -45,6 +54,31 @@ public class TutorialMenu : MonoBehaviour
 
         //Check if every player is ready
         if(playerIcons.Count > 0)
+        {
+            return;
+        }
+
+        manager.State = GameManager.GameState.Countdown;
+        this.gameObject.SetActive(false);
+    }
+    private void SpawnVRPlayerIcon()
+    {
+        GameObject newPlayerIcon = Instantiate(playerIconPrefab, playerIconsParent.transform);
+        TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+        txt.color = new Color(255, 255, 255);
+        txt.text = "VR Master";
+
+        playerIcons.Add("VR", newPlayerIcon);
+    }
+
+    public void ReadyUpVR()
+    {
+        playerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
+        playerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
+        playerIcons.Remove("VR");
+
+        //Check if every player is ready
+        if (playerIcons.Count > 0)
         {
             return;
         }
