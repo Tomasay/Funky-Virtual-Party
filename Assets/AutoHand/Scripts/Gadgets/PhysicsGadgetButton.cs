@@ -17,6 +17,8 @@ namespace Autohand{
         Vector3 pressedPos;
         float pressedValue;
 
+        bool isTouchingHandLeft;
+
         new protected void Start(){
             base.Start();
             startPos = transform.localPosition;
@@ -38,12 +40,23 @@ namespace Autohand{
                 transform.localPosition = pressedPos;
         }
 
+        protected void OnCollisionEnter(Collision collision)
+        {
+            Hand h;
+            if(collision.gameObject.TryGetComponent<Hand>(out h))
+            {
+                isTouchingHandLeft = h.left;
+            }
+        }
+
 
         public void Pressed() {
             pressed = true;
             pressedValue = GetValue();
             pressedPos = transform.localPosition;
             OnPressed?.Invoke();
+
+            HapticsManager.instance.TriggerHaptic(isTouchingHandLeft);
         }
 
         public void Unpressed(){
