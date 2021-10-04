@@ -6,6 +6,12 @@ using UnityEngine.SceneManagement;
 public class SceneChanger : MonoBehaviour
 {
     [SerializeField] ClientManager cm;
+
+    private void Start()
+    {
+        cm = GameObject.Find("ClientManager").GetComponent<ClientManager>();
+    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))

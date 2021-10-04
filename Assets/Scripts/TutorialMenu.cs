@@ -29,7 +29,9 @@ public class TutorialMenu : MonoBehaviour
             SpawnVRPlayerIcon();
         }
 
-        cm.onReadyUp += ReadyUp;
+            cm.onReadyUp += ReadyUp;
+        
+
         if(VrPlayerReady != null )
         {
             VrPlayerReady.onClick.AddListener(ReadyUpVR);
@@ -75,6 +77,7 @@ public class TutorialMenu : MonoBehaviour
             return;
         }
 
+        cm.onReadyUp -= ReadyUp;
         manager.State = GameManager.GameState.Countdown;
         this.gameObject.SetActive(false);
     }
@@ -111,6 +114,7 @@ public class TutorialMenu : MonoBehaviour
             return;
         }
 
+        cm.onReadyUp -= ReadyUp;
         manager.State = GameManager.GameState.Countdown;
         this.gameObject.SetActive(false);
     }
