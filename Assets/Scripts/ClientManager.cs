@@ -73,6 +73,11 @@ public class ClientManager : MonoBehaviour
         manager.Socket.Emit("unityCloseRoom", passcode);
     }
 
+    public void OnMinigameStart(string game)
+    {
+        manager.Socket.Emit("minigameStarted", game);
+    }
+
     public event Action<GameObject> onClientConnect;
     private void OnClientConnect(string id, string ip, string name)
     {

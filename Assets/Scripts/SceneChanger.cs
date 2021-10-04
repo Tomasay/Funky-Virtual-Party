@@ -5,17 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class SceneChanger : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
+    [SerializeField] ClientManager cm;
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            cm.OnMinigameStart("ChaseGame");
             SceneManager.LoadScene("ChaseGame");
         }
     }
