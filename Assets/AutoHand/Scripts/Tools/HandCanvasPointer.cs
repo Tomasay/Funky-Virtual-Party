@@ -49,7 +49,10 @@ public class HandCanvasPointer : MonoBehaviour
             cam.fieldOfView = 0.00001f;
 
             foreach (var canvas in FindObjectsOfType<Canvas>()){
-                canvas.worldCamera = cam;
+                if (canvas.tag != "Client")
+                {
+                    canvas.worldCamera = cam;
+                }
             }
         }
 

@@ -6,19 +6,22 @@ using TMPro;
 
 public class TutorialMenu : MonoBehaviour
 {
-    [SerializeField] GameObject playerIconPrefab, playerIconsParent;
+    [SerializeField] Canvas clientCanvas, vrCanvas;
+
+    [SerializeField] GameObject playerIconPrefab, clientPlayerIconsParent, VRPlayerIconsParent;
     [SerializeField] GameManager manager;
     [SerializeField] Button VrPlayerReady;
 
-    private Dictionary<string, GameObject> playerIcons;
+    private Dictionary<string, GameObject> clientPlayerIcons, vrPlayerIcons;
 
     private ClientManager cm;
 
     void Start()
     {
-        GetComponent<Canvas>().enabled = true;
+        clientCanvas.enabled = true;
 
-        playerIcons = new Dictionary<string, GameObject>();
+        clientPlayerIcons = new Dictionary<string, GameObject>();
+        vrPlayerIcons = new Dictionary<string, GameObject>();
         cm = ClientManager.instance;
         SpawnPlayerIcons();
         if (VrPlayerReady != null)
@@ -37,23 +40,37 @@ public class TutorialMenu : MonoBehaviour
     {
         for (int i = 0; i < cm.Players.Count; i++)
         {
-            GameObject newPlayerIcon = Instantiate(playerIconPrefab, playerIconsParent.transform);
+            GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
             TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
             txt.color = cm.Players[i].PlayerColor;
             txt.text = cm.Players[i].PlayerName;
 
-            playerIcons.Add(cm.Players[i].PlayerID, newPlayerIcon);
+            clientPlayerIcons.Add(cm.Players[i].PlayerID, newPlayerIcon);
+        }
+
+        for (int i = 0; i < cm.Players.Count; i++)
+        {
+            GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
+            TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+            txt.color = cm.Players[i].PlayerColor;
+            txt.text = cm.Players[i].PlayerName;
+
+            vrPlayerIcons.Add(cm.Players[i].PlayerID, newPlayerIcon);
         }
     }
 
     private void ReadyUp(ClientPlayer p)
     {
-        playerIcons[p.PlayerID].GetComponentInChildren<TMP_Text>().text = "READY";
-        playerIcons[p.PlayerID].GetComponent<Animator>().SetTrigger("Ready");
-        playerIcons.Remove(p.PlayerID);
+        clientPlayerIcons[p.PlayerID].GetComponentInChildren<TMP_Text>().text = "READY";
+        clientPlayerIcons[p.PlayerID].GetComponent<Animator>().SetTrigger("Ready");
+        clientPlayerIcons.Remove(p.PlayerID);
+
+        vrPlayerIcons[p.PlayerID].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons[p.PlayerID].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove(p.PlayerID);
 
         //Check if every player is ready
-        if(playerIcons.Count > 0)
+        if (clientPlayerIcons.Count > 0)
         {
             return;
         }
@@ -63,22 +80,33 @@ public class TutorialMenu : MonoBehaviour
     }
     private void SpawnVRPlayerIcon()
     {
-        GameObject newPlayerIcon = Instantiate(playerIconPrefab, playerIconsParent.transform);
+        GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
         TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
         txt.color = new Color(255, 255, 255);
         txt.text = "VR Master";
 
-        playerIcons.Add("VR", newPlayerIcon);
+        clientPlayerIcons.Add("VR", newPlayerIcon);
+
+        newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
+        txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+        txt.color = new Color(255, 255, 255);
+        txt.text = "VR Master";
+
+        vrPlayerIcons.Add("VR", newPlayerIcon);
     }
 
     public void ReadyUpVR()
     {
-        playerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
-        playerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
-        playerIcons.Remove("VR");
+        clientPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
+        clientPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
+        clientPlayerIcons.Remove("VR");
+
+        vrPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove("VR");
 
         //Check if every player is ready
-        if (playerIcons.Count > 0)
+        if (clientPlayerIcons.Count > 0)
         {
             return;
         }
