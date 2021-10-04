@@ -75,7 +75,7 @@ public class ClientManager : MonoBehaviour
 
     public void OnMinigameStart(string game)
     {
-        manager.Socket.Emit("minigameStarted", game);
+        manager.Socket.Emit("minigameStarted", passcode, game);
     }
 
     public event Action<GameObject> onClientConnect;
