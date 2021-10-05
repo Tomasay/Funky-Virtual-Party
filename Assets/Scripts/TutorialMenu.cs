@@ -23,13 +23,13 @@ public class TutorialMenu : MonoBehaviour
         clientPlayerIcons = new Dictionary<string, GameObject>();
         vrPlayerIcons = new Dictionary<string, GameObject>();
         cm = ClientManager.instance;
-        SpawnPlayerIcons();
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();
         }
+        SpawnPlayerIcons();
 
-            cm.onReadyUp += ReadyUp;
+        cm.onReadyUp += ReadyUp;
         
 
         if(VrPlayerReady != null )
@@ -86,14 +86,16 @@ public class TutorialMenu : MonoBehaviour
         GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
         TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
         txt.color = new Color(255, 255, 255);
-        txt.text = "VR Master";
+        txt.text = "";
+        newPlayerIcon.GetComponentsInChildren<Image>(true)[1].gameObject.SetActive(true);
 
         clientPlayerIcons.Add("VR", newPlayerIcon);
 
         newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
         txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
         txt.color = new Color(255, 255, 255);
-        txt.text = "VR Master";
+        txt.text = "";
+        newPlayerIcon.GetComponentsInChildren<Image>(true)[1].gameObject.SetActive(true);
 
         vrPlayerIcons.Add("VR", newPlayerIcon);
     }
