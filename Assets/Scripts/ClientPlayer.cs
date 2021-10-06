@@ -14,8 +14,8 @@ public class ClientPlayer : MonoBehaviour
 
     protected string playerID, playerName;
     protected Color playerColor = Color.white;
-    protected int headType;
-    protected float height; //Between -0.2f anf 2.0f
+    protected int headType = -99;
+    protected float height = -99; //Between -0.2f anf 2.0f
 
     protected Vector3 movement;
     protected Quaternion lookRotation;
@@ -26,7 +26,7 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; smr.SetBlendShapeWeight(value, 100); } }
-    public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += Random.Range(-0.2f, 2.0f); spineBone.transform.localPosition = pos;} }
+    public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += height; spineBone.transform.localPosition = pos;} }
 
     public bool CanMove { get => canMove; set => canMove = value; }
 
@@ -75,17 +75,21 @@ public class ClientPlayer : MonoBehaviour
         }
 
         //Head shapes
-        int headShapeIndex = Random.Range(-1, smr.sharedMesh.blendShapeCount);
-        if (headShapeIndex > -1) //if -1, keep base head shape
+        if (headType == -99)
         {
-            smr.SetBlendShapeWeight(headShapeIndex, 100);
+            headType = Random.Range(-1, smr.sharedMesh.blendShapeCount);
+            if (headType > -1) //if -1, keep base head shape
+            {
+                smr.SetBlendShapeWeight(headType, 100);
+            }
         }
 
         //Height
-        if (spineBone)
+        if (spineBone && height == -99)
         {
             Vector3 pos = spineBone.transform.localPosition;
-            pos.y += Random.Range(-0.2f, 0.75f);
+            height = Random.Range(-0.2f, 0.75f);
+            pos.y += height;
             spineBone.transform.localPosition = pos;
         }
     }
