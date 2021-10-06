@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class ChaseGameClientPlayer : ClientPlayer
 {
-    [SerializeField] private int tackleForce;
+    [SerializeField] private int tackleForce, tackleCooldown = 2;
 
     private GameManager gm;
     private bool tackling;
+    private float timeTackled = 0;
 
     bool isInWater;
 
@@ -50,10 +51,14 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     public override void Action()
     {
-        anim.SetTrigger("Tackle");
-        canMove = false;
-        StartCoroutine("TackleEnd", 2);
-        GetComponent<Rigidbody>().AddForce(anim.transform.forward * tackleForce);
+        if (timeTackled == 0 || (Time.time - timeTackled) > tackleCooldown)
+        {
+            timeTackled = Time.time;
+            anim.SetTrigger("Tackle");
+            canMove = false;
+            StartCoroutine("TackleEnd", 2);
+            GetComponent<Rigidbody>().AddForce(anim.transform.forward * tackleForce);
+        }
     }
 
     IEnumerator TackleEnd(int delay)
