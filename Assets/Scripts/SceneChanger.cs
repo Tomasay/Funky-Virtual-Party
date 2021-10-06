@@ -12,12 +12,9 @@ public class SceneChanger : MonoBehaviour
         cm = GameObject.Find("ClientManager").GetComponent<ClientManager>();
     }
 
-    void Update()
+    public void StartChaseGame()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            cm.OnMinigameStart("ChaseGame");
-            SceneManager.LoadScene("ChaseGame");
-        }
+        cm.OnMinigameStart("ChaseGame");
+        SceneManager.LoadScene("ChaseGame");
     }
 }
