@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 177922407457187359}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_LocalScale: {x: 0.71988004, y: 0.71988004, z: 0.71988004}
   m_Children: []
   m_Father: {fileID: 806096758572260091}
   m_RootOrder: 1
@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -427,7 +427,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: -DASH
+  m_text: -TACKLE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b4ac9673f1cdfad44a7c33366167cf57, type: 2}
   m_sharedMaterial: {fileID: 8470341567610444652, guid: b4ac9673f1cdfad44a7c33366167cf57, type: 2}
@@ -741,8 +741,13 @@ PrefabInstance:
       propertyPath: m_text
       value: 'Capture the VR User!
 
-        Use the dash ability to lunge forward
-        and tackle'
+        -Use the tackle ability to lunge forward
+
+        -Running
+        in water will slow you down
+
+        -vr user can dynamically change the
+        map'
       objectReference: {fileID: 0}
     - target: {fileID: 6236867551839329191, guid: 255d5e66a5df9244f915149e0690ec46, type: 3}
       propertyPath: m_Name

@@ -51,6 +51,8 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     public override void Action()
     {
+        if (!canMove) return;
+
         if (timeTackled == 0 || (Time.time - timeTackled) > tackleCooldown)
         {
             timeTackled = Time.time;
