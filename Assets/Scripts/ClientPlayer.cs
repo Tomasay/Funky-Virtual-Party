@@ -14,8 +14,8 @@ public class ClientPlayer : MonoBehaviour
 
     protected string playerID, playerName;
     protected Color playerColor = Color.white;
-    protected int headType = -99;
-    protected float height = -99; //Between -0.2f anf 2.0f
+    protected int headType;
+    protected float height; //Between -0.2f anf 2.0f
 
     protected Vector3 movement;
     protected Quaternion lookRotation;
@@ -25,7 +25,7 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
-    public int PlayerHeadType { get => headType; set{ headType = value; smr.SetBlendShapeWeight(value, 100); } }
+    public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
     public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += height; spineBone.transform.localPosition = pos;} }
 
     public bool CanMove { get => canMove; set => canMove = value; }
@@ -52,9 +52,6 @@ public class ClientPlayer : MonoBehaviour
         Mesh m2 = Instantiate(m);
         smr.sharedMesh = m2;
 
-        Customize();
-
-        PlayerColor = playerColor;
         speed = startingSpeed;
     }
     
@@ -65,7 +62,7 @@ public class ClientPlayer : MonoBehaviour
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
-    protected void Customize()
+    public void InitialCustomize()
     {
         //Color
         if (playerColor == Color.white)
@@ -75,23 +72,17 @@ public class ClientPlayer : MonoBehaviour
         }
 
         //Head shapes
-        if (headType == -99)
+        headType = Random.Range(-1, smr.sharedMesh.blendShapeCount);
+        if (headType > -1) //if -1, keep base head shape
         {
-            headType = Random.Range(-1, smr.sharedMesh.blendShapeCount);
-            if (headType > -1) //if -1, keep base head shape
-            {
-                smr.SetBlendShapeWeight(headType, 100);
-            }
+            smr.SetBlendShapeWeight(headType, 100);
         }
 
         //Height
-        if (spineBone && height == -99)
-        {
-            Vector3 pos = spineBone.transform.localPosition;
-            height = Random.Range(-0.2f, 0.75f);
-            pos.y += height;
-            spineBone.transform.localPosition = pos;
-        }
+        Vector3 pos = spineBone.transform.localPosition;
+        height = Random.Range(-0.2f, 0.75f);
+        pos.y += height;
+        spineBone.transform.localPosition = pos;
     }
 
     private void ChangeColor(Color col)

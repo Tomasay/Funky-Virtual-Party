@@ -43,6 +43,7 @@ public class MainMenu : MonoBehaviour
         {
             if(t.childCount == 0)
             {
+                player.GetComponent<ClientPlayer>().InitialCustomize();
                 player.transform.position = t.position;
                 break;
             }
