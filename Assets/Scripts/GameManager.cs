@@ -11,10 +11,14 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] Transform[] playerSpawns;
 
+    [SerializeField] GameObject VRPlayer;
+
     private const int COUNTDOWN_AMOUNT = 5, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
+
+    public Vector3 VRPlayerPos { get => VRPlayer.transform.position; }
 
     public enum GameState
     {
