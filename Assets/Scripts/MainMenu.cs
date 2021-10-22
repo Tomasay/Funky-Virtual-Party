@@ -49,6 +49,13 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+        ClientManager.instance.onClientConnect -= SpawnPlayer;
+        ClientManager.instance.onClientConnect -= SpawnPlayerIcon;
+        ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
+    }
+
     private void SpawnPlayer(GameObject player)
     {
         foreach (Transform t in playerPositions)
