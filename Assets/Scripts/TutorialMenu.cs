@@ -87,7 +87,7 @@ public class TutorialMenu : MonoBehaviour
         TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
         txt.color = new Color(255, 255, 255);
         txt.text = "";
-        newPlayerIcon.GetComponentsInChildren<Image>(true)[1].gameObject.SetActive(true);
+        newPlayerIcon.GetComponentsInChildren<Image>(true)[2].gameObject.SetActive(true);
 
         clientPlayerIcons.Add("VR", newPlayerIcon);
 
@@ -95,7 +95,7 @@ public class TutorialMenu : MonoBehaviour
         txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
         txt.color = new Color(255, 255, 255);
         txt.text = "";
-        newPlayerIcon.GetComponentsInChildren<Image>(true)[1].gameObject.SetActive(true);
+        newPlayerIcon.GetComponentsInChildren<Image>(true)[2].gameObject.SetActive(true);
 
         vrPlayerIcons.Add("VR", newPlayerIcon);
     }
