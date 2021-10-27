@@ -35,7 +35,7 @@ public class ClientPlayer : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         //Instantiate list of available colors from palette
         if(availableColors == null)

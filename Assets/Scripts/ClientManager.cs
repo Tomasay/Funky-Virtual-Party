@@ -146,7 +146,7 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    public void SpawnPlayers(GameObject prefab, Transform[] locations)
+    public void SpawnPlayers(GameObject prefab, Transform[] locations, bool parentToLocation = false)
     {
         for (int i = 0; i < players.Count; i++)
         {
@@ -166,7 +166,17 @@ public class ClientManager : MonoBehaviour
 
             if (locations[i])
             {
-                players[i].transform.position = locations[i].position;
+                if (parentToLocation)
+                {
+                    players[i].transform.SetParent(locations[i]);
+                    players[i].transform.localRotation = Quaternion.identity;
+                    players[i].transform.localScale = Vector3.one;
+                    players[i].transform.localPosition = Vector3.zero;
+                }
+                else
+                {
+                    players[i].transform.position = locations[i].position;
+                }
             }
         }
     }

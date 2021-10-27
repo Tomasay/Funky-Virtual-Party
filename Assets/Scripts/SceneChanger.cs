@@ -14,10 +14,16 @@ public class SceneChanger : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.C))
         {
             cm.OnMinigameStart("ChaseGame");
             SceneManager.LoadScene("ChaseGame");
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            cm.OnMinigameStart("MazeGame");
+            SceneManager.LoadScene("MazeGame");
         }
     }
 
