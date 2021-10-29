@@ -45,17 +45,22 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         Debug.Log("Z: " + hitPointTerZ);
         //Now you can use this point to edit it using SetHeights
         float[,] heights = ter.terrainData.GetHeights(0,0,ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
-        heights[hitPointTerX, hitPointTerZ] = 0;
+        int radius = 20;
 
-        heights[hitPointTerX, hitPointTerZ - 1] = 0;
-        heights[hitPointTerX, hitPointTerZ + 1] = 0;
 
-        heights[hitPointTerX - 1, hitPointTerZ - 1] = 0;
-        heights[hitPointTerX + 1, hitPointTerZ - 1] = 0;
-        heights[hitPointTerX - 1, hitPointTerZ] = 0;
-        heights[hitPointTerX + 1, hitPointTerZ + 1] = 0;
-        heights[hitPointTerX - 1, hitPointTerZ + 1] = 0;
-        heights[hitPointTerX + 1, hitPointTerZ] = 0;
+        for(int z = hitPointTerZ - radius; z < hitPointTerZ + radius; z++)
+            for(int x = hitPointTerX - radius; x < hitPointTerX + radius; x++)
+            {
+                int rSquare = (radius * radius);
+                float sqMag = (new Vector2(hitPointTerX, hitPointTerZ) - new Vector2(x, z)).sqrMagnitude;
+                if ( sqMag < rSquare )
+                {
+                    float portion = (sqMag / rSquare);
+                    //float portion = sqMag / rSquare;
+                    heights[z, x] = 0;
+                }
+            }
+
 
 
         ter.terrainData.SetHeights(0, 0, heights);
