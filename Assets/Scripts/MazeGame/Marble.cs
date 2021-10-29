@@ -7,22 +7,35 @@ public class Marble : MonoBehaviour
     [SerializeField] GameObject handheldMaze;
     Rigidbody RB, mazeRB;
 
+    private float threshold = 0.0015f, startingMazeHeight;
+    private Vector3 previousValidPoint;
 
     void Start()
     {
         RB = GetComponent<Rigidbody>();
         mazeRB = handheldMaze.GetComponent<Rigidbody>();
+
+        startingMazeHeight = GetPosRelativeToMaze().y;
     }
 
     void Update()
     {
-        //Lock local position to not move vertically, relative to the board
-        if (RB && mazeRB)
+        //If marble is out of threshold for maze center
+        if(Mathf.Abs(GetPosRelativeToMaze().y - startingMazeHeight) > threshold)
         {
-            Vector3 localVelocity = transform.InverseTransformDirection(mazeRB.velocity);
-            localVelocity.y = 0;
+            transform.position = handheldMaze.transform.TransformPoint(previousValidPoint);
+            //Debug.Log("OUT OF THRESHOLD, setting new pos to: " + handheldMaze.transform.TransformPoint(previousValidPoint));
 
-            RB.velocity = transform.TransformDirection(localVelocity);
         }
+        else
+        {
+            previousValidPoint = GetPosRelativeToMaze();
+        }
+    }
+
+    private Vector3 GetPosRelativeToMaze()
+    {
+        Vector3 relativePoint = handheldMaze.transform.InverseTransformPoint(transform.position);
+        return relativePoint;
     }
 }
