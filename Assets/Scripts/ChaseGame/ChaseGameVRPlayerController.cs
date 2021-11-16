@@ -13,10 +13,12 @@ public class ChaseGameVRPlayerController : VRPlayerController
     private float handDistance = 0;
     private float sprintAmount, minimumSprintPercent = 0.5f;
     private bool handMovement = true, sprintCooldown;
+    private float walkSpeed;
 
     private void Start()
     {
         sprintAmount = maxSprint;
+        walkSpeed = ahp.moveSpeed;
     }
 
     void Update()
@@ -58,5 +60,15 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
         //Update sprint sprite
         sprintMeter.fillAmount = sprintAmount / maxSprint;
+    }
+
+    public void EnteredWater()
+    {
+        ahp.moveSpeed = walkSpeed * 0.5f;
+    }
+
+    public void ExitedWater()
+    {
+        ahp.moveSpeed = walkSpeed;
     }
 }
