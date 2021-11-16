@@ -6,12 +6,12 @@ using UnityEngine.UI;
 
 public class ChaseGameVRPlayerController : VRPlayerController
 {
-    [SerializeField] private float handMovementSpeed = 20;
+    [SerializeField] private float handMovementSpeed = 20, maxSprint = 2f;
     [SerializeField] private Image sprintMeter;
 
     private Vector3 movement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;
-    private float sprintAmount, maxSprint = 3, minimumSprintPercent = 0.5f;
+    private float sprintAmount, minimumSprintPercent = 0.5f;
     private bool handMovement = true, sprintCooldown;
 
     private void Start()
@@ -30,7 +30,7 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
             if (handDistance < 1 && handDistance > 0)
             {
-                movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * handMovementSpeed * Time.deltaTime), 5 * Time.deltaTime);
+                movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * handMovementSpeed), 5 * Time.deltaTime);
                 ahp.AddMove(movement);
 
                 sprintAmount = Mathf.Max(sprintAmount - Time.deltaTime, 0);
