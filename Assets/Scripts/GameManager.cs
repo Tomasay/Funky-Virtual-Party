@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
+using Autohand;
 
 public class GameManager : MonoBehaviour
 {
@@ -48,6 +49,7 @@ public class GameManager : MonoBehaviour
         {
             case GameState.Tutorial:
                 SetPlayerMovement(false);
+                SetVRPlayerMovement(false);
                 break;
             case GameState.Countdown:
                 if (!countingDown)
@@ -76,6 +78,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
+        SetVRPlayerMovement(true);
         countingDown = true;
         for (int i = countdown; i > 0; i--)
         {
@@ -115,6 +118,11 @@ public class GameManager : MonoBehaviour
         {
             p.CanMove = canPlayerMove;
         }
+    }
+
+    private void SetVRPlayerMovement(bool canPlayerMove)
+    {
+        VRPlayer.GetComponentInChildren<AutoHandPlayer>().canMove = canPlayerMove;
     }
 
     public string FormatTime(float time)

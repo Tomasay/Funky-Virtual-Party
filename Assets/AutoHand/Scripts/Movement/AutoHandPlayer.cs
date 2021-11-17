@@ -27,6 +27,9 @@ namespace Autohand{
         [Tooltip("Maximum distance that the head is allowed to be from the body before movement on that axis is stopped")]
         [Min(0.1f)]
         public float maxHeadDistance = 0.3f;
+        [Foldout("Movement")]
+        [Tooltip("Whether or not the player can move at all")]
+        public bool canMove = true;
 
         [Header("Height Settings")]
         [Foldout("Height")]
@@ -277,6 +280,9 @@ namespace Autohand{
         
         /// <summary>Sets move direction, uses move speed multiplyer</summary>
         public void Move(Vector2 axis, bool useDeadzone = false) {
+            if (!canMove)
+                return;
+
             if(!useDeadzone || Mathf.Abs(axis.x) > movementDeadzone)
                 moveDirection.x = axis.x;
             else
@@ -293,7 +299,10 @@ namespace Autohand{
         }
         /// <summary>Sets move direction, uses move speed multiplyer</summary>
         public void Move(Vector3 axis, bool useDeadzone = false) {
-            if(!useDeadzone || Mathf.Abs(axis.x) > movementDeadzone)
+            if (!canMove)
+                return;
+
+            if (!useDeadzone || Mathf.Abs(axis.x) > movementDeadzone)
                 moveDirection.x = axis.x;
             else
                 moveDirection.x = 0;
@@ -314,6 +323,8 @@ namespace Autohand{
 
         /// <summary>Adds move direction on top of core movement for the next fixed movement update, does not use move speed</summary>
         public void AddMove(Vector3 axis, bool useDeadzone = false) {
+            if (!canMove)
+                return;
 
             var moveDirection = Vector3.zero;
             if(!useDeadzone || Mathf.Abs(axis.x) > movementDeadzone)
