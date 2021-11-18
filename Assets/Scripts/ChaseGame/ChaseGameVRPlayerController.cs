@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class ChaseGameVRPlayerController : VRPlayerController
 {
     [SerializeField] private float handMovementSpeed = 20, maxSprint = 2f;
+    private float currentHandMovementSpeed;
     [SerializeField] private Image sprintMeter;
 
     private Vector3 movement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
@@ -19,6 +20,7 @@ public class ChaseGameVRPlayerController : VRPlayerController
     {
         sprintAmount = maxSprint;
         walkSpeed = ahp.moveSpeed;
+        currentHandMovementSpeed = handMovementSpeed;
     }
 
     void Update()
@@ -32,13 +34,13 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
             if (handDistance < 1 && handDistance > 0)
             {
-                movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * handMovementSpeed), 5 * Time.deltaTime);
+                movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * currentHandMovementSpeed), 5 * Time.deltaTime);
                 ahp.AddMove(movement);
 
                 sprintAmount = Mathf.Max(sprintAmount - Time.deltaTime, 0);
             }
 
-            if(sprintAmount / maxSprint < 0.05f)
+            if (sprintAmount / maxSprint < 0.05f)
             {
                 sprintCooldown = true;
                 sprintMeter.color = Color.red;
@@ -48,11 +50,11 @@ public class ChaseGameVRPlayerController : VRPlayerController
         {
             sprintAmount = Mathf.Min(sprintAmount + Time.deltaTime, maxSprint);
 
-            if(sprintCooldown && sprintAmount / maxSprint > minimumSprintPercent)
+            if (sprintCooldown && sprintAmount / maxSprint > minimumSprintPercent)
             {
                 sprintCooldown = false;
             }
-            else if(sprintCooldown)
+            else if (sprintCooldown)
             {
                 sprintMeter.color = Color.Lerp(Color.red, Color.white, (sprintAmount / maxSprint) / minimumSprintPercent);
             }
@@ -65,10 +67,12 @@ public class ChaseGameVRPlayerController : VRPlayerController
     public void EnteredWater()
     {
         ahp.moveSpeed = walkSpeed * 0.5f;
+        currentHandMovementSpeed = handMovementSpeed * 0.5f;
     }
 
     public void ExitedWater()
     {
         ahp.moveSpeed = walkSpeed;
+        currentHandMovementSpeed = handMovementSpeed;
     }
 }
