@@ -136,4 +136,9 @@ public class GameManager : MonoBehaviour
         int seconds = (int)time - (minutes*60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
+
+    public void DisplayVRCapture(string playerName)
+    {
+        vrInfoText.text = playerName + " captured you!";
+    }
 }
