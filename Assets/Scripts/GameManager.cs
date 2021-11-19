@@ -139,6 +139,8 @@ public class GameManager : MonoBehaviour
 
     public void DisplayVRCapture(string playerName)
     {
+        HapticsManager.instance.TriggerHaptic(false, 2);
+        HapticsManager.instance.TriggerHaptic(true, 2);
         vrInfoText.text = playerName + " captured you!";
     }
 }
