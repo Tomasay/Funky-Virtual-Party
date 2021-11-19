@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject VRPlayer;
 
     private const int COUNTDOWN_AMOUNT = 5, GAME_TIME_AMOUNT = 60;
-    [SerializeField] private TMP_Text countdownText, vrInfoText, gameTimeText;
+    [SerializeField] private TMP_Text countdownText, vrInfoText, gameTimeText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
 
@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
         State = GameState.Tutorial;
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
+        vrGameTimeText.text = FormatTime(timeRemaining);
     }
 
     // Update is called once per frame
@@ -60,7 +61,8 @@ public class GameManager : MonoBehaviour
             case GameState.GameLoop:
                 timeRemaining -= Time.deltaTime;
                 gameTimeText.text = FormatTime(timeRemaining);
-                if(timeRemaining <= 0)
+                vrGameTimeText.text = FormatTime(timeRemaining);
+                if (timeRemaining <= 0)
                 {
                     State = GameState.TimeEnded;
                 }
