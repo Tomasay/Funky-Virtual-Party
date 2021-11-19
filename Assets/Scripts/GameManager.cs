@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject VRPlayer;
 
     private const int COUNTDOWN_AMOUNT = 5, GAME_TIME_AMOUNT = 60;
-    [SerializeField] private TMP_Text countdownText, gameTimeText;
+    [SerializeField] private TMP_Text countdownText, vrInfoText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
 
@@ -83,12 +83,15 @@ public class GameManager : MonoBehaviour
         for (int i = countdown; i > 0; i--)
         {
             countdownText.text = "" + i;
+            vrInfoText.text = "" + i;
             yield return new WaitForSeconds(1);
         }
 
         countdownText.text = "GO!";
+        vrInfoText.text = "GO!";
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
+        vrInfoText.text = "";
 
         State = GameState.GameLoop;
         SetPlayerMovement(true);

@@ -25,7 +25,7 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         base.OnCollisionEnter(collision);
 
-        if(collision.gameObject.transform.root.tag.Equals("Player"))
+        if(gm.State == GameManager.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
         {
             gm.State = GameManager.GameState.PlayerCaptured;
         }
