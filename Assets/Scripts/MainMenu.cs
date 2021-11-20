@@ -58,15 +58,8 @@ public class MainMenu : MonoBehaviour
 
     private void SpawnPlayer(GameObject player)
     {
-        foreach (Transform t in playerPositions)
-        {
-            if(t.childCount == 0)
-            {
-                player.GetComponent<ClientPlayer>().InitialCustomize();
-                player.transform.position = t.position;
-                break;
-            }
-        }
+        player.GetComponent<ClientPlayer>().InitialCustomize();
+        player.transform.position = playerPositions[ClientManager.instance.Players.Count-1].position;
     }
 
     private void SpawnPlayerIcon(GameObject player)
