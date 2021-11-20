@@ -25,7 +25,7 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         base.OnCollisionEnter(collision);
 
-        if(gm.State == GameManager.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
+        if(gm && gm.State == GameManager.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
         {
             gm.State = GameManager.GameState.PlayerCaptured;
             gm.DisplayVRCapture(playerName);
@@ -36,7 +36,6 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         if (other.tag.Equals("Water"))
         {
-            Debug.Log("COLLIDING WITH WATER");
             isInWater = true;
             speed = 0.5f * startingSpeed;
         }
