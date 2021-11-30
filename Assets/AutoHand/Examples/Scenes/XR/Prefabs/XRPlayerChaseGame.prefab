@@ -151,6 +151,71 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &8637045242962245981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2180686678062484468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9cb056324afa3f4392cfd0e8207ce42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forwardDirection: {fileID: 8103367799181185533}
+  ahp: {fileID: 3270633542346178656}
+  handMovementSpeed: 2
+  maxSprint: 2
+  sprintMeter: {fileID: 3368231206423510503}
+--- !u!114 &1459602370694366106
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3270633542346178658}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c0abe3e3c5eaf48b7149760dfc3b35, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionEnter:
+    m_PersistentCalls:
+      m_Calls: []
+  collisionExit:
+    m_PersistentCalls:
+      m_Calls: []
+  triggerEnter:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8637045242962245981}
+        m_TargetAssemblyTypeName: ChaseGameVRPlayerController, Assembly-CSharp
+        m_MethodName: EnteredWater
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  triggerExit:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8637045242962245981}
+        m_TargetAssemblyTypeName: ChaseGameVRPlayerController, Assembly-CSharp
+        m_MethodName: ExitedWater
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4449736546023868723
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,71 +452,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &8637045242962245981
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2180686678062484468}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9cb056324afa3f4392cfd0e8207ce42, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  forwardDirection: {fileID: 8103367799181185533}
-  ahp: {fileID: 3270633542346178656}
-  handMovementSpeed: 2
-  maxSprint: 2
-  sprintMeter: {fileID: 3368231206423510503}
---- !u!114 &1459602370694366106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3270633542346178658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9c0abe3e3c5eaf48b7149760dfc3b35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionEnter:
-    m_PersistentCalls:
-      m_Calls: []
-  collisionExit:
-    m_PersistentCalls:
-      m_Calls: []
-  triggerEnter:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8637045242962245981}
-        m_TargetAssemblyTypeName: ChaseGameVRPlayerController, Assembly-CSharp
-        m_MethodName: EnteredWater
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  triggerExit:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8637045242962245981}
-        m_TargetAssemblyTypeName: ChaseGameVRPlayerController, Assembly-CSharp
-        m_MethodName: ExitedWater
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &8983826138627309036
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,6 +463,7 @@ GameObject:
   - component: {fileID: 3620555388313663002}
   - component: {fileID: 7604927046853193883}
   - component: {fileID: 456229598387389329}
+  - component: {fileID: 3101331793472284989}
   m_Layer: 5
   m_Name: TimerText
   m_TagString: Untagged
@@ -586,6 +587,25 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!95 &3101331793472284989
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8983826138627309036}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d2b857987f3121a4eb2c38b6602cde86, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &8103367799175913152
 PrefabInstance:
   m_ObjectHideFlags: 0
