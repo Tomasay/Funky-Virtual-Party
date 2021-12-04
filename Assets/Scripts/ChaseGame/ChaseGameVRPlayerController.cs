@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class ChaseGameVRPlayerController : VRPlayerController
 {
-    [SerializeField] private float handMovementSpeed = 20, maxSprint = 2f;
+    [SerializeField] private float handMovementSpeed = 20, maxSprint = 2f, handMovementThreshold = 0;
     private float currentHandMovementSpeed;
     [SerializeField] private Image sprintMeter;
 
@@ -14,6 +14,7 @@ public class ChaseGameVRPlayerController : VRPlayerController
     private float handDistance = 0;
     private float sprintAmount, minimumSprintPercent = 0.5f;
     private bool handMovement = true, sprintCooldown;
+    private float movementCooldown;
     private float walkSpeed;
 
     private void Start()
@@ -25,14 +26,19 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
     void Update()
     {
-        if (handMovement && !sprintCooldown && ahp.handLeft.IsSqueezing() && ahp.handRight.IsSqueezing())
+        if(handMovement)
         {
             handDistance = Vector3.Distance(leftHandPos, ahp.handLeft.transform.localPosition) + Vector3.Distance(rightHandPos, ahp.handRight.transform.localPosition);
 
             leftHandPos = ahp.handLeft.transform.localPosition;
             rightHandPos = ahp.handRight.transform.localPosition;
+        }
 
-            if (handDistance < 1 && handDistance > 0)
+        if (handMovement && !sprintCooldown && /*ahp.handLeft.IsSqueezing() && ahp.handRight.IsSqueezing()*/ handDistance > handMovementThreshold)
+        {
+            movementCooldown = 0;
+
+            if (handDistance < 1)
             {
                 movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * currentHandMovementSpeed), 5 * Time.deltaTime);
                 ahp.AddMove(movement);
@@ -48,12 +54,19 @@ public class ChaseGameVRPlayerController : VRPlayerController
         }
         else
         {
-            sprintAmount = Mathf.Min(sprintAmount + Time.deltaTime, maxSprint);
+            //Player must stop pumping arms for a second to start recharing sprint meter
+            movementCooldown += Time.deltaTime;
+            if (movementCooldown > 1)
+            {
+                sprintAmount = Mathf.Min(sprintAmount + Time.deltaTime, maxSprint);
+            }
 
+            //After depleting spring meter, it must hit mimimumSprintPercent in order to be able to sprint again
             if (sprintCooldown && sprintAmount / maxSprint > minimumSprintPercent)
             {
                 sprintCooldown = false;
             }
+            //After depleting sprint cooldown, lerp the color from red back to white to indicate when it's ready
             else if (sprintCooldown)
             {
                 sprintMeter.color = Color.Lerp(Color.red, Color.white, (sprintAmount / maxSprint) / minimumSprintPercent);
