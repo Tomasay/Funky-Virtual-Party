@@ -71,11 +71,14 @@ public class ClientManager : MonoBehaviour
     void OnApplicationQuit()
     {
         manager.Socket.Emit("unityCloseRoom", passcode);
+        manager?.Close();
+        manager?.Socket?.Disconnect();
     }
 
     public void OnMinigameStart(string game)
     {
-        manager.Socket.Emit("minigameStarted", passcode, game);
+        Socket s = manager.Socket.Emit("minigameStarted", passcode, game);
+        
     }
 
     public event Action<GameObject> onClientConnect;
