@@ -188,11 +188,11 @@ MonoBehaviour:
   RenderCam: {fileID: 1578151817}
   Resolution: {x: 1024, y: 1024}
   MatchScreenAspect: 1
-  FastMode: 0
-  AsyncMode: 0
-  GZipMode: 0
+  FastMode: 1
+  AsyncMode: 1
+  GZipMode: 1
   PanoramaMode: 0
-  Quality: 100
+  Quality: 50
   ChromaSubsampling: 2
   StreamFPS: 60
   ignoreSimilarTexture: 1
@@ -219,9 +219,9 @@ MonoBehaviour:
   OnDataByteReadyEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1064101023}
-        m_TargetAssemblyTypeName: FMSocketIOManager, Assembly-CSharp
-        m_MethodName: SendToOthers
+      - m_Target: {fileID: 1909306993}
+        m_TargetAssemblyTypeName: ClientManager, Assembly-CSharp
+        m_MethodName: SendVideoDataToServer
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1462,7 +1462,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1064101023
 MonoBehaviour:
   m_ObjectHideFlags: 0

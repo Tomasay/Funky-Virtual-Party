@@ -215,4 +215,18 @@ public class ClientManager : MonoBehaviour
 
         return null;
     }
+
+    public void SendVideoDataToServer(byte[] _byteData)
+    {
+        /*
+        FMSocketIOData _data = new FMSocketIOData();
+        _data.DataString = "";
+        _data.DataByte = _byteData;
+        _data.EmitType = FMSocketIOEmitType.All;
+
+        manager.Socket.Emit("VideoData", JsonUtility.ToJson(_data));
+        */
+
+        manager.Socket.Emit("VideoData", _byteData);
+    }
 }
