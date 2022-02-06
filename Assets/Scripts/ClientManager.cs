@@ -57,6 +57,13 @@ public class ClientManager : MonoBehaviour
 
             DontDestroyOnLoad(gameObject);
         }
+
+        //Spawn Player
+        ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
+
+        players.Add(newPlayer);
+        newPlayer.PlayerID = "";
+        newPlayer.PlayerName = "";
     }
 
     private void Update()

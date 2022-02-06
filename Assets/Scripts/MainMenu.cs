@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using epoching.easy_qr_code;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 public class MainMenu : MonoBehaviour
 {

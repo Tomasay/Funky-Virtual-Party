@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.InputSystem;
   
 public class ClientPlayer : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class ClientPlayer : MonoBehaviour
     protected Quaternion lookRotation;
     protected float startingSpeed = 5, speed;
     protected bool canMove = true;
+
+    protected PlayerInput playerInput;
 
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
@@ -53,10 +56,15 @@ public class ClientPlayer : MonoBehaviour
         smr.sharedMesh = m2;
 
         speed = startingSpeed;
+
+        playerInput = GetComponent<PlayerInput>();
     }
     
     protected virtual void Update()
     {
+        Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+        Move((int)(input.x * 100), (int)(input.y * 100));
+
         transform.Translate(movement * Time.deltaTime);
 
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);

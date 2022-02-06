@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-us">
+   <head>
+      <meta charset="utf-8" />
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+      <title>{{{ PRODUCT_NAME }}}</title>
+
+      <link rel="stylesheet" href="Template/style.css" />
+      
+   </head>
+   <body class="{{{SPLASH_SCREEN_STYLE}}}">
+      <!-- Unity Container -->
+      <div id="main-container" class="fill-window">
+
+         <div id="unity-container">
+            <canvas id="unity-canvas"></canvas>
+         </div>
+
+         <!-- This is a simple progress bar -->
+         <div id="loader" class="loader">
+            <div class="logo-container card">
+               <div class="logo-cont">
+                  <img class="logo" src="Template/logo.png"/>
+               </div>
+               <div class="title-cont">
+                  <h1>{{{ PRODUCT_NAME }}}</h1>
+                  <h2>{{{ COMPANY_NAME }}}</h2>
+                  <p>v. {{{ PRODUCT_VERSION }}}</p>
+               </div>
+               <div style="clear:both"></div>
+               <div class="progressbar">
+                  <div id="fill" class="fill" style="width: 0%;"></div>
+               </div>
+            </div>
+            
+         </div>
+         
+      </div>
+
+      <script src="Template/app.js"> </script>
+
+   </body>
+</html>

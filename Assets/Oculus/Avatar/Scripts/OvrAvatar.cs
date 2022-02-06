@@ -983,6 +983,7 @@ public class OvrAvatar : MonoBehaviour
         }
     }
 
+    #if !UNITY_WEBGL
     bool IsValidMic()
     {
         string[] devices = Microphone.devices;
@@ -1024,6 +1025,7 @@ public class OvrAvatar : MonoBehaviour
         Microphone.End(selectedDevice);
         return true;
     }
+#endif
 
     void InitPostLoad()
     {
@@ -1034,6 +1036,7 @@ public class OvrAvatar : MonoBehaviour
         if (GetComponent<OvrAvatarLocalDriver>() != null)
         {
             // Use mic.
+#if !UNITY_WEBGL
             lipsyncContext.audioLoopback = false;
             if (CanOwnMicrophone && IsValidMic())
             {
@@ -1042,6 +1045,7 @@ public class OvrAvatar : MonoBehaviour
                 micInput.MicFrequency = 44100;
                 micInput.micControl = OVRLipSyncMicInput.micActivation.ConstantSpeak;
             }
+#endif
 
             // Set lipsync animation parameters in SDK
             CAPI.ovrAvatar_SetActionUnitOnsetSpeed(sdkAvatar, ACTION_UNIT_ONSET_SPEED);
