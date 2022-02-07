@@ -18,7 +18,11 @@ public class KeyboardController : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void UpdateInputFieldText(string txt);
 
-    public TMP_InputField field;
+    [SerializeField] TMP_InputField nameField, codeField;
+
+    private TMP_InputField currentField;
+
+    public ClientManagerWeb manager;
 
     private void Start()
     {
@@ -32,12 +36,17 @@ public class KeyboardController : MonoBehaviour
 
     public void UpdateText(string input)
     {
-        field.text = input;
+        currentField.text = input;
     }
 
     public void SetField(TMP_InputField f)
     {
-        field = f;
+        currentField = f;
         UpdateInputFieldText(f.text);
+    }
+
+    public void SubmitButtonPressed()
+    {
+        manager.AttemptJoinRoom(codeField.text, nameField.text);
     }
 }

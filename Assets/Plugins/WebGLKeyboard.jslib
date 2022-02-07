@@ -14,7 +14,6 @@ mergeInto(LibraryManager.library, {
         inputElement.style = "font-size: 16px;";
         divElement.appendChild(inputElement);
 		inputElement.oninput = function() {console.log("ON INPUT"); window.unityInstance.SendMessage('KeyboardController', 'UpdateText', document.getElementById("dummyInput").value.toString());}
-		inputElement.onclick = function() {console.log("ON CLICK"); window.unityInstance.SendMessage('KeyboardController', 'UpdateText', document.getElementById("dummyInput").value.toString());}
 	},
 	OpenInputKeyboard: function () 
 	{
@@ -25,9 +24,8 @@ mergeInto(LibraryManager.library, {
 	{
 		document.getElementById("dummyInput").blur();
 	},
-	UpdateInputFieldText: function (string txt)
+	UpdateInputFieldText: function (txt)
 	{
-		document.getElementById("dummyInput").value = txt;
+		document.getElementById("dummyInput").value = txt.toString();
 	}
-	
 });

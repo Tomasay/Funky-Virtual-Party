@@ -14,6 +14,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] GameObject spineBone; //Used to change height of player
 
     protected string playerID, playerName;
+    protected bool isLocal = false; //Is this the player being controlled by device?
     protected Color playerColor = Color.white;
     protected int headType;
     protected float height; //Between -0.2f anf 2.0f
@@ -23,6 +24,9 @@ public class ClientPlayer : MonoBehaviour
     protected float startingSpeed = 5, speed;
     protected bool canMove = true;
 
+    public ClientManagerWeb clientManagerWeb = null; //Used to communicate with host
+
+
     protected PlayerInput playerInput;
 
     public string PlayerID { get => playerID; set => playerID = value; }
@@ -31,6 +35,7 @@ public class ClientPlayer : MonoBehaviour
     public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
     public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += height; spineBone.transform.localPosition = pos;} }
 
+    public bool IsLocal { get => isLocal; set => isLocal = value; }
     public bool CanMove { get => canMove; set => canMove = value; }
 
     protected virtual void Start()
@@ -62,11 +67,15 @@ public class ClientPlayer : MonoBehaviour
     
     protected virtual void Update()
     {
-        Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-        Move((int)(input.x * 100), (int)(input.y * 100));
+        if (isLocal) //Only read values from analog stick, and emit movement if being done from local device
+        {
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+            Move((int)(input.x * 100), (int)(input.y * 100));
+
+            clientManagerWeb.Manager.Socket.Emit("input", input.x, input.y);
+        }
 
         transform.Translate(movement * Time.deltaTime);
-
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
@@ -112,10 +121,10 @@ public class ClientPlayer : MonoBehaviour
     {
         if (canMove)
         {
-            movement = new Vector3((x / 100.0f) * speed, 0, (y / 100.0f) * speed);
+            movement = new Vector3(x * speed, 0, y * speed);
 
             //Magnitude of movement for animations
-            float val = Mathf.Abs(new Vector2(x/100.0f, y/100.0f).magnitude);
+            float val = Mathf.Abs(new Vector2(x, y).magnitude);
             anim.SetFloat("Speed", val);
 
             //Update rotation
@@ -123,6 +132,7 @@ public class ClientPlayer : MonoBehaviour
             if (lookDirection != Vector3.zero)
             {
                 lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                Debug.Log("Look Rotation: " + lookRotation);
             }
         }
         else

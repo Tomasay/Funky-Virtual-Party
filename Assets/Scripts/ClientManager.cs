@@ -50,20 +50,13 @@ public class ClientManager : MonoBehaviour
             manager.Socket.Once("connect", () => Debug.Log("connected!"));
 
             manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
-            manager.Socket.On<string, string, string>("connectToUnity", OnClientConnect);
+            manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
 
             DontDestroyOnLoad(gameObject);
         }
-
-        //Spawn Player
-        ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
-
-        players.Add(newPlayer);
-        newPlayer.PlayerID = "";
-        newPlayer.PlayerName = "";
     }
 
     private void Update()
