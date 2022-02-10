@@ -500,6 +500,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7942002210973373747}
   - component: {fileID: 7412725206770988215}
+  - component: {fileID: 5392262708007760888}
   m_Layer: 0
   m_Name: XRPlayer
   m_TagString: Player
@@ -559,6 +560,21 @@ MonoBehaviour:
     - Elite
     position: {x: 0.015, y: 0, z: 0.0412}
     rotation: {x: 30, y: -17, z: 0}
+--- !u!114 &5392262708007760888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7942002210973373748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4101a3438d2697b419ee97cf3fcd4663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  head: {fileID: 7942002211881670213}
+  leftHand: {fileID: 1262313374629172509}
+  rightHand: {fileID: 1262313376109179214}
 --- !u!1 &7942002211305997993
 GameObject:
   m_ObjectHideFlags: 0

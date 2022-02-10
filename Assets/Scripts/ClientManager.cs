@@ -23,6 +23,8 @@ public class ClientManager : MonoBehaviour
 
     private const int PASSCODE_LENGTH = 6;
     private static string passcode;
+
+    public SocketManager Manager { get => manager; }
     public string URL { get => url; }
     public string Passcode { get => passcode; }
     void Awake()
