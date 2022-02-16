@@ -12,6 +12,7 @@ public class ClientManagerWeb : MonoBehaviour
     [SerializeField]
     private GameObject playerPrefab;
     private static List<ClientPlayer> players = new List<ClientPlayer>();
+    private ClientPlayer localPlayer;
 
     public List<ClientPlayer> Players { get => players; }
 
@@ -40,6 +41,7 @@ public class ClientManagerWeb : MonoBehaviour
         manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
         manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
         manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
+        manager.Socket.On<string>("action", OnAction);
 
         DontDestroyOnLoad(gameObject);
     }
@@ -50,6 +52,20 @@ public class ClientManagerWeb : MonoBehaviour
 
         manager.Socket.Emit("joinRoom", code);
         //manager.Socket.Once("connect", () => Debug.Log("connected!"));
+    }
+
+    public void ActionButtonPressed()
+    {
+        localPlayer.Action();
+        manager.Socket.Emit("Action");
+    }
+
+    private void OnAction(string id)
+    {
+        if (GetPlayerByID(id))
+        {
+            GetPlayerByID(id).Action();
+        }
     }
 
     private void JoinRoomCheck(bool joined, string socketID)
@@ -79,6 +95,7 @@ public class ClientManagerWeb : MonoBehaviour
         if(players.Count == 1) //If this is the first player added, it is local
         {
             newPlayer.IsLocal = true;
+            localPlayer = newPlayer;
         }
 
         if (onClientConnect != null)

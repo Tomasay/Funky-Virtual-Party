@@ -70,7 +70,7 @@ public class ClientPlayer : MonoBehaviour
         if (isLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-            Move((int)(input.x), (int)(input.y));
+            Move(input.x,input.y);
 
             clientManagerWeb.Manager.Socket.Emit("input", input.x, input.y);
         }
@@ -117,7 +117,7 @@ public class ClientPlayer : MonoBehaviour
         playerColor = col;
     }
 
-    public void Move(int x, int y)
+    public void Move(float x, float y)
     {
         if (canMove)
         {
