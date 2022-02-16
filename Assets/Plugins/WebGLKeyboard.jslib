@@ -26,6 +26,6 @@ mergeInto(LibraryManager.library, {
 	},
 	UpdateInputFieldText: function (txt)
 	{
-		document.getElementById("dummyInput").value = txt.toString();
+		document.getElementById("dummyInput").value = Pointer_stringify(txt);
 	}
 });

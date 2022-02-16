@@ -24,6 +24,8 @@ public class KeyboardController : MonoBehaviour
 
     public ClientManagerWeb manager;
 
+    [SerializeField] private TMP_Text debugText;
+
     private void Start()
     {
         CreateDummyInput();
