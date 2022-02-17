@@ -12,7 +12,7 @@ public class KeyboardActivator : MonoBehaviour
 
     public void ActivateKeyboard()
     {
-        field.Select();
         field.ActivateInputField();
+        field.caretPosition = field.text.Length;
     }
 }

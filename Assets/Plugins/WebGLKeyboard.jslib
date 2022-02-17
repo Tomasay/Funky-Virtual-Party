@@ -11,7 +11,7 @@ mergeInto(LibraryManager.library, {
         var inputElement = document.createElement("input");
         inputElement.type = "text";
         inputElement.id = "dummyInput";
-        inputElement.style = "font-size: 16px;";
+        inputElement.style = "font-size: 16px; position:absolute; bottom:25%;";
         divElement.appendChild(inputElement);
 		inputElement.oninput = function() {console.log("ON INPUT"); window.unityInstance.SendMessage('KeyboardController', 'UpdateText', document.getElementById("dummyInput").value.toString());}
 	},
