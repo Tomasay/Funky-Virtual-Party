@@ -51,14 +51,20 @@ public class ClientManager : MonoBehaviour
 
             manager.Socket.Once("connect", () => Debug.Log("connected!"));
 
-            manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
+            manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
+            manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
 
             DontDestroyOnLoad(gameObject);
         }
+
+        //Testing
+        string colorString = "#" + ColorUtility.ToHtmlStringRGB(Color.blue);
+        if (ColorUtility.TryParseHtmlString(colorString, out Color newCol))
+            Debug.Log("COLOR: " + newCol);
     }
 
     private void Update()
@@ -96,12 +102,23 @@ public class ClientManager : MonoBehaviour
         }
         */
 
+        string[] playersToSend = new string[players.Count];
+        for (int i = 0; i < players.Count; i++)
+        {
+            playersToSend[i] = players[i].ToString();
+        }
+        manager.Socket.Emit("playerInfoFromHost", id, playersToSend);
+        Debug.Log("Sent players: " + playersToSend.Length);
+
         ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
 
         players.Add(newPlayer);
         newPlayer.PlayerID = id;
+        newPlayer.PlayerIP = ip;
         //players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
         newPlayer.PlayerName = name;
+
+        
 
         if (onClientConnect != null)
         {
@@ -126,12 +143,17 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    private void OnInputReceived(int x, int y, string id)
+    private void OnInputReceived(float x, float y, string id)
     {
         if (GetPlayerByID(id))
         {
             GetPlayerByID(id).Move(x, y);
         }
+    }
+
+    private void SyncCustomizations(string id, string color, int headShape, float height)
+    {
+        GetPlayerByID(id).SetCustomizations(color, headShape, height);
     }
 
     public event Action<ClientPlayer> onReadyUp;

@@ -29,21 +29,25 @@ public class MainMenuWeb : MonoBehaviour
 
         //Functionality for spawning new players who enter
         ClientManagerWeb.instance.onClientConnect += SpawnPlayer;
-        ClientManagerWeb.instance.onClientConnect += SpawnPlayerIcon;
+        //ClientManagerWeb.instance.onClientConnect += SpawnPlayerIcon;
         ClientManagerWeb.instance.onClientConnect += SwitchToController;
-        ClientManagerWeb.instance.onClientDisonnect += RemovePlayerIcon;
+        //ClientManagerWeb.instance.onClientDisonnect += RemovePlayerIcon;
     }
 
     private void OnDisable()
     {
         ClientManagerWeb.instance.onClientConnect -= SpawnPlayer;
-        ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
-        ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;
+        ClientManagerWeb.instance.onClientConnect -= SwitchToController;
+        //ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
+        //ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;
     }
 
     private void SpawnPlayer(GameObject player)
     {
-        player.GetComponent<ClientPlayer>().InitialCustomize();
+        if (player.GetComponent<ClientPlayer>().IsLocal)
+        {
+            player.GetComponent<ClientPlayer>().InitialCustomize();
+        }
         player.transform.position = playerPositions[ClientManagerWeb.instance.Players.Count - 1].position;
     }
 

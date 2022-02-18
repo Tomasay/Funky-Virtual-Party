@@ -13,7 +13,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] protected Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player
 
-    protected string playerID, playerName;
+    protected string playerID, playerIP, playerName;
     protected bool isLocal = false; //Is this the player being controlled by device?
     protected Color playerColor = Color.white;
     protected int headType;
@@ -30,6 +30,7 @@ public class ClientPlayer : MonoBehaviour
     protected PlayerInput playerInput;
 
     public string PlayerID { get => playerID; set => playerID = value; }
+    public string PlayerIP { get => playerIP; set => playerIP = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
@@ -100,6 +101,22 @@ public class ClientPlayer : MonoBehaviour
         height = Random.Range(-0.2f, 0.75f);
         pos.y += height;
         spineBone.transform.localPosition = pos;
+
+        if(isLocal)
+        {
+            clientManagerWeb.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height);
+        }
+    }
+
+    public void SetCustomizations(string color, int headShape, float height)
+    {
+        if (ColorUtility.TryParseHtmlString(color, out Color newCol))
+        {
+            ChangeColor(newCol);
+        }
+
+        PlayerHeadType = headShape;
+        PlayerHeight = height;
     }
 
     private void ChangeColor(Color col)
@@ -132,7 +149,6 @@ public class ClientPlayer : MonoBehaviour
             if (lookDirection != Vector3.zero)
             {
                 lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-                Debug.Log("Look Rotation: " + lookRotation);
             }
         }
         else
@@ -152,5 +168,18 @@ public class ClientPlayer : MonoBehaviour
     protected virtual void OnCollisionEnter(Collision collision)
     {
         //Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
+    }
+
+    public override string ToString()
+    {
+        string s = "";
+        s += playerID + "\n";
+        s += PlayerIP + "\n";
+        s += playerName + "\n";
+        s += "#" + ColorUtility.ToHtmlStringRGB(playerColor) + "\n";
+        s += headType + "\n";
+        s += height;
+
+        return s;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using BestHTTP;
 using BestHTTP.SocketIO3;
+using TMPro;
 
 public class ClientManagerWeb : MonoBehaviour
 {
@@ -23,6 +24,8 @@ public class ClientManagerWeb : MonoBehaviour
 
     public SocketManager Manager { get => manager; }
 
+    [SerializeField] TMP_Text debugText;
+
     private void Awake()
     {
         //Singleton instantiation
@@ -40,8 +43,10 @@ public class ClientManagerWeb : MonoBehaviour
         manager.Socket.On<bool, string>("joinedRoom", JoinRoomCheck);
         manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
         manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-        manager.Socket.On<int, int, string>("toUnity", OnInputReceived);
+        manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
         manager.Socket.On<string>("action", OnAction);
+        manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
+        manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
 
         DontDestroyOnLoad(gameObject);
     }
@@ -50,8 +55,30 @@ public class ClientManagerWeb : MonoBehaviour
     {
         Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
 
-        manager.Socket.Emit("joinRoom", code);
+        manager.Socket.Emit("joinRoom", code, name);
         //manager.Socket.Once("connect", () => Debug.Log("connected!"));
+    }
+
+    public void playerInfoReceived(string[] players)
+    {
+        if (players.Length == 0)
+        {
+            return;
+        }
+
+        //Parse players string
+        char[] delims = new[] { '\n' };
+        foreach (string s in players)
+        {
+            string[] attributes = s.Split(delims, StringSplitOptions.RemoveEmptyEntries);
+
+            OnClientConnect(attributes[0], attributes[1], attributes[2]);
+
+            if (int.TryParse(attributes[4], out int parsedHead) && float.TryParse(attributes[5], out float parsedHeight))
+            {
+                SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight);
+            }
+        }
     }
 
     public void ActionButtonPressed()
@@ -121,6 +148,11 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
+    private void SyncCustomizations(string id, string color, int headShape, float height)
+    {
+        GetPlayerByID(id).SetCustomizations(color, headShape, height);
+    }
+
     private ClientPlayer GetPlayerByID(string id)
     {
         foreach (ClientPlayer p in players)
@@ -132,7 +164,7 @@ public class ClientManagerWeb : MonoBehaviour
         return null;
     }
 
-    private void OnInputReceived(int x, int y, string id)
+    private void OnInputReceived(float x, float y, string id)
     {
         if (GetPlayerByID(id))
         {

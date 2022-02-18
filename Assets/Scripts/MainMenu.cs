@@ -59,7 +59,6 @@ public class MainMenu : MonoBehaviour
 
     private void SpawnPlayer(GameObject player)
     {
-        player.GetComponent<ClientPlayer>().InitialCustomize();
         player.transform.position = playerPositions[ClientManager.instance.Players.Count-1].position;
     }
 
