@@ -21,8 +21,11 @@ public class KeyboardController : MonoBehaviour
 
     [DllImport("__Internal")]
     private static extern void UpdateInputFieldText(string txt);
+    [DllImport("__Internal")]
+    private static extern void SetPointerDownOnButton(bool isDown);
 
     [SerializeField] TMP_InputField nameField, codeField;
+    [SerializeField] ButtonEvents nameFieldButton, codeFieldButton;
 
     private TMP_InputField currentField;
 
@@ -32,8 +35,14 @@ public class KeyboardController : MonoBehaviour
 
     private void Start()
     {
-        CreateDummyInput();
+        //CreateDummyInput();
+
+        nameFieldButton.onPointerDown.AddListener(ButtonPointerDown);
+        nameFieldButton.onPointerUp.AddListener(ButtonPointerUp);
+        codeFieldButton.onPointerDown.AddListener(ButtonPointerDown);
+        codeFieldButton.onPointerUp.AddListener(ButtonPointerUp);
     }
+
 
     private void Update()
     {
@@ -43,6 +52,22 @@ public class KeyboardController : MonoBehaviour
             currentField.ActivateInputField();
             currentField.caretPosition = currentField.text.Length;
         }
+    }
+
+    public void ButtonPointerDown()
+    {
+        SetPointerDownOnButton(true);
+    }
+
+    public void ButtonPointerUp()
+    {
+        StartCoroutine("ButtonDown");
+    }
+
+    IEnumerator ButtonDown()
+    {
+        yield return new WaitForSeconds(1);
+        SetPointerDownOnButton(false);
     }
 
     public void OpenKeyboard()

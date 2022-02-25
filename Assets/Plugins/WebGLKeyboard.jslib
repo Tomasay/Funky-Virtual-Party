@@ -17,7 +17,9 @@ mergeInto(LibraryManager.library, {
 	},
 	OpenInputKeyboard: function () 
 	{
-		document.getElementById("dummyInput").focus();
+		//document.getElementById("dummyInput").focus();
+		//fakeInputFocus();
+		//document.getElementById("fakeInputButton").click();
 		console.log("OpenInputKeyboard");
 	},
 	CloseInputKeyboard: function ()
@@ -27,5 +29,9 @@ mergeInto(LibraryManager.library, {
 	UpdateInputFieldText: function (txt)
 	{
 		document.getElementById("dummyInput").value = Pointer_stringify(txt);
+	},
+	SetPointerDownOnButton: function (isDown)
+	{
+		window.isPointerDownOnButton = isDown;
 	}
 });
