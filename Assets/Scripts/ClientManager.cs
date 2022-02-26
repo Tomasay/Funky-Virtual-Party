@@ -156,6 +156,14 @@ public class ClientManager : MonoBehaviour
         GetPlayerByID(id).SetCustomizations(color, headShape, height);
     }
 
+    public void SyncAllPlayerPos()
+    {
+        foreach (ClientPlayer cp in players)
+        {
+            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z);
+        }
+    }
+
     public event Action<ClientPlayer> onReadyUp;
     private void OnReadyUp(string id)
     {

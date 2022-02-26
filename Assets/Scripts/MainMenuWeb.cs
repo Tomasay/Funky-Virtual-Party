@@ -28,7 +28,7 @@ public class MainMenuWeb : MonoBehaviour
         */
 
         //Functionality for spawning new players who enter
-        ClientManagerWeb.instance.onClientConnect += SpawnPlayer;
+        //ClientManagerWeb.instance.onClientConnect += SpawnPlayer;
         //ClientManagerWeb.instance.onClientConnect += SpawnPlayerIcon;
         ClientManagerWeb.instance.onClientConnect += SwitchToController;
         //ClientManagerWeb.instance.onClientDisonnect += RemovePlayerIcon;
@@ -36,7 +36,7 @@ public class MainMenuWeb : MonoBehaviour
 
     private void OnDisable()
     {
-        ClientManagerWeb.instance.onClientConnect -= SpawnPlayer;
+        //ClientManagerWeb.instance.onClientConnect -= SpawnPlayer;
         ClientManagerWeb.instance.onClientConnect -= SwitchToController;
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
         //ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;

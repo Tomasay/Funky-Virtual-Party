@@ -33,5 +33,9 @@ mergeInto(LibraryManager.library, {
 	SetPointerDownOnButton: function (isDown)
 	{
 		window.isPointerDownOnButton = isDown;
+	},
+	ReloadPage: function ()
+	{
+		window.location.reload();
 	}
 });

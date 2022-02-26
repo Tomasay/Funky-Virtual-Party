@@ -60,6 +60,7 @@ public class MainMenu : MonoBehaviour
     private void SpawnPlayer(GameObject player)
     {
         player.transform.position = playerPositions[ClientManager.instance.Players.Count-1].position;
+        ClientManager.instance.SyncAllPlayerPos();
     }
 
     private void SpawnPlayerIcon(GameObject player)

@@ -5,6 +5,7 @@ using System;
 using BestHTTP;
 using BestHTTP.SocketIO3;
 using TMPro;
+using System.Runtime.InteropServices;
 
 public class ClientManagerWeb : MonoBehaviour
 {
@@ -25,6 +26,10 @@ public class ClientManagerWeb : MonoBehaviour
     public SocketManager Manager { get => manager; }
 
     [SerializeField] TMP_Text debugText;
+
+
+    [DllImport("__Internal")]
+    private static extern void ReloadPage();
 
     private void Awake()
     {
@@ -47,6 +52,8 @@ public class ClientManagerWeb : MonoBehaviour
         manager.Socket.On<string>("action", OnAction);
         manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
         manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
+        manager.Socket.On<string, float, float, float>("syncPlayerPosToClient", SyncPlayerPos);
+        manager.Socket.On("roomClosed", ReloadPage);
 
         DontDestroyOnLoad(gameObject);
     }
@@ -79,6 +86,11 @@ public class ClientManagerWeb : MonoBehaviour
                 SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight);
             }
         }
+    }
+
+    public void SyncPlayerPos(string id, float x, float y, float z)
+    {
+        GetPlayerByID(id).transform.position = new Vector3(x, y, z);
     }
 
     public void ActionButtonPressed()
@@ -124,6 +136,9 @@ public class ClientManagerWeb : MonoBehaviour
             newPlayer.IsLocal = true;
             localPlayer = newPlayer;
         }
+
+        newPlayer.InitialCustomize();
+
 
         if (onClientConnect != null)
         {
