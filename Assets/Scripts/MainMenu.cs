@@ -50,6 +50,14 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (ClientManager.instance.Players.Count > 0)
+        {
+            Debug.Log("COLOR: " + ClientManager.instance.Players[0].PlayerColor);
+        }
+    }
+
     private void OnDisable()
     {
         ClientManager.instance.onClientConnect -= SpawnPlayer;
@@ -65,6 +73,13 @@ public class MainMenu : MonoBehaviour
 
     private void SpawnPlayerIcon(GameObject player)
     {
+        StartCoroutine(SpawnPlayerIconDelayed(player, 0.5f));
+    }
+
+    IEnumerator SpawnPlayerIconDelayed(GameObject player, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
         ClientPlayer cp = player.GetComponent<ClientPlayer>();
         GameObject newIcon = Instantiate(playerIconPrefab, playerNamesList.transform);
         newIcon.name = cp.PlayerID;

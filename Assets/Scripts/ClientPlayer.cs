@@ -37,6 +37,8 @@ public class ClientPlayer : MonoBehaviour
     public bool IsLocal { get => isLocal; set => isLocal = value; }
     public bool CanMove { get => canMove; set => canMove = value; }
 
+    public Animator Anim { get => anim;}
+
     protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -66,7 +68,7 @@ public class ClientPlayer : MonoBehaviour
     
     protected virtual void Update()
     {
-        if (isLocal) //Only read values from analog stick, and emit movement if being done from local device
+        if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
             

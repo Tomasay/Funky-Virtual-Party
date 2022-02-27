@@ -19,6 +19,7 @@ public class MainMenuWeb : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
         VRPlayer.SetActive(false);
 
         //Functionality for spawning new players who enter

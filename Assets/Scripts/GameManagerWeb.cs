@@ -5,12 +5,15 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
+using Cinemachine;
 
 public class GameManagerWeb : MonoBehaviour
 {
     [SerializeField] GameObject playerPrefab;
 
     [SerializeField] GameObject VRPlayer;
+
+    [SerializeField] CinemachineFreeLook playerCamera;
 
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
@@ -38,6 +41,8 @@ public class GameManagerWeb : MonoBehaviour
         State = GameState.Tutorial;
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
+        playerCamera.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+        playerCamera.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
     }
 
     // Update is called once per frame
