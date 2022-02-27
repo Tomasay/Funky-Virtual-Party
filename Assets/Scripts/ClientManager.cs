@@ -61,10 +61,7 @@ public class ClientManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
-        //Testing
-        string colorString = "#" + ColorUtility.ToHtmlStringRGB(Color.blue);
-        if (ColorUtility.TryParseHtmlString(colorString, out Color newCol))
-            Debug.Log("COLOR: " + newCol);
+        //InvokeRepeating("SyncAllPlayerPos", 1, 1);
     }
 
     private void Update()

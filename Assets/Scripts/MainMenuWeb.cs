@@ -12,26 +12,27 @@ public class MainMenuWeb : MonoBehaviour
 
     [SerializeField] GameObject playerNamesList;
     [SerializeField] GameObject playerIconPrefab;
+    [SerializeField] GameObject VRPlayer;
 
     [SerializeField] Canvas joinRoomCanvas, controllerCanvas;
 
     // Start is called before the first frame update
     void Start()
     {
-        //Spawn all existing players
-        /*
-        ClientManagerWeb.instance.SpawnPlayers(playerPrefab, playerPositions);
-        foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
-        {
-            SpawnPlayerIcon(cp.gameObject);
-        }
-        */
+        VRPlayer.SetActive(false);
 
         //Functionality for spawning new players who enter
         //ClientManagerWeb.instance.onClientConnect += SpawnPlayer;
         //ClientManagerWeb.instance.onClientConnect += SpawnPlayerIcon;
         ClientManagerWeb.instance.onClientConnect += SwitchToController;
         //ClientManagerWeb.instance.onClientDisonnect += RemovePlayerIcon;
+
+        //If this is isn't first time visiting main menu
+        if(ClientManagerWeb.instance.Players.Count > 0)
+        {
+            SwitchToController(null);
+            VRPlayer.SetActive(true);
+        }
     }
 
     private void OnDisable()
@@ -74,6 +75,7 @@ public class MainMenuWeb : MonoBehaviour
 
     private void SwitchToController(GameObject player)
     {
+        VRPlayer.SetActive(true);
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
     }

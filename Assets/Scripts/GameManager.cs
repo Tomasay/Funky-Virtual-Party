@@ -71,10 +71,10 @@ public class GameManager : MonoBehaviour
                 }
                 break;
             case GameState.PlayerCaptured:
-                StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
+                StartCoroutine(GameOver(2, "YOU'VE BEEN CAPTURED"));
                 break;
             case GameState.TimeEnded:
-                StartCoroutine(GameOver(2, "TIMES UP!"));
+                StartCoroutine(GameOver(2, "TIMES UP!\nYOU WIN"));
                 break;
             default:
                 break;
@@ -108,7 +108,7 @@ public class GameManager : MonoBehaviour
     {
         state = GameState.GameOver;
 
-        vrInfoText.text = "YOU WIN!";
+        vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
         SceneManager.LoadScene("MainMenu");

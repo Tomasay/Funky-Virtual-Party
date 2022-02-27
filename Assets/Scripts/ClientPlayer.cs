@@ -69,9 +69,13 @@ public class ClientPlayer : MonoBehaviour
         if (isLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-            Move(input.x,input.y);
+            
+            if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
+            {
+                ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y);
+            }
 
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y);
+            Move(input.x, input.y);
         }
 
         transform.Translate(movement * Time.deltaTime);
