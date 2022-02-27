@@ -6,7 +6,9 @@ public class ChaseGameClientPlayer : ClientPlayer
 {
     [SerializeField] private int tackleForce, tackleCooldown = 2, tacklePlayerRange = 10;
 
-    private GameManager gm;
+    private GameManager gm = null;
+    private GameManagerWeb gmw = null;
+    private bool isWebGL = false;
     private bool tackling;
     private float timeTackled = 0;
 
@@ -16,8 +18,19 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         base.Start();
 
+#if UNITY_WEBGL
+        isWebGL = true;
+#endif
+
         //TEMPORARY cause I am lazy
-        gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        if(isWebGL)
+        {
+            gmw = GameObject.Find("GameManager").GetComponent<GameManagerWeb>();
+        }
+        else
+        {
+            gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        }
     }
 
 
@@ -25,10 +38,20 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         base.OnCollisionEnter(collision);
 
-        if(gm && gm.State == GameManager.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
+        if (isWebGL)
         {
-            gm.State = GameManager.GameState.PlayerCaptured;
-            gm.DisplayVRCapture(playerName);
+            if (gmw && gmw.State == GameManagerWeb.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
+            {
+                gmw.State = GameManagerWeb.GameState.PlayerCaptured;
+            }
+        }
+        else
+        {
+            if (gm && gm.State == GameManager.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
+            {
+                gm.State = GameManager.GameState.PlayerCaptured;
+                gm.DisplayVRCapture(playerName);
+            }
         }
     }
 
@@ -62,12 +85,12 @@ public class ChaseGameClientPlayer : ClientPlayer
             StartCoroutine("TackleEnd", 2);
 
             //If VR player is within range, tackle towards them
-            Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, gm.VRPlayerPos));
-            if (Vector3.Distance(transform.position, gm.VRPlayerPos) < tacklePlayerRange)
+            //Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, gm.VRPlayerPos));
+            if (Vector3.Distance(transform.position, isWebGL ? gmw.VRPlayerPos : gm.VRPlayerPos) < tacklePlayerRange)
             {
                 //Get direction towards VR player
-                Vector3 dir = (gm.VRPlayerPos - transform.position).normalized;
-                Debug.Log("DIRECTION TOWARDS VR PLAYER: " + dir);
+                Vector3 dir = ((isWebGL ? gmw.VRPlayerPos : gm.VRPlayerPos) - transform.position).normalized;
+                //Debug.Log("DIRECTION TOWARDS VR PLAYER: " + dir);
 
                 //Rotate to look at player, only on Y axis
                 Quaternion lookDir = Quaternion.LookRotation(dir);

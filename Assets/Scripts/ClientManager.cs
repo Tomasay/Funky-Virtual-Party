@@ -214,6 +214,8 @@ public class ClientManager : MonoBehaviour
                 }
             }
         }
+
+        SyncAllPlayerPos();
     }
 
     private string GetTime()

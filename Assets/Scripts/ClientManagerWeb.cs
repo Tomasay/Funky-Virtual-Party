@@ -6,6 +6,7 @@ using BestHTTP;
 using BestHTTP.SocketIO3;
 using TMPro;
 using System.Runtime.InteropServices;
+using UnityEngine.SceneManagement;
 
 public class ClientManagerWeb : MonoBehaviour
 {
@@ -24,6 +25,7 @@ public class ClientManagerWeb : MonoBehaviour
     public string URL { get => url; }
 
     public SocketManager Manager { get => manager; }
+    public ClientPlayer LocalPlayer { get => localPlayer; }
 
     [SerializeField] TMP_Text debugText;
 
@@ -36,26 +38,28 @@ public class ClientManagerWeb : MonoBehaviour
         //Singleton instantiation
         if (!instance)
         {
+            manager = new SocketManager(new Uri(socketUrl));
+            manager.Socket.On<bool, string>("joinedRoom", JoinRoomCheck);
+            manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
+            manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
+            manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
+            manager.Socket.On<string>("action", OnAction);
+            manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
+            manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
+            manager.Socket.On<string, float, float, float>("syncPlayerPosToClient", SyncPlayerPos);
+            manager.Socket.On("roomClosed", ReloadPage);
+            manager.Socket.On<string>("minigameStart", LoadGame);
+            manager.Socket.On("readyUpVR", OnVRReadyUp);
+            manager.Socket.On<string>("readyUp", OnReadyUp);
+
+            DontDestroyOnLoad(gameObject);
+
             instance = this;
         }
         else
         {
             Destroy(gameObject);
         }
-
-        manager = new SocketManager(new Uri(socketUrl));
-
-        manager.Socket.On<bool, string>("joinedRoom", JoinRoomCheck);
-        manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
-        manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-        manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
-        manager.Socket.On<string>("action", OnAction);
-        manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
-        manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
-        manager.Socket.On<string, float, float, float>("syncPlayerPosToClient", SyncPlayerPos);
-        manager.Socket.On("roomClosed", ReloadPage);
-
-        DontDestroyOnLoad(gameObject);
     }
 
     public void AttemptJoinRoom(string code, string name)
@@ -129,8 +133,6 @@ public class ClientManagerWeb : MonoBehaviour
         newPlayer.PlayerID = id;
         newPlayer.PlayerName = name;
 
-        newPlayer.clientManagerWeb = instance;
-
         if(players.Count == 1) //If this is the first player added, it is local
         {
             newPlayer.IsLocal = true;
@@ -184,6 +186,62 @@ public class ClientManagerWeb : MonoBehaviour
         if (GetPlayerByID(id))
         {
             GetPlayerByID(id).Move(x, y);
+        }
+    }
+
+    public event Action onVRReadyUp;
+    private void OnVRReadyUp()
+    {
+        if (onVRReadyUp != null)
+        {
+            onVRReadyUp();
+        }
+    }
+
+    public event Action<ClientPlayer> onReadyUp;
+    private void OnReadyUp(string id)
+    {
+        if (onReadyUp != null)
+        {
+            onReadyUp(GetPlayerByID(id));
+        }
+    }
+
+    private void LoadGame(string gameName)
+    {
+        switch (gameName)
+        {
+            case "ChaseGame":
+                SceneManager.LoadScene("ChaseGameClient");
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void SpawnPlayers(GameObject prefab)
+    {
+        for (int i = 0; i < players.Count; i++)
+        {
+            string ID = players[i].PlayerID;
+            string playerName = players[i].PlayerName;
+            Color playerColor = players[i].PlayerColor;
+            int playerHeadType = players[i].PlayerHeadType;
+            float playerHeight = players[i].PlayerHeight;
+            bool isLocal = players[i].IsLocal;
+
+            Destroy(players[i].gameObject);
+            players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
+            players[i].PlayerID = ID;
+            players[i].PlayerName = playerName;
+            players[i].PlayerColor = playerColor;
+            players[i].PlayerHeadType = playerHeadType;
+            players[i].PlayerHeight = playerHeight;
+            players[i].IsLocal = isLocal;
+            if(isLocal)
+            {
+                localPlayer = players[i];
+            }
         }
     }
 }

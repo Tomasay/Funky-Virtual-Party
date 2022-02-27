@@ -24,8 +24,6 @@ public class ClientPlayer : MonoBehaviour
     protected float startingSpeed = 5, speed;
     protected bool canMove = true;
 
-    public ClientManagerWeb clientManagerWeb = null; //Used to communicate with host
-
 
     protected PlayerInput playerInput;
 
@@ -73,7 +71,7 @@ public class ClientPlayer : MonoBehaviour
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
             Move(input.x,input.y);
 
-            clientManagerWeb.Manager.Socket.Emit("input", input.x, input.y);
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y);
         }
 
         transform.Translate(movement * Time.deltaTime);
@@ -104,7 +102,7 @@ public class ClientPlayer : MonoBehaviour
 
         if(isLocal)
         {
-            clientManagerWeb.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height);
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height);
         }
     }
 
