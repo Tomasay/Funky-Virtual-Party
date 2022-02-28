@@ -104,6 +104,6 @@ public class KeyboardController : MonoBehaviour
     public void SubmitButtonPressed()
     {
         CloseKeyboard();
-        manager.AttemptJoinRoom(codeField.text, nameField.text);
+        manager.AttemptJoinRoom(codeField.text.ToUpper(), nameField.text);
     }
 }

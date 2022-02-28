@@ -46,7 +46,7 @@ public class ClientManagerWeb : MonoBehaviour
             manager.Socket.On<string>("action", OnAction);
             manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
             manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
-            manager.Socket.On<string, float, float, float>("syncPlayerPosToClient", SyncPlayerPos);
+            manager.Socket.On<string, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
             manager.Socket.On("roomClosed", ReloadPage);
             manager.Socket.On<string>("minigameStart", LoadGame);
             manager.Socket.On("readyUpVR", OnVRReadyUp);
@@ -92,9 +92,17 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
-    public void SyncPlayerPos(string id, float x, float y, float z)
+    public void SyncPlayerPos(string id, float x, float y, float z, bool lerp)
     {
-        GetPlayerByID(id).transform.position = new Vector3(x, y, z);
+        if (!lerp)
+        {
+            GetPlayerByID(id).transform.position = new Vector3(x, y, z);
+        }
+        else
+        {
+            //GetPlayerByID(id).transform.position = Vector3.Lerp(GetPlayerByID(id).transform.position, new Vector3(x, y, z), Time.deltaTime);
+            GetPlayerByID(id).posFromHost = new Vector3(x, y, z);
+        }
     }
 
     public void ActionButtonPressed()

@@ -24,6 +24,7 @@ public class ClientPlayer : MonoBehaviour
     protected float startingSpeed = 5, speed;
     protected bool canMove = true;
 
+    public Vector3 posFromHost; //Current position from host, we need to sync to this if different
 
     protected PlayerInput playerInput;
 
@@ -78,9 +79,15 @@ public class ClientPlayer : MonoBehaviour
             }
 
             Move(input.x, input.y);
+
+            Vector3 positionDifference = posFromHost - transform.position;
+            transform.Translate((movement + positionDifference/4) * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(movement * Time.deltaTime);
         }
 
-        transform.Translate(movement * Time.deltaTime);
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 

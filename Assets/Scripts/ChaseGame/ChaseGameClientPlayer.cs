@@ -85,7 +85,7 @@ public class ChaseGameClientPlayer : ClientPlayer
             StartCoroutine("TackleEnd", 2);
 
             //If VR player is within range, tackle towards them
-            //Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, gm.VRPlayerPos));
+            //Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, isWebGL ? gmw.VRPlayerPos : gm.VRPlayerPos));
             if (Vector3.Distance(transform.position, isWebGL ? gmw.VRPlayerPos : gm.VRPlayerPos) < tacklePlayerRange)
             {
                 //Get direction towards VR player

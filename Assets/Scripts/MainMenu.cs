@@ -50,14 +50,6 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (ClientManager.instance.Players.Count > 0)
-        {
-            Debug.Log("COLOR: " + ClientManager.instance.Players[0].PlayerColor);
-        }
-    }
-
     private void OnDisable()
     {
         ClientManager.instance.onClientConnect -= SpawnPlayer;

@@ -40,6 +40,13 @@ public class GameManager : MonoBehaviour
         State = GameState.Tutorial;
         timeRemaining = GAME_TIME_AMOUNT;
         vrGameTimeText.text = FormatTime(timeRemaining);
+
+        ClientManager.instance.Manager.Socket.On<string>("action", OnAction);
+    }
+
+    public void OnAction(string id)
+    {
+        ClientManager.instance.GetPlayerByID(id).GetComponent<ChaseGameClientPlayer>().Action();
     }
 
     // Update is called once per frame

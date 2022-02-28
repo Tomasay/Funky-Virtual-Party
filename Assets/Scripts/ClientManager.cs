@@ -61,7 +61,7 @@ public class ClientManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
-        //InvokeRepeating("SyncAllPlayerPos", 1, 1);
+        InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
     }
 
     private void Update()
@@ -157,7 +157,15 @@ public class ClientManager : MonoBehaviour
     {
         foreach (ClientPlayer cp in players)
         {
-            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z);
+            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
+        }
+    }
+
+    public void SyncAllPlayerPosWithLerp()
+    {
+        foreach (ClientPlayer cp in players)
+        {
+            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, true);
         }
     }
 
@@ -236,7 +244,7 @@ public class ClientManager : MonoBehaviour
         return (char)UnityEngine.Random.Range(65, 91);
     }
 
-    private ClientPlayer GetPlayerByID(string id)
+    public ClientPlayer GetPlayerByID(string id)
     {
         foreach (ClientPlayer p in players)
         {
