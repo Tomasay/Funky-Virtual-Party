@@ -57,7 +57,7 @@ public class TutorialMenuClient : MonoBehaviour
             return;
         }
 
-        manager.State = GameManagerWeb.GameState.Countdown;
+        //manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
         tutorialCanvas.enabled = false;
         controllerCanvas.enabled = true;
@@ -85,7 +85,7 @@ public class TutorialMenuClient : MonoBehaviour
             return;
         }
 
-        manager.State = GameManagerWeb.GameState.Countdown;
+        //manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
         tutorialCanvas.enabled = false;
         controllerCanvas.enabled = true;

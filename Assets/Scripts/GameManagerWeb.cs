@@ -22,16 +22,6 @@ public class GameManagerWeb : MonoBehaviour
     
     public Vector3 VRPlayerPos { get => VRPlayer.transform.position; }
 
-    public enum GameState
-    {
-        Tutorial,
-        Countdown,
-        GameLoop,
-        PlayerCaptured,
-        TimeEnded,
-        GameOver
-    }
-
     private GameState state;
     public GameState State { get => state; set => state = value; }
 
@@ -43,6 +33,8 @@ public class GameManagerWeb : MonoBehaviour
         gameTimeText.text = FormatTime(timeRemaining);
         playerCamera.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
         playerCamera.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+
+        ClientManagerWeb.instance.Manager.Socket.On<string>("gameStateToClient", OnStateChange);
     }
 
     // Update is called once per frame
@@ -60,12 +52,16 @@ public class GameManagerWeb : MonoBehaviour
                 }
                 break;
             case GameState.GameLoop:
+                SetPlayerMovement(true);
+                countingDown = false;
                 timeRemaining -= Time.deltaTime;
                 gameTimeText.text = FormatTime(timeRemaining);
+                /*
                 if (timeRemaining <= 0) //Game end, VR player wins
                 {
                     State = GameState.TimeEnded;
                 }
+                */
                 break;
             case GameState.PlayerCaptured:
                 StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
@@ -95,15 +91,12 @@ public class GameManagerWeb : MonoBehaviour
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
 
-        State = GameState.GameLoop;
-        SetPlayerMovement(true);
-
-        countingDown = false;
+        //State = GameState.GameLoop;
     }
 
     IEnumerator GameOver(int countdown, string txt)
     {
-        state = GameState.GameOver;
+        //State = GameState.GameOver;
         countdownText.enabled = true;
         countdownText.text = txt;
         yield return new WaitForSeconds(3);
@@ -124,5 +117,13 @@ public class GameManagerWeb : MonoBehaviour
         int minutes = (int)time / 60;
         int seconds = (int)time - (minutes * 60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    private void OnStateChange(string s)
+    {
+        if(System.Enum.TryParse(s, out GameState newGameState))
+        {
+            State = newGameState;
+        }
     }
 }

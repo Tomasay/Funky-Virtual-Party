@@ -40,16 +40,18 @@ public class ChaseGameClientPlayer : ClientPlayer
 
         if (isWebGL)
         {
+            /*
             if (gmw && gmw.State == GameManagerWeb.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
             {
                 gmw.State = GameManagerWeb.GameState.PlayerCaptured;
             }
+            */
         }
         else
         {
-            if (gm && gm.State == GameManager.GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
+            if (gm && gm.State == GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
             {
-                gm.State = GameManager.GameState.PlayerCaptured;
+                gm.State = GameState.PlayerCaptured;
                 gm.DisplayVRCapture(playerName);
             }
         }

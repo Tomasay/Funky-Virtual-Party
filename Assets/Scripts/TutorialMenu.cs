@@ -61,7 +61,7 @@ public class TutorialMenu : MonoBehaviour
         }
 
         cm.onReadyUp -= ReadyUp;
-        manager.State = GameManager.GameState.Countdown;
+        manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
     }
     private void SpawnVRPlayerIcon()
@@ -90,7 +90,7 @@ public class TutorialMenu : MonoBehaviour
         }
 
         cm.onReadyUp -= ReadyUp;
-        manager.State = GameManager.GameState.Countdown;
+        manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
     }
 }

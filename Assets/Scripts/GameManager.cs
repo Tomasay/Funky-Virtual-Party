@@ -6,6 +6,16 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 
+public enum GameState
+{
+    Tutorial,
+    Countdown,
+    GameLoop,
+    PlayerCaptured,
+    TimeEnded,
+    GameOver
+}
+
 public class GameManager : MonoBehaviour
 {
     [SerializeField] GameObject playerPrefab;
@@ -21,18 +31,8 @@ public class GameManager : MonoBehaviour
 
     public Vector3 VRPlayerPos { get => VRPlayer.transform.position; }
 
-    public enum GameState
-    {
-        Tutorial,
-        Countdown,
-        GameLoop,
-        PlayerCaptured,
-        TimeEnded,
-        GameOver
-    }
-
     private GameState state;
-    public GameState State { get => state; set => state = value; }
+    public GameState State { get => state; set{ state = value; ClientManager.instance.Manager.Socket.Emit("gameStateFromHost", "" + state); } }
 
     void Start()
     {
@@ -113,7 +113,7 @@ public class GameManager : MonoBehaviour
 
     IEnumerator GameOver(int countdown, string txt)
     {
-        state = GameState.GameOver;
+        //State = GameState.GameOver;
 
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
