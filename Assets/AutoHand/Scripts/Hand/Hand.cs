@@ -142,6 +142,7 @@ namespace Autohand
         [Tooltip("This is used in conjunction with custom poses. For a custom pose to work it must has the same PoseIndex as the hand. Used for when your game has multiple hands")]
         public int poseIndex = 0;
 
+        public GameObject outerMesh;
 
         Grabbable HoldingObj = null;
         public Grabbable holdingObj { get{ return HoldingObj; } internal set { HoldingObj = value; } }

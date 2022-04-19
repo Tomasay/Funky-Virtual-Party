@@ -59,7 +59,10 @@ public class XRSyncer : MonoBehaviour
 
         string json = JsonUtility.ToJson(currentData);
 
-        ClientManager.instance.Manager.Socket.Emit("XRDataToServer", json);
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.Manager.Socket.Emit("XRDataToServer", json);
+        }
 #endif
     }
 
