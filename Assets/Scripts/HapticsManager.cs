@@ -25,21 +25,31 @@ public class HapticsManager : MonoBehaviour
         UnityEngine.XR.InputDevices.GetDevicesWithRole(UnityEngine.XR.InputDeviceRole.LeftHanded, leftDevices);
     }
 
-    public void TriggerHaptic(bool isLeft, float duration = 0.5f)
+    public void TriggerHaptic(bool isLeft, float duration = 0.5f, float amplitude = 0.5f)
     {
         List <UnityEngine.XR.InputDevice> d = isLeft ? leftDevices : rightDevices;
 
         foreach (var device in d)
         {
             UnityEngine.XR.HapticCapabilities capabilities;
+            if (device.TryGetHapticCapabilities(out capabilities) && capabilities.supportsImpulse)
+            {
+                uint channel = 0;
+                device.SendHapticImpulse(channel, amplitude, duration);
+            }
+        }
+    }
+
+    public void StopHaptics(bool isLeft)
+    {
+        List<UnityEngine.XR.InputDevice> d = isLeft ? leftDevices : rightDevices;
+
+        foreach (var device in d)
+        {
+            UnityEngine.XR.HapticCapabilities capabilities;
             if (device.TryGetHapticCapabilities(out capabilities))
             {
-                if (capabilities.supportsImpulse)
-                {
-                    uint channel = 0;
-                    float amplitude = 0.5f;
-                    device.SendHapticImpulse(channel, amplitude, duration);
-                }
+                device.StopHaptics();
             }
         }
     }

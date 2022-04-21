@@ -123,6 +123,83 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1001 &636344829
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1262313374629172509, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: grabLayers.m_Bits
+      value: 67108864
+      objectReference: {fileID: 0}
+    - target: {fileID: 1262313376109179214, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: grabLayers.m_Bits
+      value: 67108864
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -6.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373747, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373748, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
+      propertyPath: m_Name
+      value: XRPlayerShootout
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 9dbf5b8968046e745a0ac5ce57fdcc1e, type: 3}
 --- !u!114 &923307269 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6707951067419483808, guid: a5226a72c9553294abfe172a458b5805, type: 3}
@@ -475,6 +552,10 @@ PrefabInstance:
     - target: {fileID: 7942002210973373748, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_Name
       value: Auto Hand Player Container
+      objectReference: {fileID: 0}
+    - target: {fileID: 7942002210973373748, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a5226a72c9553294abfe172a458b5805, type: 3}

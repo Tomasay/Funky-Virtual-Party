@@ -1,21 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class Fireball : MonoBehaviour
 {
     [SerializeField] ParticleSystem explosion;
     [SerializeField] GameObject fireball;
-    [SerializeField] Collider col;
     [SerializeField] Rigidbody rb;
 
+    public Collider col;
+    public ParentConstraint constraint;
+
     private bool hasExploded;
+    private float maxTimeAlive = 10, timeDropped;
 
     void Update()
     {
-        if(hasExploded && explosion.isStopped)
+        if((hasExploded && explosion.isStopped) || (timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
         {
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
 
@@ -24,7 +28,6 @@ public class Fireball : MonoBehaviour
         if(collision.gameObject.GetComponent<Terrain>())
         {
             TriggerExplosion();
-            Debug.Log("Colliding with floor");
         }
     }
 
@@ -35,5 +38,17 @@ public class Fireball : MonoBehaviour
         rb.isKinematic = true;
         explosion.Play();
         hasExploded = true;
+    }
+
+    public void Activate()
+    {
+        fireball.SetActive(true);
+        rb.isKinematic = false;
+        rb.useGravity = true;
+    }
+
+    public void OnDrop()
+    {
+        timeDropped = Time.time;
     }
 }

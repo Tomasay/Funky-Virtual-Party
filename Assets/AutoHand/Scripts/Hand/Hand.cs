@@ -353,6 +353,15 @@ namespace Autohand
 #endif
 
             body.WakeUp();
+
+            maxFollowDistance = 0.0f;
+            StartCoroutine(SetFollowDistanceDelayed(0.75f, 3));
+        }
+
+        IEnumerator SetFollowDistanceDelayed(float dist, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+            maxFollowDistance = dist;
         }
 
         public virtual void SetPalmRays() {
