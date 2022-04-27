@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Digger.Modules.Runtime.Sources;
+using Digger.Modules.Core.Sources;
 
 public class Shootout_DestructibleTerrian : MonoBehaviour
 {
-    [SerializeField] int blastRadius = 10;
+    [SerializeField] int blastRadius = 10, blastDepth = 2;
     [SerializeField] float startingHeight = 30;
+
+    [SerializeField] DiggerMasterRuntime digger;
 
     Terrain ter = null;
 
@@ -26,7 +30,6 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Collision!");
         List<ContactPoint> contacts = new List<ContactPoint>(); 
         collision.GetContacts(contacts);
         foreach( var c in contacts )
@@ -52,7 +55,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         //Now you can use this point to edit it using SetHeights
         float[,] heights = ter.terrainData.GetHeights(0,0,ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
 
-
+        /*
         for(int z = hitPointTerZ - blastRadius; z < hitPointTerZ + blastRadius; z++)
             for(int x = hitPointTerX - blastRadius; x < hitPointTerX + blastRadius; x++)
             {
@@ -61,23 +64,38 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
                 if ( sqMag < rSquare )
                 {
                     float portion = (sqMag / rSquare);
-                    heights[z, x] = 0;
+                    heights[z, x] = startingHeight - blastDepth;
                 }
             }
 
         ter.terrainData.SetHeights(0, 0, heights);
+        */
+
+        digger.ModifyAsyncBuffured(new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z), BrushType.Sphere, ActionType.Dig, 0, 1, blastRadius);
     }
 
     private void ResetHeight()
     {
         float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
+
         for (int x = 0; x < heights.GetLength(0); x++)
         {
             for (int y = 0; y < heights.GetLength(1); y++)
             {
-                heights[x, y] = startingHeight;
+                int rSquare = ((ter.terrainData.alphamapWidth/2) * (ter.terrainData.alphamapWidth/2));
+                float sqMag = (new Vector2(ter.terrainData.alphamapWidth / 2, ter.terrainData.alphamapWidth / 2) - new Vector2(x, y)).sqrMagnitude;
+                if (sqMag > rSquare)
+                {
+                    float portion = (sqMag / rSquare);
+                    heights[x, y] = 0;
+                }
+                else
+                {
+                    heights[x, y] = startingHeight;
+                }
             }
         }
+
         ter.terrainData.SetHeights(0, 0, heights);
     }
 }

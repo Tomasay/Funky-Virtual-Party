@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class ShootoutGameVRPlayerController : VRPlayerController
 {
     [SerializeField] GameObject fireballPrefab, fireballHandAnchorLeft, fireballHandAnchorRight;
+    [SerializeField] GameObject handFireEffectLeft, handFireEffectRight;
 
     public float fireballThrowPower = 1, handOffset = 0.05f;
 
@@ -32,6 +33,14 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         hand.TryGrab(hand.left ? currentFireballLeft.GetComponent<Grabbable>() : currentFireballRight.GetComponent<Grabbable>());
 
         HapticsManager.instance.TriggerHaptic(hand.left, 99);
+        if (hand.left)
+        {
+            handFireEffectLeft.SetActive(true);
+        }
+        else
+        {
+            handFireEffectRight.SetActive(true);
+        }
     }
 
     private void OnRelease(Hand hand, Grabbable grabbable)
@@ -47,6 +56,15 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
         HapticsManager.instance.StopHaptics(hand.left);
         PreloadFireball(hand.left);
+
+        if (hand.left)
+        {
+            handFireEffectLeft.SetActive(false);
+        }
+        else
+        {
+            handFireEffectRight.SetActive(false);
+        }
     }
 
     private void PreloadFireball(bool isLeftHand)

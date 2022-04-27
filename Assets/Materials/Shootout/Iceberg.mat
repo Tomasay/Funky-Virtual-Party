@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Iceberg
-  m_Shader: {fileID: -6465566751694194690, guid: c84ed6878022a294c9b92bccce58fe46, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: cb79b35a1742c884aaae77a1fab8a987, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -19,6 +19,14 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _NormalFromTexture_1378816ec2d94f9ea74136626bbeea73_Texture_0:
+        m_Texture: {fileID: 2800000, guid: 43289a972418f5849aa00b2766efa29c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalFromTexture_5db691d83c594ee1a6ab993d9ea7cdb4_Texture_0:
+        m_Texture: {fileID: 2800000, guid: 43289a972418f5849aa00b2766efa29c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -33,6 +41,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - SnowStartHeight: 30
-    m_Colors: []
+    - RefractStrength: 0
+    - SnowStartHeight: 21.6
+    m_Colors:
+    - IceColor: {r: 0.93333334, g: 0.9882353, b: 1.0039216, a: 1}
+    - IceTiling: {r: 2, g: 2, b: 0, a: 0}
+    - SnowColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 1}
   m_BuildTextureStacks: []
