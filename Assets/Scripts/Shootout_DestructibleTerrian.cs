@@ -6,7 +6,7 @@ using Digger.Modules.Core.Sources;
 
 public class Shootout_DestructibleTerrian : MonoBehaviour
 {
-    [SerializeField] int blastRadius = 10, blastDepth = 2;
+    [SerializeField] int blastRadius = 20, blastDepth = 2;
     [SerializeField] float startingHeight = 30;
 
     [SerializeField] DiggerMasterRuntime digger;
@@ -30,48 +30,26 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        List<ContactPoint> contacts = new List<ContactPoint>(); 
-        collision.GetContacts(contacts);
-        foreach( var c in contacts )
+        if (collision.gameObject.TryGetComponent<Fireball>(out Fireball fireball))
         {
-            //Debug.Log("X: " + c.point.x);
-            //Debug.Log("Z: " + c.point.z);
+            List<ContactPoint> contacts = new List<ContactPoint>();
+            collision.GetContacts(contacts);
+            ContactPoint ray = contacts[0];
+            float relativeHitTerX = (ray.point.x - transform.position.x) / ter.terrainData.size.x;
+            float relativeHitTerZ = (ray.point.z - transform.position.z) / ter.terrainData.size.z;
+            // you have a number between 0 and 1 where your terrain has been hit (multiplied by 100 it would be the percentage of width and length)
+            float relativeTerCoordX = ter.terrainData.heightmapResolution * relativeHitTerX;
+            float relativeTerCoordZ = ter.terrainData.heightmapResolution * relativeHitTerZ;
+
+            // now you have the relative point of your terrain, but you need to floor this because the number of points on terrain are integer
+            int hitPointTerX = (int)relativeTerCoordX;
+            int hitPointTerZ = (int)relativeTerCoordZ;
+
+            //Now you can use this point to edit it using SetHeights
+            float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
+
+            digger.ModifyAsyncBuffured(new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z), BrushType.Sphere, ActionType.Dig, 0, 1, Mathf.Max(2, fireball.currentScale * blastRadius));
         }
-        ContactPoint ray = contacts[0];
-        float relativeHitTerX = (ray.point.x - transform.position.x) / ter.terrainData.size.x;
-        float relativeHitTerZ = (ray.point.z - transform.position.z) / ter.terrainData.size.z;
-        // you have a number between 0 and 1 where your terrain has been hit (multiplied by 100 it would be the percentage of width and length)
-        float relativeTerCoordX = ter.terrainData.heightmapResolution * relativeHitTerX;
-        float relativeTerCoordZ = ter.terrainData.heightmapResolution * relativeHitTerZ;
-        //Debug.Log("X: " + relativeHitTerX);
-        //Debug.Log("Z: " + relativeHitTerZ);
-
-        // now you have the relative point of your terrain, but you need to floor this because the number of points on terrain are integer
-        int hitPointTerX = (int)relativeTerCoordX;
-        int hitPointTerZ = (int)relativeTerCoordZ;
-        //Debug.Log("X: " + hitPointTerX);
-        //Debug.Log("Z: " + hitPointTerZ);
-
-        //Now you can use this point to edit it using SetHeights
-        float[,] heights = ter.terrainData.GetHeights(0,0,ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
-
-        /*
-        for(int z = hitPointTerZ - blastRadius; z < hitPointTerZ + blastRadius; z++)
-            for(int x = hitPointTerX - blastRadius; x < hitPointTerX + blastRadius; x++)
-            {
-                int rSquare = (blastRadius * blastRadius);
-                float sqMag = (new Vector2(hitPointTerX, hitPointTerZ) - new Vector2(x, z)).sqrMagnitude;
-                if ( sqMag < rSquare )
-                {
-                    float portion = (sqMag / rSquare);
-                    heights[z, x] = startingHeight - blastDepth;
-                }
-            }
-
-        ter.terrainData.SetHeights(0, 0, heights);
-        */
-
-        digger.ModifyAsyncBuffured(new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z), BrushType.Sphere, ActionType.Dig, 0, 1, blastRadius);
     }
 
     private void ResetHeight()

@@ -4940,8 +4940,11 @@ MonoBehaviour:
   explosion: {fileID: 8065244542973703527}
   fireball: {fileID: 5349683969086038956}
   rb: {fileID: 566606611587223269}
+  minSize: 0.1
+  maxSize: 1.25
   col: {fileID: 566606611587223289}
   constraint: {fileID: 3865167073801075657}
+  currentScale: 0
 --- !u!114 &3466704360205798773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19757,7 +19760,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3640556054494162585
 Transform:
   m_ObjectHideFlags: 0
@@ -19957,12 +19960,20 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
-      propertyPath: simulationSpeed
-      value: 1
+      propertyPath: scalingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
       propertyPath: ShapeModule.type
       value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
+      propertyPath: NoiseModule.damping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
+      propertyPath: VelocityModule.y.scalar
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
       propertyPath: ShapeModule.m_MeshRenderer
@@ -19976,17 +19987,9 @@ PrefabInstance:
       propertyPath: VelocityModule.inWorldSpace
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
-      propertyPath: InitialModule.startSize.scalar
-      value: 0.04
-      objectReference: {fileID: 0}
-    - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
-      propertyPath: InitialModule.startSpeed.scalar
-      value: 0.005
-      objectReference: {fileID: 0}
-    - target: {fileID: 2866062456590267642, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
-      propertyPath: InitialModule.startSize.minScalar
-      value: 0.02
+    - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
+      propertyPath: scalingMode
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
       propertyPath: simulationSpeed
@@ -19997,6 +20000,10 @@ PrefabInstance:
       value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
+      propertyPath: VelocityModule.y.scalar
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
       propertyPath: ShapeModule.m_MeshRenderer
       value: 
       objectReference: {fileID: 4902937300699952129}
@@ -20007,14 +20014,6 @@ PrefabInstance:
     - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
       propertyPath: VelocityModule.inWorldSpace
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
-      propertyPath: InitialModule.startSize.scalar
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
-      propertyPath: InitialModule.startSize.minScalar
-      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4451711845555372132, guid: 1b59b1a7b867c904f92e34b9b0439310, type: 3}
       propertyPath: InitialModule.startLifetime.scalar

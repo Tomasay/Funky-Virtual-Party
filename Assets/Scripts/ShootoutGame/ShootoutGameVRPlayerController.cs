@@ -13,6 +13,8 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     private GameObject currentFireballLeft, currentFireballRight;
 
+    private bool isGrabbingLeft, isGrabbingRight;
+
     void Awake()
     {
         ahp.handRight.OnTriggerGrab += OnGrabbed;
@@ -32,15 +34,18 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
         hand.TryGrab(hand.left ? currentFireballLeft.GetComponent<Grabbable>() : currentFireballRight.GetComponent<Grabbable>());
 
-        HapticsManager.instance.TriggerHaptic(hand.left, 99);
         if (hand.left)
         {
             handFireEffectLeft.SetActive(true);
+            isGrabbingLeft = true;
         }
         else
         {
             handFireEffectRight.SetActive(true);
+            isGrabbingRight = true;
         }
+
+        StartCoroutine(TriggerFireballHaptics(hand.left));
     }
 
     private void OnRelease(Hand hand, Grabbable grabbable)
@@ -48,13 +53,14 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         if (hand.left)
         {
             currentFireballLeft.GetComponent<Fireball>().OnDrop();
+            isGrabbingLeft = false;
         }
         else
         {
             currentFireballRight.GetComponent<Fireball>().OnDrop();
+            isGrabbingRight = false;
         }
 
-        HapticsManager.instance.StopHaptics(hand.left);
         PreloadFireball(hand.left);
 
         if (hand.left)
@@ -90,6 +96,26 @@ public class ShootoutGameVRPlayerController : VRPlayerController
             src.weight = 1;
             currentFireballRight.GetComponent<Fireball>().constraint.AddSource(src);
             currentFireballRight.GetComponent<Fireball>().constraint.constraintActive = true;
+        }
+    }
+
+    IEnumerator TriggerFireballHaptics(bool isLeft)
+    {
+        if (isLeft)
+        {
+            while(isGrabbingLeft)
+            {
+                HapticsManager.instance.TriggerHaptic(true, 0.1f, currentFireballLeft.GetComponent<Fireball>().currentScale);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+        else
+        {
+            while (isGrabbingRight)
+            {
+                HapticsManager.instance.TriggerHaptic(false, 0.1f, currentFireballRight.GetComponent<Fireball>().currentScale);
+                yield return new WaitForSeconds(0.1f);
+            }
         }
     }
 }
