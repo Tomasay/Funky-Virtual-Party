@@ -222,6 +222,9 @@ public class ClientManagerWeb : MonoBehaviour
             case "ChaseGame":
                 SceneManager.LoadScene("ChaseGameClient");
                 break;
+            case "Shootout":
+                SceneManager.LoadScene("ShootoutClient");
+                break;
             default:
                 break;
         }

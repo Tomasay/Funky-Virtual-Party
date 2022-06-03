@@ -33,4 +33,10 @@ public class SceneChanger : MonoBehaviour
         cm.OnMinigameStart("ChaseGame");
         SceneManager.LoadScene("ChaseGame");
     }
+
+    public void StartShootoutGame()
+    {
+        cm.OnMinigameStart("Shootout");
+        SceneManager.LoadScene("Shootout");
+    }
 }

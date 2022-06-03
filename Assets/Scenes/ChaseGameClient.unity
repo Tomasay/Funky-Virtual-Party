@@ -2173,7 +2173,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 0.44946492, y: 1}
+    m_SensorSize: {x: 1.3333334, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -2601,7 +2601,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 0.44946492, y: 1}
+    m_SensorSize: {x: 1.3333334, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -3190,7 +3190,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 0.44946492, y: 1}
+    m_SensorSize: {x: 1.3333334, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -4097,7 +4097,7 @@ MonoBehaviour:
   controllerCanvas: {fileID: 996340461}
   playerIconPrefab: {fileID: 4733715363934975906, guid: 327e227188968c3468b0190d8443791d, type: 3}
   clientPlayerIconsParent: {fileID: 172430378}
-  manager: {fileID: 1917974693}
+  manager: {fileID: 0}
 --- !u!1001 &1807997683
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4203,7 +4203,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1917974692}
-  - component: {fileID: 1917974693}
+  - component: {fileID: 1917974691}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4211,6 +4211,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1917974691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1917974690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe5ef4c3e665ce4fa34e8a0ecbf2540, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 8903612349321449842, guid: a0b55a4972306b445ae44ac746ea3f3f, type: 3}
+  VRPlayer: {fileID: 2034842733}
+  playerCamera: {fileID: 741762999}
+  countdownText: {fileID: 482772239}
+  gameTimeText: {fileID: 481779875}
 --- !u!4 &1917974692
 Transform:
   m_ObjectHideFlags: 0
@@ -4225,23 +4242,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1917974693
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1917974690}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 88951a6db11dafe418aed8f107b4fc4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 8903612349321449842, guid: a0b55a4972306b445ae44ac746ea3f3f, type: 3}
-  VRPlayer: {fileID: 2034842733}
-  playerCamera: {fileID: 741762999}
-  countdownText: {fileID: 482772239}
-  gameTimeText: {fileID: 481779875}
 --- !u!1 &2034842733 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8884637260369917442, guid: da8c272ae09df4f479463d6d6e2f5923, type: 3}
@@ -4393,7 +4393,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 0.44946492, y: 1}
+    m_SensorSize: {x: 1.3333334, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0

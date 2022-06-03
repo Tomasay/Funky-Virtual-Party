@@ -6,7 +6,7 @@ public class ChaseGameClientPlayer : ClientPlayer
 {
     [SerializeField] private int tackleForce, tackleCooldown = 2, tacklePlayerRange = 10;
 
-    private GameManager gm = null;
+    private ChaseGameManager gm = null;
     private GameManagerWeb gmw = null;
     private bool isWebGL = false;
     private bool tackling;
@@ -29,7 +29,7 @@ public class ChaseGameClientPlayer : ClientPlayer
         }
         else
         {
-            gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+            gm = GameObject.Find("GameManager").GetComponent<ChaseGameManager>();
         }
     }
 
