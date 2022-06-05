@@ -13,6 +13,7 @@ public class Fireball : MonoBehaviour
     public Collider col;
     public ParentConstraint constraint;
     public float currentScale = 0; //Between 0 and 1, indicates level between min and max size
+    public bool readyToSpawn = false;
 
     private bool hasExploded = false, isDropped = false;
     private float maxTimeAlive = 10, timeDropped;
@@ -20,16 +21,16 @@ public class Fireball : MonoBehaviour
 
     private void Awake()
     {
-        fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
-        fireball.SetActive(false);
         fireballMat = fireball.GetComponent<Renderer>().material;
+
+        Reset();
     }
 
     void Update()
     {
         if((hasExploded && explosion.isStopped) || (timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
         {
-            Destroy(gameObject);
+            Reset();
         }
 
         if(fireball.activeSelf && !isDropped)
@@ -53,6 +54,11 @@ public class Fireball : MonoBehaviour
         {
             TriggerExplosion();
         }
+        else if (collision.gameObject.name.Contains("Water"))
+        {
+            //TODO: Trigger smoke burnout effect
+            Reset();
+        }
     }
 
     private void TriggerExplosion()
@@ -69,11 +75,26 @@ public class Fireball : MonoBehaviour
         fireball.SetActive(true);
         rb.isKinematic = false;
         rb.useGravity = true;
+        readyToSpawn = false;
     }
 
     public void OnDrop()
     {
         timeDropped = Time.time;
         isDropped = true;
+    }
+
+    private void Reset()
+    {
+        currentScale = 0;
+        fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        fireball.SetActive(false);
+        hasExploded = false;
+        isDropped = false;
+        //constraint.constraintActive = false;
+
+        readyToSpawn = true;
     }
 }

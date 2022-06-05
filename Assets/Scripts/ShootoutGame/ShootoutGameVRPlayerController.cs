@@ -8,6 +8,8 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 {
     [SerializeField] GameObject fireballPrefab, fireballHandAnchorLeft, fireballHandAnchorRight;
     [SerializeField] GameObject handFireEffectLeft, handFireEffectRight;
+    [SerializeField] Fireball[] fireballsPool;
+
 
     public float fireballThrowPower = 1, handOffset = 0.05f;
 
@@ -75,27 +77,61 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     private void PreloadFireball(bool isLeftHand)
     {
+        //Get next available fireball in pool
+        Fireball nextFireball = fireballsPool[0];
+        for (int i = 0; i < fireballsPool.Length; i++)
+        {
+            if(fireballsPool[i].readyToSpawn)
+            {
+                nextFireball = fireballsPool[i];
+                break;
+            }
+        }
+
+        //Set up fireball
         if (isLeftHand)
         {
-            currentFireballLeft = Instantiate(fireballPrefab);
+            currentFireballLeft = nextFireball.gameObject;
             currentFireballLeft.transform.localPosition = fireballHandAnchorLeft.transform.position;
             currentFireballLeft.transform.localRotation = Quaternion.identity;
             UnityEngine.Animations.ConstraintSource src = new UnityEngine.Animations.ConstraintSource();
             src.sourceTransform = fireballHandAnchorLeft.transform;
             src.weight = 1;
-            currentFireballLeft.GetComponent<Fireball>().constraint.AddSource(src);
-            currentFireballLeft.GetComponent<Fireball>().constraint.constraintActive = true;
+
+            Fireball f = currentFireballLeft.GetComponent<Fireball>();
+            if (f.constraint.sourceCount > 0)
+            {
+                f.constraint.SetSource(0, src);
+            }
+            else
+            {
+                f.constraint.AddSource(src);
+            }
+            f.constraint.constraintActive = true;
+            f.constraint.enabled = true;
+            f.readyToSpawn = false;
         }
         else
         {
-            currentFireballRight = Instantiate(fireballPrefab);
+            currentFireballRight = nextFireball.gameObject;
             currentFireballRight.transform.localPosition = fireballHandAnchorRight.transform.position;
             currentFireballRight.transform.localRotation = Quaternion.identity;
             UnityEngine.Animations.ConstraintSource src = new UnityEngine.Animations.ConstraintSource();
             src.sourceTransform = fireballHandAnchorRight.transform;
             src.weight = 1;
-            currentFireballRight.GetComponent<Fireball>().constraint.AddSource(src);
-            currentFireballRight.GetComponent<Fireball>().constraint.constraintActive = true;
+
+            Fireball f = currentFireballRight.GetComponent<Fireball>();
+            if (f.constraint.sourceCount > 0)
+            {
+                f.constraint.SetSource(0, src);
+            }
+            else
+            {
+                f.constraint.AddSource(src);
+            }
+            f.constraint.constraintActive = true;
+            f.constraint.enabled = true;
+            f.readyToSpawn = false;
         }
     }
 
