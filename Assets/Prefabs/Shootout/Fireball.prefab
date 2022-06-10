@@ -4822,7 +4822,7 @@ GameObject:
   - component: {fileID: 3294322318788967274}
   - component: {fileID: 3466704360205798773}
   - component: {fileID: 3865167073801075657}
-  - component: {fileID: 6313949045172281603}
+  - component: {fileID: 4879968599162948385}
   m_Layer: 0
   m_Name: Fireball
   m_TagString: Untagged
@@ -4946,6 +4946,12 @@ MonoBehaviour:
   col: {fileID: 566606611587223289}
   constraint: {fileID: 3865167073801075657}
   currentScale: 0
+  readyToSpawn: 0
+  hasExploded: 0
+  isDropped: 0
+  maxTimeAlive: 10
+  timeDropped: 0
+  fireballMat: {fileID: 0}
 --- !u!114 &3466704360205798773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5038,7 +5044,7 @@ ParentConstraint:
   m_IsContraintActive: 0
   m_IsLocked: 0
   m_Sources: []
---- !u!114 &6313949045172281603
+--- !u!114 &4879968599162948385
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5047,7 +5053,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 566606611587223288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fd35b5818f80534b918bc892d617062, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f9d75771baefb7409dee2c11a897e06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1589349854153909103

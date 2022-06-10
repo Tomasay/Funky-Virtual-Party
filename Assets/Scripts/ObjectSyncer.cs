@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ObjectSyncer : MonoBehaviour
 {
+    //How often data is sent to be synced
+    public float sendRate = 0.25f;
+
     public class ObjectData
     {
         public Vector3 Position;
@@ -18,7 +21,7 @@ public class ObjectSyncer : MonoBehaviour
         }
     }
 
-    ObjectData currentData;
+    protected ObjectData currentData;
 
 
     protected virtual void Awake()
@@ -30,12 +33,15 @@ public class ObjectSyncer : MonoBehaviour
         ClientManagerWeb.instance.Manager.Socket.On<string>("ObjectDataToClient", ReceiveData);
 #endif
 
+#if !UNITY_WEBGL
+        InvokeRepeating("SendData", 0, sendRate);
+#endif
+
     }
 
-
-    protected virtual void Update()
-    {
 #if !UNITY_WEBGL
+    protected virtual void SendData()
+    {
         //Position
         currentData.Position = transform.position;
 
@@ -48,16 +54,16 @@ public class ObjectSyncer : MonoBehaviour
         {
             ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", json);
         }
-#endif
     }
+#endif
 
 
-    public void ReceiveData(string json)
+    public virtual void ReceiveData(string json)
     {
         ApplyNewData(JsonUtility.FromJson<ObjectData>(json));
     }
 
-    protected void ApplyNewData(ObjectData data)
+    protected virtual void ApplyNewData<T>(T data) where T : ObjectData
     {
         if(data.objectID != currentData.objectID)
         {

@@ -6,8 +6,8 @@ using UnityEngine.Animations;
 public class Fireball : MonoBehaviour
 {
     [SerializeField] ParticleSystem explosion;
-    [SerializeField] GameObject fireball;
-    [SerializeField] Rigidbody rb;
+    [SerializeField] public GameObject fireball;
+    [SerializeField] public Rigidbody rb;
     [SerializeField] float minSize, maxSize;
 
     public Collider col;
@@ -15,9 +15,9 @@ public class Fireball : MonoBehaviour
     public float currentScale = 0; //Between 0 and 1, indicates level between min and max size
     public bool readyToSpawn = false;
 
-    private bool hasExploded = false, isDropped = false;
-    private float maxTimeAlive = 10, timeDropped;
-    private Material fireballMat;
+    public bool hasExploded = false, isDropped = false;
+    public float maxTimeAlive = 10, timeDropped;
+    public Material fireballMat;
 
     private void Awake()
     {

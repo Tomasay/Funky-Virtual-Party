@@ -5,6 +5,9 @@ using Autohand;
 
 public class XRSyncer : MonoBehaviour
 {
+    //How often data is sent to be synced
+    public float sendRate = 0.1f;
+
     //References
     [SerializeField] GameObject head;
     [SerializeField] Hand leftHand, rightHand;
@@ -28,12 +31,15 @@ public class XRSyncer : MonoBehaviour
         ClientManagerWeb.instance.Manager.Socket.On<string>("XRDataToClient", ReceiveData);
 #endif
 
+#if !UNITY_WEBGL
+        InvokeRepeating("SendData", 0, sendRate);
+#endif
+
     }
 
-
-    void Update()
-    {
 #if !UNITY_WEBGL
+    protected virtual void SendData()
+    {
         //Position
         currentData.HeadPosition = head.transform.position;
         currentData.LeftHandPosition = leftHand.transform.position;
@@ -63,8 +69,8 @@ public class XRSyncer : MonoBehaviour
         {
             ClientManager.instance.Manager.Socket.Emit("XRDataToServer", json);
         }
-#endif
     }
+#endif
 
 
     public void ReceiveData(string json)
