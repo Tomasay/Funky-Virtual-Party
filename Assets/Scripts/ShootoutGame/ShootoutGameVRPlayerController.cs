@@ -40,11 +40,13 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         {
             handFireEffectLeft.SetActive(true);
             isGrabbingLeft = true;
+            fireball.isInLeftHand = true;
         }
         else
         {
             handFireEffectRight.SetActive(true);
             isGrabbingRight = true;
+            fireball.isInRightHand = true;
         }
 
         StartCoroutine(TriggerFireballHaptics(hand.left));

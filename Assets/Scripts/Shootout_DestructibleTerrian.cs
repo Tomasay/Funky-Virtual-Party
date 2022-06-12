@@ -49,6 +49,8 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
             float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
 
             digger.ModifyAsyncBuffured(new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z), BrushType.Sphere, ActionType.Dig, 0, 1, Mathf.Max(2, fireball.currentScale * blastRadius));
+
+            Debug.Log("Terrain modified!");
         }
     }
 
