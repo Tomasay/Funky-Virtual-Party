@@ -12,5 +12,7 @@ copy WGLframework WGLDest
 copy WGLwasm WGLDest
 
 cd ..\..\Web\vrpartygame
+git add -A
+git commit -m "testing WebGL changes auto"
 git push
 
