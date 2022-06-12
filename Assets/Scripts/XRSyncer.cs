@@ -6,7 +6,7 @@ using Autohand;
 public class XRSyncer : MonoBehaviour
 {
     //How often data is sent to be synced
-    public float sendRate = 0.1f;
+    public float UpdatesPerSecond = 10;
 
     //References
     [SerializeField] GameObject head;
@@ -32,7 +32,7 @@ public class XRSyncer : MonoBehaviour
 #endif
 
 #if !UNITY_WEBGL
-        InvokeRepeating("SendData", 0, sendRate);
+        InvokeRepeating("SendData", 0, 1/UpdatesPerSecond);
 #endif
 
     }

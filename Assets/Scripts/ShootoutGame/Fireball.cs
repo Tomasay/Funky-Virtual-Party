@@ -14,6 +14,7 @@ public class Fireball : MonoBehaviour
     public ParentConstraint constraint;
     public float currentScale = 0; //Between 0 and 1, indicates level between min and max size
     public bool readyToSpawn = false;
+    public bool isInLeftHand, isInRightHand;
 
     public bool hasExploded = false, isDropped = false;
     public float maxTimeAlive = 10, timeDropped;
@@ -82,6 +83,8 @@ public class Fireball : MonoBehaviour
     {
         timeDropped = Time.time;
         isDropped = true;
+        isInLeftHand = false;
+        isInRightHand = false;
     }
 
     private void Reset()

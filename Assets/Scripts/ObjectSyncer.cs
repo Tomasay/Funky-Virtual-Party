@@ -5,7 +5,7 @@ using UnityEngine;
 public class ObjectSyncer : MonoBehaviour
 {
     //How often data is sent to be synced
-    public float sendRate = 0.25f;
+    public float UpdatesPerSecond = 10;
 
     public class ObjectData
     {
@@ -34,7 +34,7 @@ public class ObjectSyncer : MonoBehaviour
 #endif
 
 #if !UNITY_WEBGL
-        InvokeRepeating("SendData", 0, sendRate);
+        InvokeRepeating("SendData", 0, 1/ UpdatesPerSecond);
 #endif
 
     }

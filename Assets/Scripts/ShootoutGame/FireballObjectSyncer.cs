@@ -10,6 +10,8 @@ public class FireballObjectSyncer : ObjectSyncer
         public float timeDropped;
         public bool isKinematic, useGravity;
         public bool isActive;
+        public bool isInLeftHand, isInRightHand;
+        public float currentScale;
     }
 
     FireballObjectData currentFireballData;
@@ -25,7 +27,7 @@ public class FireballObjectSyncer : ObjectSyncer
 #endif
 
 #if !UNITY_WEBGL
-        InvokeRepeating("SendData", 0, sendRate);
+        InvokeRepeating("SendData", 0, 1/UpdatesPerSecond);
 #endif
     }
 
@@ -47,6 +49,9 @@ public class FireballObjectSyncer : ObjectSyncer
         currentFireballData.isKinematic = f.rb.isKinematic;
         currentFireballData.useGravity = f.rb.useGravity;
         currentFireballData.isActive = f.fireball.activeSelf;
+        currentFireballData.isInLeftHand = f.isInLeftHand;
+        currentFireballData.isInRightHand = f.isInRightHand;
+        currentFireballData.currentScale = f.currentScale;
 
         string json = JsonUtility.ToJson(currentFireballData);
 
@@ -80,8 +85,20 @@ public class FireballObjectSyncer : ObjectSyncer
         f.hasExploded = data.hasExploded;
         f.isDropped = data.isDropped;
         f.timeDropped = data.timeDropped;
-        f.rb.isKinematic = data.isKinematic;
-        f.rb.useGravity = data.useGravity;
+        //f.rb.isKinematic = data.isKinematic;
+        //f.rb.useGravity = data.useGravity;
         f.fireball.SetActive(data.isActive);
+        f.currentScale = data.currentScale;
+
+        f.isInLeftHand = data.isInLeftHand;
+        f.isInRightHand = data.isInRightHand;
+
+        if (!data.hasExploded)
+        {
+            f.rb.useGravity = !(data.isInLeftHand || data.isInRightHand);
+            f.rb.isKinematic = (data.isInLeftHand || data.isInRightHand);
+            f.col.enabled = !(data.isInLeftHand || data.isInRightHand);
+        }
+        
     }
 }
