@@ -20,6 +20,8 @@ public class Fireball : MonoBehaviour
     public float maxTimeAlive = 10, timeDropped;
     public Material fireballMat;
 
+    public bool explodeEvent;
+
     private void Awake()
     {
         fireballMat = fireball.GetComponent<Renderer>().material;
@@ -69,6 +71,7 @@ public class Fireball : MonoBehaviour
         rb.isKinematic = true;
         explosion.Play();
         hasExploded = true;
+        explodeEvent = true;
     }
 
     public void Activate()

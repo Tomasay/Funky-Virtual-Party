@@ -4,14 +4,16 @@ using UnityEngine;
 
 public class FireballObjectSyncer : ObjectSyncer
 {
+    [SerializeField] GameObject fireballMesh;
+    [SerializeField] ParticleSystem explosion;
+    [SerializeField] Shootout_DestructibleTerrian terrain;
+
     public class FireballObjectData : ObjectData
     {
-        public bool hasExploded, isDropped;
         public float timeDropped;
-        public bool isKinematic, useGravity;
         public bool isActive;
-        public bool isInLeftHand, isInRightHand;
-        public float currentScale;
+
+        public bool explodeEvent;
     }
 
     FireballObjectData currentFireballData;
@@ -43,15 +45,14 @@ public class FireballObjectSyncer : ObjectSyncer
 
         //FireballObjectData fireballData = currentData as FireballObjectData;
         Fireball f = GetComponent<Fireball>();
-        currentFireballData.hasExploded = f.hasExploded;
-        currentFireballData.isDropped = f.isDropped;
         currentFireballData.timeDropped = f.timeDropped;
-        currentFireballData.isKinematic = f.rb.isKinematic;
-        currentFireballData.useGravity = f.rb.useGravity;
         currentFireballData.isActive = f.fireball.activeSelf;
-        currentFireballData.isInLeftHand = f.isInLeftHand;
-        currentFireballData.isInRightHand = f.isInRightHand;
-        currentFireballData.currentScale = f.currentScale;
+
+        currentFireballData.explodeEvent = f.explodeEvent;
+        if(f.explodeEvent)
+        {
+            f.explodeEvent = false;
+        }
 
         string json = JsonUtility.ToJson(currentFireballData);
 
@@ -81,24 +82,11 @@ public class FireballObjectSyncer : ObjectSyncer
         transform.rotation = data.Rotation;
 
         //Fireball
-        Fireball f = GetComponent<Fireball>();
-        f.hasExploded = data.hasExploded;
-        f.isDropped = data.isDropped;
-        f.timeDropped = data.timeDropped;
-        //f.rb.isKinematic = data.isKinematic;
-        //f.rb.useGravity = data.useGravity;
-        f.fireball.SetActive(data.isActive);
-        f.currentScale = data.currentScale;
-
-        f.isInLeftHand = data.isInLeftHand;
-        f.isInRightHand = data.isInRightHand;
-
-        if (!data.hasExploded)
-        {
-            f.rb.useGravity = !(data.isInLeftHand || data.isInRightHand);
-            f.rb.isKinematic = (data.isInLeftHand || data.isInRightHand);
-            f.col.enabled = !(data.isInLeftHand || data.isInRightHand);
-        }
+        fireballMesh.SetActive(data.isActive);
         
+        if(data.explodeEvent)
+        {
+            explosion.Play();
+        }
     }
 }

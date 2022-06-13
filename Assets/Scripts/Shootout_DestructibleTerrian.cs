@@ -13,6 +13,10 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     Terrain ter = null;
 
+    public bool explodeEvent;
+    public Vector3 explodePos;
+    public float fireballScale;
+
     void Start()
     {
         if(TryGetComponent<Terrain>(out Terrain t))
@@ -32,6 +36,8 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
     {
         if (collision.gameObject.TryGetComponent<Fireball>(out Fireball fireball))
         {
+            
+
             List<ContactPoint> contacts = new List<ContactPoint>();
             collision.GetContacts(contacts);
             ContactPoint ray = contacts[0];
@@ -48,10 +54,17 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
             //Now you can use this point to edit it using SetHeights
             float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
 
-            digger.ModifyAsyncBuffured(new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z), BrushType.Sphere, ActionType.Dig, 0, 1, Mathf.Max(2, fireball.currentScale * blastRadius));
+            explodePos = new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z);
+            fireballScale = fireball.currentScale;
+            Explosion(fireballScale, explodePos);
 
-            Debug.Log("Terrain modified!");
+            explodeEvent = true;
         }
+    }
+
+    public void Explosion(float fs, Vector3 ep)
+    {
+        digger.ModifyAsyncBuffured(ep, BrushType.Sphere, ActionType.Dig, 0, 1, Mathf.Max(2, fs * blastRadius));
     }
 
     private void ResetHeight()
