@@ -36,14 +36,14 @@ public class TerrainObjectSyncer : MonoBehaviour
     protected void SendData()
     {
         Shootout_DestructibleTerrian t = GetComponent<Shootout_DestructibleTerrian>();
-        currentTerrainData.explodePos = t.explodePos;
-        currentTerrainData.fireballScale = t.fireballScale;
-        currentTerrainData.explodeEvent = t.explodeEvent;
-        if(t.explodeEvent)
+        currentTerrainData.explodePos = t.ExplodePos;
+        currentTerrainData.fireballScale = t.FireballScale;
+        currentTerrainData.explodeEvent = t.ExplodeEvent;
+        if (t.ExplodeEvent)
         {
-            t.explodeEvent = false;
+            t.ExplodeEvent = false;
         }
-        
+
         string json = JsonUtility.ToJson(currentTerrainData);
 
         if (ClientManager.instance)
@@ -60,7 +60,6 @@ public class TerrainObjectSyncer : MonoBehaviour
 
     protected void ApplyNewTerrainData(TerrainObjectData data)
     {
-        Debug.Log("ApplyNewTerrainData");
         if (data.objectID != currentTerrainData.objectID)
         {
             return;
@@ -68,8 +67,6 @@ public class TerrainObjectSyncer : MonoBehaviour
 
         currentTerrainData.explodePos = data.explodePos;
         currentTerrainData.fireballScale = data.fireballScale;
-
-        Debug.Log("Terrain data applied");
 
         if (data.explodeEvent)
         {

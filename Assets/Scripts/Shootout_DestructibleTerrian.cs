@@ -13,9 +13,13 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     Terrain ter = null;
 
-    public bool explodeEvent;
-    public Vector3 explodePos;
-    public float fireballScale;
+    private bool explodeEvent;
+    private Vector3 explodePos;
+    private float fireballScale;
+
+    public bool ExplodeEvent { get => explodeEvent; set => explodeEvent = value; }
+    public Vector3 ExplodePos { get => explodePos;}
+    public float FireballScale { get => fireballScale;}
 
     void Start()
     {
