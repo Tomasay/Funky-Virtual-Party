@@ -5,6 +5,7 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
+using Digger.Modules.Core.Sources;
 
 public class ShootoutGameManager : GameManager
 {
@@ -19,6 +20,8 @@ public class ShootoutGameManager : GameManager
 
         timeRemaining = GAME_TIME_AMOUNT;
         vrGameTimeText.text = FormatTime(timeRemaining);
+
+        DiggerSocketManagerGetter.instance.manager = ClientManager.instance.Manager;
     }
 
     void Update()

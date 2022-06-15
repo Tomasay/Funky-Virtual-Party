@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 using Cinemachine;
+using Digger.Modules.Core.Sources;
 
 public class ShootoutGameManagerWeb : GameManagerWeb
 {
@@ -13,6 +14,15 @@ public class ShootoutGameManagerWeb : GameManagerWeb
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
+
+    [SerializeField] DiggerSystem digger;
+
+    private void Awake()
+    {
+#if UNITY_WEBGL
+            ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+#endif
+    }
 
     protected override void Start()
     {
@@ -80,5 +90,23 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         yield return new WaitForSeconds(3);
 
         SceneManager.LoadScene("MainMenuClient");
+    }
+
+    void MethodCalledFromServer(string methodName, string data)
+    {
+        Debug.Log("Method called");
+        if (methodName.Equals("GenerateVoxels"))
+        {
+            StartCoroutine("GenerateVoxelsCorouting", data);
+        }
+    }
+
+    IEnumerator GenerateVoxelsCorouting(string data)
+    {
+        Debug.Log("Coroutine starting");
+        yield return new WaitForSeconds(0);
+
+        UpdateVoxelsData newData = JsonUtility.FromJson<UpdateVoxelsData>(data);
+        VoxelChunk.GenerateVoxels(digger, newData.heightarray, newData.chunkAltitude, ref newData.voxelArray);
     }
 }
