@@ -48,7 +48,7 @@ public class ChaseGameManager : GameManager
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
                 break;
-            case GameState.PlayerCaptured:
+            case GameState.VRPlayerLoses:
                 StartCoroutine(GameOver(2, "YOU'VE BEEN CAPTURED"));
                 break;
             case GameState.TimeEnded:

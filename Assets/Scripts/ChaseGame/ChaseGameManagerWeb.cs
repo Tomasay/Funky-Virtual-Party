@@ -51,7 +51,7 @@ public class ChaseGameManagerWeb : GameManagerWeb
                 }
                 */
                 break;
-            case GameState.PlayerCaptured:
+            case GameState.VRPlayerLoses:
                 StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
                 break;
             case GameState.TimeEnded:

@@ -9,7 +9,7 @@ using Digger.Modules.Core.Sources;
 
 public class ShootoutGameManager : GameManager
 {
-    private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
+    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     [SerializeField] private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
@@ -42,8 +42,8 @@ public class ShootoutGameManager : GameManager
                 timeRemaining -= Time.deltaTime;
                 vrGameTimeText.text = FormatTime(timeRemaining);
                 break;
-            case GameState.PlayerCaptured:
-                StartCoroutine(GameOver(2, "YOU'VE BEEN CAPTURED"));
+            case GameState.VRPlayerWins:
+                //TODO:
                 break;
             case GameState.TimeEnded:
                 StartCoroutine(GameOver(2, "TIMES UP!\nYOU WIN"));
@@ -57,7 +57,7 @@ public class ShootoutGameManager : GameManager
     {
         countingDown = true;
 
-        vrInfoText.text = "RUN!";
+        vrInfoText.text = "GO!";
         SetVRPlayerMovement(true);
         yield return new WaitForSeconds(1);
 
@@ -78,17 +78,9 @@ public class ShootoutGameManager : GameManager
 
     IEnumerator GameOver(int countdown, string txt)
     {
-        //State = GameState.GameOver;
-
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
         SceneManager.LoadScene("MainMenu");
-    }
-    public void DisplayVRCapture(string playerName)
-    {
-        HapticsManager.instance.TriggerHaptic(false, 2);
-        HapticsManager.instance.TriggerHaptic(true, 2);
-        vrInfoText.text = playerName + " captured you!";
     }
 }

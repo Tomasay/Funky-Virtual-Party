@@ -11,9 +11,9 @@ public enum GameState
     Tutorial,
     Countdown,
     GameLoop,
-    PlayerCaptured,
-    TimeEnded,
-    GameOver
+    VRPlayerLoses,
+    VRPlayerWins,
+    TimeEnded
 }
 
 public class GameManager : MonoBehaviour

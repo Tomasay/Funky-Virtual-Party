@@ -51,7 +51,7 @@ public class ChaseGameClientPlayer : ClientPlayer
         {
             if (gm && gm.State == GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
             {
-                gm.State = GameState.PlayerCaptured;
+                gm.State = GameState.VRPlayerLoses;
                 gm.DisplayVRCapture(playerName);
             }
         }
