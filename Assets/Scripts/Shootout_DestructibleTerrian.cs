@@ -6,6 +6,12 @@ using Digger.Modules.Core.Sources;
 
 public class Shootout_DestructibleTerrian : MonoBehaviour
 {
+    public class ExplosionData
+    {
+        public Vector3 pos;
+        public float size;
+    }
+
     [SerializeField] int blastRadius = 20, blastDepth = 2;
     [SerializeField] float startingHeight = 30;
 
@@ -13,13 +19,12 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     Terrain ter = null;
 
-    private bool explodeEvent;
-    private Vector3 explodePos;
-    private float fireballScale;
-
-    public bool ExplodeEvent { get => explodeEvent; set => explodeEvent = value; }
-    public Vector3 ExplodePos { get => explodePos;}
-    public float FireballScale { get => fireballScale;}
+    private void Awake()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+#endif
+    }
 
     void Start()
     {
@@ -34,14 +39,25 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         }
 
         ResetHeight();
+
+        //digger.ModifyAsyncBuffured(new Vector3(-55, 26, 50), BrushType.Sphere, ActionType.Dig, 0, 1, 4);
     }
 
+    void MethodCalledFromServer(string methodName, string data)
+    {
+        if(methodName.Equals("ExplosionEvent"))
+        {
+            Debug.Log("EXPLOSION");
+            ExplosionData newData = JsonUtility.FromJson<ExplosionData>(data);
+            digger.ModifyAsyncBuffured(newData.pos, BrushType.Sphere, ActionType.Dig, 0, 1, newData.size);
+        }
+    }
+
+#if !UNITY_WEBGL
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.TryGetComponent<Fireball>(out Fireball fireball))
         {
-            
-
             List<ContactPoint> contacts = new List<ContactPoint>();
             collision.GetContacts(contacts);
             ContactPoint ray = contacts[0];
@@ -58,18 +74,18 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
             //Now you can use this point to edit it using SetHeights
             float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
 
-            explodePos = new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z);
-            fireballScale = fireball.currentScale;
-            Explosion(fireballScale, explodePos);
+            Vector3 explodePos = new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z);
+            float fireballSize = Mathf.Max(2, fireball.currentScale * blastRadius);
+            digger.ModifyAsyncBuffured(explodePos, BrushType.Sphere, ActionType.Dig, 0, 1, fireballSize);
 
-            explodeEvent = true;
+            //Send explosion data to clients
+            ExplosionData newData = new ExplosionData();
+            newData.pos = explodePos;
+            newData.size = fireballSize;
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
         }
     }
-
-    public void Explosion(float fs, Vector3 ep)
-    {
-        digger.ModifyAsyncBuffured(ep, BrushType.Sphere, ActionType.Dig, 0, 1, Mathf.Max(2, fs * blastRadius));
-    }
+#endif
 
     private void ResetHeight()
     {

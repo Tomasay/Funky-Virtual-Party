@@ -92,7 +92,7 @@ namespace Digger.Modules.Core.Sources
             Debug.Log("Voxel chunk awake");
 
 #if UNITY_WEBGL
-            DiggerSocketManagerGetter.instance.manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+            //DiggerSocketManagerGetter.instance.manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
 #endif
         }
 
@@ -181,7 +181,7 @@ namespace Digger.Modules.Core.Sources
             newData.heightarray = heightArray;
             newData.chunkAltitude = chunkAltitude;
             newData.voxelArray = voxelArray;
-            DiggerSocketManagerGetter.instance.manager.Socket.Emit("MethodCallToServer", "GenerateVoxels", JsonUtility.ToJson(newData));
+            //DiggerSocketManagerGetter.instance.manager.Socket.Emit("MethodCallToServer", "GenerateVoxels", JsonUtility.ToJson(newData));
             Debug.Log("Voxel data sent!");
 #endif
 

@@ -212,6 +212,8 @@ namespace Digger.Modules.Core.Sources
 #if ((!UNITY_ANDROID && !UNITY_WEBGL) || UNITY_EDITOR)
             return File.Exists(path) ? File.ReadAllBytes(path) : null;
 #else
+            return null;
+
             var uri = path;
             if (!uri.StartsWith("jar:") && !uri.StartsWith("file:")) {
                 if (File.Exists(uri)) {
