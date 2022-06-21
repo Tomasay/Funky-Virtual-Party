@@ -85,35 +85,6 @@ namespace Digger.Modules.Core.Sources
         public TerrainCutter Cutter => digger.Cutter;
         public DiggerSystem Digger => digger;
 
-        
-
-        private void Awake()
-        {
-            Debug.Log("Voxel chunk awake");
-
-#if UNITY_WEBGL
-            //DiggerSocketManagerGetter.instance.manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-#endif
-        }
-
-        void MethodCalledFromServer(string methodName, string data)
-        {
-            Debug.Log("Method called");
-            if(methodName.Equals("GenerateVoxels"))
-            {
-                StartCoroutine("GenerateVoxelsCorouting", data);
-            }
-        }
-
-        IEnumerator GenerateVoxelsCorouting(string data)
-        {
-            Debug.Log("Coroutine starting");
-            yield return new WaitForSeconds(0);
-
-            UpdateVoxelsData newData = JsonUtility.FromJson<UpdateVoxelsData>(data);
-            GenerateVoxels(digger, newData.heightarray, newData.chunkAltitude, ref newData.voxelArray);
-        }
-
         internal static VoxelChunk Create(DiggerSystem digger, Chunk chunk)
         {
             Utils.Profiler.BeginSample("VoxelChunk.Create");
@@ -141,11 +112,6 @@ namespace Digger.Modules.Core.Sources
         public static void GenerateVoxels(DiggerSystem digger, float[] heightArray, float chunkAltitude,
             ref Voxel[] voxelArray)
         {
-            Debug.Log("Generating voxels!");
-
-            Debug.Log("Digger system: " + digger.gameObject.name);
-
-
             Utils.Profiler.BeginSample("[Dig] VoxelChunk.GenerateVoxels");
             var sizeVox = digger.SizeVox;
             if (voxelArray == null)
@@ -175,15 +141,6 @@ namespace Digger.Modules.Core.Sources
             voxels.CopyTo(voxelArray);
             heights.Dispose();
             voxels.Dispose();
-
-#if !UNITY_WEBGL
-            UpdateVoxelsData newData = new UpdateVoxelsData();
-            newData.heightarray = heightArray;
-            newData.chunkAltitude = chunkAltitude;
-            newData.voxelArray = voxelArray;
-            //DiggerSocketManagerGetter.instance.manager.Socket.Emit("MethodCallToServer", "GenerateVoxels", JsonUtility.ToJson(newData));
-            Debug.Log("Voxel data sent!");
-#endif
 
             Utils.Profiler.EndSample();
         }

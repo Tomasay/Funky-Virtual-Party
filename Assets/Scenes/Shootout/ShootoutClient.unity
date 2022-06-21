@@ -1267,7 +1267,6 @@ GameObject:
   - component: {fileID: 1161875111}
   - component: {fileID: 1161875110}
   - component: {fileID: 1161875109}
-  - component: {fileID: 1161875108}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -1275,40 +1274,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1161875108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161875107}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72ece51f2901e7445ab60da3685d6b5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_ShowDebugText: 0
-  m_ShowCameraFrustum: 1
-  m_IgnoreTimeScale: 0
-  m_WorldUpOverride: {fileID: 0}
-  m_UpdateMethod: 2
-  m_BlendUpdateMethod: 1
-  m_DefaultBlend:
-    m_Style: 1
-    m_Time: 2
-    m_CustomCurve:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-  m_CustomBlends: {fileID: 0}
-  m_CameraCutEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_CameraActivatedEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1161875109
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1781,7 +1746,7 @@ Terrain:
   m_DrawTreesAndFoliage: 1
   m_StaticShadowCaster: 0
   m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 2100000, guid: e2ab33567c4e1b448a54c609624c774c, type: 2}
+  m_MaterialTemplate: {fileID: 2100000, guid: 5d4c856fce631b2489526fb4baeb68d0, type: 2}
   m_BakeLightProbesForTrees: 1
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
@@ -2065,7 +2030,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   master: {fileID: 1371804621}
   guid: e7c8f660fc9536e43926ca9433705c8b
-  version: 2
+  version: 3
   basePathData: Assets\DiggerData\Scenes\Shootout\e7c8f660fc9536e43926ca9433705c8b
   cutter: {fileID: 1343114779}
   heightmapScale: {x: 0.068359375, y: 1, z: 0.068359375}
@@ -2112,12 +2077,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 521f8e3d06ab44cadaed6ad179732778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkSize: 33
+  chunkSize: 17
   sceneDataFolder: Shootout
   screenRelativeTransitionHeightLod0: 0.1
   screenRelativeTransitionHeightLod1: 0.05
   colliderLodIndex: 0
-  createLODs: 1
+  createLODs: 0
   showUnderlyingObjects: 1
   resolutionMult: 1
   voxelHeight: 1

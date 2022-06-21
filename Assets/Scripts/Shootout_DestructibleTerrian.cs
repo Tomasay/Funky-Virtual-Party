@@ -40,14 +40,13 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
         ResetHeight();
 
-        //digger.ModifyAsyncBuffured(new Vector3(-55, 26, 50), BrushType.Sphere, ActionType.Dig, 0, 1, 4);
+        digger.ModifyAsyncBuffured(new Vector3(-55, 26, 50), BrushType.Sphere, ActionType.Dig, 0, 1, 4);
     }
 
     void MethodCalledFromServer(string methodName, string data)
     {
         if(methodName.Equals("ExplosionEvent"))
         {
-            Debug.Log("EXPLOSION");
             ExplosionData newData = JsonUtility.FromJson<ExplosionData>(data);
             digger.ModifyAsyncBuffured(newData.pos, BrushType.Sphere, ActionType.Dig, 0, 1, newData.size);
         }
