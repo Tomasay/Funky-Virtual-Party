@@ -41,12 +41,22 @@ public class ShootoutGameManager : GameManager
             case GameState.GameLoop:
                 timeRemaining -= Time.deltaTime;
                 vrGameTimeText.text = FormatTime(timeRemaining);
+
+                if (timeRemaining <= 5) //Display final 5 seconds for VR player
+                {
+                    vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", true);
+                }
+                if (timeRemaining <= 0) //Game end, VR player wins
+                {
+                    State = GameState.TimeEnded;
+                    vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
+                }
                 break;
             case GameState.VRPlayerWins:
                 //TODO:
                 break;
             case GameState.TimeEnded:
-                StartCoroutine(GameOver(2, "TIMES UP!\nYOU WIN"));
+                StartCoroutine(GameOver(2, "TIMES UP!\nYOU LOSE"));
                 break;
             default:
                 break;
@@ -56,16 +66,15 @@ public class ShootoutGameManager : GameManager
     IEnumerator StartCountdownTimer(int countdown)
     {
         countingDown = true;
-
-        vrInfoText.text = "GO!";
         SetVRPlayerMovement(true);
-        yield return new WaitForSeconds(1);
 
         for (int i = countdown; i > 0; i--)
         {
             vrInfoText.text = "" + i;
             yield return new WaitForSeconds(1);
         }
+
+        vrInfoText.text = "GO!";
 
         yield return new WaitForSeconds(1);
         vrInfoText.text = "";
