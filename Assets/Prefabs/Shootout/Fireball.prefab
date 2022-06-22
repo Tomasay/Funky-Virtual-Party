@@ -4947,11 +4947,14 @@ MonoBehaviour:
   constraint: {fileID: 3865167073801075657}
   currentScale: 0
   readyToSpawn: 0
+  isInLeftHand: 0
+  isInRightHand: 0
   hasExploded: 0
   isDropped: 0
   maxTimeAlive: 10
   timeDropped: 0
   fireballMat: {fileID: 0}
+  explodeEvent: 0
 --- !u!114 &3466704360205798773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5056,6 +5059,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f9d75771baefb7409dee2c11a897e06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UpdatesPerSecond: 15
+  fireballMesh: {fileID: 5349683969086038956}
+  explosion: {fileID: 8065244542973703527}
 --- !u!1 &1589349854153909103
 GameObject:
   m_ObjectHideFlags: 0

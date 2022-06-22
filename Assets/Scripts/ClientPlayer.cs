@@ -169,6 +169,16 @@ public class ClientPlayer : MonoBehaviour
         }
     }
 
+    //Sets player visuals and movement
+    protected void SetPlayerActive(bool active)
+    {
+        smr.enabled = active;
+        playerNameText.enabled = active;
+        playerNameTextBack.enabled = active;
+
+        CanMove = active;
+    }
+
     //Default action, dance of course
     public virtual void Action()
     {

@@ -178,7 +178,7 @@ public class ClientManagerWeb : MonoBehaviour
         GetPlayerByID(id).SetCustomizations(color, headShape, height);
     }
 
-    private ClientPlayer GetPlayerByID(string id)
+    public ClientPlayer GetPlayerByID(string id)
     {
         foreach (ClientPlayer p in players)
         {

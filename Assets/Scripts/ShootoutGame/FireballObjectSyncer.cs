@@ -6,7 +6,6 @@ public class FireballObjectSyncer : ObjectSyncer
 {
     [SerializeField] GameObject fireballMesh;
     [SerializeField] ParticleSystem explosion;
-    [SerializeField] Shootout_DestructibleTerrian terrain;
 
     public class FireballObjectData : ObjectData
     {
@@ -24,7 +23,6 @@ public class FireballObjectSyncer : ObjectSyncer
         currentFireballData.Awake();
 
 #if UNITY_WEBGL
-        Debug.Log("CLIENT MANAGER IS HERE: " + (ClientManagerWeb.instance != null));
         ClientManagerWeb.instance.Manager.Socket.On<string>("ObjectDataToClient", ReceiveData);
 #endif
 
