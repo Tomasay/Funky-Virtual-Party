@@ -43,11 +43,13 @@ public class Fireball : MonoBehaviour
             fireball.transform.localScale = new Vector3(s, s, s);
 
             //Mat effect
+            /*
             fireballMat.SetVector("Flame_fre_pow_burn_amount", new Vector4(0, currentScale, 0, 0));
             fireballMat.SetFloat("fresnel_power", Mathf.Lerp(20, 5, currentScale));
             Color fireColor = fireballMat.GetColor("BaseColor");
             fireColor.a = currentScale;
             fireballMat.SetColor("BaseColor", fireColor);
+            */
         }
     }
 
@@ -72,6 +74,8 @@ public class Fireball : MonoBehaviour
         explosion.Play();
         hasExploded = true;
         explodeEvent = true;
+
+        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", "");
     }
 
     public void Activate()

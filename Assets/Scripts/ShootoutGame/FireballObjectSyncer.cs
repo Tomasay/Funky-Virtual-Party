@@ -7,12 +7,12 @@ public class FireballObjectSyncer : ObjectSyncer
     [SerializeField] GameObject fireballMesh;
     [SerializeField] ParticleSystem explosion;
 
+    private bool lastActiveSent; //Value of isActive last sent to clients
+
     public class FireballObjectData : ObjectData
     {
-        public float timeDropped;
+        public Vector3 scale;
         public bool isActive;
-
-        public bool explodeEvent;
     }
 
     FireballObjectData currentFireballData;
@@ -24,6 +24,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string>("ObjectDataToClient", ReceiveData);
+        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
 #endif
 
 #if !UNITY_WEBGL
@@ -31,32 +32,36 @@ public class FireballObjectSyncer : ObjectSyncer
 #endif
     }
 
+    void MethodCalledFromServer(string methodName, string data)
+    {
+        if (methodName.Equals("FireballExplosionEvent"))
+        {
+            explosion.Play();
+        }
+    }
+
 #if !UNITY_WEBGL
     protected override void SendData()
     {
-        //Position
-        currentFireballData.Position = transform.position;
-
-        //Rotation
-        currentFireballData.Rotation = transform.rotation;
-
-
-        //FireballObjectData fireballData = currentData as FireballObjectData;
         Fireball f = GetComponent<Fireball>();
-        currentFireballData.timeDropped = f.timeDropped;
-        currentFireballData.isActive = f.fireball.activeSelf;
-
-        currentFireballData.explodeEvent = f.explodeEvent;
-        if(f.explodeEvent)
+        if (f.fireball.activeSelf || lastActiveSent == true) //Only send data if fireball is active, make sure it is marked inactive on client first
         {
-            f.explodeEvent = false;
-        }
+            //Position
+            currentFireballData.Position = transform.position;
 
-        string json = JsonUtility.ToJson(currentFireballData);
+            //Rotation
+            currentFireballData.Rotation = transform.rotation;
 
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", json);
+            //Fireball variables
+            currentFireballData.isActive = lastActiveSent = f.fireball.activeSelf;
+            currentFireballData.scale = f.fireball.transform.localScale;
+
+            //Send Data
+            string json = JsonUtility.ToJson(currentFireballData);
+            if (ClientManager.instance)
+            {
+                ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", json);
+            }
         }
     }
 #endif
@@ -81,10 +86,6 @@ public class FireballObjectSyncer : ObjectSyncer
 
         //Fireball
         fireballMesh.SetActive(data.isActive);
-        
-        if(data.explodeEvent)
-        {
-            explosion.Play();
-        }
+        fireballMesh.transform.localScale = data.scale;
     }
 }
