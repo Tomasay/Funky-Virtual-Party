@@ -22,6 +22,12 @@ public class ShootoutGameManager : GameManager
         vrGameTimeText.text = FormatTime(timeRemaining);
 
         DiggerSocketManagerGetter.instance.manager = ClientManager.instance.Manager;
+
+        foreach (ClientPlayer p in ClientManager.instance.Players)
+        {
+            ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
+            sp.OnDeath.AddListener(CheckPlayersLeft);
+        }
     }
 
     void Update()
@@ -53,13 +59,31 @@ public class ShootoutGameManager : GameManager
                 }
                 break;
             case GameState.VRPlayerWins:
-                //TODO:
+                StartCoroutine(GameOver(2, "YOU WIN!"));
                 break;
             case GameState.TimeEnded:
                 StartCoroutine(GameOver(2, "TIMES UP!\nYOU LOSE"));
                 break;
             default:
                 break;
+        }
+    }
+
+    void CheckPlayersLeft()
+    {
+        int playersAlive = 0;
+        foreach (ClientPlayer p in ClientManager.instance.Players)
+        {
+            ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
+            if(sp.isAlive)
+            {
+                playersAlive++;
+            }
+        }
+
+        if(playersAlive == 0)
+        {
+            State = GameState.VRPlayerWins;
         }
     }
 

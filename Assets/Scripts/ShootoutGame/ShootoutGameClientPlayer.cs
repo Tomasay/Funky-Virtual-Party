@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ShootoutGameClientPlayer : ClientPlayer
 {
@@ -9,6 +10,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         public Vector3 splashPos; //Where the splash should display
         public string playerID; //Player who died
     }
+
+    public UnityEvent OnDeath;
 
     [SerializeField] ParticleSystem waterSplash;
 
@@ -32,6 +35,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             SpawnSplashEffect(pos);
             SetPlayerActive(false);
             isAlive = false;
+            OnDeath.Invoke();
 
             WaterSplashData data = new WaterSplashData();
             data.splashPos = pos;

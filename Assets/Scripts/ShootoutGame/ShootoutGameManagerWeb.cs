@@ -52,7 +52,7 @@ public class ShootoutGameManagerWeb : GameManagerWeb
                 gameTimeText.text = FormatTime(timeRemaining);
                 break;
             case GameState.VRPlayerWins:
-                //TODO:
+                StartCoroutine(GameOver(2, "YOU LOSE!"));
                 break;
             case GameState.TimeEnded:
                 StartCoroutine(GameOver(2, "TIMES UP!"));
