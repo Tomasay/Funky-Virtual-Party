@@ -45,6 +45,32 @@ public class ShootoutGameClientPlayer : ClientPlayer
     }
 #endif
 
+    Vector2 prevVector = Vector2.zero;
+    protected override void Update()
+    {
+        if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
+        {
+            // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
+            float frictionCoefficient = 0.15f;
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+            Vector2 delta = (input - prevVector) * frictionCoefficient;
+            Vector2 target = prevVector + delta;
+
+            if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
+            {
+                ClientManagerWeb.instance.Manager.Socket.Emit("input", target.x, target.y);
+            }
+
+            Move(target.x, target.y);
+
+            Vector3 positionDifference = posFromHost - transform.position;
+            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(movement * Time.deltaTime);
+        }
+    }
     void MethodCalledFromServer(string methodName, string data)
     {
         if (methodName.Equals("WaterSplashEvent"))
