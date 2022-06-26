@@ -45,7 +45,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     }
 #endif
 
-    Vector2 prevVector = Vector2.zero;
+    public Vector2 prevVector = Vector2.zero;
     protected override void Update()
     {
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
@@ -76,6 +76,33 @@ public class ShootoutGameClientPlayer : ClientPlayer
             transform.Translate(movement * Time.deltaTime);
         }
     }
+    public struct ShootoutPlayerCollisionData
+    {
+        public Vector2 prevVectorA;
+        public Vector2 prevVectorB;
+        public string idA;
+        public string idB;
+    }
+
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        #if !UNITY_WEBGL
+        ShootoutPlayerCollisionData c = new ShootoutPlayerCollisionData();
+        // expensive this should be optimized.
+        ShootoutGameClientPlayer ext = collision.gameObject.GetComponent<ShootoutGameClientPlayer>();
+        if(ext)
+        {
+            c.prevVectorA = prevVector;
+            c.prevVectorB = ext.prevVector;
+            c.idA = playerID;
+            c.idB = ext.playerID;
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(prevVector));
+            // reflect the vector on VR side
+            prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
+        }
+        #endif
+    }
+
     void MethodCalledFromServer(string methodName, string data)
     {
         if (methodName.Equals("WaterSplashEvent"))
@@ -89,6 +116,18 @@ public class ShootoutGameClientPlayer : ClientPlayer
             player.SetPlayerActive(false);
             player.isAlive = false;
         }
+        if (methodName.Equals("BounceEvent"))
+        {
+            PerformBouncePhysics(data);
+        }
+    }
+
+    // reflects on client side
+    void PerformBouncePhysics(string data)
+    {
+        ShootoutPlayerCollisionData c = JsonUtility.FromJson<ShootoutPlayerCollisionData>(data);
+        if(c.idA == playerID)
+        prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
     }
 
     void SpawnSplashEffect(Vector3 collisionPoint)
