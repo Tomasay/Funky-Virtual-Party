@@ -51,8 +51,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
-            float frictionCoefficient = 0.15f;
+            float frictionCoefficient = 0.05f;
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+            
+            if (prevVector == Vector2.zero)
+                prevVector = input;
+
             Vector2 delta = (input - prevVector) * frictionCoefficient;
             Vector2 target = prevVector + delta;
             prevVector = target;
