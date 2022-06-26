@@ -55,6 +55,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
             Vector2 delta = (input - prevVector) * frictionCoefficient;
             Vector2 target = prevVector + delta;
+            prevVector = target;
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
