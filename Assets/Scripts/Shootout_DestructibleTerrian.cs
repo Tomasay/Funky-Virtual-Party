@@ -81,7 +81,11 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
             ExplosionData newData = new ExplosionData();
             newData.pos = explodePos;
             newData.size = fireballSize;
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
+
+            if (ClientManager.instance)
+            {
+                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
+            }
         }
     }
 #endif
@@ -89,13 +93,14 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
     private void ResetHeight()
     {
         float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
+        int size = ter.terrainData.heightmapResolution - 1;
 
         for (int x = 0; x < heights.GetLength(0); x++)
         {
             for (int y = 0; y < heights.GetLength(1); y++)
             {
-                int rSquare = ((ter.terrainData.alphamapWidth/2) * (ter.terrainData.alphamapWidth/2));
-                float sqMag = (new Vector2(ter.terrainData.alphamapWidth / 2, ter.terrainData.alphamapWidth / 2) - new Vector2(x, y)).sqrMagnitude;
+                int rSquare = ((size / 2) * (size / 2));
+                float sqMag = (new Vector2(size / 2, size / 2) - new Vector2(x, y)).sqrMagnitude;
                 if (sqMag > rSquare)
                 {
                     float portion = (sqMag / rSquare);

@@ -75,6 +75,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             transform.Translate(movement * Time.deltaTime);
         }
+
+        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
     public struct ShootoutPlayerCollisionData
     {
@@ -96,7 +98,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
             c.prevVectorB = ext.prevVector;
             c.idA = playerID;
             c.idB = ext.playerID;
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(prevVector));
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(c));
+            Debug.Log("BounceEvent sent");
             // reflect the vector on VR side
             prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
         }
@@ -118,6 +121,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         if (methodName.Equals("BounceEvent"))
         {
+            Debug.Log("BounceEvent received");
             PerformBouncePhysics(data);
         }
     }
@@ -126,8 +130,11 @@ public class ShootoutGameClientPlayer : ClientPlayer
     void PerformBouncePhysics(string data)
     {
         ShootoutPlayerCollisionData c = JsonUtility.FromJson<ShootoutPlayerCollisionData>(data);
-        if(c.idA == playerID)
-        prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
+        if (c.idA.Equals(playerID))
+        {
+            prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
+            Debug.Log("BounceEvent performed");
+        }
     }
 
     void SpawnSplashEffect(Vector3 collisionPoint)

@@ -29,10 +29,17 @@ public class GameManager : MonoBehaviour
 
     protected virtual void Start()
     {
-        ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
-        State = GameState.Tutorial;
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
+            State = GameState.Tutorial;
 
-        ClientManager.instance.Manager.Socket.On<string>("action", OnAction);
+            ClientManager.instance.Manager.Socket.On<string>("action", OnAction);
+        }
+        else
+        {
+            Debug.LogError("Client Manager Instance Not Found!");
+        }
     }
 
     public void OnAction(string id)
@@ -49,6 +56,11 @@ public class GameManager : MonoBehaviour
 
     protected void SetPlayerMovement(bool canPlayerMove)
     {
+        if(!ClientManager.instance)
+        {
+            return;
+        }
+
         foreach (ClientPlayer p in ClientManager.instance.Players)
         {
             p.CanMove = canPlayerMove;

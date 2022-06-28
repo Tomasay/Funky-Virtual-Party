@@ -1655,17 +1655,17 @@ Terrain:
   m_TreeMaximumFullLODCount: 50
   m_DetailObjectDistance: 80
   m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
+  m_HeightmapPixelError: 50
   m_SplatMapDistance: 1000
   m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 2
+  m_ShadowCastingMode: 0
   m_DrawHeightmap: 1
   m_DrawInstanced: 0
-  m_DrawTreesAndFoliage: 1
+  m_DrawTreesAndFoliage: 0
   m_StaticShadowCaster: 0
-  m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 2100000, guid: 5d4c856fce631b2489526fb4baeb68d0, type: 2}
-  m_BakeLightProbesForTrees: 1
+  m_ReflectionProbeUsage: 0
+  m_MaterialTemplate: {fileID: 2100000, guid: d842ff9e5d1aeed44a67f6e396690247, type: 2}
+  m_BakeLightProbesForTrees: 0
   m_PreserveTreePrototypeLayers: 0
   m_DeringLightProbesForTrees: 1
   m_ScaleInLightmap: 0.0256
@@ -1681,7 +1681,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1322563735}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -73, y: 12, z: 32.5}
+  m_LocalPosition: {x: -73, y: 21.91, z: 32.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1343114778}
@@ -1704,6 +1704,7 @@ MonoBehaviour:
   blastDepth: 2
   startingHeight: 0.025
   digger: {fileID: 1670597467}
+  master: {fileID: 1371804621}
 --- !u!1001 &1325705224
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1948,18 +1949,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   master: {fileID: 1371804621}
   guid: e7c8f660fc9536e43926ca9433705c8b
-  version: 3
+  version: 2
   basePathData: Assets\DiggerData\Scenes\Shootout\e7c8f660fc9536e43926ca9433705c8b
   cutter: {fileID: 1343114779}
   heightmapScale: {x: 0.068359375, y: 1, z: 0.068359375}
   holeMapScale: {x: 0.068359375, y: 1, z: 0.068359375}
   Terrain: {fileID: 1322563737}
   Materials:
-  - {fileID: 2100000, guid: bb23c23f8603ab34f955d015ef6feba4, type: 2}
+  - {fileID: 2100000, guid: d842ff9e5d1aeed44a67f6e396690247, type: 2}
   materialType: 2
-  terrainTextures:
-  - {fileID: 2800000, guid: eacdc0a3832af44489ecb0e29d02c0cb, type: 3}
-  - {fileID: 2800000, guid: f782c73d7a7b0f148993890d554e8ae6, type: 3}
+  terrainTextures: []
   chunksInStreamingAssets: []
   persistenceSubPath: 
   ShowDebug: 1
@@ -2001,7 +2000,7 @@ MonoBehaviour:
   screenRelativeTransitionHeightLod1: 0.05
   colliderLodIndex: 0
   createLODs: 0
-  showUnderlyingObjects: 1
+  showUnderlyingObjects: 0
   resolutionMult: 1
   voxelHeight: 1
   autoVoxelHeight: 0
