@@ -49,6 +49,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         {
             ExplosionData newData = JsonUtility.FromJson<ExplosionData>(data);
             digger.ModifyAsyncBuffured(newData.pos, BrushType.Sphere, ActionType.Dig, 0, 1, newData.size);
+            CinemachineShake.Instance.ShakeCamera(1, 1);
         }
     }
 
