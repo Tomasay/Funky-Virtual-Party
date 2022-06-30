@@ -28,6 +28,12 @@ public class TutorialMenuClient : MonoBehaviour
         cm.onReadyUp += ReadyUp;
     }
 
+    private void OnDestroy()
+    {
+        cm.onVRReadyUp -= ReadyUpVR;
+        cm.onReadyUp -= ReadyUp;
+    }
+
     private void SpawnPlayerIcons()
     {
         for (int i = 0; i < cm.Players.Count; i++)

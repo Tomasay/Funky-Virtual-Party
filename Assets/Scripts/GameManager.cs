@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
             ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns);
             State = GameState.Tutorial;
 
-            ClientManager.instance.Manager.Socket.On<string>("action", OnAction);
+            //ClientManager.instance.Manager.Socket.On<string>("action", OnAction);
         }
         else
         {
