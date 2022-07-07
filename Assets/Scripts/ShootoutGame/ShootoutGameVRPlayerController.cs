@@ -86,6 +86,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
             if(fireballsPool[i].readyToSpawn)
             {
                 nextFireball = fireballsPool[i];
+                nextFireball.col.enabled = false;
                 break;
             }
         }

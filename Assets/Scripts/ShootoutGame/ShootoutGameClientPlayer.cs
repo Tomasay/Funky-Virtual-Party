@@ -12,6 +12,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
     }
 
     public UnityEvent OnDeath;
+    public bool isColliding = false;
+    float collisionTimer = 0.5f;
+    const float collisionTimerDefault = 0.5f;
+    Vector2 collisionVector;
 
     [SerializeField] ParticleSystem waterSplash;
 
@@ -48,12 +52,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
     public Vector2 prevVector = Vector2.zero;
     protected override void Update()
     {
-        if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
+        if (IsLocal && !isColliding) //Only read values from analog stick, and emit movement if being done from local device
         {
             // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
-            float frictionCoefficient = 0.05f;
+            float frictionCoefficient = 0.025f;
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-            
+
             if (prevVector == Vector2.zero)
                 prevVector = input;
 
@@ -70,38 +74,40 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+            collisionTimer = collisionTimerDefault;
+
+        }
+        else if (IsLocal && isColliding)
+        {
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x, collisionVector.normalized.y);
+            Move(collisionVector.normalized.x, collisionVector.normalized.y);
+
+            Vector3 positionDifference = posFromHost - transform.position;
+            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+
+            collisionTimer -= Time.deltaTime;
+            if (collisionTimer <= 0)
+            {
+                isColliding = false;
+            }
         }
         else
-        {
+        { 
             transform.Translate(movement * Time.deltaTime);
         }
-    }
-    public struct ShootoutPlayerCollisionData
-    {
-        public Vector2 prevVectorA;
-        public Vector2 prevVectorB;
-        public string idA;
-        public string idB;
+
+        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
     protected override void OnCollisionEnter(Collision collision)
     {
-#if !UNITY_WEBGL
-        ShootoutPlayerCollisionData c = new ShootoutPlayerCollisionData();
         // expensive this should be optimized.
         ShootoutGameClientPlayer ext = collision.gameObject.GetComponent<ShootoutGameClientPlayer>();
         if(ext)
         {
-            c.prevVectorA = prevVector;
-            c.prevVectorB = ext.prevVector;
-            c.idA = playerID;
-            c.idB = ext.playerID;
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(prevVector));
-            // reflect the vector on VR side
-            Debug.Log("Reflect the player " + c.idA + " from " + c.idB);
-            prevVector = Vector2.Reflect(prevVector, new Vector2(0, 1));
+            isColliding = true;
+            collisionVector = Vector2.Reflect(prevVector, collision.contacts[0].normal );
         }
-#endif
     }
 
     void MethodCalledFromServer(string methodName, string data)
@@ -117,22 +123,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
             player.SetPlayerActive(false);
             player.isAlive = false;
         }
-        if (methodName.Equals("BounceEvent"))
-        {
-            PerformBouncePhysics(data);
-        }
-    }
-
-    // reflects on client side
-    void PerformBouncePhysics(string data)
-    {
-        ShootoutPlayerCollisionData c = JsonUtility.FromJson<ShootoutPlayerCollisionData>(data);
-        if (c.idA == playerID)
-        {
-            Debug.Log("Reflect the player " + c.idA + " from " + c.idB);
-            prevVector = Vector2.Reflect(prevVector, new Vector2(0, 1));
-        }
-
     }
 
     void SpawnSplashEffect(Vector3 collisionPoint)
