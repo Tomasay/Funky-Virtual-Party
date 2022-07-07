@@ -8,7 +8,18 @@ using BestHTTP.SocketIO3;
 
 public class ClientManager : MonoBehaviour
 {
-    public static ClientManager instance;
+    private static ClientManager Instance = null;
+    public static ClientManager instance; 
+    /*{
+    get
+        {
+            if(Instance == null)
+            {
+                Instance = new ClientManager();
+            }
+            return Instance;
+        }
+    }*/
 
     [SerializeField]
     private GameObject playerPrefab;

@@ -86,7 +86,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void OnCollisionEnter(Collision collision)
     {
-        #if !UNITY_WEBGL
+#if !UNITY_WEBGL
         ShootoutPlayerCollisionData c = new ShootoutPlayerCollisionData();
         // expensive this should be optimized.
         ShootoutGameClientPlayer ext = collision.gameObject.GetComponent<ShootoutGameClientPlayer>();
@@ -98,9 +98,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
             c.idB = ext.playerID;
             ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(prevVector));
             // reflect the vector on VR side
-            prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
+            Debug.Log("Reflect the player " + c.idA + " from " + c.idB);
+            prevVector = Vector2.Reflect(prevVector, new Vector2(0, 1));
         }
-        #endif
+#endif
     }
 
     void MethodCalledFromServer(string methodName, string data)
@@ -126,8 +127,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
     void PerformBouncePhysics(string data)
     {
         ShootoutPlayerCollisionData c = JsonUtility.FromJson<ShootoutPlayerCollisionData>(data);
-        if(c.idA == playerID)
-        prevVector = Vector2.Reflect(prevVector, c.prevVectorB.normalized);
+        if (c.idA == playerID)
+        {
+            Debug.Log("Reflect the player " + c.idA + " from " + c.idB);
+            prevVector = Vector2.Reflect(prevVector, new Vector2(0, 1));
+        }
+
     }
 
     void SpawnSplashEffect(Vector3 collisionPoint)
