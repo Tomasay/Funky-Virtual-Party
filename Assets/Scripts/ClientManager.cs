@@ -32,7 +32,7 @@ public class ClientManager : MonoBehaviour
     private const string url = "https://vrpartygame.herokuapp.com/";
     private const string socketUrl = url + "socket.io/";
 
-    private const int PASSCODE_LENGTH = 6;
+    private const int PASSCODE_LENGTH = 4;
     private static string passcode;
 
     public SocketManager Manager { get => manager; }

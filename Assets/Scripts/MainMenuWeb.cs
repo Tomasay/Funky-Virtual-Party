@@ -16,6 +16,15 @@ public class MainMenuWeb : MonoBehaviour
 
     [SerializeField] Canvas joinRoomCanvas, controllerCanvas;
 
+    [SerializeField] Material dotsMat;
+
+    [SerializeField] Color[] backgroundColors, dotsColors;
+    Color currentBackgroundColor, currentDotsColor;
+
+    public float colorChangeSpeed = 0.0005f, timeOnColorSwatch = 5;
+
+    private float currentColorSwatchTime;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,6 +43,37 @@ public class MainMenuWeb : MonoBehaviour
             SwitchToController(null);
             VRPlayer.SetActive(true);
         }
+
+        GetNewBackgroundColors();
+
+        Camera.main.backgroundColor = currentBackgroundColor;
+        dotsMat.color = currentDotsColor;
+
+        GetNewBackgroundColors();
+    }
+
+    private void Update()
+    {
+        if((Time.time - currentColorSwatchTime) > timeOnColorSwatch &&
+           Mathf.Abs(Camera.main.backgroundColor.r - currentBackgroundColor.r) < 0.1f &&
+           Mathf.Abs(Camera.main.backgroundColor.g - currentBackgroundColor.g) < 0.1f &&
+           Mathf.Abs(Camera.main.backgroundColor.b - currentBackgroundColor.b) < 0.1f)
+        {
+            GetNewBackgroundColors();
+        }
+
+        Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, currentBackgroundColor, colorChangeSpeed);
+        dotsMat.color = Color.Lerp(dotsMat.color, currentDotsColor, colorChangeSpeed);
+    }
+
+    private void GetNewBackgroundColors()
+    {
+        int colorIndex = Random.Range(0, backgroundColors.Length);
+
+        currentBackgroundColor = backgroundColors[colorIndex];
+        currentDotsColor = dotsColors[colorIndex];
+
+        currentColorSwatchTime = Time.time;
     }
 
     private void OnDisable()

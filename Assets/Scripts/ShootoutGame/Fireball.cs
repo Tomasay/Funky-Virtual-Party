@@ -9,6 +9,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] public GameObject fireball;
     [SerializeField] public Rigidbody rb;
     [SerializeField] float minSize, maxSize;
+    [SerializeField] float fireballGrowSpeed = 0.25f;
 
     public Collider col;
     public ParentConstraint constraint;
@@ -38,7 +39,7 @@ public class Fireball : MonoBehaviour
 
         if(fireball.activeSelf && !isDropped)
         {
-            currentScale = Mathf.Lerp(currentScale, 1, 0.5f * Time.deltaTime);
+            currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
             float s = Mathf.Lerp(minSize, maxSize, currentScale);
             fireball.transform.localScale = new Vector3(s, s, s);
 

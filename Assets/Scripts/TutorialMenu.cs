@@ -28,11 +28,15 @@ public class TutorialMenu : MonoBehaviour
 
         cm.onReadyUp += ReadyUp;
         
-
         if(VrPlayerReady != null )
         {
             VrPlayerReady.onClick.AddListener(ReadyUpVR);
         }
+    }
+
+    private void OnDestroy()
+    {
+        cm.onReadyUp -= ReadyUp;
     }
 
     private void SpawnPlayerIcons()

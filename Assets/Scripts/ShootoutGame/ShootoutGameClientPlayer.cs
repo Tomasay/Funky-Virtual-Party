@@ -51,7 +51,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
-            float frictionCoefficient = 0.05f;
+            float frictionCoefficient = 0.025f;
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
             
             if (prevVector == Vector2.zero)
@@ -75,6 +75,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             transform.Translate(movement * Time.deltaTime);
         }
+
+        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
     public struct ShootoutPlayerCollisionData
     {
@@ -96,7 +98,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
             c.prevVectorB = ext.prevVector;
             c.idA = playerID;
             c.idB = ext.playerID;
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(prevVector));
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "BounceEvent", JsonUtility.ToJson(c));
+            Debug.Log("BounceEvent sent");
             // reflect the vector on VR side
             Debug.Log("Reflect the player " + c.idA + " from " + c.idB);
             prevVector = Vector2.Reflect(prevVector, new Vector2(0, 1));
@@ -119,6 +122,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         if (methodName.Equals("BounceEvent"))
         {
+            Debug.Log("BounceEvent received");
             PerformBouncePhysics(data);
         }
     }
@@ -127,12 +131,11 @@ public class ShootoutGameClientPlayer : ClientPlayer
     void PerformBouncePhysics(string data)
     {
         ShootoutPlayerCollisionData c = JsonUtility.FromJson<ShootoutPlayerCollisionData>(data);
-        if (c.idA == playerID)
+        if (c.idA.Equals(playerID))
         {
-            Debug.Log("Reflect the player " + c.idA + " from " + c.idB);
             prevVector = Vector2.Reflect(prevVector, new Vector2(0, 1));
+            Debug.Log("BounceEvent performed");
         }
-
     }
 
     void SpawnSplashEffect(Vector3 collisionPoint)
