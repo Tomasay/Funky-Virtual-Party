@@ -5,6 +5,7 @@ using Autohand;
 using TMPro;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class VinylPlayer : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class VinylPlayer : MonoBehaviour
 
     [SerializeField] TMP_Text titleText, descriptionText;
     [SerializeField] VideoPlayer videoPlayer;
+    [SerializeField] RawImage videoTexture;
+
+    [SerializeField] GameObject trianglesParent;
 
     private Animator anim;
     private GameObject currentVinyl = null;
@@ -28,6 +32,7 @@ public class VinylPlayer : MonoBehaviour
 
         titleText.enabled = false;
         descriptionText.enabled = false;
+        videoTexture.enabled = false;
     }
 
     private void OnTriggerStay(Collider other)
@@ -55,7 +60,8 @@ public class VinylPlayer : MonoBehaviour
                 descriptionText.enabled = true;
                 titleText.text = info.Title;
                 descriptionText.text = info.Description;
-                //videoPlayer.clip = info.videoPreview;
+                videoPlayer.clip = info.videoPreview;
+                videoTexture.enabled = true;
 
                 StartCoroutine(LoadSceneDelayed(info.SceneToLoad, 3));
             }
