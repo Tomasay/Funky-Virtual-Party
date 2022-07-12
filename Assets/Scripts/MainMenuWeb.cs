@@ -21,7 +21,7 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] Color[] backgroundColors, dotsColors;
     Color currentBackgroundColor, currentDotsColor;
 
-    public float colorChangeSpeed = 0.0005f, timeOnColorSwatch = 5;
+    public float colorChangeSpeed = 0.1f, timeOnColorSwatch = 5;
 
     private float currentColorSwatchTime;
 
@@ -62,8 +62,8 @@ public class MainMenuWeb : MonoBehaviour
             GetNewBackgroundColors();
         }
 
-        Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, currentBackgroundColor, colorChangeSpeed);
-        dotsMat.color = Color.Lerp(dotsMat.color, currentDotsColor, colorChangeSpeed);
+        Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, currentBackgroundColor, colorChangeSpeed * Time.deltaTime);
+        dotsMat.color = Color.Lerp(dotsMat.color, currentDotsColor, colorChangeSpeed * Time.deltaTime);
     }
 
     private void GetNewBackgroundColors()

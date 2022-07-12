@@ -7,6 +7,9 @@ public class FireballObjectSyncer : ObjectSyncer
     [SerializeField] GameObject fireballMesh;
     [SerializeField] ParticleSystem explosion;
 
+    [SerializeField] SpriteRenderer indicator;
+    private int maxIndicatorDistance = 20;
+
     private bool lastActiveSent; //Value of isActive last sent to clients
 
     public class FireballObjectData : ObjectData
@@ -29,6 +32,40 @@ public class FireballObjectSyncer : ObjectSyncer
 
 #if !UNITY_WEBGL
         InvokeRepeating("SendData", 0, 1/UpdatesPerSecond);
+#endif
+    }
+
+    void FixedUpdate()
+    {
+#if UNITY_WEBGL
+        if (currentFireballData.isActive)
+        {
+            //Check to see if above terrain
+            Vector3 down = transform.TransformDirection(Vector3.down);
+            if (Physics.Raycast(transform.position, down, out RaycastHit hit, maxIndicatorDistance))
+            {
+                if (hit.transform.TryGetComponent<Terrain>(out Terrain ter))
+                {
+                    //Enable indicator
+                    indicator.enabled = true;
+                    indicator.transform.position = hit.point + new Vector3(0, 0.1f, 0);
+
+                    //Color and size
+                    float t = hit.distance / maxIndicatorDistance;
+                    transform.localScale = Vector3.one * Mathf.Lerp(0.1f, 2, t);
+                    indicator.color = Color.Lerp(Color.red, Color.yellow, t);
+
+                }
+                else
+                {
+                    indicator.enabled = false;
+                }
+            }
+            else
+            {
+                indicator.enabled = false;
+            }
+        }
 #endif
     }
 
