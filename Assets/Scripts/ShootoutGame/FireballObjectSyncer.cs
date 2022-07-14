@@ -20,6 +20,8 @@ public class FireballObjectSyncer : ObjectSyncer
 
     FireballObjectData currentFireballData;
 
+    public FireballObjectData CurrentFireballData { get => currentFireballData;}
+
     protected override void Awake()
     {
         currentFireballData = new FireballObjectData();
@@ -77,8 +79,8 @@ public class FireballObjectSyncer : ObjectSyncer
 
     void MethodCalledFromServer(string methodName, string data)
     {
-        if (methodName.Equals("FireballExplosionEvent"))
-        {
+        if (methodName.Equals("FireballExplosionEvent") && int.TryParse(data, out int id) && id == currentFireballData.objectID)
+        { 
             explosion.Play();
         }
     }

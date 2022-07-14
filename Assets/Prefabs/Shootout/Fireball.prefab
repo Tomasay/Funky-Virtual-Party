@@ -4945,6 +4945,7 @@ MonoBehaviour:
   minSize: 0.1
   maxSize: 2
   fireballGrowSpeed: 0.25
+  syncer: {fileID: 4879968599162948385}
   col: {fileID: 566606611587223289}
   constraint: {fileID: 3865167073801075657}
   currentScale: 0
@@ -4956,7 +4957,6 @@ MonoBehaviour:
   maxTimeAlive: 10
   timeDropped: 0
   fireballMat: {fileID: 0}
-  explodeEvent: 0
 --- !u!114 &3466704360205798773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5064,6 +5064,7 @@ MonoBehaviour:
   UpdatesPerSecond: 15
   fireballMesh: {fileID: 4423289069885267050}
   explosion: {fileID: 8065244542973703527}
+  indicator: {fileID: 0}
 --- !u!1 &1589349854153909103
 GameObject:
   m_ObjectHideFlags: 0
@@ -8916,7 +8917,7 @@ ParticleSystem:
     collidesWithDynamic: 1
     interiorCollisions: 0
   TriggerModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 2
     inside: 1
     outside: 0

@@ -10,6 +10,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] public Rigidbody rb;
     [SerializeField] float minSize, maxSize;
     [SerializeField] float fireballGrowSpeed = 0.25f;
+    [SerializeField] FireballObjectSyncer syncer;
 
     public Collider col;
     public ParentConstraint constraint;
@@ -20,8 +21,6 @@ public class Fireball : MonoBehaviour
     public bool hasExploded = false, isDropped = false;
     public float maxTimeAlive = 10, timeDropped;
     public Material fireballMat;
-
-    public bool explodeEvent;
 
     private void Awake()
     {
@@ -74,9 +73,8 @@ public class Fireball : MonoBehaviour
         rb.isKinematic = true;
         explosion.Play();
         hasExploded = true;
-        explodeEvent = true;
 
-        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", "");
+        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", syncer.CurrentFireballData.objectID.ToString());
     }
 
     public void Activate()
