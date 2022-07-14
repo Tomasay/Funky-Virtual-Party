@@ -662,6 +662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4101a3438d2697b419ee97cf3fcd4663, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UpdatesPerSecond: 10
   head: {fileID: 7942002211881670213}
   leftHand: {fileID: 1262313374629172509}
   rightHand: {fileID: 1262313376109179214}
@@ -684,6 +685,7 @@ MonoBehaviour:
   fireballHandAnchorRight: {fileID: 9030867247775888193}
   handFireEffectLeft: {fileID: 7455144277648140974}
   handFireEffectRight: {fileID: 1365587830312751268}
+  fireballsPool: []
   fireballThrowPower: 10
   handOffset: 0.05
 --- !u!1 &7942002211305997993
@@ -1606,6 +1608,10 @@ PrefabInstance:
       propertyPath: handRight
       value: 
       objectReference: {fileID: 1262313376109179214}
+    - target: {fileID: 8834320319295017360, guid: fdc3ba53f4e81a040b0471bbbafbb10a, type: 3}
+      propertyPath: headModel
+      value: 
+      objectReference: {fileID: 735138498}
     - target: {fileID: 8834320319295017360, guid: fdc3ba53f4e81a040b0471bbbafbb10a, type: 3}
       propertyPath: headCamera
       value: 

@@ -59,7 +59,11 @@ public class Fireball : MonoBehaviour
         {
             TriggerExplosion();
         }
-        else if (collision.gameObject.name.Contains("Water"))
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.name.Contains("Water"))
         {
             //TODO: Trigger smoke burnout effect
             Reset();

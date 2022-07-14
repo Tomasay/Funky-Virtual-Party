@@ -4975,12 +4975,12 @@ MonoBehaviour:
   maintainGrabOffset: 0
   singleHandOnly: 0
   allowHeldSwapping: 1
-  instantGrab: 0
+  instantGrab: 1
   parentOnGrab: 1
   throwMultiplyer: 1
   lookAssistMultiplyer: 1
   hightlightMaterial: {fileID: 0}
-  jointBreakForce: 2500
+  jointBreakForce: Infinity
   showAdvancedSettings: 1
   lockHandOnGrab: 0
   makeChildrenGrabbable: 1
@@ -5021,7 +5021,7 @@ MonoBehaviour:
   onUnhighlight:
     m_PersistentCalls:
       m_Calls: []
-  pullApartBreakOnly: 1
+  pullApartBreakOnly: 0
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []

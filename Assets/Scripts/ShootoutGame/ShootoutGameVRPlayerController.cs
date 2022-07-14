@@ -19,6 +19,12 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     void Awake()
     {
+        foreach (Fireball f in fireballsPool)
+        {
+            Physics.IgnoreCollision(f.col, ahp.headModel.GetComponent<Collider>());
+            Physics.IgnoreCollision(f.col, ahp.handLeft.GetComponent<Collider>());
+        }
+
         ahp.handRight.OnTriggerGrab += OnGrabbed;
         ahp.handRight.OnTriggerRelease += OnRelease;
         ahp.handLeft.OnTriggerGrab += OnGrabbed;
