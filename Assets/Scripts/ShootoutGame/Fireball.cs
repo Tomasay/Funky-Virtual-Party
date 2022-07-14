@@ -5,7 +5,7 @@ using UnityEngine.Animations;
 
 public class Fireball : MonoBehaviour
 {
-    [SerializeField] ParticleSystem explosion;
+    [SerializeField] ParticleSystem explosion, smokePuff;
     [SerializeField] public GameObject fireball;
     [SerializeField] public Rigidbody rb;
     [SerializeField] float minSize, maxSize;
@@ -20,12 +20,9 @@ public class Fireball : MonoBehaviour
 
     public bool hasExploded = false, isDropped = false;
     public float maxTimeAlive = 10, timeDropped;
-    public Material fireballMat;
 
     private void Awake()
     {
-        fireballMat = fireball.GetComponent<Renderer>().material;
-
         Reset();
     }
 
@@ -40,16 +37,10 @@ public class Fireball : MonoBehaviour
         {
             currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
             float s = Mathf.Lerp(minSize, maxSize, currentScale);
-            fireball.transform.localScale = new Vector3(s, s, s);
-
-            //Mat effect
-            /*
-            fireballMat.SetVector("Flame_fre_pow_burn_amount", new Vector4(0, currentScale, 0, 0));
-            fireballMat.SetFloat("fresnel_power", Mathf.Lerp(20, 5, currentScale));
-            Color fireColor = fireballMat.GetColor("BaseColor");
-            fireColor.a = currentScale;
-            fireballMat.SetColor("BaseColor", fireColor);
-            */
+            Vector3 scale = new Vector3(s, s, s);
+            fireball.transform.localScale = scale;
+            explosion.transform.localScale = scale;
+            smokePuff.transform.localScale = scale;
         }
     }
 
@@ -65,7 +56,7 @@ public class Fireball : MonoBehaviour
     {
         if (other.name.Contains("Water"))
         {
-            //TODO: Trigger smoke burnout effect
+            smokePuff.Play();
             Reset();
         }
     }
