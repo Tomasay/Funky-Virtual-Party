@@ -5,7 +5,7 @@ using UnityEngine;
 public class FireballObjectSyncer : ObjectSyncer
 {
     [SerializeField] GameObject fireballMesh;
-    [SerializeField] ParticleSystem explosion;
+    [SerializeField] ParticleSystem explosion, smokePuff;
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
@@ -79,9 +79,16 @@ public class FireballObjectSyncer : ObjectSyncer
 
     void MethodCalledFromServer(string methodName, string data)
     {
-        if (methodName.Equals("FireballExplosionEvent") && int.TryParse(data, out int id) && id == currentFireballData.objectID)
-        { 
-            explosion.Play();
+        if (int.TryParse(data, out int id) && id == currentFireballData.objectID)
+        {
+            if (methodName.Equals("SmokePuffEvent"))
+            {
+                smokePuff.Play();
+            }
+            else if (methodName.Equals("FireballExplosionEvent"))
+            {
+                explosion.Play();
+            }
         }
     }
 

@@ -60,6 +60,8 @@ public class Fireball : MonoBehaviour
         {
             smokePuff.Play();
             Reset();
+
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SmokePuffEvent", syncer.CurrentFireballData.objectID.ToString());
         }
     }
 
