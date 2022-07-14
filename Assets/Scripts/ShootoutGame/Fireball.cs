@@ -28,7 +28,7 @@ public class Fireball : MonoBehaviour
 
     void Update()
     {
-        if((hasExploded && explosion.isStopped) || (timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
+        if((hasExploded && explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
         {
             Reset();
         }
