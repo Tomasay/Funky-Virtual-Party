@@ -5,7 +5,7 @@ using UnityEngine;
 public class FireballObjectSyncer : ObjectSyncer
 {
     [SerializeField] GameObject fireballMesh;
-    [SerializeField] ParticleSystem explosion;
+    [SerializeField] ParticleSystem explosion, smokePuff;
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
@@ -20,6 +20,8 @@ public class FireballObjectSyncer : ObjectSyncer
 
     FireballObjectData currentFireballData;
 
+    public FireballObjectData CurrentFireballData { get => currentFireballData;}
+
     protected override void Awake()
     {
         currentFireballData = new FireballObjectData();
@@ -28,6 +30,8 @@ public class FireballObjectSyncer : ObjectSyncer
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string>("ObjectDataToClient", ReceiveData);
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+
+        //indicator.transform.parent = null;
 #endif
 
 #if !UNITY_WEBGL
@@ -35,20 +39,20 @@ public class FireballObjectSyncer : ObjectSyncer
 #endif
     }
 
-    void FixedUpdate()
+    void Update()
     {
 #if UNITY_WEBGL
         if (currentFireballData.isActive)
         {
             //Check to see if above terrain
-            Vector3 down = transform.TransformDirection(Vector3.down);
-            if (Physics.Raycast(transform.position, down, out RaycastHit hit, maxIndicatorDistance))
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, maxIndicatorDistance))
             {
                 if (hit.transform.TryGetComponent<Terrain>(out Terrain ter))
                 {
                     //Enable indicator
                     indicator.enabled = true;
                     indicator.transform.position = hit.point + new Vector3(0, 0.1f, 0);
+                    indicator.transform.rotation = Quaternion.Euler(Quaternion.identity.eulerAngles + new Vector3(-90, 0, 0));
 
                     //Color and size
                     float t = hit.distance / maxIndicatorDistance;
@@ -66,14 +70,25 @@ public class FireballObjectSyncer : ObjectSyncer
                 indicator.enabled = false;
             }
         }
+        else
+        {
+            indicator.enabled = false;
+        }
 #endif
     }
 
     void MethodCalledFromServer(string methodName, string data)
     {
-        if (methodName.Equals("FireballExplosionEvent"))
+        if (int.TryParse(data, out int id) && id == currentFireballData.objectID)
         {
-            explosion.Play();
+            if (methodName.Equals("SmokePuffEvent"))
+            {
+                smokePuff.Play();
+            }
+            else if (methodName.Equals("FireballExplosionEvent"))
+            {
+                explosion.Play();
+            }
         }
     }
 
@@ -116,13 +131,16 @@ public class FireballObjectSyncer : ObjectSyncer
         }
 
         //Position
-        transform.position = data.Position;
+        currentFireballData.Position = transform.position = data.Position;
 
         //Rotation
-        transform.rotation = data.Rotation;
+        currentFireballData.Rotation = transform.rotation = data.Rotation;
 
         //Fireball
+        currentFireballData.isActive = data.isActive;
         fireballMesh.SetActive(data.isActive);
+
+        currentFireballData.scale = data.scale;
         fireballMesh.transform.localScale = data.scale;
     }
 }

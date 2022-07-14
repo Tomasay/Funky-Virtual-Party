@@ -12,6 +12,8 @@ namespace Autohand{
         [Header("References")]
         [Tooltip("The tracked headCamera object")]
         public Camera headCamera;
+        [Tooltip("The head model object, contains head collider")]
+        public GameObject headModel;
         [Tooltip("The object that represents the forward direction movement, usually should be set as the camera or a tracked controller")]
         public Transform forwardFollow;
         [Tooltip("This should NOT be a child of this body. This should be a GameObject that contains all the tracked objects (head/controllers)")]

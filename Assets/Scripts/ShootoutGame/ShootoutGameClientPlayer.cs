@@ -80,7 +80,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         else if (IsLocal && isColliding)
         {
             ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x, collisionVector.normalized.y);
-            Move(collisionVector.normalized.x, collisionVector.normalized.y);
+            Move(collisionVector.normalized.x, collisionVector.normalized.y, false);
 
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime);

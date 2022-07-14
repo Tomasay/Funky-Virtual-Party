@@ -145,7 +145,7 @@ public class ClientPlayer : MonoBehaviour
         playerColor = col;
     }
 
-    public void Move(float x, float y)
+    public void Move(float x, float y, bool changeDirection = true)
     {
         if (canMove)
         {
@@ -156,10 +156,13 @@ public class ClientPlayer : MonoBehaviour
             anim.SetFloat("Speed", val);
 
             //Update rotation
-            Vector3 lookDirection = new Vector3(x, 0, y);
-            if (lookDirection != Vector3.zero)
+            if (changeDirection)
             {
-                lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                Vector3 lookDirection = new Vector3(x, 0, y);
+                if (lookDirection != Vector3.zero)
+                {
+                    lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                }
             }
         }
         else

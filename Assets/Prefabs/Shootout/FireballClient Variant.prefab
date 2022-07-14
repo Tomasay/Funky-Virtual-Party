@@ -29,7 +29,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5807593645347935183}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!212 &2380546436686043329
 SpriteRenderer:
@@ -175,9 +175,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2380546436686043329}
     - target: {fileID: 4879968599162948385, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
+      propertyPath: smokePuff
+      value: 
+      objectReference: {fileID: 8714448319613569103}
+    - target: {fileID: 4879968599162948385, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
       propertyPath: fireballMesh
       value: 
       objectReference: {fileID: 7649056007744504129}
+    - target: {fileID: 8065244542973703527, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
+      propertyPath: TriggerModule.enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8176001292351674950, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -200,5 +208,10 @@ ParticleSystem:
 --- !u!1 &7649056007744504129 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4423289069885267050, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
+  m_PrefabInstance: {fileID: 6288232414809218347}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &8714448319613569103 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3435044216057484644, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
   m_PrefabInstance: {fileID: 6288232414809218347}
   m_PrefabAsset: {fileID: 0}
