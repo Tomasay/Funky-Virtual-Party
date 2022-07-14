@@ -19,11 +19,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     void Awake()
     {
-        foreach (Fireball f in fireballsPool)
-        {
-            Physics.IgnoreCollision(f.col, ahp.headModel.GetComponent<Collider>());
-            Physics.IgnoreCollision(f.col, ahp.handLeft.GetComponent<Collider>());
-        }
+        SetupCollisionIgnore();
 
         ahp.handRight.OnTriggerGrab += OnGrabbed;
         ahp.handRight.OnTriggerRelease += OnRelease;
@@ -141,6 +137,24 @@ public class ShootoutGameVRPlayerController : VRPlayerController
             f.constraint.constraintActive = true;
             f.constraint.enabled = true;
             f.readyToSpawn = false;
+        }
+    }
+
+    void SetupCollisionIgnore()
+    {
+        foreach (Fireball f in fireballsPool)
+        {
+            Physics.IgnoreCollision(f.col, ahp.headModel.GetComponent<Collider>());
+            Physics.IgnoreCollision(f.col, ahp.handLeft.GetComponent<Collider>());
+            Physics.IgnoreCollision(f.col, ahp.handRight.GetComponent<Collider>());
+            foreach (Finger fingy in ahp.handLeft.fingers)
+            {
+                Physics.IgnoreCollision(f.col, fingy.GetComponent<Collider>());
+            }
+            foreach (Finger fingy in ahp.handRight.fingers)
+            {
+                Physics.IgnoreCollision(f.col, fingy.GetComponent<Collider>());
+            }
         }
     }
 
