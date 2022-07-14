@@ -11,6 +11,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] float minSize, maxSize;
     [SerializeField] float fireballGrowSpeed = 0.25f;
     [SerializeField] FireballObjectSyncer syncer;
+    [SerializeField] Shootout_DestructibleTerrian terrain;
 
     public Collider col;
     public ParentConstraint constraint;
@@ -48,6 +49,7 @@ public class Fireball : MonoBehaviour
     {
         if (collision.gameObject.GetComponent<Terrain>() || collision.gameObject.name.Contains("ChunkObject"))
         {
+            terrain.Explosion(collision, this);
             TriggerExplosion();
         }
     }

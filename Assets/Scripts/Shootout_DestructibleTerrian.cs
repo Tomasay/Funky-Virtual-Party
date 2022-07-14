@@ -53,43 +53,38 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         }
     }
 
-#if !UNITY_WEBGL
-    private void OnCollisionEnter(Collision collision)
+    public void Explosion(Collision collision, Fireball fireball)
     {
-        if (collision.gameObject.TryGetComponent<Fireball>(out Fireball fireball))
+        List<ContactPoint> contacts = new List<ContactPoint>();
+        collision.GetContacts(contacts);
+        ContactPoint ray = contacts[0];
+        float relativeHitTerX = (ray.point.x - transform.position.x) / ter.terrainData.size.x;
+        float relativeHitTerZ = (ray.point.z - transform.position.z) / ter.terrainData.size.z;
+        // you have a number between 0 and 1 where your terrain has been hit (multiplied by 100 it would be the percentage of width and length)
+        float relativeTerCoordX = ter.terrainData.heightmapResolution * relativeHitTerX;
+        float relativeTerCoordZ = ter.terrainData.heightmapResolution * relativeHitTerZ;
+
+        // now you have the relative point of your terrain, but you need to floor this because the number of points on terrain are integer
+        int hitPointTerX = (int)relativeTerCoordX;
+        int hitPointTerZ = (int)relativeTerCoordZ;
+
+        //Now you can use this point to edit it using SetHeights
+        float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
+
+        Vector3 explodePos = new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z);
+        float fireballSize = Mathf.Max(2, fireball.currentScale * blastRadius);
+        digger.ModifyAsyncBuffured(explodePos, BrushType.Sphere, ActionType.Dig, 0, 1, fireballSize);
+
+        //Send explosion data to clients
+        ExplosionData newData = new ExplosionData();
+        newData.pos = explodePos;
+        newData.size = fireballSize;
+
+        if (ClientManager.instance)
         {
-            List<ContactPoint> contacts = new List<ContactPoint>();
-            collision.GetContacts(contacts);
-            ContactPoint ray = contacts[0];
-            float relativeHitTerX = (ray.point.x - transform.position.x) / ter.terrainData.size.x;
-            float relativeHitTerZ = (ray.point.z - transform.position.z) / ter.terrainData.size.z;
-            // you have a number between 0 and 1 where your terrain has been hit (multiplied by 100 it would be the percentage of width and length)
-            float relativeTerCoordX = ter.terrainData.heightmapResolution * relativeHitTerX;
-            float relativeTerCoordZ = ter.terrainData.heightmapResolution * relativeHitTerZ;
-
-            // now you have the relative point of your terrain, but you need to floor this because the number of points on terrain are integer
-            int hitPointTerX = (int)relativeTerCoordX;
-            int hitPointTerZ = (int)relativeTerCoordZ;
-
-            //Now you can use this point to edit it using SetHeights
-            float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
-
-            Vector3 explodePos = new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z);
-            float fireballSize = Mathf.Max(2, fireball.currentScale * blastRadius);
-            digger.ModifyAsyncBuffured(explodePos, BrushType.Sphere, ActionType.Dig, 0, 1, fireballSize);
-
-            //Send explosion data to clients
-            ExplosionData newData = new ExplosionData();
-            newData.pos = explodePos;
-            newData.size = fireballSize;
-
-            if (ClientManager.instance)
-            {
-                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
-            }
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
         }
     }
-#endif
 
     private void ResetHeight()
     {
