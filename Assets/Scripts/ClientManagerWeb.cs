@@ -29,9 +29,15 @@ public class ClientManagerWeb : MonoBehaviour
 
     [SerializeField] TMP_Text debugText;
 
+    [SerializeField] Animator FadeAnim;
 
     [DllImport("__Internal")]
     private static extern void ReloadPage();
+
+    private void Start()
+    {
+        FadeAnim.SetTrigger("FadeIn");
+    }
 
     private void Awake()
     {
@@ -220,14 +226,28 @@ public class ClientManagerWeb : MonoBehaviour
         switch (gameName)
         {
             case "ChaseGame":
-                SceneManager.LoadScene("ChaseGameClient");
+                StartCoroutine("LoadSceneWithFade", "ChaseGameClient");
                 break;
             case "Shootout":
-                SceneManager.LoadScene("ShootoutClient");
+                StartCoroutine("LoadSceneWithFade", "ShootoutClient");
                 break;
             default:
                 break;
         }
+    }
+
+    public void LoadMainMenu()
+    {
+        StartCoroutine("LoadSceneWithFade", "MainMenuClient");
+    }
+
+    IEnumerator LoadSceneWithFade(string sceneName)
+    {
+        FadeAnim.SetTrigger("FadeOut");
+
+        yield return new WaitForSeconds(1);
+
+        SceneManager.LoadScene(sceneName);
     }
 
     public void SpawnPlayers(GameObject prefab)
