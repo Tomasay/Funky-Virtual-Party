@@ -99,6 +99,5 @@ public class VinylPlayer : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         cm.OnMinigameStart(sceneName);
-        SceneManager.LoadScene(sceneName);
     }
 }

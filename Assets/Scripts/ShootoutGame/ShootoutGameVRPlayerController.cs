@@ -155,6 +155,10 @@ public class ShootoutGameVRPlayerController : VRPlayerController
             {
                 Physics.IgnoreCollision(f.col, fingy.GetComponent<Collider>());
             }
+            foreach (ClientPlayer cp in ClientManager.instance.Players)
+            {
+                Physics.IgnoreCollision(f.col, cp.GetComponent<Collider>());
+            }
         }
     }
 

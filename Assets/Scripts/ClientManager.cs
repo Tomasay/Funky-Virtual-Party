@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 using System;
 using BestHTTP;
 using BestHTTP.SocketIO3;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 public class ClientManager : MonoBehaviour
 {
@@ -35,6 +37,8 @@ public class ClientManager : MonoBehaviour
     private const int PASSCODE_LENGTH = 4;
     private static string passcode;
 
+    [SerializeField] private VolumeProfile postProcessingProfile;
+
     public SocketManager Manager { get => manager; }
     public string URL { get => url; }
     public string Passcode { get => passcode; }
@@ -49,6 +53,8 @@ public class ClientManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        SceneManager.sceneLoaded += FadeInScene;
 
         if (passcode == null)
         {
@@ -94,7 +100,47 @@ public class ClientManager : MonoBehaviour
     public void OnMinigameStart(string game)
     {
         Socket s = manager.Socket.Emit("minigameStarted", passcode, game);
-        
+        StartCoroutine("LoadSceneWithFade", game);
+    }
+
+    public void LoadMainMenu()
+    {
+        StartCoroutine("LoadSceneWithFade", "MainMenu");
+    }
+
+    IEnumerator LoadSceneWithFade(string sceneName)
+    {
+        //Fade out
+        if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
+        {
+            for (int i = 0; i < 60; i++)
+            {
+                float t = (float)i / (float)60;
+                ca.postExposure.value = Mathf.Lerp(0, -10, t);
+                yield return new WaitForSeconds(1 / 60);
+            }
+        }
+
+        SceneManager.LoadScene(sceneName);
+    }
+
+    private void FadeInScene(Scene arg0, LoadSceneMode arg1)
+    {
+        StartCoroutine("FadeIn");
+    }
+
+    IEnumerator FadeIn()
+    {
+        //Fade in
+        if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
+        {
+            for (int i = 0; i < 60; i++)
+            {
+                float t = (float)i / (float)60;
+                ca.postExposure.value = Mathf.Lerp(-10, 0, t);
+                yield return new WaitForSeconds(1 / 60);
+            }
+        }
     }
 
     public event Action<GameObject> onClientConnect;

@@ -29,6 +29,8 @@ public class ClientManagerWeb : MonoBehaviour
 
     [SerializeField] TMP_Text debugText;
 
+    [SerializeField] RectTransform fadeRect;
+    private float fadeIncrementDistance;
 
     [DllImport("__Internal")]
     private static extern void ReloadPage();
@@ -55,11 +57,18 @@ public class ClientManagerWeb : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             instance = this;
+
+            SceneManager.sceneLoaded += FadeInScene;
         }
         else
         {
             Destroy(gameObject);
         }
+
+        //Set fade rect proper size
+        float aspect = (Screen.height / fadeRect.rect.height) * 2;
+        fadeRect.sizeDelta = new Vector2(fadeRect.rect.width * aspect, fadeRect.rect.height * aspect);
+        fadeIncrementDistance = Screen.width / 8;
     }
 
     public void AttemptJoinRoom(string code, string name)
@@ -220,14 +229,54 @@ public class ClientManagerWeb : MonoBehaviour
         switch (gameName)
         {
             case "ChaseGame":
-                SceneManager.LoadScene("ChaseGameClient");
+                StartCoroutine("LoadSceneWithFade", "ChaseGameClient");
                 break;
             case "Shootout":
-                SceneManager.LoadScene("ShootoutClient");
+                StartCoroutine("LoadSceneWithFade", "ShootoutClient");
                 break;
             default:
                 break;
         }
+    }
+
+    public void LoadMainMenu()
+    {
+        StartCoroutine("LoadSceneWithFade", "MainMenuClient");
+    }
+
+    IEnumerator LoadSceneWithFade(string sceneName)
+    {
+        //Fade out
+        float val = Screen.width + (Screen.width / 2);
+        fadeRect.position = new Vector2(-val, fadeRect.position.y);
+
+        for (int i = 0; i <= (val * 2) / fadeIncrementDistance; i++)
+        {
+            fadeRect.position = new Vector2(-val + (i * fadeIncrementDistance), fadeRect.position.y);
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        SceneManager.LoadScene(sceneName);
+    }
+
+    IEnumerator FadeIn()
+    {
+        //Fade in
+        float val = Screen.width + (Screen.width / 2);
+        fadeRect.position = new Vector2(val, fadeRect.position.y);
+        
+
+        for (int i = 0; i <= (val * 2) / fadeIncrementDistance; i++)
+        {
+            fadeRect.position = new Vector2(val - (i * fadeIncrementDistance), fadeRect.position.y);
+            yield return new WaitForSeconds(0.05f);
+        }
+        
+    }
+
+    private void FadeInScene(Scene arg0, LoadSceneMode arg1)
+    {
+        StartCoroutine("FadeIn");
     }
 
     public void SpawnPlayers(GameObject prefab)

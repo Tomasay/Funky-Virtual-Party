@@ -86,7 +86,7 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         countdownText.text = txt;
         yield return new WaitForSeconds(3);
 
-        SceneManager.LoadScene("MainMenuClient");
+        ClientManagerWeb.instance.LoadMainMenu();
     }
 
     void MethodCalledFromServer(string methodName, string data)
