@@ -14,6 +14,7 @@ public class ShootoutGameManagerWeb : GameManagerWeb
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
+    private bool endingGame = false;
 
     [SerializeField] DiggerSystem digger;
 
@@ -55,7 +56,11 @@ public class ShootoutGameManagerWeb : GameManagerWeb
                 StartCoroutine(GameOver(2, "YOU LOSE!"));
                 break;
             case GameState.TimeEnded:
-                StartCoroutine(GameOver(2, "TIMES UP!"));
+                if (!endingGame)
+                {
+                    StartCoroutine(GameOver(2, "TIMES UP!"));
+                    endingGame = true;
+                }
                 break;
             default:
                 break;
@@ -91,7 +96,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
 
     void MethodCalledFromServer(string methodName, string data)
     {
-        Debug.Log("Method called");
         if (methodName.Equals("GenerateVoxels"))
         {
             StartCoroutine("GenerateVoxelsCorouting", data);
