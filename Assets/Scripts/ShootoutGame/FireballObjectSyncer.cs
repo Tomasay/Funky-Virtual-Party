@@ -90,7 +90,7 @@ public class FireballObjectSyncer : ObjectSyncer
                 explosion.Play();
 
                 #if UNITY_WEBGL
-                ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.localPlayer;
+                ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.LocalPlayer;
                 sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, (currentFireballData.scale.x / 2.0f) * 8) ); 
                 #endif
 

@@ -84,6 +84,12 @@ public class ClientPlayer : MonoBehaviour
 
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference/4) * Time.deltaTime);
+
+            //Check if we are falling through the map
+            if (transform.position.y < -100)
+            {
+                ClientManagerWeb.instance.Manager.Socket.Emit("requestPosFromClient");
+            }
         }
         else
         {
