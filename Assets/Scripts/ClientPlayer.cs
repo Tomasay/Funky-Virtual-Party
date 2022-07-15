@@ -12,6 +12,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] SkinnedMeshRenderer smr;
     [SerializeField] protected Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player
+    [SerializeField] Collider col; //Used to change height of player
 
     protected string playerID, playerIP, playerName;
     protected bool isLocal = false; //Is this the player being controlled by device?
@@ -39,6 +40,7 @@ public class ClientPlayer : MonoBehaviour
     public bool CanMove { get => canMove; set => canMove = value; }
 
     public Animator Anim { get => anim;}
+    public Collider Col { get => col; }
 
     protected virtual void Start()
     {

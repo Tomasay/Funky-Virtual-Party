@@ -18,8 +18,15 @@ MonoBehaviour:
   smr: {fileID: 2951685193550484969}
   anim: {fileID: 2498496601624005029}
   spineBone: {fileID: 6297579372331702703}
+  col: {fileID: 5078588715292493184}
   posFromHost: {x: 0, y: 0, z: 0}
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
+  isColliding: 0
   waterSplash: {fileID: 5531231052371847848, guid: 60c88e966a0f8324da766221921ee65f, type: 3}
+  isAlive: 1
+  prevVector: {x: 0, y: 0}
 --- !u!1001 &3998870548620408853
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -81,6 +88,11 @@ PrefabInstance:
 --- !u!1 &5078588715292493185 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8143653906893471124, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+  m_PrefabInstance: {fileID: 3998870548620408853}
+  m_PrefabAsset: {fileID: 0}
+--- !u!136 &5078588715292493184 stripped
+CapsuleCollider:
+  m_CorrespondingSourceObject: {fileID: 8143653906893471125, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
   m_PrefabInstance: {fileID: 3998870548620408853}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &5630419980778754063 stripped

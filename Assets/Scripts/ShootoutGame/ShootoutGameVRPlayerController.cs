@@ -19,7 +19,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     void Awake()
     {
-        SetupCollisionIgnore();
+        ClientManager.instance.onPlayerSpawned.AddListener(SetupCollisionIgnore);
 
         ahp.handRight.OnTriggerGrab += OnGrabbed;
         ahp.handRight.OnTriggerRelease += OnRelease;
@@ -28,6 +28,11 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
         PreloadFireball(true);
         PreloadFireball(false);
+    }
+
+    private void Update()
+    {
+        Debug.Log(ClientManager.instance.Players[0].PlayerName + " collider: " + ClientManager.instance.Players[0].gameObject.GetComponent<ShootoutGameClientPlayer>().Col.name);
     }
 
     private void OnGrabbed(Hand hand, Grabbable grabbable)
@@ -157,7 +162,12 @@ public class ShootoutGameVRPlayerController : VRPlayerController
             }
             foreach (ClientPlayer cp in ClientManager.instance.Players)
             {
-                Physics.IgnoreCollision(f.col, cp.GetComponent<Collider>());
+                ShootoutGameClientPlayer scp = cp.gameObject.GetComponent<ShootoutGameClientPlayer>();
+                if (scp != null)
+                {
+                    Physics.IgnoreCollision(f.col, scp.Col);
+                }
+                
             }
         }
     }
