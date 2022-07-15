@@ -17,6 +17,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     const float collisionTimerDefault = 0.5f;
     Vector2 collisionVector;
 
+
     [SerializeField] ParticleSystem waterSplash;
 
     public bool isAlive = true;
@@ -96,6 +97,25 @@ public class ShootoutGameClientPlayer : ClientPlayer
             transform.Translate(movement * Time.deltaTime);
         }
 
+        if (isLocal && isExplosion)
+        {
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x, collisionVector.normalized.y);
+            Move(collisionVector.normalized.x * 2.5f, collisionVector.normalized.y * 2.5f, false);
+
+            Vector3 positionDifference = posFromHost - transform.position;
+            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+
+            explosionTimer -= Time.deltaTime;
+            if (explosionTimer <= 0)
+            {
+                isExplosion = false;
+            }
+        }
+        else if(isLocal)
+        {
+            explosionTimer = explosionTimerDefault;
+        }
+
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
@@ -129,5 +149,22 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         Instantiate(waterSplash, collisionPoint, Quaternion.identity);
         waterSplash.Play();
+    }
+
+    bool isExplosion = false;
+    float explosionTimer = 0.25f;
+    const float explosionTimerDefault = 0.25f;
+    public void CheckCollisionWithFireball(Vector3 firePos, float radius)
+    {
+        if (!isLocal)
+            return;
+
+        float dist = Vector3.Distance(firePos, transform.position);
+        isExplosion = dist < radius;
+        if(isExplosion)
+        {
+            collisionVector = firePos - transform.position;
+        }
+
     }
 }

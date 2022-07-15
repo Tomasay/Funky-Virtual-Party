@@ -12,7 +12,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         public float size;
     }
 
-    [SerializeField] int blastRadius = 20, blastDepth = 2;
+    [SerializeField] int blastRadius = 8, blastDepth = 2;
     [SerializeField] float startingHeight = 30;
 
     [SerializeField] DiggerMasterRuntime digger;

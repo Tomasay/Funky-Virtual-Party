@@ -74,6 +74,7 @@ public class Fireball : MonoBehaviour
         hasExploded = true;
 
         ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", syncer.CurrentFireballData.objectID.ToString());
+
     }
 
     public void Activate()
