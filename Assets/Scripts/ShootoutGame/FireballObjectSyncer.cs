@@ -88,11 +88,14 @@ public class FireballObjectSyncer : ObjectSyncer
             else if (methodName.Equals("FireballExplosionEvent"))
             {
                 explosion.Play();
-                foreach (ClientPlayer p in ClientManager.instance.Players)
+                
+                #if UNITY_WEBGL
+                foreach (ClientPlayer p in ClientManagerWeb.instance.Players)
                 {
                     ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
                     sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, (currentFireballData.scale.x / 2.0f) * 8) );
                 }
+                #endif
             }
         }
     }
