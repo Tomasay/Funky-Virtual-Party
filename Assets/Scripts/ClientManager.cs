@@ -7,11 +7,12 @@ using BestHTTP;
 using BestHTTP.SocketIO3;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Events;
 
 public class ClientManager : MonoBehaviour
 {
     private static ClientManager Instance = null;
-    public static ClientManager instance; 
+    public static ClientManager instance;
     /*{
     get
         {
@@ -22,6 +23,8 @@ public class ClientManager : MonoBehaviour
             return Instance;
         }
     }*/
+
+    public UnityEvent onPlayerSpawned;
 
     [SerializeField]
     private GameObject playerPrefab;
@@ -276,6 +279,8 @@ public class ClientManager : MonoBehaviour
                 }
             }
         }
+
+        onPlayerSpawned.Invoke();
 
         SyncAllPlayerPos();
     }
