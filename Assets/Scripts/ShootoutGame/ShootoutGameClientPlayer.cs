@@ -156,9 +156,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
     const float explosionTimerDefault = 0.25f;
     public void CheckCollisionWithFireball(Vector3 firePos, float radius)
     {
-        if (!isLocal)
-            return;
-
         float dist = Vector3.Distance(firePos, transform.position);
         isExplosion = dist < radius;
         if(isExplosion)
