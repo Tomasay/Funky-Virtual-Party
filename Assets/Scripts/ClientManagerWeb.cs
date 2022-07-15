@@ -30,6 +30,7 @@ public class ClientManagerWeb : MonoBehaviour
     [SerializeField] TMP_Text debugText;
 
     [SerializeField] RectTransform fadeRect;
+    private float fadeIncrementDistance;
 
     [DllImport("__Internal")]
     private static extern void ReloadPage();
@@ -63,6 +64,11 @@ public class ClientManagerWeb : MonoBehaviour
         }
 
         SceneManager.sceneLoaded += FadeInScene;
+
+        //Set faderect proper size
+        float aspect = (Screen.height / fadeRect.rect.height) * 2;
+        fadeRect.sizeDelta = new Vector2(fadeRect.rect.width * aspect, fadeRect.rect.height * aspect);
+        fadeIncrementDistance = Screen.width / 8;
     }
 
     public void AttemptJoinRoom(string code, string name)
@@ -241,16 +247,12 @@ public class ClientManagerWeb : MonoBehaviour
     IEnumerator LoadSceneWithFade(string sceneName)
     {
         //Fade out
-        //Fade out
-        int incrementDistance = 50;
         float val = Screen.width + (Screen.width / 2);
-        fadeRect.SetLeft(-val);
-        fadeRect.SetRight(val);
+        fadeRect.position = new Vector2(-val, fadeRect.position.y);
 
-        for (int i = 0; i <= (val * 2) / incrementDistance; i++)
+        for (int i = 0; i <= (val * 2) / fadeIncrementDistance; i++)
         {
-            fadeRect.SetLeft(-val + (i * incrementDistance));
-            fadeRect.SetRight(val - (i * incrementDistance));
+            fadeRect.position = new Vector2(-val + (i * fadeIncrementDistance), fadeRect.position.y);
             yield return new WaitForSeconds(0.05f);
         }
 
@@ -260,15 +262,13 @@ public class ClientManagerWeb : MonoBehaviour
     IEnumerator FadeIn()
     {
         //Fade in
-        int incrementDistance = 50;
         float val = Screen.width + (Screen.width / 2);
-        fadeRect.SetLeft(val);
-        fadeRect.SetRight(-val);
+        fadeRect.position = new Vector2(val, fadeRect.position.y);
         
-        for (int i = 0; i <= (val * 2) / incrementDistance; i++)
+
+        for (int i = 0; i <= (val * 2) / fadeIncrementDistance; i++)
         {
-            fadeRect.SetLeft(val - (i * incrementDistance));
-            fadeRect.SetRight(-val + (i * incrementDistance));
+            fadeRect.position = new Vector2(val - (i * fadeIncrementDistance), fadeRect.position.y);
             yield return new WaitForSeconds(0.05f);
         }
         
