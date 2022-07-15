@@ -14,7 +14,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
-    private bool endingGame = false;
 
     [SerializeField] DiggerSystem digger;
 

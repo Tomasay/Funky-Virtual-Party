@@ -55,7 +55,11 @@ public class ChaseGameManagerWeb : GameManagerWeb
                 StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
                 break;
             case GameState.TimeEnded:
-                StartCoroutine(GameOver(2, "TIMES UP!"));
+                if (!endingGame)
+                {
+                    StartCoroutine(GameOver(2, "TIMES UP!"));
+                    endingGame = true;
+                }
                 break;
             default:
                 break;
@@ -89,6 +93,6 @@ public class ChaseGameManagerWeb : GameManagerWeb
         countdownText.text = txt;
         yield return new WaitForSeconds(3);
 
-        SceneManager.LoadScene("MainMenuClient");
+        ClientManagerWeb.instance.LoadMainMenu();
     }
 }
