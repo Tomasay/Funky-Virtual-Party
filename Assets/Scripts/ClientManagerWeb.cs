@@ -57,15 +57,15 @@ public class ClientManagerWeb : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             instance = this;
+
+            SceneManager.sceneLoaded += FadeInScene;
         }
         else
         {
             Destroy(gameObject);
         }
 
-        SceneManager.sceneLoaded += FadeInScene;
-
-        //Set faderect proper size
+        //Set fade rect proper size
         float aspect = (Screen.height / fadeRect.rect.height) * 2;
         fadeRect.sizeDelta = new Vector2(fadeRect.rect.width * aspect, fadeRect.rect.height * aspect);
         fadeIncrementDistance = Screen.width / 8;
