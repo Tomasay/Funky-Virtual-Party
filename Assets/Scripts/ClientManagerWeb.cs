@@ -29,15 +29,10 @@ public class ClientManagerWeb : MonoBehaviour
 
     [SerializeField] TMP_Text debugText;
 
-    [SerializeField] Animator FadeAnim;
+    [SerializeField] RectTransform fadeRect;
 
     [DllImport("__Internal")]
     private static extern void ReloadPage();
-
-    private void Start()
-    {
-        FadeAnim.SetTrigger("FadeIn");
-    }
 
     private void Awake()
     {
@@ -66,6 +61,8 @@ public class ClientManagerWeb : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        SceneManager.sceneLoaded += FadeInScene;
     }
 
     public void AttemptJoinRoom(string code, string name)
@@ -243,11 +240,43 @@ public class ClientManagerWeb : MonoBehaviour
 
     IEnumerator LoadSceneWithFade(string sceneName)
     {
-        FadeAnim.SetTrigger("FadeOut");
+        //Fade out
+        //Fade out
+        int incrementDistance = 50;
+        float val = Screen.width + (Screen.width / 2);
+        fadeRect.SetLeft(-val);
+        fadeRect.SetRight(val);
 
-        yield return new WaitForSeconds(1);
+        for (int i = 0; i <= (val * 2) / incrementDistance; i++)
+        {
+            fadeRect.SetLeft(-val + (i * incrementDistance));
+            fadeRect.SetRight(val - (i * incrementDistance));
+            yield return new WaitForSeconds(0.05f);
+        }
 
         SceneManager.LoadScene(sceneName);
+    }
+
+    IEnumerator FadeIn()
+    {
+        //Fade in
+        int incrementDistance = 50;
+        float val = Screen.width + (Screen.width / 2);
+        fadeRect.SetLeft(val);
+        fadeRect.SetRight(-val);
+        
+        for (int i = 0; i <= (val * 2) / incrementDistance; i++)
+        {
+            fadeRect.SetLeft(val - (i * incrementDistance));
+            fadeRect.SetRight(-val + (i * incrementDistance));
+            yield return new WaitForSeconds(0.05f);
+        }
+        
+    }
+
+    private void FadeInScene(Scene arg0, LoadSceneMode arg1)
+    {
+        StartCoroutine("FadeIn");
     }
 
     public void SpawnPlayers(GameObject prefab)
