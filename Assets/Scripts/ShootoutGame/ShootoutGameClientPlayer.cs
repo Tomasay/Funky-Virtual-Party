@@ -115,7 +115,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             explosionTimer = explosionTimerDefault;
         }
-
+        // check if we are below the floor
+        if(transform.position.y < -10 && transform.position.y != posFromHost.y)
+        {
+            transform.position = posFromHost;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 

@@ -18,5 +18,12 @@ public class MazeGameClientPlayer : ClientPlayer
         lookRotation = Quaternion.Euler(new Vector3(0, lookRotation.eulerAngles.y, 0)); //Override rotation, we want player to rotate with board and only care about Y
 
         anim.transform.localRotation = Quaternion.RotateTowards(lookRotation, transform.localRotation, Time.deltaTime);
+        
+        // check if we are below the floor
+        if (transform.position.y < -10 && transform.position.y != posFromHost.y)
+        {
+            transform.position = posFromHost;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
     }
 }

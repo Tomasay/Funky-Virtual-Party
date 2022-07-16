@@ -84,16 +84,17 @@ public class ClientPlayer : MonoBehaviour
 
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference/4) * Time.deltaTime);
-
-            //Check if we are falling through the map
-            if (transform.position.y < -100)
-            {
-                ClientManagerWeb.instance.Manager.Socket.Emit("requestPosFromClient");
-            }
         }
         else
         {
             transform.Translate(movement * Time.deltaTime);
+        }
+
+        // check if we are below the floor
+        if (transform.position.y < -10 && transform.position.y != posFromHost.y)
+        {
+            transform.position = posFromHost;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
 
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
