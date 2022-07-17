@@ -77,7 +77,6 @@ public class ClientManager : MonoBehaviour
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
             manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
-            manager.Socket.On<string>("requestPosToHost", OnPlayerPositionRequested);
 
             DontDestroyOnLoad(gameObject);
         }
@@ -99,11 +98,6 @@ public class ClientManager : MonoBehaviour
         manager.Socket.Emit("unityCloseRoom", passcode);
         manager?.Close();
         manager?.Socket?.Disconnect();
-    }
-
-    void OnPlayerPositionRequested(string playerID)
-    {
-        SyncAllPlayerPos();
     }
 
     public void OnMinigameStart(string game)
