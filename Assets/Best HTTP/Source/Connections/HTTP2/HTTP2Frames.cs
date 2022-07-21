@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace BestHTTP.Connections.HTTP2
 {
     // https://httpwg.org/specs/rfc7540.html#iana-frames
-    enum HTTP2FrameTypes : byte
+    public enum HTTP2FrameTypes : byte
     {
         DATA = 0x00,
         HEADERS = 0x01,
@@ -26,7 +26,7 @@ namespace BestHTTP.Connections.HTTP2
     }
 
     [Flags]
-    enum HTTP2DataFlags : byte
+    public enum HTTP2DataFlags : byte
     {
         None = 0x00,
         END_STREAM = 0x01,
@@ -34,7 +34,7 @@ namespace BestHTTP.Connections.HTTP2
     }
 
     [Flags]
-    enum HTTP2HeadersFlags : byte
+    public enum HTTP2HeadersFlags : byte
     {
         None = 0x00,
         END_STREAM = 0x01,
@@ -44,14 +44,14 @@ namespace BestHTTP.Connections.HTTP2
     }
 
     [Flags]
-    enum HTTP2SettingsFlags : byte
+    public enum HTTP2SettingsFlags : byte
     {
         None = 0x00,
         ACK = 0x01,
     }
 
     [Flags]
-    enum HTTP2PushPromiseFlags : byte
+    public enum HTTP2PushPromiseFlags : byte
     {
         None = 0x00,
         END_HEADERS = 0x04,
@@ -59,20 +59,20 @@ namespace BestHTTP.Connections.HTTP2
     }
 
     [Flags]
-    enum HTTP2PingFlags : byte
+    public enum HTTP2PingFlags : byte
     {
         None = 0x00,
         ACK = 0x01,
     }
 
     [Flags]
-    enum HTTP2ContinuationFlags : byte
+    public enum HTTP2ContinuationFlags : byte
     {
         None = 0x00,
         END_HEADERS = 0x04,
     }
 
-    struct HTTP2FrameHeaderAndPayload
+    public struct HTTP2FrameHeaderAndPayload
     {
         public UInt32 PayloadLength;
         public HTTP2FrameTypes Type;
@@ -105,7 +105,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2SettingsFrame
+    public struct HTTP2SettingsFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2SettingsFlags Flags { get { return (HTTP2SettingsFlags)this.Header.Flags; } }
@@ -134,7 +134,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2DataFrame
+    public struct HTTP2DataFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2DataFlags Flags { get { return (HTTP2DataFlags)this.Header.Flags; } }
@@ -163,7 +163,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2HeadersFrame
+    public struct HTTP2HeadersFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2HeadersFlags Flags { get { return (HTTP2HeadersFlags)this.Header.Flags; } }
@@ -201,7 +201,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2PriorityFrame
+    public struct HTTP2PriorityFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
 
@@ -224,7 +224,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2RSTStreamFrame
+    public struct HTTP2RSTStreamFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
 
@@ -243,7 +243,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2PushPromiseFrame
+    public struct HTTP2PushPromiseFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2PushPromiseFlags Flags { get { return (HTTP2PushPromiseFlags)this.Header.Flags; } }
@@ -278,7 +278,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2PingFrame
+    public struct HTTP2PingFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2PingFlags Flags { get { return (HTTP2PingFlags)this.Header.Flags; } }
@@ -302,7 +302,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2GoAwayFrame
+    public struct HTTP2GoAwayFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2ErrorCodes Error { get { return (HTTP2ErrorCodes)this.ErrorCode; } }
@@ -336,7 +336,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2WindowUpdateFrame
+    public struct HTTP2WindowUpdateFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
 
@@ -357,7 +357,7 @@ namespace BestHTTP.Connections.HTTP2
         }
     }
 
-    struct HTTP2ContinuationFrame
+    public struct HTTP2ContinuationFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
         public HTTP2ContinuationFlags Flags { get { return (HTTP2ContinuationFlags)this.Header.Flags; } }
@@ -383,7 +383,7 @@ namespace BestHTTP.Connections.HTTP2
     /// <summary>
     /// https://tools.ietf.org/html/rfc7838#section-4
     /// </summary>
-    struct HTTP2AltSVCFrame
+    public struct HTTP2AltSVCFrame
     {
         public readonly HTTP2FrameHeaderAndPayload Header;
 

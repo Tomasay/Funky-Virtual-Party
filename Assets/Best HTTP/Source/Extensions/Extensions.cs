@@ -207,7 +207,7 @@ namespace BestHTTP.Extensions
 
             try
             {
-                DateTime.TryParse(str, out defaultValue);
+                DateTime.TryParse(str, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out defaultValue);
                 return defaultValue.ToUniversalTime();
             }
             catch

@@ -224,6 +224,9 @@ namespace BestHTTP.SocketIO3
             this.State = States.Initial;
             this.PreviousState = States.Initial;
             this.Parser = parser ?? new DefaultJsonParser();
+
+            if (uri.Scheme.StartsWith("ws"))
+                options.ConnectWith = TransportTypes.WebSocket;
         }
 
         #endregion
@@ -313,7 +316,7 @@ namespace BestHTTP.SocketIO3
             HTTPManager.Heartbeats.Subscribe(this);
 
             // The root namespace will be opened by default
-            GetSocket("/");
+            //GetSocket("/");
         }
 
         /// <summary>
@@ -589,7 +592,7 @@ namespace BestHTTP.SocketIO3
             Socket socket = null;
             if (Namespaces.TryGetValue(packet.Namespace, out socket))
                 (socket as ISocket).OnPacket(packet);
-            else
+            else if (packet.TransportEvent == TransportEventTypes.Message)
                 HTTPManager.Logger.Warning("SocketManager", "Namespace \"" + packet.Namespace + "\" not found!", this.Context);
         }
 

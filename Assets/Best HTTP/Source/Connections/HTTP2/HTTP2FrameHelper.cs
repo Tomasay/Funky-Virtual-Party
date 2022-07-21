@@ -9,7 +9,7 @@ using System.IO;
 namespace BestHTTP.Connections.HTTP2
 {
     // https://httpwg.org/specs/rfc7540.html#ErrorCodes
-    enum HTTP2ErrorCodes
+    public enum HTTP2ErrorCodes
     {
         NO_ERROR = 0x00,
         PROTOCOL_ERROR = 0x01,
@@ -27,7 +27,7 @@ namespace BestHTTP.Connections.HTTP2
         HTTP_1_1_REQUIRED = 0x0D
     }
 
-    static class HTTP2FrameHelper
+    public static class HTTP2FrameHelper
     {
         public static HTTP2ContinuationFrame ReadContinuationFrame(HTTP2FrameHeaderAndPayload header)
         {
@@ -56,6 +56,8 @@ namespace BestHTTP.Connections.HTTP2
         public static HTTP2GoAwayFrame ReadGoAwayFrame(HTTP2FrameHeaderAndPayload header)
         {
             // https://httpwg.org/specs/rfc7540.html#GOAWAY
+            //      str id      error
+            // | 0, 1, 2, 3 | 4, 5, 6, 7 | ...
 
             HTTP2GoAwayFrame frame = new HTTP2GoAwayFrame(header);
 
@@ -67,7 +69,7 @@ namespace BestHTTP.Connections.HTTP2
             if (frame.AdditionalDebugDataLength > 0)
             {
                 frame.AdditionalDebugData = BufferPool.Get(frame.AdditionalDebugDataLength, true);
-                Array.Copy(header.Payload, 0, frame.AdditionalDebugData, 0, frame.AdditionalDebugDataLength);
+                Array.Copy(header.Payload, 8, frame.AdditionalDebugData, 0, frame.AdditionalDebugDataLength);
             }
 
             return frame;

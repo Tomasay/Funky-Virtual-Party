@@ -27,9 +27,6 @@ namespace BestHTTP
     using BestHTTP.Logger;
     using BestHTTP.Timings;
 
-    /// <summary>
-    ///
-    /// </summary>
     public class HTTPResponse : IDisposable
     {
         internal const byte CR = 13;
@@ -163,6 +160,9 @@ namespace BestHTTP
         /// </summary>
         public bool IsClosedManually { get; protected set; }
 
+        /// <summary>
+        /// IProtocol.LoggingContext implementation.
+        /// </summary>
         public LoggingContext Context { get; private set; }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace BestHTTP
             this.Context.Add("IsFromCache", isFromCache);
         }
 
-        public virtual bool Receive(int forceReadRawContentLength = -1, bool readPayloadData = true, bool sendUpgradedEvent = true)
+        public bool Receive(long forceReadRawContentLength = -1, bool readPayloadData = true, bool sendUpgradedEvent = true)
         {
             if (this.baseRequest.IsCancellationRequested)
                 return false;
@@ -245,6 +245,9 @@ namespace BestHTTP
             }
             catch
             {
+                if (baseRequest.IsCancellationRequested)
+                    return false;
+
                 if (baseRequest.Retries >= baseRequest.MaxRetries)
                 {
                     HTTPManager.Logger.Warning("HTTPResponse", "Failed to read Status Line! Retry is enabled, returning with false.", this.Context, this.baseRequest.Context);
@@ -321,10 +324,13 @@ namespace BestHTTP
             if (!readPayloadData)
                 return true;
 
+            if (this.StatusCode == 200 && this.IsProxyResponse)
+                return true;
+
             return ReadPayload(forceReadRawContentLength);
         }
 
-        protected bool ReadPayload(int forceReadRawContentLength)
+        protected bool ReadPayload(long forceReadRawContentLength)
         {
             // Reading from an already unpacked stream (eq. From a file cache or all responses under webgl)
             if (forceReadRawContentLength != -1)
@@ -378,6 +384,8 @@ namespace BestHTTP
 
         protected void ReadHeaders(Stream stream)
         {
+            var newHeaders = this.baseRequest.OnHeadersReceived != null ? new Dictionary<string, List<string>>() : null;
+
             string headerName = ReadTo(stream, (byte)':', LF)/*.Trim()*/;
             while (headerName != string.Empty)
             {
@@ -388,11 +396,20 @@ namespace BestHTTP
 
                 AddHeader(headerName, value);
 
+                if (newHeaders != null)
+                {
+                    List<string> values;
+                    if (!newHeaders.TryGetValue(headerName, out values))
+                        newHeaders.Add(headerName, values = new List<string>(1));
+
+                    values.Add(value);
+                }
+
                 headerName = ReadTo(stream, (byte)':', LF);
             }
 
             if (this.baseRequest.OnHeadersReceived != null)
-                RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.baseRequest, RequestEvents.Headers));
+                RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.baseRequest, newHeaders));
         }
 
         public void AddHeader(string name, string value)
@@ -1147,7 +1164,7 @@ namespace BestHTTP
             if (!IsCacheOnly)
 #endif
             {
-                if (this.baseRequest.OnStreamingData != null && buffer != null && bufferLength > 0)
+                if (this.baseRequest.UseStreaming && buffer != null && bufferLength > 0)
                 {
                     RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.baseRequest, buffer, bufferLength));
                     Interlocked.Increment(ref this.UnprocessedFragments);
@@ -1202,26 +1219,24 @@ namespace BestHTTP
             GC.SuppressFinalize(this);
         }
 
-        ~HTTPResponse()
-        {
-            Dispose(false);
-        }
-
         protected virtual void Dispose(bool disposing)
         {
-            // Release resources in case we are using ReadOnlyBufferedStream, it will not close its inner stream.
-            // Otherwise, closing the (inner) Stream is the connection's responsibility
-            if (Stream != null && Stream is ReadOnlyBufferedStream)
-                (Stream as IDisposable).Dispose();
-            Stream = null;
+            if (disposing)
+            {
+                // Release resources in case we are using ReadOnlyBufferedStream, it will not close its inner stream.
+                // Otherwise, closing the (inner) Stream is the connection's responsibility
+                if (Stream != null && Stream is ReadOnlyBufferedStream)
+                    (Stream as IDisposable).Dispose();
+                Stream = null;
 
 #if !BESTHTTP_DISABLE_CACHING
-            if (cacheStream != null)
-            {
-                cacheStream.Dispose();
-                cacheStream = null;
-            }
+                if (cacheStream != null)
+                {
+                    cacheStream.Dispose();
+                    cacheStream = null;
+                }
 #endif
+            }
         }
     }
 }
