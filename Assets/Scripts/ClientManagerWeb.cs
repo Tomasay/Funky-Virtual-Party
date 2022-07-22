@@ -34,7 +34,7 @@ public class ClientManagerWeb : MonoBehaviour
     private float fadeIncrementDistance;
 
     private float lastHeartbeatReceived;
-    private float hostTimeoutTime = 5.0f;
+    private float hostTimeoutTime = 7.0f;
 
     [DllImport("__Internal")]
     private static extern void ReloadPage();
@@ -77,7 +77,7 @@ public class ClientManagerWeb : MonoBehaviour
         fadeIncrementDistance = Screen.width / 8;
     }
 
-    private void Update()
+    private void CheckHeartbeat()
     {
         if(joinedRoom && !reloadingPage && (Time.time - lastHeartbeatReceived) > hostTimeoutTime)
         {
@@ -149,6 +149,8 @@ public class ClientManagerWeb : MonoBehaviour
         {
             lastHeartbeatReceived = Time.time;
             joinedRoom = true;
+
+            InvokeRepeating("CheckHeartbeat", 0, 1);
         }
         else //If room was invalid
         {
