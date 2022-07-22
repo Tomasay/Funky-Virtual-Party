@@ -73,7 +73,7 @@ public class ClientManager : MonoBehaviour
 
             manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
-            manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
+            manager.Socket.On<string, string, bool>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
             manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
@@ -82,6 +82,7 @@ public class ClientManager : MonoBehaviour
         }
 
         InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
+        InvokeRepeating("SendHeartbeat", 0, 2.0f);
     }
 
     private void Update()
@@ -98,6 +99,11 @@ public class ClientManager : MonoBehaviour
         manager.Socket.Emit("unityCloseRoom", passcode);
         manager?.Close();
         manager?.Socket?.Disconnect();
+    }
+
+    void SendHeartbeat()
+    {
+        manager.Socket.Emit("heartbeatToServer");
     }
 
     public void OnMinigameStart(string game)
@@ -184,7 +190,7 @@ public class ClientManager : MonoBehaviour
     }
 
     public event Action<string> onClientDisonnect;
-    private void OnClientDisconnect(string id, string ip)
+    private void OnClientDisconnect(string id, string ip, bool wasHost)
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
 

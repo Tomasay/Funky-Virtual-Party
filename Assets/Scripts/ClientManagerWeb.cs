@@ -16,6 +16,7 @@ public class ClientManagerWeb : MonoBehaviour
     private GameObject playerPrefab;
     private static List<ClientPlayer> players = new List<ClientPlayer>();
     private ClientPlayer localPlayer;
+    private bool joinedRoom;
 
     public List<ClientPlayer> Players { get => players; }
 
@@ -32,8 +33,12 @@ public class ClientManagerWeb : MonoBehaviour
     [SerializeField] RectTransform fadeRect;
     private float fadeIncrementDistance;
 
+    private float lastHeartbeatReceived;
+    private float hostTimeoutTime = 5.0f;
+
     [DllImport("__Internal")]
     private static extern void ReloadPage();
+    private bool reloadingPage = false;
 
     private void Awake()
     {
@@ -41,7 +46,8 @@ public class ClientManagerWeb : MonoBehaviour
         if (!instance)
         {
             manager = new SocketManager(new Uri(socketUrl));
-            manager.Socket.On<bool, string>("joinedRoom", JoinRoomCheck);
+            manager.Socket.On<bool>("joinedRoom", JoinRoomCheck);
+            manager.Socket.On("heartbeatToClients", OnHeartBeat);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
@@ -69,6 +75,15 @@ public class ClientManagerWeb : MonoBehaviour
         float aspect = (Screen.height / fadeRect.rect.height) * 2;
         fadeRect.sizeDelta = new Vector2(fadeRect.rect.width * aspect, fadeRect.rect.height * aspect);
         fadeIncrementDistance = Screen.width / 8;
+    }
+
+    private void Update()
+    {
+        if(joinedRoom && !reloadingPage && (Time.time - lastHeartbeatReceived) > hostTimeoutTime)
+        {
+            ReloadPage();
+            reloadingPage = true;
+        }
     }
 
     public void AttemptJoinRoom(string code, string name)
@@ -128,10 +143,12 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
-    private void JoinRoomCheck(bool joined, string socketID)
+    private void JoinRoomCheck(bool joined)
     {
         if(joined) //If we successfuly joined a room
         {
+            lastHeartbeatReceived = Time.time;
+            joinedRoom = true;
         }
         else //If room was invalid
         {
@@ -180,6 +197,11 @@ public class ClientManagerWeb : MonoBehaviour
         {
             onClientDisonnect(id);
         }
+    }
+
+    private void OnHeartBeat()
+    {
+        lastHeartbeatReceived = Time.time;
     }
 
     private void SyncCustomizations(string id, string color, int headShape, float height)
