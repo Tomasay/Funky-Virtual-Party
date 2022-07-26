@@ -9,6 +9,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
+    private int fireballExplosionRange = 10;
 
     private bool lastActiveSent; //Value of isActive last sent to clients
 
@@ -89,10 +90,10 @@ public class FireballObjectSyncer : ObjectSyncer
             {
                 explosion.Play();
 
-                #if UNITY_WEBGL
+#if UNITY_WEBGL
                 ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.LocalPlayer;
-                sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, (currentFireballData.scale.x / 2.0f) * 8) ); 
-                #endif
+                sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, currentFireballData.scale.x * fireballExplosionRange) ); 
+#endif
 
             }
         }

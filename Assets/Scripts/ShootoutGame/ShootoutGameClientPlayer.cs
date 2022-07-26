@@ -99,8 +99,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * 2.5f, collisionVector.normalized.y * 2.5f );
-            Move(collisionVector.normalized.x * 2.5f, collisionVector.normalized.y * 2.5f, false);
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f );
+            Move(collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, false);
 
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime); 
