@@ -143,6 +143,7 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
+    public event Action onClientFailedConnect;
     private void JoinRoomCheck(bool joined)
     {
         if(joined) //If we successfuly joined a room
@@ -154,7 +155,7 @@ public class ClientManagerWeb : MonoBehaviour
         }
         else //If room was invalid
         {
-            //TODO: Inform player that party code was invalid
+            onClientFailedConnect.Invoke();
         }
     }
 
