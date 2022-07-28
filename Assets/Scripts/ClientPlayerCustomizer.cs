@@ -7,6 +7,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
 {
     [SerializeField] Button toggleHatLeftButton, toggleHatRightButton, enableCustomizationButton, closeCustomizationButton;
     [SerializeField] Canvas controllerCanvas;
+    [SerializeField] GameObject backgroundDots;
 
     private Vector3 initialCameraPos;
     private Quaternion initialCameraRot;
@@ -35,6 +36,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         toggleHatRightButton.gameObject.SetActive(true);
         closeCustomizationButton.gameObject.SetActive(true);
         enableCustomizationButton.gameObject.SetActive(false);
+        backgroundDots.SetActive(false);
     }
 
     private void DisableCustomization()
@@ -50,6 +52,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         toggleHatRightButton.gameObject.SetActive(false);
         closeCustomizationButton.gameObject.SetActive(false);
         enableCustomizationButton.gameObject.SetActive(true);
+        backgroundDots.SetActive(true);
     }
 
     private void NextHatCustomization()

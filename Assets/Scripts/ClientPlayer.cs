@@ -131,9 +131,8 @@ public class ClientPlayer : MonoBehaviour
         pos.y += height;
         spineBone.transform.localPosition = pos;
 
-        //Hat
-        currentHatIndex = Random.Range(0, hats.Length);
-        currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+        //Hat, default none
+        currentHatIndex = -1;
 
         if (isLocal)
         {
@@ -149,7 +148,10 @@ public class ClientPlayer : MonoBehaviour
         }
 
         currentHatIndex = newIndex;
-        currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+        if (newIndex > -1)
+        {
+            currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+        }
 
         if (isLocal)
         {
@@ -171,7 +173,12 @@ public class ClientPlayer : MonoBehaviour
         {
             Destroy(currentHat);
         }
-        currentHat = Instantiate(hats[hatIndex], hatAttachPoint.transform);
+
+        currentHatIndex = hatIndex;
+        if (hatIndex > -1)
+        {
+            currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+        }
     }
 
     private void ChangeColor(Color col)
