@@ -18,6 +18,8 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] GameObject partyCodeInvalidDebug;
     [SerializeField] Button submitButton;
 
+    [SerializeField] Button enableCustomizationsButton;
+
     [SerializeField] Material dotsMat;
 
     [SerializeField] Color[] backgroundColors, dotsColors;
@@ -140,5 +142,6 @@ public class MainMenuWeb : MonoBehaviour
         VRPlayer.SetActive(true);
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
+        enableCustomizationsButton.gameObject.SetActive(true);
     }
 }

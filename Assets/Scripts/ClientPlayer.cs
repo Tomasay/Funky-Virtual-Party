@@ -14,7 +14,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] GameObject spineBone; //Used to change height of player
     [SerializeField] Collider col; //Used to change height of player
 
-    [SerializeField] GameObject[] hats;
+    [SerializeField] public GameObject[] hats;
     [SerializeField] GameObject hatAttachPoint;
     protected GameObject currentHat;
     protected int currentHatIndex = -1;
@@ -24,6 +24,7 @@ public class ClientPlayer : MonoBehaviour
     protected Color playerColor = Color.white;
     protected int headType;
     protected float height; //Between -0.2f anf 2.0f
+    private Vector3 spinePos;
 
     protected Vector3 movement;
     protected Quaternion lookRotation;
@@ -39,7 +40,8 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
-    public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += height; spineBone.transform.localPosition = pos;} }
+    public float PlayerHeight { get => height; set{ height = value; spineBone.transform.localPosition = spinePos + new Vector3(0, height, 0); } }
+    public int PlayerHatIndex { get => currentHatIndex; set{ UpdateHat(value); } }
 
     public bool IsLocal { get => isLocal; set => isLocal = value; }
     public bool CanMove { get => canMove; set => canMove = value; }
@@ -72,6 +74,8 @@ public class ClientPlayer : MonoBehaviour
         speed = startingSpeed;
 
         playerInput = GetComponent<PlayerInput>();
+
+        spinePos = spineBone.transform.localPosition;
     }
     
     protected virtual void Update()
@@ -129,6 +133,22 @@ public class ClientPlayer : MonoBehaviour
 
         //Hat
         currentHatIndex = Random.Range(0, hats.Length);
+        currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+
+        if (isLocal)
+        {
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+        }
+    }
+
+    void UpdateHat(int newIndex)
+    {
+        if (currentHat)
+        {
+            Destroy(currentHat);
+        }
+
+        currentHatIndex = newIndex;
         currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
 
         if (isLocal)
