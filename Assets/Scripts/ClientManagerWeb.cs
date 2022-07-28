@@ -53,7 +53,7 @@ public class ClientManagerWeb : MonoBehaviour
             manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
             manager.Socket.On<string>("action", OnAction);
             manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
-            manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
+            manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
             manager.Socket.On<string, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
             manager.Socket.On("roomClosed", ReloadPage);
             manager.Socket.On<string>("minigameStart", LoadGame);
@@ -109,9 +109,9 @@ public class ClientManagerWeb : MonoBehaviour
 
             OnClientConnect(attributes[0], attributes[1], attributes[2]);
 
-            if (int.TryParse(attributes[4], out int parsedHead) && float.TryParse(attributes[5], out float parsedHeight))
+            if (int.TryParse(attributes[4], out int parsedHead) && float.TryParse(attributes[5], out float parsedHeight) && int.TryParse(attributes[6], out int parsedHatIndex))
             {
-                SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight);
+                SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight, parsedHatIndex);
             }
         }
     }
@@ -207,9 +207,9 @@ public class ClientManagerWeb : MonoBehaviour
         lastHeartbeatReceived = Time.time;
     }
 
-    private void SyncCustomizations(string id, string color, int headShape, float height)
+    private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
     {
-        GetPlayerByID(id).SetCustomizations(color, headShape, height);
+        GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
     public ClientPlayer GetPlayerByID(string id)

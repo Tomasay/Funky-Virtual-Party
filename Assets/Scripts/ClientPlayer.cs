@@ -14,6 +14,11 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] GameObject spineBone; //Used to change height of player
     [SerializeField] Collider col; //Used to change height of player
 
+    [SerializeField] GameObject[] hats;
+    [SerializeField] GameObject hatAttachPoint;
+    protected GameObject currentHat;
+    protected int currentHatIndex = -1;
+
     protected string playerID, playerIP, playerName;
     protected bool isLocal = false; //Is this the player being controlled by device?
     protected Color playerColor = Color.white;
@@ -122,13 +127,17 @@ public class ClientPlayer : MonoBehaviour
         pos.y += height;
         spineBone.transform.localPosition = pos;
 
-        if(isLocal)
+        //Hat
+        currentHatIndex = Random.Range(0, hats.Length);
+        currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+
+        if (isLocal)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height);
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
         }
     }
 
-    public void SetCustomizations(string color, int headShape, float height)
+    public void SetCustomizations(string color, int headShape, float height, int hatIndex)
     {
         if (ColorUtility.TryParseHtmlString(color, out Color newCol))
         {
@@ -137,6 +146,12 @@ public class ClientPlayer : MonoBehaviour
 
         PlayerHeadType = headShape;
         PlayerHeight = height;
+
+        if(currentHat)
+        {
+            Destroy(currentHat);
+        }
+        currentHat = Instantiate(hats[hatIndex], hatAttachPoint.transform);
     }
 
     private void ChangeColor(Color col)
@@ -211,7 +226,8 @@ public class ClientPlayer : MonoBehaviour
         s += playerName + "\n";
         s += "#" + ColorUtility.ToHtmlStringRGB(playerColor) + "\n";
         s += headType + "\n";
-        s += height;
+        s += height + "\n";
+        s += currentHatIndex;
 
         return s;
     }

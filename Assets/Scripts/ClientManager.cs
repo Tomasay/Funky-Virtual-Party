@@ -73,10 +73,10 @@ public class ClientManager : MonoBehaviour
 
             manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
-            manager.Socket.On<string, string, bool>("disconnectToUnity", OnClientDisconnect);
+            manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
-            manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
+            manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
 
             DontDestroyOnLoad(gameObject);
         }
@@ -190,7 +190,7 @@ public class ClientManager : MonoBehaviour
     }
 
     public event Action<string> onClientDisonnect;
-    private void OnClientDisconnect(string id, string ip, bool wasHost)
+    private void OnClientDisconnect(string id, string ip)
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
 
@@ -214,9 +214,9 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    private void SyncCustomizations(string id, string color, int headShape, float height)
+    private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
     {
-        GetPlayerByID(id).SetCustomizations(color, headShape, height);
+        GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
     public void SyncAllPlayerPos()
