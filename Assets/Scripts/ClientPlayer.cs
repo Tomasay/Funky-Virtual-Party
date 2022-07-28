@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
   
 public class ClientPlayer : MonoBehaviour
 {
-    [SerializeField] Texture2D colorPalette;
+    [SerializeField] public Texture2D colorPalette;
     private static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] TMP_Text playerNameText, playerNameTextBack;
     [SerializeField] SkinnedMeshRenderer smr;
@@ -181,6 +181,10 @@ public class ClientPlayer : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Changes the color locally
+    /// </summary>
+    /// <param name="col"></param>
     private void ChangeColor(Color col)
     {
         Mesh mesh = smr.sharedMesh;
@@ -194,6 +198,48 @@ public class ClientPlayer : MonoBehaviour
         availableColors.Remove(col);
         mesh.colors = colors;
         playerColor = col;
+    }
+
+    /// <summary>
+    /// Changes the color locally and syncs on network
+    /// </summary>
+    /// <param name="col"></param>
+    public void UpdateColor(Color col)
+    {
+        Mesh mesh = smr.sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+
+        Color[] colors = new Color[vertices.Length];
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            colors[i] = col;
+        }
+        availableColors.Remove(col);
+        mesh.colors = colors;
+        playerColor = col;
+
+        if (isLocal)
+        {
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+        }
+    }
+
+    public int GetColorIndex()
+    {
+        List<Color> cols = new List<Color>();
+        for (int i = 0; i < colorPalette.width; i++)
+        {
+            cols.Add(colorPalette.GetPixel(i, 0));
+        }
+
+        for (int i = 0; i < cols.Count; i++)
+        {
+            if (PlayerColor.Equals(cols[i]))
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void Move(float x, float y, bool changeDirection = true)
