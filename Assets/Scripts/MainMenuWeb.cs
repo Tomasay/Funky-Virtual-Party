@@ -16,6 +16,7 @@ public class MainMenuWeb : MonoBehaviour
 
     [SerializeField] Canvas joinRoomCanvas, controllerCanvas;
     [SerializeField] GameObject partyCodeInvalidDebug;
+    [SerializeField] Button nameWebGLButton, codeWebGLButton; //Buttons used to access keyboard on WebGL
     [SerializeField] Button submitButton;
 
     [SerializeField] Button enableCustomizationsButton;
@@ -32,6 +33,11 @@ public class MainMenuWeb : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+#if UNITY_EDITOR
+        nameWebGLButton.gameObject.SetActive(false);
+        codeWebGLButton.gameObject.SetActive(false);
+#endif
+
         ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
         VRPlayer.SetActive(false);
 
