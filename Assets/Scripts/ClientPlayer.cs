@@ -16,6 +16,7 @@ public class ClientPlayer : MonoBehaviour
 
     [SerializeField] public GameObject[] hats;
     [SerializeField] GameObject hatAttachPoint;
+    [SerializeField] ParticleSystem hatPoofParticles;
     protected GameObject currentHat;
     protected int currentHatIndex = -1;
 
@@ -151,6 +152,7 @@ public class ClientPlayer : MonoBehaviour
         if (newIndex > -1)
         {
             currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+            hatPoofParticles.Play();
         }
 
         if (isLocal)
@@ -178,6 +180,7 @@ public class ClientPlayer : MonoBehaviour
         if (hatIndex > -1)
         {
             currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+            hatPoofParticles.Play();
         }
     }
 
