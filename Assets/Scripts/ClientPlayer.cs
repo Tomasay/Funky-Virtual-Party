@@ -171,6 +171,8 @@ public class ClientPlayer : MonoBehaviour
         PlayerHeadType = headShape;
         PlayerHeight = height;
 
+        bool newHat = (currentHatIndex != hatIndex);
+
         if(currentHat)
         {
             Destroy(currentHat);
@@ -180,7 +182,7 @@ public class ClientPlayer : MonoBehaviour
         if (hatIndex > -1)
         {
             currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
-            hatPoofParticles.Play();
+            if (newHat) { hatPoofParticles.Play(); }
         }
     }
 
