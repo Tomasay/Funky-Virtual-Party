@@ -261,6 +261,7 @@ public class ClientManager : MonoBehaviour
             Color playerColor = players[i].PlayerColor;
             int playerHeadType = players[i].PlayerHeadType;
             float playerHeight = players[i].PlayerHeight;
+            int hatIndex = players[i].PlayerHatIndex;
 
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
@@ -269,6 +270,7 @@ public class ClientManager : MonoBehaviour
             players[i].PlayerColor = playerColor;
             players[i].PlayerHeadType = playerHeadType;
             players[i].PlayerHeight = playerHeight;
+            players[i].PlayerHatIndex = hatIndex;
 
             if (locations[i])
             {

@@ -313,6 +313,7 @@ public class ClientManagerWeb : MonoBehaviour
             Color playerColor = players[i].PlayerColor;
             int playerHeadType = players[i].PlayerHeadType;
             float playerHeight = players[i].PlayerHeight;
+            int hatIndex = players[i].PlayerHatIndex;
             bool isLocal = players[i].IsLocal;
 
             Destroy(players[i].gameObject);
@@ -322,6 +323,7 @@ public class ClientManagerWeb : MonoBehaviour
             players[i].PlayerColor = playerColor;
             players[i].PlayerHeadType = playerHeadType;
             players[i].PlayerHeight = playerHeight;
+            players[i].PlayerHatIndex = hatIndex;
             players[i].IsLocal = isLocal;
             if(isLocal)
             {
