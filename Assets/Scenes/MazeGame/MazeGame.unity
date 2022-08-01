@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2056377434}
-  m_IndirectSpecularColor: {r: 0.11268882, g: 0.28156924, b: 0.7091791, a: 1}
+  m_IndirectSpecularColor: {r: 0.36981785, g: 0.5671755, b: 0.85925514, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2512,6 +2512,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handheldMaze: {fileID: 1872234904}
+  mazeBounds: {fileID: 1927282086}
 --- !u!1 &1684616907
 GameObject:
   m_ObjectHideFlags: 0
@@ -2955,6 +2956,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1920469852}
   m_CullTransparentMesh: 1
+--- !u!65 &1927282086 stripped
+BoxCollider:
+  m_CorrespondingSourceObject: {fileID: 3121597862702784179, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
+  m_PrefabInstance: {fileID: 2363442964410467572}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2055442411
 GameObject:
   m_ObjectHideFlags: 0
