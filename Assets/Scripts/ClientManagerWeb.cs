@@ -251,17 +251,7 @@ public class ClientManagerWeb : MonoBehaviour
 
     private void LoadGame(string gameName)
     {
-        switch (gameName)
-        {
-            case "ChaseGame":
-                StartCoroutine("LoadSceneWithFade", "ChaseGameClient");
-                break;
-            case "Shootout":
-                StartCoroutine("LoadSceneWithFade", "ShootoutClient");
-                break;
-            default:
-                break;
-        }
+        StartCoroutine("LoadSceneWithFade", gameName + "Client");
     }
 
     public void LoadMainMenu()
