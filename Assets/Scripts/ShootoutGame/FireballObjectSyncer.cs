@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FireballObjectSyncer : ObjectSyncer
 {
-    [SerializeField] GameObject fireballMesh;
+    [SerializeField] GameObject fireballMesh, fireballTrail;
     [SerializeField] ParticleSystem explosion, smokePuff;
 
     [SerializeField] SpriteRenderer indicator;
@@ -146,8 +146,23 @@ public class FireballObjectSyncer : ObjectSyncer
         //Fireball
         currentFireballData.isActive = data.isActive;
         fireballMesh.SetActive(data.isActive);
+        if(data.isActive && !fireballTrail.activeSelf)
+        {
+            StartCoroutine("ActivateTrailDelayed", 0.5f);
+        }
+        else
+        {
+            fireballTrail.SetActive(data.isActive);
+        }
 
         currentFireballData.scale = data.scale;
         fireballMesh.transform.localScale = data.scale;
+    }
+
+    IEnumerator ActivateTrailDelayed(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        fireballTrail.SetActive(true);
     }
 }
