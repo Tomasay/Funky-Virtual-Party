@@ -68,13 +68,11 @@ namespace BestHTTP.Extensions
 
             canWrite = true;
 
-            //internalBuffer = capacity > 0 ? BufferPool.Get(capacity, true) : BufferPool.NoData;
-            //this.capacity = internalBuffer.Length;
-            //
-            //expandable = true;
-            //allowGetBuffer = true;
-            var buffer = capacity > 0 ? BufferPool.Get(capacity, true) : BufferPool.NoData;
-            InternalConstructor(buffer, 0, buffer.Length, true, true, true, true);
+            internalBuffer = capacity > 0 ? BufferPool.Get(capacity, true) : BufferPool.NoData;
+            this.capacity = internalBuffer.Length;
+
+            expandable = true;
+            allowGetBuffer = true;
         }
 
         public BufferPoolMemoryStream(byte[] buffer)
@@ -134,8 +132,7 @@ namespace BestHTTP.Extensions
 
             internalBuffer = buffer;
             capacity = count + index;
-            //length = capacity;
-            length = 0;
+            length = capacity;
             position = index;
             initialIndex = index;
 
@@ -243,7 +240,7 @@ namespace BestHTTP.Extensions
         {
             streamClosed = true;
             expandable = false;
-            if (disposing && internalBuffer != null && this.releaseInternalBuffer)
+            if (internalBuffer != null && this.releaseInternalBuffer)
                 BufferPool.Release(internalBuffer);
             internalBuffer = null;
         }

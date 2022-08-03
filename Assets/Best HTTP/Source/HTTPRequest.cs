@@ -72,7 +72,6 @@ namespace BestHTTP
     public delegate bool OnBeforeRedirectionDelegate(HTTPRequest originalRequest, HTTPResponse response, Uri redirectUri);
     public delegate void OnHeaderEnumerationDelegate(string header, List<string> values);
     public delegate void OnBeforeHeaderSendDelegate(HTTPRequest req);
-    public delegate void OnHeadersReceivedDelegate(HTTPRequest originalRequest, HTTPResponse response, Dictionary<string, List<string>> headers);
 
     /// <summary>
     /// Called for every fragment of data downloaded from the server. Its return value indicates whether the plugin free to reuse the dataFragment array.
@@ -100,8 +99,7 @@ namespace BestHTTP
                                                           HTTPMethods.Delete.ToString().ToUpper(),
                                                           HTTPMethods.Patch.ToString().ToUpper(),
                                                           HTTPMethods.Merge.ToString().ToUpper(),
-                                                          HTTPMethods.Options.ToString().ToUpper(),
-                                                          HTTPMethods.Connect.ToString().ToUpper(),
+                                                          HTTPMethods.Options.ToString().ToUpper()
                                                       };
 
         /// <summary>
@@ -266,7 +264,7 @@ namespace BestHTTP
         /// <summary>
         /// This event is called when the plugin received and parsed all headers.
         /// </summary>
-        public OnHeadersReceivedDelegate OnHeadersReceived;
+        public Action<HTTPRequest, HTTPResponse> OnHeadersReceived;
 
         /// <summary>
         /// Number of times that the plugin retried the request.
@@ -350,6 +348,13 @@ namespace BestHTTP
         /// </summary>
         public int MaxRedirects { get; set; }
 
+#if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
+        /// <summary>
+        /// Use Bouncy Castle's code to handle the secure protocol instead of Mono's. You can try to set it true if you receive a "System.Security.Cryptography.CryptographicException: Unsupported hash algorithm" exception.
+        /// </summary>
+        public bool UseAlternateSSL { get; set; }
+#endif
+
 #if !BESTHTTP_DISABLE_COOKIES
 
         /// <summary>
@@ -406,6 +411,14 @@ namespace BestHTTP
         /// </summary>
         public int RedirectCount { get; internal set; }
 
+#if !NETFX_CORE
+        /// <summary>
+        /// Custom validator for an SslStream. This event will receive the original HTTPRequest, an X509Certificate and an X509Chain objects. It must return true if the certificate valid, false otherwise.
+        /// <remarks>It's called in a thread! Not available on Windows Phone!</remarks>
+        /// </summary>
+        public event System.Func<HTTPRequest, System.Security.Cryptography.X509Certificates.X509Certificate, System.Security.Cryptography.X509Certificates.X509Chain, bool> CustomCertificationValidator;
+#endif
+
         /// <summary>
         /// Maximum time we wait to establish the connection to the target server. If set to TimeSpan.Zero or lower, no connect timeout logic is executed. Default value is 20 seconds.
         /// </summary>
@@ -426,6 +439,26 @@ namespace BestHTTP
         /// Enables safe read method when the response's length of the content is unknown. Its default value is enabled (true).
         /// </summary>
         public bool EnableSafeReadOnUnknownContentLength { get; set; }
+
+#if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
+        /// <summary>
+        /// The ICertificateVerifyer implementation that the plugin will use to verify the server certificates when the request's UseAlternateSSL property is set to true.
+        /// </summary>
+        public SecureProtocol.Org.BouncyCastle.Crypto.Tls.ICertificateVerifyer CustomCertificateVerifyer { get; set; }
+
+        /// <summary>
+        /// The IClientCredentialsProvider implementation that the plugin will use to send client certificates when the request's UseAlternateSSL property is set to true.
+        /// </summary>
+        public SecureProtocol.Org.BouncyCastle.Crypto.Tls.IClientCredentialsProvider CustomClientCredentialsProvider { get; set; }
+
+        /// <summary>
+        /// With this property custom Server Name Indication entries can be sent to the server while negotiating TLS. 
+        /// All added entries must conform to the rules defined in the RFC (https://tools.ietf.org/html/rfc3546#section-3.1), the plugin will not check the entries' validity!
+        /// <remarks>This list will be sent to every server that the plugin must connect to while it tries to finish the request.
+        /// So for example if redirected to an another server, that new server will receive this list too!</remarks>
+        /// </summary>
+        public List<string> CustomTLSServerNameList { get; set; }
+#endif
 
         /// <summary>
         /// It's called before the plugin will do a new request to the new uri. The return value of this function will control the redirection: if it's false the redirection is aborted.
@@ -465,12 +498,15 @@ namespace BestHTTP
         public bool WithCredentials { get; set; }
 #endif
 
-#if !UNITY_WEBGL || UNITY_EDITOR
+        /// <summary>
+        ///
+        /// </summary>
+        internal SupportedProtocols ProtocolHandler { get; set; }
+
         /// <summary>
         /// Called when the current protocol is upgraded to an other. (HTTP => WebSocket for example)
         /// </summary>
         internal OnRequestFinishedDelegate OnUpgraded;
-#endif
 
         #region Internal Properties For Progress Report Support
 
@@ -521,6 +557,7 @@ namespace BestHTTP
         private bool cacheOnly;
 #endif
         private int streamFragmentSize;
+        private bool useStreaming;
 
         private Dictionary<string, List<string>> Headers { get; set; }
 
@@ -648,12 +685,22 @@ namespace BestHTTP
             this.UseUploadStreamLength = true;
             this.DisposeUploadStream = true;
 
+#if !BESTHTTP_DISABLE_ALTERNATE_SSL && (!UNITY_WEBGL || UNITY_EDITOR)
+            this.CustomCertificateVerifyer = HTTPManager.DefaultCertificateVerifyer;
+            this.CustomClientCredentialsProvider = HTTPManager.DefaultClientCredentialsProvider;
+            this.UseAlternateSSL = HTTPManager.UseAlternateSSLDefaultValue;
+#endif
+
+#if !NETFX_CORE
+            this.CustomCertificationValidator += HTTPManager.DefaultCertificationValidator;
+#endif
+
 #if UNITY_WEBGL && !BESTHTTP_DISABLE_COOKIES
             this.WithCredentials = this.IsCookiesEnabled;
 #endif
 
             this.Context = new LoggingContext(this);
-            this.Timing = new TimingCollector(this);
+            this.Timing = new TimingCollector();
         }
 
         #endregion
@@ -919,7 +966,7 @@ namespace BestHTTP
 #endif
 
             #if !BESTHTTP_DISABLE_PROXY
-            if (!HTTPProtocolFactory.IsSecureProtocol(this.CurrentUri) && HasProxy && !HasHeader("Proxy-Connection"))
+            if (HasProxy && !HasHeader("Proxy-Connection"))
                 AddHeader("Proxy-Connection", IsKeepAlive ? "Keep-Alive" : "Close");
             #endif
 
@@ -968,21 +1015,19 @@ namespace BestHTTP
             // Always set the Content-Length header if possible
             // http://tools.ietf.org/html/rfc2616#section-4.4 : For compatibility with HTTP/1.0 applications, HTTP/1.1 requests containing a message-body MUST include a valid Content-Length header field unless the server is known to be HTTP/1.1 compliant.
             // 2018.06.03: Changed the condition so that content-length header will be included for zero length too.
-            // 2022.05.25: Don't send a Content-Length (: 0) header if there's an Upgrade header. Upgrade is set for websocket, and it might be not true that the client doesn't send any bytes.
             if (
 #if !UNITY_WEBGL || UNITY_EDITOR
                 contentLength >= 0
 #else
                 contentLength != -1
 #endif
-                && !HasHeader("Content-Length")
-                && !HasHeader("Upgrade"))
+                && !HasHeader("Content-Length"))
                 SetHeader("Content-Length", contentLength.ToString());
 
 #if !UNITY_WEBGL || UNITY_EDITOR
             #if !BESTHTTP_DISABLE_PROXY
             // Proxy Authentication
-            if (!HTTPProtocolFactory.IsSecureProtocol(this.CurrentUri) && HasProxy && Proxy.Credentials != null)
+            if (HasProxy && Proxy.Credentials != null)
             {
                 switch (Proxy.Credentials.Type)
                 {
@@ -1354,7 +1399,6 @@ namespace BestHTTP
 #endif
         }
 
-#if !UNITY_WEBGL || UNITY_EDITOR
         internal void UpgradeCallback()
         {
             if (Response == null || !Response.IsUpgraded)
@@ -1370,7 +1414,6 @@ namespace BestHTTP
                 HTTPManager.Logger.Exception("HTTPRequest", "UpgradeCallback", ex, this.Context);
             }
         }
-#endif
 
         internal bool CallOnBeforeRedirection(Uri redirectUri)
         {
@@ -1388,6 +1431,15 @@ namespace BestHTTP
 
         }
 
+#if !NETFX_CORE
+        internal bool CallCustomCertificationValidator(System.Security.Cryptography.X509Certificates.X509Certificate cert, System.Security.Cryptography.X509Certificates.X509Chain chain)
+        {
+            if (CustomCertificationValidator != null)
+                return CustomCertificationValidator(this, cert, chain);
+            return true;
+        }
+#endif
+
 #endregion
 
         /// <summary>
@@ -1396,7 +1448,6 @@ namespace BestHTTP
         public HTTPRequest Send()
         {
             this.IsCancellationRequested = false;
-            this.Exception = null;
 
             return HTTPManager.SendRequest(this);
         }
@@ -1455,7 +1506,6 @@ namespace BestHTTP
 
             this.IsRedirected = false;
             this.RedirectCount = 0;
-            this.Exception = null;
         }
 
         private void VerboseLogging(string str)

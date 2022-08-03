@@ -508,7 +508,7 @@ namespace BestHTTP.JSON.LitJson
 
                     string property = (string) reader.Value;
 
-                    if (t_data.Properties.ContainsKey (property) && !t_data.IsDictionary) {
+                    if (t_data.Properties.ContainsKey (property)) {
                         PropertyMetadata prop_data =
                             t_data.Properties[property];
 

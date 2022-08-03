@@ -1,4 +1,5 @@
 #if !BESTHTTP_DISABLE_SIGNALR_CORE
+using BestHTTP.Connections;
 using System;
 
 namespace BestHTTP.SignalRCore.Authentication
@@ -44,10 +45,12 @@ namespace BestHTTP.SignalRCore.Authentication
             if (this._connection.NegotiationResult == null)
                 return;
 
+#if !UNITY_WEBGL || UNITY_EDITOR
             // Add Authorization header to http requests, add access_token param to the uri otherwise
             if (BestHTTP.Connections.HTTPProtocolFactory.GetProtocolFromUri(request.CurrentUri) == BestHTTP.Connections.SupportedProtocols.HTTP)
                 request.SetHeader("Authorization", "Bearer " + this._connection.NegotiationResult.AccessToken);
             else
+#endif
 #if !BESTHTTP_DISABLE_WEBSOCKET
                 if (BestHTTP.Connections.HTTPProtocolFactory.GetProtocolFromUri(request.Uri) != BestHTTP.Connections.SupportedProtocols.WebSocket)
                     request.Uri = PrepareUriImpl(request.Uri);
@@ -80,14 +83,9 @@ namespace BestHTTP.SignalRCore.Authentication
 
         private Uri PrepareUriImpl(Uri uri)
         {
-            if (this._connection.NegotiationResult != null && !string.IsNullOrEmpty(this._connection.NegotiationResult.AccessToken))
-            {
-                string query = string.IsNullOrEmpty(uri.Query) ? "" : uri.Query + "&";
-                UriBuilder uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath, query + "access_token=" + this._connection.NegotiationResult.AccessToken);
-                return uriBuilder.Uri;
-            }
-
-            return uri;
+            string query = string.IsNullOrEmpty(uri.Query) ? "" : uri.Query + "&";
+            UriBuilder uriBuilder = new UriBuilder(uri.Scheme, uri.Host, uri.Port, uri.AbsolutePath, query + "access_token=" + this._connection.NegotiationResult.AccessToken);
+            return uriBuilder.Uri;
         }
 
         public void Cancel()

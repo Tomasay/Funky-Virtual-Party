@@ -10,33 +10,26 @@ using UnityEngine.UI;
 
 namespace BestHTTP.Examples.SocketIO3
 {
-#pragma warning disable 0649
-    [PlatformSupport.IL2CPP.Preserve]
     class LoginData
     {
-        [PlatformSupport.IL2CPP.Preserve] public int numUsers;
+        public int numUsers;
     }
 
-    [PlatformSupport.IL2CPP.Preserve]
     sealed class NewMessageData
     {
-        [PlatformSupport.IL2CPP.Preserve] public string username;
-        [PlatformSupport.IL2CPP.Preserve] public string message;
+        public string username;
+        public string message;
     }
 
-    [PlatformSupport.IL2CPP.Preserve]
     sealed class UserJoinedData : LoginData
     {
-        [PlatformSupport.IL2CPP.Preserve] public string username;
+        public string username;
     }
 
-    [PlatformSupport.IL2CPP.Preserve]
     sealed class TypingData
     {
-        [PlatformSupport.IL2CPP.Preserve] public string username;
+        public string username;
     }
-
-#pragma warning restore
 
     public sealed class ChatSample : BestHTTP.Examples.Helpers.SampleBase
     {

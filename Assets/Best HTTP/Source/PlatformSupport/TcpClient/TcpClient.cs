@@ -34,7 +34,6 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -439,14 +438,11 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
                 throw new ArgumentNullException("ipAddresses");
             }
 
-            List<IPAddress> addresses = new List<IPAddress>(ipAddresses);
-            addresses.Sort((a, b) => a.AddressFamily - b.AddressFamily);
-
-            for (int i = 0; i < addresses.Count; i++)
+            for (int i = 0; i < ipAddresses.Length; i++)
             {
                 try
                 {
-                    IPAddress address = addresses[i];
+                    IPAddress address = ipAddresses[i];
 
                     if (address.Equals(IPAddress.Any) ||
                         address.Equals(IPAddress.IPv6Any))
@@ -471,8 +467,6 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
 
                     if (request != null && request.IsCancellationRequested)
                         throw new Exception("IsCancellationRequested");
-
-                    HTTPManager.Logger.Verbose("TcpClient", string.Format("Trying to connect to {0}:{1}", address.ToString(), port.ToString()), request.Context);
 
                     Connect(new IPEndPoint(address, port));
 
@@ -510,7 +504,7 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
                     catch{ }
 #endif
 
-                    HTTPManager.Logger.Information("TcpClient", string.Format("Connected to {0}:{1}", address.ToString(), port.ToString()), request.Context);
+                    HTTPManager.Logger.Information("TcpClient", string.Format("Connected to {0}:{1}", address.ToString(), port.ToString()));
 
                     break;
                 }
@@ -526,7 +520,7 @@ namespace BestHTTP.PlatformSupport.TcpClient.General
                      * address, so re-throw the
                      * exception
                      */
-                    if (i == addresses.Count - 1)
+                    if (i == ipAddresses.Length - 1)
                     {
                         throw e;
                     }

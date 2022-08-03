@@ -1,4 +1,4 @@
-namespace BestHTTP
+﻿namespace BestHTTP
 {
     /// <summary>
     /// Some supported methods described in the rfc: http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9
@@ -71,11 +71,6 @@ namespace BestHTTP
         /// </summary>
         Merge,
 
-        Options,
-
-        /// <summary>
-        /// https://tools.ietf.org/html/rfc8441
-        /// </summary>
-        Connect
+        Options
     }
 }

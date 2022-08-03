@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-using BestHTTP.Core;
-
 namespace BestHTTP.Timings
 {
     public sealed class TimingCollector
     {
-        public HTTPRequest ParentRequest { get; }
-
         /// <summary>
         /// When the TimingCollector instance created.
         /// </summary>
@@ -19,25 +15,9 @@ namespace BestHTTP.Timings
         /// </summary>
         public List<TimingEvent> Events { get; private set; }
 
-        public TimingCollector(HTTPRequest parentRequest)
+        public TimingCollector()
         {
-            this.ParentRequest = parentRequest;
             this.Start = DateTime.Now;
-        }
-
-        internal void AddEvent(string name, DateTime when, TimeSpan duration)
-        {
-            if (this.Events == null)
-                this.Events = new List<TimingEvent>();
-
-            if (duration == TimeSpan.Zero)
-            {
-                DateTime prevEventAt = this.Start;
-                if (this.Events.Count > 0)
-                    prevEventAt = this.Events[this.Events.Count - 1].When;
-                duration = when - prevEventAt;
-            }
-            this.Events.Add(new TimingEvent(name, when, duration));
         }
 
         /// <summary>
@@ -45,7 +25,13 @@ namespace BestHTTP.Timings
         /// </summary>
         public void Add(string name)
         {
-            RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.ParentRequest, name, DateTime.Now));
+            if (this.Events == null)
+                this.Events = new List<TimingEvent>();
+
+            DateTime prevEventAt = this.Start;
+            if (this.Events.Count > 0)
+                prevEventAt = this.Events[this.Events.Count - 1].When;
+            this.Events.Add(new TimingEvent(name, DateTime.Now - prevEventAt));
         }
 
         /// <summary>
@@ -53,7 +39,10 @@ namespace BestHTTP.Timings
         /// </summary>
         public void Add(string name, TimeSpan duration)
         {
-            RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(this.ParentRequest, name, duration));
+            if (this.Events == null)
+                this.Events = new List<TimingEvent>();
+
+            this.Events.Add(new TimingEvent(name, duration));
         }
 
         public TimingEvent FindFirst(string name)

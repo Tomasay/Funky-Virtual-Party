@@ -238,16 +238,9 @@ namespace BestHTTP.SignalRCore.Transports
                         case 200:
                             Interlocked.Exchange(ref this.sendingInProgress, 0);
 
-                            // The connections is OK, call OnMessages with an empty list to update HubConnection's lastMessageReceivedAt.
                             this.messages.Clear();
-                            try
-                            {
-                                this.connection.OnMessages(this.messages);
-                            }
-                            finally
-                            {
-                                this.messages.Clear();
-                            }
+                            this.messages.Add(new Messages.Message { type = Messages.MessageTypes.Ping });
+                            this.connection.OnMessages(this.messages);
 
                             SendMessages();
 

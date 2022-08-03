@@ -3,7 +3,6 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 	$ws: {
 		webSocketInstances: {},
 		nextInstanceId : 1,
-        /*UTF8Decoder: new TextDecoder('utf8'),*/
 
 		Set : function(socket) {
 			ws.webSocketInstances[ws.nextInstanceId] = socket;
@@ -25,7 +24,7 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 
 			stringToUTF8Array(reason, HEAPU8, buffer, length);
 
-			Module['dynCall_viii'](onClose, id, code, buffer);
+			Runtime.dynCall('viii', onClose, [id, code, buffer]);
 
 			_free(buffer);
 		},
@@ -37,7 +36,7 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 
 			stringToUTF8Array(reason, HEAPU8, buffer, length);
 
-			Module['dynCall_vii'](errCallback, id, buffer);
+			Runtime.dynCall('vii', errCallback, [id, buffer]);
 
 			_free(buffer);
 		}
@@ -45,8 +44,8 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 
 	WS_Create: function(url, protocol, onOpen, onText, onBinary, onError, onClose)
 	{
-		var urlStr = new URL(UTF8ToString(url)); ///*encodeURI*/(UTF8ToString(url)).replace(/\+/g, '%2B').replace(/%252[fF]/ig, '%2F');
-		var proto = UTF8ToString(protocol);
+		var urlStr = new URL(Pointer_stringify(url)); ///*encodeURI*/(Pointer_stringify(url)).replace(/\+/g, '%2B').replace(/%252[fF]/ig, '%2F');
+		var proto = Pointer_stringify(protocol);
 
 		console.log('WS_Create(' + urlStr + ', "' + proto + '")');
 
@@ -66,7 +65,7 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 		socket.socketImpl.onopen = function(e) {
 			console.log(id + ' WS_Create - onOpen');
 
-			Module['dynCall_vi'](onOpen, id);
+			Runtime.dynCall('vi', onOpen, [id]);
 		};
 
 		socket.socketImpl.onmessage = function (e)
@@ -78,7 +77,7 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 				var buffer = _malloc(byteArray.length);
 				HEAPU8.set(byteArray, buffer);
 
-				Module['dynCall_viii'](onBinary, id, buffer, byteArray.length);
+				Runtime.dynCall('viii', onBinary, [id, buffer, byteArray.length]);
 
 				_free(buffer);
 			}
@@ -89,7 +88,7 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 
 				stringToUTF8Array(e.data, HEAPU8, buffer, length);
 
-				Module['dynCall_vii'](onText, id, buffer);
+				Runtime.dynCall('vii', onText, [id, buffer]);
 
 				_free(buffer);
 			}
@@ -156,15 +155,10 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 		return socket.socketImpl.bufferedAmount;
 	},
 
-	WS_Send_String: function (id, ptr, pos, length)
+	WS_Send_String: function (id, str)
 	{
 		var socket = ws.Get(id);
-
-        var startPtr = ptr + pos;
-        var endPtr = startPtr + length;
-
-        var UTF8Decoder = new TextDecoder('utf8');
-        var str = UTF8Decoder.decode(HEAPU8.subarray ? HEAPU8.subarray(startPtr, endPtr) : new Uint8Array(HEAPU8.slice(startPtr, endPtr)));
+		var str = Pointer_stringify(str);
 
 		try
 		{
@@ -196,7 +190,7 @@ var Lib_BEST_HTTP_WebGL_WS_Bridge =
 	WS_Close: function (id, code, reason)
 	{
 		var socket = ws.Get(id);
-		var reasonStr = UTF8ToString(reason);
+		var reasonStr = Pointer_stringify(reason);
 
 		console.log(id + ' WS_Close(' + code + ', ' + reasonStr + ')');
 

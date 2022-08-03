@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-
 using UnityEngine;
 
 #if NETFX_CORE
@@ -13,7 +10,6 @@ namespace BestHTTP
     /// Will route some U3D calls to the HTTPManager.
     /// </summary>
     [ExecuteInEditMode]
-    [BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
     public sealed class HTTPUpdateDelegator : MonoBehaviour
     {
         #region Public Properties
@@ -54,9 +50,7 @@ namespace BestHTTP
         #endregion
 
         private static bool IsSetupCalled;
-        private int isHTTPManagerOnUpdateRunning;
 
-#if UNITY_EDITOR
         /// <summary>
         /// Called after scene loaded to support Configurable Enter Play Mode (https://docs.unity3d.com/2019.3/Documentation/Manual/ConfigurableEnterPlayMode.html)
         /// </summary>
@@ -68,7 +62,6 @@ namespace BestHTTP
             IsSetupCalled = false;
             HTTPManager.Logger.Information("HTTPUpdateDelegator", "Reset called!");
         }
-#endif
 
         static HTTPUpdateDelegator()
         {
@@ -113,11 +106,6 @@ namespace BestHTTP
                     UnityEditor.EditorApplication.playmodeStateChanged += Instance.OnPlayModeStateChanged;
 #endif
 #endif
-
-                    // https://docs.unity3d.com/ScriptReference/Application-wantsToQuit.html
-                    Application.wantsToQuit -= UnityApplication_WantsToQuit;
-                    Application.wantsToQuit += UnityApplication_WantsToQuit;
-
                     HTTPManager.Logger.Information("HTTPUpdateDelegator", "Instance Created!");
                 }
             }
@@ -125,22 +113,6 @@ namespace BestHTTP
             {
                 HTTPManager.Logger.Error("HTTPUpdateDelegator", "Please call the BestHTTP.HTTPManager.Setup() from one of Unity's event(eg. awake, start) before you send any request!");
             }
-        }
-
-        public void SwapThreadingMode()
-        {
-#if !UNITY_WEBGL || UNITY_EDITOR
-            if (IsThreaded)
-            {
-                IsThreadRunning = false;
-                IsThreaded = false;
-            }
-            else
-            {
-                IsThreaded = true;
-                PlatformSupport.Threading.ThreadedRunner.RunLongLiving(ThreadFunc);
-            }
-#endif
         }
 
         private void Setup()
@@ -175,7 +147,7 @@ namespace BestHTTP
                 IsThreadRunning = true;
                 while (IsThreadRunning)
                 {
-                    CallOnUpdate();
+                    HTTPManager.OnUpdate();
 
 #if NETFX_CORE
 	                await Task.Delay(ThreadFrequencyInMS);
@@ -196,23 +168,7 @@ namespace BestHTTP
                 Setup();
 
             if (!IsThreaded)
-                CallOnUpdate();
-        }
-
-        private void CallOnUpdate()
-        {
-            // Prevent overlapping call of OnUpdate from unity's main thread and a separate thread
-            if (Interlocked.CompareExchange(ref isHTTPManagerOnUpdateRunning, 1, 0) == 0)
-            {
-                try
-                {
-                    HTTPManager.OnUpdate();
-                }
-                finally
-                {
-                    Interlocked.Exchange(ref isHTTPManagerOnUpdateRunning, 0);
-                }
-            }
+                HTTPManager.OnUpdate();
         }
 
 #if UNITY_EDITOR
@@ -220,9 +176,7 @@ namespace BestHTTP
         void OnPlayModeStateChanged(UnityEditor.PlayModeStateChange playMode)
         {
             if (playMode == UnityEditor.PlayModeStateChange.EnteredPlayMode)
-            {
                 UnityEditor.EditorApplication.update -= Update;
-            }
             else if (playMode == UnityEditor.PlayModeStateChange.EnteredEditMode)
             {
                 UnityEditor.EditorApplication.update -= Update;
@@ -251,7 +205,7 @@ namespace BestHTTP
 #if UNITY_EDITOR
             if (UnityEditor.EditorApplication.isPlaying)
 #endif
-                UnityApplication_WantsToQuit();
+                OnApplicationQuit();
         }
 
         void OnApplicationPause(bool isPaused)
@@ -262,9 +216,9 @@ namespace BestHTTP
                 HTTPUpdateDelegator.OnApplicationForegroundStateChanged(isPaused);
         }
 
-        private static bool UnityApplication_WantsToQuit()
+        void OnApplicationQuit()
         {
-            HTTPManager.Logger.Information("HTTPUpdateDelegator", "UnityApplication_WantsToQuit Called!");
+            HTTPManager.Logger.Information("HTTPUpdateDelegator", "OnApplicationQuit Called!");
 
             if (OnBeforeApplicationQuit != null)
             {
@@ -272,11 +226,11 @@ namespace BestHTTP
                 {
                     if (!OnBeforeApplicationQuit())
                     {
-                        HTTPManager.Logger.Information("HTTPUpdateDelegator", "OnBeforeApplicationQuit call returned false, postponing plugin and application shutdown.");
-                        return false;
+                        HTTPManager.Logger.Information("HTTPUpdateDelegator", "OnBeforeApplicationQuit call returned false, postponing plugin shutdown.");
+                        return;
                     }
                 }
-                catch (System.Exception ex)
+                catch(System.Exception ex)
                 {
                     HTTPManager.Logger.Exception("HTTPUpdateDelegator", string.Empty, ex);
                 }
@@ -285,13 +239,11 @@ namespace BestHTTP
             IsThreadRunning = false;
 
             if (!IsCreated)
-                return true;
+                return;
 
             IsCreated = false;
 
             HTTPManager.OnQuit();
-
-            return true;
         }
     }
 }

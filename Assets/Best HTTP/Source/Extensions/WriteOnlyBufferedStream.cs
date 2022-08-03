@@ -1,4 +1,4 @@
-using BestHTTP.PlatformSupport.Memory;
+﻿using BestHTTP.PlatformSupport.Memory;
 using System;
 using System.IO;
 
@@ -74,7 +74,7 @@ namespace BestHTTP.Extensions
         {
             base.Dispose(disposing);
 
-            if (disposing && this.buffer != null)
+            if (this.buffer != null)
                 BufferPool.Release(this.buffer);
             this.buffer = null;
         }

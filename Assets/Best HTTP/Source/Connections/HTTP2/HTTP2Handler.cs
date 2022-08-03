@@ -27,15 +27,10 @@ namespace BestHTTP.Connections.HTTP2
 
         public double Latency { get; private set; }
 
-        public HTTP2SettingsManager settings;
-        public HPACKEncoder HPACKEncoder;
-
         public LoggingContext Context { get; private set; }
 
         private DateTime lastPingSent = DateTime.MinValue;
-        private TimeSpan pingFrequency = TimeSpan.MaxValue; // going to be overridden in RunHandler
-        private int waitingForPingAck = 0;
-
+        private TimeSpan pingFrequency = TimeSpan.FromMinutes(5);
         public static int RTTBufferCapacity = 5;
         private CircularBuffer<double> rtts = new CircularBuffer<double>(RTTBufferCapacity);
 
@@ -46,11 +41,13 @@ namespace BestHTTP.Connections.HTTP2
         private ConcurrentQueue<HTTPRequest> requestQueue = new ConcurrentQueue<HTTPRequest>();
 
         private List<HTTP2Stream> clientInitiatedStreams = new List<HTTP2Stream>();
+        private HPACKEncoder HPACKEncoder;
 
         private ConcurrentQueue<HTTP2FrameHeaderAndPayload> newFrames = new ConcurrentQueue<HTTP2FrameHeaderAndPayload>();
 
         private List<HTTP2FrameHeaderAndPayload> outgoingFrames = new List<HTTP2FrameHeaderAndPayload>();
 
+        private HTTP2SettingsManager settings;
         private UInt32 remoteWindow;
         private DateTime lastInteraction;
         private DateTime goAwaySentAt = DateTime.MaxValue;
@@ -74,7 +71,8 @@ namespace BestHTTP.Connections.HTTP2
 
             this.settings = new HTTP2SettingsManager(this);
 
-            Process(this.conn.CurrentRequest);
+            // Put the first request to the queue
+            this.requestQueue.Enqueue(conn.CurrentRequest);
         }
 
         public void Process(HTTPRequest request)
@@ -86,16 +84,6 @@ namespace BestHTTP.Connections.HTTP2
 
             this.requestQueue.Enqueue(request);
 
-            // Wee might added the request to a dead queue, signaling would be pointless.
-            // When the ConnectionEventHelper processes the Close state-change event
-            // requests in the queue going to be resent. (We should avoid resending the request just right now,
-            // as it might still select this connection/handler resulting in a infinite loop.)
-            if (Volatile.Read(ref this.threadExitCount) == 0)
-                this.newFrameSignal.Set();
-        }
-
-        public void SignalRunnerThread()
-        {
             this.newFrameSignal.Set();
         }
 
@@ -170,17 +158,14 @@ namespace BestHTTP.Connections.HTTP2
                             bufferedStream.Flush();
 
                             // Wait until we have to send the next ping, OR a new frame is received on the read thread.
-                            //                lastPingSent             Now           lastPingSent+frequency       lastPingSent+Ping timeout
-                            //----|---------------------|---------------|----------------------|----------------------|------------|
-                            // lastInteraction                                                                                    lastInteraction + MaxIdleTime
+                            //       Sent             Now      Sent+frequency
+                            //----|-----|---------------|--------|-------------------|
+                            // lastInteraction                                  lastInteraction + MaxIdleTime
 
                             var sendPingAt = this.lastPingSent + this.pingFrequency;
-                            var timeoutAt = this.lastPingSent + HTTPManager.HTTP2Settings.Timeout;
-                            var nextPingInteraction = sendPingAt < timeoutAt ? sendPingAt : timeoutAt;
-
                             var disconnectByIdleAt = this.lastInteraction + HTTPManager.HTTP2Settings.MaxIdleTime;
+                            var nextDueClientInteractionAt = sendPingAt < disconnectByIdleAt ? sendPingAt : disconnectByIdleAt;
 
-                            var nextDueClientInteractionAt = nextPingInteraction < disconnectByIdleAt ? nextPingInteraction : disconnectByIdleAt;
                             int wait = (int)(nextDueClientInteractionAt - now).TotalMilliseconds;
 
                             wait = (int)Math.Min(wait, this.MaxGoAwayWaitTime.TotalMilliseconds);
@@ -195,8 +180,7 @@ namespace BestHTTP.Connections.HTTP2
                             }
                         }
 
-                        //  Don't send a new ping until a pong isn't received for the last one
-                        if (now - this.lastPingSent >= this.pingFrequency && Interlocked.CompareExchange(ref this.waitingForPingAck, 1, 0) == 0)
+                        if (now - this.lastPingSent >= this.pingFrequency)
                         {
                             this.lastPingSent = now;
 
@@ -205,10 +189,6 @@ namespace BestHTTP.Connections.HTTP2
 
                             this.outgoingFrames.Add(frame);
                         }
-
-                        //  If no pong received in a (configurable) reasonable time, treat the connection broken
-                        if (this.waitingForPingAck != 0 && now - this.lastPingSent >= HTTPManager.HTTP2Settings.Timeout)
-                            throw new TimeoutException("Ping ACK isn't received in time!");
 
                         // Process received frames
                         HTTP2FrameHeaderAndPayload header;
@@ -246,7 +226,6 @@ namespace BestHTTP.Connections.HTTP2
                                     case HTTP2FrameTypes.PING:
                                         var pingFrame = HTTP2FrameHelper.ReadPingFrame(header);
 
-                                        // https://httpwg.org/specs/rfc7540.html#PING
                                         // if it wasn't an ack for our ping, we have to send one
                                         if ((pingFrame.Flags & HTTP2PingFlags.ACK) == 0)
                                         {
@@ -451,6 +430,19 @@ namespace BestHTTP.Connections.HTTP2
                     this.clientInitiatedStreams[i].Abort("Connection closed unexpectedly");
                 this.clientInitiatedStreams.Clear();
 
+                HTTPRequest request = null;
+                while (this.requestQueue.TryDequeue(out request))
+                {
+                    HTTPManager.Logger.Information("HTTP2Handler", string.Format("Request '{0}' IsCancellationRequested: {1}", request.CurrentUri.ToString(), request.IsCancellationRequested.ToString()), this.Context);
+                    if (request.IsCancellationRequested)
+                    {
+                        request.Response = null;
+                        request.State = HTTPRequestStates.Aborted;
+                    }
+                    else
+                        RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(request, RequestEvents.Resend));
+                }
+
                 HTTPManager.Logger.Information("HTTP2Handler", "Sender thread closing", this.Context);
             }
 
@@ -490,6 +482,10 @@ namespace BestHTTP.Connections.HTTP2
 
                 while (this.isRunning)
                 {
+                    // TODO: 
+                    //  1. Set the local window to a reasonable size
+                    //  2. stop reading when the local window is about to be 0.
+                    //  3. 
                     HTTP2FrameHeaderAndPayload header = HTTP2FrameHelper.ReadHeader(this.conn.connector.Stream);
 
                     if (HTTPManager.Logger.Level <= Logger.Loglevels.Information && header.Type != HTTP2FrameTypes.DATA /*&& header.Type != HTTP2FrameTypes.PING*/)
@@ -510,9 +506,6 @@ namespace BestHTTP.Connections.HTTP2
 
                             if ((pingFrame.Flags & HTTP2PingFlags.ACK) != 0)
                             {
-                                if (Interlocked.CompareExchange(ref this.waitingForPingAck, 0, 1) == 0)
-                                    break; // waitingForPingAck was 0 == aren't expecting a ping ack!
-
                                 // it was an ack, payload must contain what we sent
 
                                 var ticks = BufferHelper.ReadLong(pingFrame.OpaqueData, 0);
@@ -540,7 +533,7 @@ namespace BestHTTP.Connections.HTTP2
             {
                 //HTTPManager.Logger.Exception("HTTP2Handler", "", ex, this.Context);
 
-                //this.isRunning = false;
+                this.isRunning = false;
             }
             finally
             {
@@ -551,8 +544,6 @@ namespace BestHTTP.Connections.HTTP2
 
         private void TryToCleanup()
         {
-            this.isRunning = false;
-
             // First thread closing notifies the ConnectionEventHelper
             int counter = Interlocked.Increment(ref this.threadExitCount);
             if (counter == 1)
@@ -611,18 +602,17 @@ namespace BestHTTP.Connections.HTTP2
 
         public void Dispose()
         {
-            HTTPRequest request = null;
-            while (this.requestQueue.TryDequeue(out request))
-            {
-                HTTPManager.Logger.Information("HTTP2Handler", string.Format("Dispose - Request '{0}' IsCancellationRequested: {1}", request.CurrentUri.ToString(), request.IsCancellationRequested.ToString()), this.Context);
-                if (request.IsCancellationRequested)
-                {
-                    request.Response = null;
-                    request.State = HTTPRequestStates.Aborted;
-                }
-                else
-                    RequestEventHelper.EnqueueRequestEvent(new RequestEventInfo(request, RequestEvents.Resend));
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+        }
+
+        ~HTTP2Handler()
+        {
+            Dispose(false);
         }
     }
 }

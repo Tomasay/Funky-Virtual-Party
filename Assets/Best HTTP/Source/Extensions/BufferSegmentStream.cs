@@ -6,7 +6,7 @@ using BestHTTP.PlatformSupport.Memory;
 
 namespace BestHTTP.Extensions
 {
-    public class BufferSegmentStream : Stream
+    public sealed class BufferSegmentStream : Stream
     {
         public override bool CanRead { get { return false; } }
 
@@ -15,21 +15,11 @@ namespace BestHTTP.Extensions
         public override bool CanWrite { get { return false; } }
 
         public override long Length { get { return this._length; } }
-        protected long _length;
+        private long _length;
 
         public override long Position { get { return 0; } set { } }
 
-        protected List<BufferSegment> bufferList = new List<BufferSegment>();
-
-        private byte[] _tempByteArray = new byte[1];
-
-        public override int ReadByte()
-        {
-            if (Read(this._tempByteArray, 0, 1) == 0)
-                return -1;
-
-            return this._tempByteArray[0];
-        }
+        List<BufferSegment> bufferList = new List<BufferSegment>();
 
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -56,23 +46,21 @@ namespace BestHTTP.Extensions
                     this.bufferList[0] = new BufferSegment(buff.Data, buff.Offset + readCount, buff.Count - readCount);
             }
 
-            this._length -= sumReadCount;
-
             return sumReadCount;
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Write(new BufferSegment(buffer, offset, count));
+            this.Write(new BufferSegment(buffer, offset, count));
         }
 
-        public virtual void Write(BufferSegment bufferSegment)
+        public void Write(BufferSegment bufferSegment)
         {
             this.bufferList.Add(bufferSegment);
             this._length += bufferSegment.Count;
         }
 
-        public virtual void Reset()
+        public void Reset()
         {
             for (int i = 0; i < this.bufferList.Count; ++i)
                 BufferPool.Release(this.bufferList[i]);

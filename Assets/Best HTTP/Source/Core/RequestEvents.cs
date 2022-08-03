@@ -5,7 +5,6 @@ using BestHTTP.Timings;
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace BestHTTP.Core
 {
@@ -17,8 +16,7 @@ namespace BestHTTP.Core
         StreamingData,
         StateChange,
         Resend,
-        Headers,
-        TimingData
+        Headers
     }
 
     public
@@ -38,14 +36,6 @@ namespace BestHTTP.Core
         public readonly byte[] Data;
         public readonly int DataLength;
 
-        // Timing Data
-        public readonly string Name;
-        public readonly DateTime Time;
-        public readonly TimeSpan Duration;
-
-        // Headers
-        public readonly Dictionary<string, List<string>> Headers;
-
         public RequestEventInfo(HTTPRequest request, RequestEvents @event)
         {
             this.SourceRequest = request;
@@ -57,14 +47,6 @@ namespace BestHTTP.Core
 
             this.Data = null;
             this.DataLength = 0;
-
-            // TimingData
-            this.Name = null;
-            this.Time = DateTime.MinValue;
-            this.Duration = TimeSpan.Zero;
-
-            // Headers
-            this.Headers = null;
         }
 
         public RequestEventInfo(HTTPRequest request, HTTPRequestStates newState)
@@ -76,14 +58,6 @@ namespace BestHTTP.Core
             this.Progress = this.ProgressLength = 0;
             this.Data = null;
             this.DataLength = 0;
-
-            // TimingData
-            this.Name = null;
-            this.Time = DateTime.MinValue;
-            this.Duration = TimeSpan.Zero;
-
-            // Headers
-            this.Headers = null;
         }
 
         public RequestEventInfo(HTTPRequest request, RequestEvents @event, long progress, long progressLength)
@@ -96,14 +70,6 @@ namespace BestHTTP.Core
             this.ProgressLength = progressLength;
             this.Data = null;
             this.DataLength = 0;
-
-            // TimingData
-            this.Name = null;
-            this.Time = DateTime.MinValue;
-            this.Duration = TimeSpan.Zero;
-
-            // Headers
-            this.Headers = null;
         }
 
         public RequestEventInfo(HTTPRequest request, byte[] data, int dataLength)
@@ -115,99 +81,12 @@ namespace BestHTTP.Core
             this.Progress = this.ProgressLength = 0;
             this.Data = data;
             this.DataLength = dataLength;
-
-            // TimingData
-            this.Name = null;
-            this.Time = DateTime.MinValue;
-            this.Duration = TimeSpan.Zero;
-
-            // Headers
-            this.Headers = null;
-        }
-
-        public RequestEventInfo(HTTPRequest request, string name, DateTime time)
-        {
-            this.SourceRequest = request;
-            this.Event = RequestEvents.TimingData;
-            this.State = HTTPRequestStates.Initial;
-
-            this.Progress = this.ProgressLength = 0;
-            this.Data = null;
-            this.DataLength = 0;
-
-            // TimingData
-            this.Name = name;
-            this.Time = time;
-            this.Duration = TimeSpan.Zero;
-
-            // Headers
-            this.Headers = null;
-        }
-
-        public RequestEventInfo(HTTPRequest request, string name, TimeSpan duration)
-        {
-            this.SourceRequest = request;
-            this.Event = RequestEvents.TimingData;
-            this.State = HTTPRequestStates.Initial;
-
-            this.Progress = this.ProgressLength = 0;
-            this.Data = null;
-            this.DataLength = 0;
-
-            // TimingData
-            this.Name = name;
-            this.Time = DateTime.Now;
-            this.Duration = duration;
-
-            // Headers
-            this.Headers = null;
-        }
-
-        public RequestEventInfo(HTTPRequest request, Dictionary<string, List<string>> headers)
-        {
-            this.SourceRequest = request;
-            this.Event = RequestEvents.Headers;
-            this.State = HTTPRequestStates.Initial;
-
-            this.Progress = this.ProgressLength = 0;
-            this.Data = null;
-            this.DataLength = 0;
-
-            // TimingData
-            this.Name = null;
-            this.Time = DateTime.MinValue;
-            this.Duration = TimeSpan.Zero;
-
-            // Headers
-            this.Headers = headers;
         }
 
         public override string ToString()
         {
-            switch (this.Event)
-            {
-                case RequestEvents.Upgraded:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: Upgraded]", this.SourceRequest.CurrentUri);
-                case RequestEvents.DownloadProgress:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: DownloadProgress, Progress: {1}, ProgressLength: {2}]", this.SourceRequest.CurrentUri, this.Progress, this.ProgressLength);
-                case RequestEvents.UploadProgress:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: UploadProgress, Progress: {1}, ProgressLength: {2}]", this.SourceRequest.CurrentUri, this.Progress, this.ProgressLength);
-                case RequestEvents.StreamingData:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: StreamingData, DataLength: {1}]", this.SourceRequest.CurrentUri, this.DataLength);
-                case RequestEvents.StateChange:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: StateChange, State: {1}]", this.SourceRequest.CurrentUri, this.State);
-                case RequestEvents.Resend:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: Resend]", this.SourceRequest.CurrentUri);
-                case RequestEvents.Headers:
-                    return string.Format("[RequestEventInfo SourceRequest: {0}, Event: Headers]", this.SourceRequest.CurrentUri);
-                case RequestEvents.TimingData:
-                    if (this.Duration == TimeSpan.Zero)
-                        return string.Format("[RequestEventInfo SourceRequest: {0}, Event: TimingData, Name: {1}, Time: {2}]", this.SourceRequest.CurrentUri, this.Name, this.Time);
-                    else
-                        return string.Format("[RequestEventInfo SourceRequest: {0}, Event: TimingData, Name: {1}, Time: {2}, Duration: {3}]", this.SourceRequest.CurrentUri, this.Name, this.Time, this.Duration);
-                default:
-                    throw new NotImplementedException(this.Event.ToString());
-            }
+            return string.Format("[RequestEventInfo SourceRequest: {0}, Event: {1}, State: {2}, Progress: {3}, ProgressLength: {4}, Data: {5}]",
+                this.SourceRequest.CurrentUri, this.Event, this.State, this.Progress, this.ProgressLength, this.DataLength);
         }
     }
 
@@ -221,9 +100,6 @@ namespace BestHTTP.Core
 
         public static void EnqueueRequestEvent(RequestEventInfo @event)
         {
-            if (HTTPManager.Logger.Level == Loglevels.All)
-                HTTPManager.Logger.Information("RequestEventHelper", "Enqueue request event: " + @event.ToString(), @event.SourceRequest.Context);
-
             requestEventQueue.Enqueue(@event);
         }
 
@@ -265,7 +141,7 @@ namespace BestHTTP.Core
                             bool reuseBuffer = true;
                             try
                             {
-                                if (source.UseStreaming)
+                                if (source.OnStreamingData != null)
                                     reuseBuffer = source.OnStreamingData(source, response, requestEvent.Data, requestEvent.DataLength);
                             }
                             catch (Exception ex)
@@ -302,7 +178,6 @@ namespace BestHTTP.Core
                         }
                         break;
 
-#if !UNITY_WEBGL || UNITY_EDITOR
                     case RequestEvents.Upgraded:
                         try
                         {
@@ -318,7 +193,6 @@ namespace BestHTTP.Core
                         if (protocol != null)
                             ProtocolEventHelper.AddProtocol(protocol);
                         break;
-#endif
 
                     case RequestEvents.Resend:
                         source.State = HTTPRequestStates.Initial;
@@ -335,7 +209,7 @@ namespace BestHTTP.Core
                             {
                                 var response = source.Response;
                                 if (source.OnHeadersReceived != null && response != null)
-                                    source.OnHeadersReceived(source, response, requestEvent.Headers);
+                                    source.OnHeadersReceived(source, response);
                             }
                             catch (Exception ex)
                             {
@@ -353,10 +227,6 @@ namespace BestHTTP.Core
                         {
                             HTTPManager.Logger.Exception("RequestEventHelper", "HandleRequestStateChange", ex, source.Context);
                         }
-                        break;
-
-                    case RequestEvents.TimingData:
-                        source.Timing.AddEvent(requestEvent.Name, requestEvent.Time, requestEvent.Duration);
                         break;
                 }
             }
@@ -465,8 +335,8 @@ namespace BestHTTP.Core
                     }
 #endif
 
-                    source.Timing.AddEvent(TimingEventNames.Queued_For_Disptach, DateTime.Now, TimeSpan.Zero);
-                    source.Timing.AddEvent(TimingEventNames.Finished, DateTime.Now, DateTime.Now - source.Timing.Start);
+                    source.Timing.Add(TimingEventNames.Queued_For_Disptach);
+                    source.Timing.Add(TimingEventNames.Finished, DateTime.Now - source.Timing.Start);
 
                     if (source.Callback != null)
                     {
@@ -474,7 +344,7 @@ namespace BestHTTP.Core
                         {
                             source.Callback(source, source.Response);
 
-                            source.Timing.AddEvent(TimingEventNames.Callback, DateTime.Now, TimeSpan.Zero);
+                            source.Timing.Add(TimingEventNames.Callback);
 
                             if (HTTPManager.Logger.Level <= Loglevels.Information)
                                 HTTPManager.Logger.Information("RequestEventHelper", "Finishing request. Timings: " + source.Timing.ToString(), source.Context);

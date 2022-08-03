@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
-
-using BestHTTP.PlatformSupport.Threading;
 
 #if NET_STANDARD_2_0 || NETFX_CORE
 using System.Runtime.CompilerServices;
@@ -14,8 +13,6 @@ namespace BestHTTP.PlatformSupport.Memory
     [BestHTTP.PlatformSupport.IL2CPP.Il2CppEagerStaticClassConstructionAttribute]
     public struct BufferSegment
     {
-        private const int ToStringMaxDumpLength = 128;
-
         public static readonly BufferSegment Empty = new BufferSegment(null, 0, 0);
 
         public readonly byte[] Data;
@@ -86,14 +83,9 @@ namespace BestHTTP.PlatformSupport.Memory
 
             if (this.Count > 0)
             {
-                if (this.Count <= ToStringMaxDumpLength)
-                {
-                    sb.AppendFormat("{0:X2}", this.Data[this.Offset]);
-                    for (int i = 1; i < this.Count; ++i)
-                        sb.AppendFormat(", {0:X2}", this.Data[this.Offset + i]);
-                }
-                else
-                    sb.Append("...");
+                sb.AppendFormat("{0:X2}", this.Data[this.Offset]);
+                for (int i = 1; i < this.Count; ++i)
+                    sb.AppendFormat(", {0:X2}", this.Data[this.Offset + i]);
             }
 
             sb.Append("]]");
@@ -177,38 +169,21 @@ namespace BestHTTP.PlatformSupport.Memory
             this.released = DateTime.UtcNow;
 #if UNITY_EDITOR
             if (BufferPool.EnableDebugStackTraceCollection)
-                this.stackTrace = ProcessStackTrace(System.Environment.StackTrace);
+                this.stackTrace = System.Environment.StackTrace;
             else
                 this.stackTrace = string.Empty;
 #endif
         }
 
-#if UNITY_EDITOR
-        private static string ProcessStackTrace(string stackTrace)
-        {
-            if (string.IsNullOrEmpty(stackTrace))
-                return null;
-
-            var lines = stackTrace.Split('\n');
-
-            StringBuilder sb = new StringBuilder(lines.Length - 3);
-            // skip top 4 lines that would show the logger.
-            for (int i = 3; i < lines.Length; ++i)
-                sb.Append(lines[i].Replace("BestHTTP.", ""));
-
-            return sb.ToString();
-        }
-#endif
-
         public override string ToString()
         {
 #if UNITY_EDITOR
             if (BufferPool.EnableDebugStackTraceCollection)
-                return string.Format("[BufferDesc Size: {0}, Released: {1}, Released StackTrace: {2}]", this.buffer.Length, DateTime.UtcNow - this.released, this.stackTrace);
+                return string.Format("[BufferDesc Size: {0}, Released: {1}, StackTrace: {2}]", this.buffer.Length, this.released, this.stackTrace);
             else
-                return string.Format("[BufferDesc Size: {0}, Released: {1}]", this.buffer.Length, DateTime.UtcNow - this.released);
+                return string.Format("[BufferDesc Size: {0}, Released: {1}]", this.buffer.Length, this.released);
 #else
-            return string.Format("[BufferDesc Size: {0}, Released: {1}]", this.buffer.Length, DateTime.UtcNow - this.released);
+            return string.Format("[BufferDesc Size: {0}, Released: {1}]", this.buffer.Length, this.released);
 #endif
         }
     }
@@ -250,7 +225,7 @@ namespace BestHTTP.PlatformSupport.Memory
         /// <summary>
         /// Minimum buffer size that the plugin will allocate when the requested size is smaller than this value, and canBeLarger is set to true.
         /// </summary>
-        public static long MinBufferSize = 32;
+        public static long MinBufferSize = 256;
 
         /// <summary>
         /// Maximum size of a buffer that the plugin will store.
@@ -393,7 +368,8 @@ namespace BestHTTP.PlatformSupport.Memory
             if (size == 0 || size > MaxBufferSize)
                 return;
 
-            using (new WriteLock(rwLock))
+            rwLock.EnterWriteLock();
+            try
             {
                 if (PoolSize + size > MaxPoolSize)
                     return;
@@ -402,6 +378,10 @@ namespace BestHTTP.PlatformSupport.Memory
                 ReleaseBuffers++;
 
                 AddFreeBuffer(buffer);
+            }
+            finally
+            {
+                rwLock.ExitWriteLock();
             }
         }
 
@@ -435,7 +415,8 @@ namespace BestHTTP.PlatformSupport.Memory
         /// </summary>
         public static string GetStatistics(bool showEmptyBuffers = true)
         {
-            using (new ReadLock(rwLock))
+            rwLock.EnterReadLock();
+            try
             {
                 statiscticsBuilder.Length = 0;
                 statiscticsBuilder.AppendFormat("Pooled array reused count: {0:N0}\n", GetBuffers);
@@ -487,6 +468,10 @@ namespace BestHTTP.PlatformSupport.Memory
 
                 return statiscticsBuilder.ToString();
             }
+            finally
+            {
+                rwLock.ExitReadLock();
+            }
         }
 
         /// <summary>
@@ -494,10 +479,15 @@ namespace BestHTTP.PlatformSupport.Memory
         /// </summary>
         public static void Clear()
         {
-            using (new WriteLock(rwLock))
+            rwLock.EnterWriteLock();
+            try
             {
                 FreeBuffers.Clear();
                 PoolSize = 0;
+            }
+            finally
+            {
+                rwLock.ExitWriteLock();
             }
         }
 
@@ -515,7 +505,8 @@ namespace BestHTTP.PlatformSupport.Memory
             //    HTTPManager.Logger.Information("BufferPool", "Before Maintain: " + GetStatistics());
 
             DateTime olderThan = now - RemoveOlderThan;
-            using (new WriteLock(rwLock))
+            rwLock.EnterWriteLock();
+            try
             {
                 for (int i = 0; i < FreeBuffers.Count; ++i)
                 {
@@ -541,6 +532,10 @@ namespace BestHTTP.PlatformSupport.Memory
                     if (RemoveEmptyLists && buffers.Count == 0)
                         FreeBuffers.RemoveAt(i--);
                 }
+            }
+            finally
+            {
+                rwLock.ExitWriteLock();
             }
 
             //if (HTTPManager.Logger.Level == Logger.Loglevels.All)
@@ -573,19 +568,8 @@ namespace BestHTTP.PlatformSupport.Memory
 #endif
         private static BufferDesc FindFreeBuffer(long size, bool canBeLarger)
         {
-            // Previously it was an upgradable read lock, and later a write lock around store.buffers.RemoveAt.
-            // However, checking store.buffers.Count in the if statement, and then get the last buffer and finally write lock the RemoveAt call
-            //  has plenty of time for race conditions.
-            //  Another thread could change store.buffers after checking count and getting the last element and before the write lock,
-            //  so in theory we could return with an element and remove another one from the buffers list.
-            //  A new FindFreeBuffer call could return it again causing malformed data and/or releasing it could duplicate it in the store.
-            // I tried to reproduce both issues (malformed data, duble entries) with a test where creating growin number of threads getting buffers writing to them, check the buffers and finally release them
-            //  would fail _only_ if i used a plain Enter/Exit ReadLock pair, or no locking at all.
-            // But, because there's quite a few different platforms and unity's implementation can be different too, switching from an upgradable lock to a more stricter write lock seems safer.
-            //
-            // An interesting read can be found here: https://stackoverflow.com/questions/21411018/readerwriterlockslim-enterupgradeablereadlock-always-a-deadlock
-
-            using (new WriteLock(rwLock))
+            rwLock.EnterUpgradeableReadLock();
+            try
             {
                 for (int i = 0; i < FreeBuffers.Count; ++i)
                 {
@@ -598,11 +582,24 @@ namespace BestHTTP.PlatformSupport.Memory
                         //  2.) Old, non-used buffers will age. Getting a buffer and putting it back will not keep buffers fresh.
 
                         BufferDesc lastFree = store.buffers[store.buffers.Count - 1];
-                        store.buffers.RemoveAt(store.buffers.Count - 1);
-                        
+
+                        rwLock.EnterWriteLock();
+                        try
+                        {
+                            store.buffers.RemoveAt(store.buffers.Count - 1);
+                        }
+                        finally
+                        {
+                            rwLock.ExitWriteLock();
+                        }
+
                         return lastFree;
                     }
                 }
+            }
+            finally
+            {
+                rwLock.ExitUpgradeableReadLock();
             }
 
             return BufferDesc.Empty;
