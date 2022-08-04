@@ -34,6 +34,24 @@ mergeInto(LibraryManager.library, {
 	{
 		window.isPointerDownOnButton = isDown;
 	},
+	StoreNameData: function (name)
+	{
+		if (typeof(Storage) !== "undefined") {
+		  localStorage.setItem("playerName", Pointer_stringify(name));
+		}
+	},
+	GetNameData: function ()
+	{
+		if (typeof(Storage) !== "undefined") {
+		  var returnStr = localStorage.getItem("playerName");
+		  if(returnStr != null){
+		    var bufferSize = lengthBytesUTF8(returnStr) + 1;
+		    var buffer = _malloc(bufferSize);
+		    stringToUTF8(returnStr, buffer, bufferSize);
+			return buffer;
+		  }
+		}
+	},
 	ReloadPage: function ()
 	{
 		window.location.reload();
