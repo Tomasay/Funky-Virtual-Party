@@ -8,7 +8,6 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 {
     [SerializeField] GameObject fireballPrefab, fireballHandAnchorLeft, fireballHandAnchorRight;
     [SerializeField] GameObject handFireEffectLeft, handFireEffectRight;
-    [SerializeField] Fireball[] fireballsPool;
 
 
     public float fireballThrowPower = 1, handOffset = 0.05f;
@@ -28,7 +27,10 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         ahp.handRight.OnTriggerRelease += OnRelease;
         ahp.handLeft.OnTriggerGrab += OnGrabbed;
         ahp.handLeft.OnTriggerRelease += OnRelease;
+    }
 
+    private void Start()
+    {
         PreloadFireball(true);
         PreloadFireball(false);
     }
@@ -85,12 +87,12 @@ public class ShootoutGameVRPlayerController : VRPlayerController
     private void PreloadFireball(bool isLeftHand)
     {
         //Get next available fireball in pool
-        Fireball nextFireball = fireballsPool[0];
-        for (int i = 0; i < fireballsPool.Length; i++)
+        Fireball nextFireball = Fireball.pool[0];
+        for (int i = 0; i < Fireball.pool.Count; i++)
         {
-            if(fireballsPool[i].readyToSpawn)
+            if(Fireball.pool[i].readyToSpawn)
             {
-                nextFireball = fireballsPool[i];
+                nextFireball = Fireball.pool[i];
                 nextFireball.col.enabled = false;
                 break;
             }
@@ -145,7 +147,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     void SetupCollisionIgnore()
     {
-        foreach (Fireball f in fireballsPool)
+        foreach (Fireball f in Fireball.pool)
         {
             Physics.IgnoreCollision(f.col, ahp.headModel.GetComponent<Collider>());
             Physics.IgnoreCollision(f.col, ahp.handLeft.GetComponent<Collider>());
