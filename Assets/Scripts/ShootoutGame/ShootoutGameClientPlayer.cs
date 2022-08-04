@@ -169,4 +169,9 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
 
     }
+
+    public override void Action()
+    {
+        
+    }
 }

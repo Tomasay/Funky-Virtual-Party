@@ -116,4 +116,9 @@ public class ShootoutGameManager : GameManager
 
         SceneManager.LoadScene("MainMenu");
     }
+
+    public override void OnAction(string id)
+    {
+        ClientManager.instance.GetPlayerByID(id).GetComponent<ShootoutGameClientPlayer>().Action();
+    }
 }

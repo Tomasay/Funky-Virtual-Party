@@ -97,4 +97,9 @@ public class ChaseGameManager : GameManager
         HapticsManager.instance.TriggerHaptic(true, 2);
         vrInfoText.text = playerName + " captured you!";
     }
+
+    public override void OnAction(string id)
+    {
+        ClientManager.instance.GetPlayerByID(id).GetComponent<ChaseGameClientPlayer>().Action();
+    }
 }

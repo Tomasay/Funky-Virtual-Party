@@ -42,9 +42,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void OnAction(string id)
+    public virtual void OnAction(string id)
     {
-        ClientManager.instance.GetPlayerByID(id).GetComponent<ChaseGameClientPlayer>().Action();
+        ClientManager.instance.GetPlayerByID(id).GetComponent<ClientPlayer>().Action();
     }
 
     public IEnumerator DisableMirroring()
