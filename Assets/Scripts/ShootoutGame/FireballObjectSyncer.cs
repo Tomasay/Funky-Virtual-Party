@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class FireballObjectSyncer : ObjectSyncer
 {
-    [SerializeField] GameObject fireballMesh;
-    [SerializeField] ParticleSystem explosion, smokePuff;
+    [SerializeField] GameObject fireballMesh, fireballTrail;
+    [SerializeField] ParticleSystem mainFireball, explosion, smokePuff;
+    [SerializeField] float minSize, maxSize;
+    [SerializeField] Color minColor, maxColor;
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
+    private int fireballExplosionRange = 10;
 
     private bool lastActiveSent; //Value of isActive last sent to clients
 
     public class FireballObjectData : ObjectData
     {
-        public Vector3 scale;
+        public float currentScale; //Value between 0 and 1
         public bool isActive;
     }
 
@@ -89,10 +92,10 @@ public class FireballObjectSyncer : ObjectSyncer
             {
                 explosion.Play();
 
-                #if UNITY_WEBGL
+#if UNITY_WEBGL
                 ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.LocalPlayer;
-                sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, (currentFireballData.scale.x / 2.0f) * 8) ); 
-                #endif
+                sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, currentFireballData.currentScale * fireballExplosionRange) ); 
+#endif
 
             }
         }
@@ -112,7 +115,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
             //Fireball variables
             currentFireballData.isActive = lastActiveSent = f.fireball.activeSelf;
-            currentFireballData.scale = f.fireball.transform.localScale;
+            currentFireballData.currentScale = f.currentScale;
 
             //Send Data
             string json = JsonUtility.ToJson(currentFireballData);
@@ -145,8 +148,31 @@ public class FireballObjectSyncer : ObjectSyncer
         //Fireball
         currentFireballData.isActive = data.isActive;
         fireballMesh.SetActive(data.isActive);
+        if(data.isActive && !fireballTrail.activeSelf)
+        {
+            StartCoroutine("ActivateTrailDelayed", 0.5f);
+        }
+        else
+        {
+            fireballTrail.SetActive(data.isActive);
+        }
 
-        currentFireballData.scale = data.scale;
-        fireballMesh.transform.localScale = data.scale;
+        currentFireballData.currentScale = data.currentScale;
+
+        float s = Mathf.Lerp(minSize, maxSize, data.currentScale);
+        Vector3 scale = new Vector3(s, s, s);
+        fireballMesh.transform.localScale = scale;
+        explosion.transform.localScale = scale;
+        smokePuff.transform.localScale = scale;
+
+        ParticleSystem.MainModule mod = mainFireball.main;
+        mod.startColor = Color.Lerp(minColor, maxColor, data.currentScale);
+    }
+
+    IEnumerator ActivateTrailDelayed(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        fireballTrail.SetActive(true);
     }
 }

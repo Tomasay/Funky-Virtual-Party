@@ -16,6 +16,7 @@ public class ClientManagerWeb : MonoBehaviour
     private GameObject playerPrefab;
     private static List<ClientPlayer> players = new List<ClientPlayer>();
     private ClientPlayer localPlayer;
+    private bool joinedRoom;
 
     public List<ClientPlayer> Players { get => players; }
 
@@ -32,8 +33,12 @@ public class ClientManagerWeb : MonoBehaviour
     [SerializeField] RectTransform fadeRect;
     private float fadeIncrementDistance;
 
+    private float lastHeartbeatReceived;
+    private float hostTimeoutTime = 7.0f;
+
     [DllImport("__Internal")]
     private static extern void ReloadPage();
+    private bool reloadingPage = false;
 
     private void Awake()
     {
@@ -41,13 +46,14 @@ public class ClientManagerWeb : MonoBehaviour
         if (!instance)
         {
             manager = new SocketManager(new Uri(socketUrl));
-            manager.Socket.On<bool, string>("joinedRoom", JoinRoomCheck);
+            manager.Socket.On<bool>("joinedRoom", JoinRoomCheck);
+            manager.Socket.On("heartbeatToClients", OnHeartBeat);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
             manager.Socket.On<string>("action", OnAction);
             manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
-            manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
+            manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
             manager.Socket.On<string, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
             manager.Socket.On("roomClosed", ReloadPage);
             manager.Socket.On<string>("minigameStart", LoadGame);
@@ -69,6 +75,15 @@ public class ClientManagerWeb : MonoBehaviour
         float aspect = (Screen.height / fadeRect.rect.height) * 2;
         fadeRect.sizeDelta = new Vector2(fadeRect.rect.width * aspect, fadeRect.rect.height * aspect);
         fadeIncrementDistance = Screen.width / 8;
+    }
+
+    private void CheckHeartbeat()
+    {
+        if(joinedRoom && !reloadingPage && (Time.time - lastHeartbeatReceived) > hostTimeoutTime)
+        {
+            ReloadPage();
+            reloadingPage = true;
+        }
     }
 
     public void AttemptJoinRoom(string code, string name)
@@ -94,9 +109,9 @@ public class ClientManagerWeb : MonoBehaviour
 
             OnClientConnect(attributes[0], attributes[1], attributes[2]);
 
-            if (int.TryParse(attributes[4], out int parsedHead) && float.TryParse(attributes[5], out float parsedHeight))
+            if (int.TryParse(attributes[4], out int parsedHead) && float.TryParse(attributes[5], out float parsedHeight) && int.TryParse(attributes[6], out int parsedHatIndex))
             {
-                SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight);
+                SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight, parsedHatIndex);
             }
         }
     }
@@ -128,14 +143,19 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
-    private void JoinRoomCheck(bool joined, string socketID)
+    public event Action onClientFailedConnect;
+    private void JoinRoomCheck(bool joined)
     {
         if(joined) //If we successfuly joined a room
         {
+            lastHeartbeatReceived = Time.time;
+            joinedRoom = true;
+
+            InvokeRepeating("CheckHeartbeat", 0, 1);
         }
         else //If room was invalid
         {
-            //TODO: Inform player that party code was invalid
+            onClientFailedConnect.Invoke();
         }
     }
 
@@ -182,9 +202,14 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
-    private void SyncCustomizations(string id, string color, int headShape, float height)
+    private void OnHeartBeat()
     {
-        GetPlayerByID(id).SetCustomizations(color, headShape, height);
+        lastHeartbeatReceived = Time.time;
+    }
+
+    private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
+    {
+        GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
     public ClientPlayer GetPlayerByID(string id)
@@ -226,17 +251,7 @@ public class ClientManagerWeb : MonoBehaviour
 
     private void LoadGame(string gameName)
     {
-        switch (gameName)
-        {
-            case "ChaseGame":
-                StartCoroutine("LoadSceneWithFade", "ChaseGameClient");
-                break;
-            case "Shootout":
-                StartCoroutine("LoadSceneWithFade", "ShootoutClient");
-                break;
-            default:
-                break;
-        }
+        StartCoroutine("LoadSceneWithFade", gameName + "Client");
     }
 
     public void LoadMainMenu()
@@ -288,6 +303,7 @@ public class ClientManagerWeb : MonoBehaviour
             Color playerColor = players[i].PlayerColor;
             int playerHeadType = players[i].PlayerHeadType;
             float playerHeight = players[i].PlayerHeight;
+            int hatIndex = players[i].PlayerHatIndex;
             bool isLocal = players[i].IsLocal;
 
             Destroy(players[i].gameObject);
@@ -297,6 +313,7 @@ public class ClientManagerWeb : MonoBehaviour
             players[i].PlayerColor = playerColor;
             players[i].PlayerHeadType = playerHeadType;
             players[i].PlayerHeight = playerHeight;
+            players[i].PlayerHatIndex = hatIndex;
             players[i].IsLocal = isLocal;
             if(isLocal)
             {

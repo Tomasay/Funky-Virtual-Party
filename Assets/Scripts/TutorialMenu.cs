@@ -14,19 +14,19 @@ public class TutorialMenu : MonoBehaviour
 
     private Dictionary<string, GameObject> vrPlayerIcons;
 
-    private ClientManager cm;
-
     void Start()
     {
         vrPlayerIcons = new Dictionary<string, GameObject>();
-        cm = ClientManager.instance;
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();
         }
         SpawnPlayerIcons();
 
-        cm.onReadyUp += ReadyUp;
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.onReadyUp += ReadyUp;
+        }
         
         if(VrPlayerReady != null )
         {
@@ -36,19 +36,25 @@ public class TutorialMenu : MonoBehaviour
 
     private void OnDestroy()
     {
-        cm.onReadyUp -= ReadyUp;
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.onReadyUp -= ReadyUp;
+        }
     }
 
     private void SpawnPlayerIcons()
     {
-        for (int i = 0; i < cm.Players.Count; i++)
+        if (ClientManager.instance)
         {
-            GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
-            TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
-            txt.color = cm.Players[i].PlayerColor;
-            txt.text = cm.Players[i].PlayerName;
+            for (int i = 0; i < ClientManager.instance.Players.Count; i++)
+            {
+                GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
+                TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+                txt.color = ClientManager.instance.Players[i].PlayerColor;
+                txt.text = ClientManager.instance.Players[i].PlayerName;
 
-            vrPlayerIcons.Add(cm.Players[i].PlayerID, newPlayerIcon);
+                vrPlayerIcons.Add(ClientManager.instance.Players[i].PlayerID, newPlayerIcon);
+            }
         }
     }
 
@@ -64,7 +70,10 @@ public class TutorialMenu : MonoBehaviour
             return;
         }
 
-        cm.onReadyUp -= ReadyUp;
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.onReadyUp -= ReadyUp;
+        }
         manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
     }
@@ -81,7 +90,10 @@ public class TutorialMenu : MonoBehaviour
 
     public void ReadyUpVR()
     {
-        cm.Manager.Socket.Emit("ReadyUpVR");
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.Manager.Socket.Emit("ReadyUpVR");
+        }
 
         vrPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
         vrPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
@@ -93,7 +105,10 @@ public class TutorialMenu : MonoBehaviour
             return;
         }
 
-        cm.onReadyUp -= ReadyUp;
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.onReadyUp -= ReadyUp;
+        }
         manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
     }

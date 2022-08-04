@@ -76,12 +76,13 @@ public class ClientManager : MonoBehaviour
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
-            manager.Socket.On<string, string, int, float>("syncCustomizationsFromServer", SyncCustomizations);
+            manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
 
             DontDestroyOnLoad(gameObject);
         }
 
         InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
+        InvokeRepeating("SendHeartbeat", 0, 2.0f);
     }
 
     private void Update()
@@ -98,6 +99,11 @@ public class ClientManager : MonoBehaviour
         manager.Socket.Emit("unityCloseRoom", passcode);
         manager?.Close();
         manager?.Socket?.Disconnect();
+    }
+
+    void SendHeartbeat()
+    {
+        manager.Socket.Emit("heartbeatToServer");
     }
 
     public void OnMinigameStart(string game)
@@ -208,9 +214,9 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    private void SyncCustomizations(string id, string color, int headShape, float height)
+    private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
     {
-        GetPlayerByID(id).SetCustomizations(color, headShape, height);
+        GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
     public void SyncAllPlayerPos()
@@ -255,6 +261,7 @@ public class ClientManager : MonoBehaviour
             Color playerColor = players[i].PlayerColor;
             int playerHeadType = players[i].PlayerHeadType;
             float playerHeight = players[i].PlayerHeight;
+            int hatIndex = players[i].PlayerHatIndex;
 
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
@@ -263,6 +270,7 @@ public class ClientManager : MonoBehaviour
             players[i].PlayerColor = playerColor;
             players[i].PlayerHeadType = playerHeadType;
             players[i].PlayerHeight = playerHeight;
+            players[i].PlayerHatIndex = hatIndex;
 
             if (locations[i])
             {

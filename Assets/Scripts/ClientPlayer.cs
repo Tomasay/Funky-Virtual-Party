@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
   
 public class ClientPlayer : MonoBehaviour
 {
-    [SerializeField] Texture2D colorPalette;
+    [SerializeField] public Texture2D colorPalette;
     private static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] TMP_Text playerNameText, playerNameTextBack;
     [SerializeField] SkinnedMeshRenderer smr;
@@ -14,11 +14,18 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] GameObject spineBone; //Used to change height of player
     [SerializeField] Collider col; //Used to change height of player
 
+    [SerializeField] public GameObject[] hats;
+    [SerializeField] GameObject hatAttachPoint;
+    [SerializeField] ParticleSystem hatPoofParticles;
+    protected GameObject currentHat;
+    protected int currentHatIndex = -1;
+
     protected string playerID, playerIP, playerName;
     protected bool isLocal = false; //Is this the player being controlled by device?
     protected Color playerColor = Color.white;
     protected int headType;
     protected float height; //Between -0.2f anf 2.0f
+    private Vector3 spinePos;
 
     protected Vector3 movement;
     protected Quaternion lookRotation;
@@ -34,7 +41,8 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
-    public float PlayerHeight { get => height; set{ height = value; Vector3 pos = spineBone.transform.localPosition; pos.y += height; spineBone.transform.localPosition = pos;} }
+    public float PlayerHeight { get => height; set{ height = value; spineBone.transform.localPosition = spinePos + new Vector3(0, height, 0); } }
+    public int PlayerHatIndex { get => currentHatIndex; set{ UpdateHat(value); } }
 
     public bool IsLocal { get => isLocal; set => isLocal = value; }
     public bool CanMove { get => canMove; set => canMove = value; }
@@ -67,6 +75,8 @@ public class ClientPlayer : MonoBehaviour
         speed = startingSpeed;
 
         playerInput = GetComponent<PlayerInput>();
+
+        spinePos = spineBone.transform.localPosition;
     }
     
     protected virtual void Update()
@@ -122,13 +132,36 @@ public class ClientPlayer : MonoBehaviour
         pos.y += height;
         spineBone.transform.localPosition = pos;
 
-        if(isLocal)
+        //Hat, default none
+        currentHatIndex = -1;
+
+        if (isLocal)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height);
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
         }
     }
 
-    public void SetCustomizations(string color, int headShape, float height)
+    void UpdateHat(int newIndex)
+    {
+        if (currentHat)
+        {
+            Destroy(currentHat);
+        }
+
+        currentHatIndex = newIndex;
+        if (newIndex > -1)
+        {
+            currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+            hatPoofParticles.Play();
+        }
+
+        if (isLocal)
+        {
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+        }
+    }
+
+    public void SetCustomizations(string color, int headShape, float height, int hatIndex)
     {
         if (ColorUtility.TryParseHtmlString(color, out Color newCol))
         {
@@ -137,8 +170,26 @@ public class ClientPlayer : MonoBehaviour
 
         PlayerHeadType = headShape;
         PlayerHeight = height;
+
+        bool newHat = (currentHatIndex != hatIndex);
+
+        if(currentHat)
+        {
+            Destroy(currentHat);
+        }
+
+        currentHatIndex = hatIndex;
+        if (hatIndex > -1)
+        {
+            currentHat = Instantiate(hats[currentHatIndex], hatAttachPoint.transform);
+            if (newHat) { hatPoofParticles.Play(); }
+        }
     }
 
+    /// <summary>
+    /// Changes the color locally
+    /// </summary>
+    /// <param name="col"></param>
     private void ChangeColor(Color col)
     {
         Mesh mesh = smr.sharedMesh;
@@ -152,6 +203,48 @@ public class ClientPlayer : MonoBehaviour
         availableColors.Remove(col);
         mesh.colors = colors;
         playerColor = col;
+    }
+
+    /// <summary>
+    /// Changes the color locally and syncs on network
+    /// </summary>
+    /// <param name="col"></param>
+    public void UpdateColor(Color col)
+    {
+        Mesh mesh = smr.sharedMesh;
+        Vector3[] vertices = mesh.vertices;
+
+        Color[] colors = new Color[vertices.Length];
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            colors[i] = col;
+        }
+        availableColors.Remove(col);
+        mesh.colors = colors;
+        playerColor = col;
+
+        if (isLocal)
+        {
+            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+        }
+    }
+
+    public int GetColorIndex()
+    {
+        List<Color> cols = new List<Color>();
+        for (int i = 0; i < colorPalette.width; i++)
+        {
+            cols.Add(colorPalette.GetPixel(i, 0));
+        }
+
+        for (int i = 0; i < cols.Count; i++)
+        {
+            if (PlayerColor.Equals(cols[i]))
+            {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void Move(float x, float y, bool changeDirection = true)
@@ -211,7 +304,8 @@ public class ClientPlayer : MonoBehaviour
         s += playerName + "\n";
         s += "#" + ColorUtility.ToHtmlStringRGB(playerColor) + "\n";
         s += headType + "\n";
-        s += height;
+        s += height + "\n";
+        s += currentHatIndex;
 
         return s;
     }

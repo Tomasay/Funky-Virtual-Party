@@ -15,6 +15,11 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] GameObject VRPlayer;
 
     [SerializeField] Canvas joinRoomCanvas, controllerCanvas;
+    [SerializeField] GameObject partyCodeInvalidDebug;
+    [SerializeField] Button nameWebGLButton, codeWebGLButton; //Buttons used to access keyboard on WebGL
+    [SerializeField] Button submitButton;
+
+    [SerializeField] Button enableCustomizationsButton;
 
     [SerializeField] Material dotsMat;
 
@@ -28,6 +33,11 @@ public class MainMenuWeb : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+#if UNITY_EDITOR
+        nameWebGLButton.gameObject.SetActive(false);
+        codeWebGLButton.gameObject.SetActive(false);
+#endif
+
         ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
         VRPlayer.SetActive(false);
 
@@ -37,8 +47,10 @@ public class MainMenuWeb : MonoBehaviour
         ClientManagerWeb.instance.onClientConnect += SwitchToController;
         //ClientManagerWeb.instance.onClientDisonnect += RemovePlayerIcon;
 
+        ClientManagerWeb.instance.onClientFailedConnect += EnableFailedConnectDebug;
+
         //If this is isn't first time visiting main menu
-        if(ClientManagerWeb.instance.Players.Count > 0)
+        if (ClientManagerWeb.instance.Players.Count > 0)
         {
             SwitchToController(null);
             VRPlayer.SetActive(true);
@@ -66,6 +78,21 @@ public class MainMenuWeb : MonoBehaviour
         dotsMat.color = Color.Lerp(dotsMat.color, currentDotsColor, colorChangeSpeed * Time.deltaTime);
     }
 
+    private void EnableFailedConnectDebug()
+    {
+        partyCodeInvalidDebug.SetActive(true);
+    }
+
+    public void DisableFailedConnectDebug()
+    {
+        partyCodeInvalidDebug.SetActive(false);
+    }
+
+    public void CheckValidPartyCode(string val)
+    {
+        submitButton.interactable = (val.Length == 4);
+    }
+
     private void GetNewBackgroundColors()
     {
         int colorIndex = Random.Range(0, backgroundColors.Length);
@@ -82,6 +109,8 @@ public class MainMenuWeb : MonoBehaviour
         ClientManagerWeb.instance.onClientConnect -= SwitchToController;
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
         //ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;
+
+        ClientManagerWeb.instance.onClientFailedConnect -= EnableFailedConnectDebug;
     }
 
     private void SpawnPlayer(GameObject player)
@@ -119,5 +148,6 @@ public class MainMenuWeb : MonoBehaviour
         VRPlayer.SetActive(true);
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
+        enableCustomizationsButton.gameObject.SetActive(true);
     }
 }

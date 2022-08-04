@@ -21,8 +21,15 @@ public class KeyboardController : MonoBehaviour
 
     [DllImport("__Internal")]
     private static extern void UpdateInputFieldText(string txt);
+
     [DllImport("__Internal")]
     private static extern void SetPointerDownOnButton(bool isDown);
+
+    [DllImport("__Internal")]
+    private static extern void StoreNameData(string name);
+
+    [DllImport("__Internal")]
+    private static extern string GetNameData();
 
     [SerializeField] TMP_InputField nameField, codeField;
     [SerializeField] ButtonEvents nameFieldButton, codeFieldButton;
@@ -41,6 +48,12 @@ public class KeyboardController : MonoBehaviour
         nameFieldButton.onPointerUp.AddListener(ButtonPointerUp);
         codeFieldButton.onPointerDown.AddListener(ButtonPointerDown);
         codeFieldButton.onPointerUp.AddListener(ButtonPointerUp);
+
+        string storedName = GetNameData();
+        if (storedName != null)
+        {
+            nameField.text = GetNameData();
+        }
     }
 
 
@@ -105,5 +118,6 @@ public class KeyboardController : MonoBehaviour
     {
         CloseKeyboard();
         manager.AttemptJoinRoom(codeField.text.ToUpper(), nameField.text);
+        StoreNameData(nameField.text);
     }
 }
