@@ -5,10 +5,11 @@ using UnityEngine.Animations;
 
 public class Fireball : MonoBehaviour
 {
-    [SerializeField] ParticleSystem explosion, smokePuff;
+    [SerializeField] ParticleSystem mainFireball, explosion, smokePuff;
     [SerializeField] public GameObject fireball;
     [SerializeField] public Rigidbody rb;
-    [SerializeField] float minSize, maxSize;
+    [SerializeField] public float minSize, maxSize;
+    [SerializeField] Color minColor, maxColor;
     [SerializeField] float fireballGrowSpeed = 0.25f;
     [SerializeField] FireballObjectSyncer syncer;
     [SerializeField] Shootout_DestructibleTerrian terrain;
@@ -38,6 +39,8 @@ public class Fireball : MonoBehaviour
         {
             currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
             float s = Mathf.Lerp(minSize, maxSize, currentScale);
+            ParticleSystem.MainModule mod = mainFireball.main;
+            mod.startColor = Color.Lerp(minColor, maxColor, currentScale);
             Vector3 scale = new Vector3(s, s, s);
             fireball.transform.localScale = scale;
             explosion.transform.localScale = scale;
@@ -61,7 +64,10 @@ public class Fireball : MonoBehaviour
             smokePuff.Play();
             Reset();
 
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SmokePuffEvent", syncer.CurrentFireballData.objectID.ToString());
+            if (ClientManager.instance)
+            {
+                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SmokePuffEvent", syncer.CurrentFireballData.objectID.ToString());
+            }
         }
     }
 
@@ -73,8 +79,10 @@ public class Fireball : MonoBehaviour
         explosion.Play();
         hasExploded = true;
 
-        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", syncer.CurrentFireballData.objectID.ToString());
-
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", syncer.CurrentFireballData.objectID.ToString());
+        }
     }
 
     public void Activate()
@@ -97,6 +105,8 @@ public class Fireball : MonoBehaviour
     {
         currentScale = 0;
         fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
+        ParticleSystem.MainModule mod = mainFireball.main;
+        mod.startColor = minColor;
         rb.isKinematic = true;
         rb.useGravity = false;
         fireball.SetActive(false);

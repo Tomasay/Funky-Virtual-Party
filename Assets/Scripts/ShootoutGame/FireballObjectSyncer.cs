@@ -5,7 +5,9 @@ using UnityEngine;
 public class FireballObjectSyncer : ObjectSyncer
 {
     [SerializeField] GameObject fireballMesh, fireballTrail;
-    [SerializeField] ParticleSystem explosion, smokePuff;
+    [SerializeField] ParticleSystem mainFireball, explosion, smokePuff;
+    [SerializeField] float minSize, maxSize;
+    [SerializeField] Color minColor, maxColor;
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
@@ -15,7 +17,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
     public class FireballObjectData : ObjectData
     {
-        public Vector3 scale;
+        public float currentScale; //Value between 0 and 1
         public bool isActive;
     }
 
@@ -113,7 +115,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
             //Fireball variables
             currentFireballData.isActive = lastActiveSent = f.fireball.activeSelf;
-            currentFireballData.scale = f.fireball.transform.localScale;
+            currentFireballData.currentScale = f.currentScale;
 
             //Send Data
             string json = JsonUtility.ToJson(currentFireballData);
@@ -155,8 +157,16 @@ public class FireballObjectSyncer : ObjectSyncer
             fireballTrail.SetActive(data.isActive);
         }
 
-        currentFireballData.scale = data.scale;
-        fireballMesh.transform.localScale = data.scale;
+        currentFireballData.currentScale = data.currentScale;
+
+        float s = Mathf.Lerp(minSize, maxSize, data.currentScale);
+        Vector3 scale = new Vector3(s, s, s);
+        fireballMesh.transform.localScale = scale;
+        explosion.transform.localScale = scale;
+        smokePuff.transform.localScale = scale;
+
+        ParticleSystem.MainModule mod = mainFireball.main;
+        mod.startColor = Color.Lerp(minColor, maxColor, data.currentScale);
     }
 
     IEnumerator ActivateTrailDelayed(float delay)
