@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Animations;
 
 public class Fireball : MonoBehaviour
@@ -10,6 +11,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] public GameObject fireball;
     [SerializeField] public Rigidbody rb;
+    [SerializeField] public Image chargeIndicator;
     [SerializeField] public float minSize, maxSize;
     [SerializeField] Color minColor, maxColor;
     [SerializeField] Color emberColor, emberColorBoosted;
@@ -20,6 +22,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] Color boostedMainColor, boostedSecondaryColor;
     [SerializeField] ParticleSystem boostedParticleEffect;
     public bool boosted = false;
+    private float scaleForBoosted = 0.8f; //What level currentScale has to be for fireball to become boosted
 
     public Collider col;
     public ParentConstraint constraint;
@@ -53,7 +56,10 @@ public class Fireball : MonoBehaviour
             currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
             SetScale();
 
-            if (!boosted && currentScale > 0.8f)
+            chargeIndicator.color = Color.Lerp(minColor, maxColor, currentScale);
+            chargeIndicator.fillAmount = currentScale / scaleForBoosted;
+
+            if (!boosted && currentScale > scaleForBoosted)
             {
                 //Level up fireball
                 boostedParticleEffect.Play();
@@ -65,6 +71,8 @@ public class Fireball : MonoBehaviour
                 fireTrail.startColor = boostedSecondaryColor;
 
                 boosted = true;
+
+                chargeIndicator.enabled = false;
             }
             else if(!boosted)
             {
@@ -201,6 +209,8 @@ public class Fireball : MonoBehaviour
         hasExploded = false;
         isDropped = false;
         boosted = false;
+        chargeIndicator.fillAmount = 0;
+        chargeIndicator.enabled = true;
         //constraint.constraintActive = false;
 
         readyToSpawn = true;
