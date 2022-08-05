@@ -19,7 +19,7 @@ public class Fireball : MonoBehaviour
 
     [SerializeField] Color boostedMainColor, boostedSecondaryColor;
     [SerializeField] ParticleSystem boostedParticleEffect;
-    private bool boosted = false;
+    public bool boosted = false;
 
     public Collider col;
     public ParentConstraint constraint;
@@ -53,28 +53,22 @@ public class Fireball : MonoBehaviour
             currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
             SetScale();
 
-            ParticleSystem.MainModule mod = mainFireball.main;
-
             if (!boosted && currentScale > 0.8f)
             {
                 //Level up fireball
                 boostedParticleEffect.Play();
 
-                mod = mainFireball.main;
-                mod.startColor = boostedMainColor;
+                mainFireball.startColor = boostedMainColor;
 
-                mod = ember.main;
-                mod.startColor = emberColorBoosted;
+                ember.startColor = emberColorBoosted;
 
-                mod = fireTrail.main;
-                mod.startColor = boostedSecondaryColor;
+                fireTrail.startColor = boostedSecondaryColor;
 
                 boosted = true;
             }
             else if(!boosted)
             {
-                mod = mainFireball.main;
-                mod.startColor = Color.Lerp(minColor, maxColor, currentScale);
+                mainFireball.startColor = Color.Lerp(minColor, maxColor, currentScale);
             }
         }
     }
@@ -198,10 +192,9 @@ public class Fireball : MonoBehaviour
     {
         currentScale = 0;
         fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
-        ParticleSystem.MainModule mod = mainFireball.main;
-        mod.startColor = minColor;
-        mod = ember.main;
-        mod.startColor = emberColor;
+        mainFireball.startColor = minColor;
+        ember.startColor = emberColor;
+        fireTrail.startColor = emberColor;
         rb.isKinematic = true;
         rb.useGravity = false;
         fireball.SetActive(false);

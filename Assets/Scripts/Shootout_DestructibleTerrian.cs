@@ -55,8 +55,6 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     public void Explosion(Collision collision, Fireball fireball)
     {
-        Debug.Log("EXPLOSION");
-
         List<ContactPoint> contacts = new List<ContactPoint>();
         collision.GetContacts(contacts);
         ContactPoint ray = contacts[0];

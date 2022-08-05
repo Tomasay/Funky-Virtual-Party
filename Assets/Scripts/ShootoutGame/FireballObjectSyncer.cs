@@ -5,9 +5,11 @@ using UnityEngine;
 public class FireballObjectSyncer : ObjectSyncer
 {
     [SerializeField] GameObject fireballMesh, fireballTrail;
-    [SerializeField] ParticleSystem mainFireball, explosion, smokePuff;
+    [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] float minSize, maxSize;
     [SerializeField] Color minColor, maxColor;
+    [SerializeField] Color emberColor, emberColorBoosted;
+    [SerializeField] Color boostedMainColor, boostedSecondaryColor;
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
@@ -19,6 +21,7 @@ public class FireballObjectSyncer : ObjectSyncer
     {
         public float currentScale; //Value between 0 and 1
         public bool isActive;
+        public bool boosted;
     }
 
     FireballObjectData currentFireballData;
@@ -116,6 +119,7 @@ public class FireballObjectSyncer : ObjectSyncer
             //Fireball variables
             currentFireballData.isActive = lastActiveSent = f.fireball.activeSelf;
             currentFireballData.currentScale = f.currentScale;
+            currentFireballData.boosted = f.boosted;
 
             //Send Data
             string json = JsonUtility.ToJson(currentFireballData);
@@ -165,8 +169,9 @@ public class FireballObjectSyncer : ObjectSyncer
         explosion.transform.localScale = scale;
         smokePuff.transform.localScale = scale;
 
-        ParticleSystem.MainModule mod = mainFireball.main;
-        mod.startColor = Color.Lerp(minColor, maxColor, data.currentScale);
+        mainFireball.startColor = data.boosted ? boostedMainColor : Color.Lerp(minColor, maxColor, data.currentScale);
+        fireTrail.startColor = data.boosted ? boostedSecondaryColor : emberColor;
+        ember.startColor = data.boosted ? emberColorBoosted : emberColor;
     }
 
     IEnumerator ActivateTrailDelayed(float delay)
