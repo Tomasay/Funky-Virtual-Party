@@ -12,6 +12,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] public Rigidbody rb;
     [SerializeField] public float minSize, maxSize;
     [SerializeField] Color minColor, maxColor;
+    [SerializeField] Color emberColor, emberColorBoosted;
     [SerializeField] float fireballGrowSpeed = 0.25f;
     [SerializeField] FireballObjectSyncer syncer;
     [SerializeField] Shootout_DestructibleTerrian terrain;
@@ -63,7 +64,7 @@ public class Fireball : MonoBehaviour
                 mod.startColor = boostedMainColor;
 
                 mod = ember.main;
-                mod.startColor = Color.magenta;
+                mod.startColor = emberColorBoosted;
 
                 mod = fireTrail.main;
                 mod.startColor = boostedSecondaryColor;
@@ -132,13 +133,13 @@ public class Fireball : MonoBehaviour
                     switch (spawnedCount)
                     {
                         case 0:
-                            f.rb.AddForce(-250, 500, 0);
+                            f.rb.AddForce(-250, 400, 0);
                             break;
                         case 1:
                             f.rb.AddForce(250, 500, 0);
                             break;
                         case 2:
-                            f.rb.AddForce(0, 500, 250);
+                            f.rb.AddForce(0, 600, 250);
                             break;
                         default:
                             break;
@@ -199,6 +200,8 @@ public class Fireball : MonoBehaviour
         fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
         ParticleSystem.MainModule mod = mainFireball.main;
         mod.startColor = minColor;
+        mod = ember.main;
+        mod.startColor = emberColor;
         rb.isKinematic = true;
         rb.useGravity = false;
         fireball.SetActive(false);
