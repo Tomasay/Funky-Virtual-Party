@@ -10,7 +10,9 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Transform[] playerPositions;
 
-    [SerializeField] private TMP_Text partyCodeText;
+    [SerializeField] private TMP_Text partyCodeText, inviteYourFriendsText, connectingText, connectionErrorText;
+
+    [SerializeField] private const float TIMEOUT_TIME = 5.0f;
 
     [SerializeField] Generate_qr_code qr = null;
     [SerializeField] RawImage qrCode;
@@ -47,6 +49,31 @@ public class MainMenu : MonoBehaviour
         for (int i = 1; i < Display.displays.Length; i++)
         {
             Display.displays[i].Activate();
+        }
+    }
+
+    private void Update()
+    {
+        if(ClientManager.instance.Manager.Socket.IsOpen)
+        {
+            partyCodeText.enabled = true;
+            inviteYourFriendsText.enabled = true;
+            connectingText.enabled = false;
+            connectionErrorText.enabled = false;
+        }
+        else if(!ClientManager.instance.Manager.Socket.IsOpen && Time.time < TIMEOUT_TIME)
+        {
+            partyCodeText.enabled = false;
+            inviteYourFriendsText.enabled = false;
+            connectingText.enabled = true;
+            connectionErrorText.enabled = false;
+        }
+        else if (!ClientManager.instance.Manager.Socket.IsOpen && Time.time > TIMEOUT_TIME)
+        {
+            partyCodeText.enabled = false;
+            inviteYourFriendsText.enabled = false;
+            connectingText.enabled = false;
+            connectionErrorText.enabled = true;
         }
     }
 
