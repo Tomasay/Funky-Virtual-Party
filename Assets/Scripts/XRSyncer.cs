@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Autohand;
 
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+
 public class XRSyncer : MonoBehaviour
 {
     //How often data is sent to be synced
@@ -15,10 +19,11 @@ public class XRSyncer : MonoBehaviour
     [SerializeField] GameObject head;
     [SerializeField] Hand leftHand, rightHand;
 
+    [Serializable]
     public class XRData
     {
-        public Vector3 HeadPosition, LeftHandPosition, RightHandPosition;
-        public Quaternion HeadRotation, LeftHandRotation, RightHandRotation;
+        public SerializedVector3 HeadPosition, LeftHandPosition, RightHandPosition;
+        public SerializedQuaternion HeadRotation, LeftHandRotation, RightHandRotation;
         public float LeftThumbBend, LeftIndexBend, LeftMiddleBend, LeftRingBend, LeftPinkyBend;
         public float RightThumbBend, RightIndexBend, RightMiddleBend, RightRingBend, RightPinkyBend;
     }
@@ -31,7 +36,7 @@ public class XRSyncer : MonoBehaviour
         currentData = new XRData();
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string>("XRDataToClient", ReceiveData);
+        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("XRDataToClient", ReceiveData);
 #endif
 
 #if !UNITY_WEBGL
@@ -105,11 +110,14 @@ public class XRSyncer : MonoBehaviour
         currentData.RightRingBend = rightHand.fingers[3].GetCurrentBend();
         currentData.RightPinkyBend = rightHand.fingers[4].GetCurrentBend();
 
-        string json = JsonUtility.ToJson(currentData);
+        byte[] bytes = ByteArrayConverter.ObjectToByteArray<XRData>(currentData);
+
+        //string json = JsonUtility.ToJson(currentData);
+        //Debug.Log("Size of json: " + json.Length * sizeof(char) + "   size of byte array: " + bytes.Length);
 
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("XRDataToServer", json);
+            ClientManager.instance.Manager.Socket.Emit("XRDataToServer", bytes);
         }
     }
 #endif
@@ -118,6 +126,11 @@ public class XRSyncer : MonoBehaviour
     public void ReceiveData(string json)
     {
         ApplyNewData(JsonUtility.FromJson<XRData>(json));
+    }
+
+    public void ReceiveData(byte[] arrBytes)
+    {
+        ApplyNewData(ByteArrayConverter.ByteArrayToObject<XRData>(arrBytes));
     }
 
     private void ApplyNewData(XRData data)

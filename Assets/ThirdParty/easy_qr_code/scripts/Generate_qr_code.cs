@@ -1,15 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZXing;
-using ZXing.QrCode;
 using UnityEngine.UI;
 using epoching.easy_gui;
+
+#if !UNITY_WEBGL
+using ZXing;
+using ZXing.QrCode;
+#endif
+
 namespace epoching.easy_qr_code
 {
     public class Generate_qr_code : MonoBehaviour
     {
-
+#if !UNITY_WEBGL
         [Header("inputfiled")]
         public InputField input_field;
 
@@ -29,6 +33,7 @@ namespace epoching.easy_qr_code
             }
         }
 
+
         private Color32[] encode_info(string textForEncoding, int width, int height)
         {
             var writer = new BarcodeWriter
@@ -43,6 +48,7 @@ namespace epoching.easy_qr_code
             return writer.Write(textForEncoding);
         }
 
+
         public Texture2D generate_qr_code(string text)
         {
             var encoded = new Texture2D(256, 256);
@@ -52,6 +58,7 @@ namespace epoching.easy_qr_code
             encoded = RemoveColor(Color.white, encoded);
             return encoded;
         }
+
 
         Texture2D RemoveColor(Color c, Texture2D imgs)
         {
@@ -100,5 +107,7 @@ namespace epoching.easy_qr_code
         }
 
         #endregion
+
+#endif
     }
 }

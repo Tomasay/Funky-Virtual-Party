@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZXing;
-using ZXing.QrCode;
 using epoching.easy_debug_on_the_phone;
 using UnityEngine.UI;
 using epoching.easy_gui;
+
+#if !UNITY_WEBGL
+using ZXing;
+using ZXing.QrCode;
+#endif
 
 
 public class QR_code_tool : MonoBehaviour
@@ -73,6 +76,7 @@ public class QR_code_tool : MonoBehaviour
 
     }
 
+    #if !UNITY_WEBGL
     private float interval_time = 1f;
     private float time_stamp = 0;
     void Update()
@@ -98,6 +102,7 @@ public class QR_code_tool : MonoBehaviour
             catch (Exception ex) { Debug.LogWarning(ex.Message); }
         }
     }
+#endif
 
 
     void OnGUI()

@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZXing;
-using ZXing.QrCode;
 using epoching.easy_debug_on_the_phone;
 using UnityEngine.UI;
 using epoching.easy_gui;
+
+#if !UNITY_WEBGL
+using ZXing;
+using ZXing.QrCode;
+#endif
 
 namespace epoching.easy_qr_code
 {
@@ -78,6 +81,7 @@ namespace epoching.easy_qr_code
             }
         }
 
+        #if !UNITY_WEBGL
         private float interval_time = 0.1f;
         private float time_stamp = 0;
         void Update()
@@ -142,6 +146,7 @@ namespace epoching.easy_qr_code
                 }
             }
         }
+#endif
     }
 }
 

@@ -41,7 +41,9 @@ public class MainMenu : MonoBehaviour
         //Generate QR code
         if(qr != null)
         {
+#if !UNITY_WEBGL
             qrCode.texture = qr.generate_qr_code(ClientManager.instance.URL + "/?partyCode=" + ClientManager.instance.Passcode);
+#endif
         }
 
         // Display.displays[0] is the primary, default display and is always ON, so start at index 1.
