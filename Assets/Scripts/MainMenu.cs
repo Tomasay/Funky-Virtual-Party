@@ -28,6 +28,8 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] GameObject discoBall;
 
+    [SerializeField] GameObject lightDial;
+
 
     // Start is called before the first frame update
     void Start()
@@ -86,6 +88,8 @@ public class MainMenu : MonoBehaviour
             connectingText.enabled = false;
             connectionErrorText.enabled = true;
         }
+
+        UpdateLight();
     }
 
     private void OnDisable()
@@ -159,5 +163,24 @@ public class MainMenu : MonoBehaviour
         linkText.color = discoBallHighlightColors[currentColorIndex];
         discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("BaseColor", discoBallMainColors[currentColorIndex]);
         discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("Highlight", discoBallHighlightColors[currentColorIndex]);
+    }
+
+    public void ToggleDiscoBall(bool down)
+    {
+        discoBall.transform.parent.GetComponent<Animator>().SetTrigger(down ? "Down" : "Up");
+    }
+
+    void UpdateLight()
+    {
+        float lightLevel = lightDial.transform.localRotation.eulerAngles.y / 180.0f;
+
+        float h, s, v;
+        Color.RGBToHSV(Camera.main.backgroundColor, out h, out s, out v);
+        v = Mathf.Lerp(1.0f, 0.25f, lightLevel);
+        Camera.main.backgroundColor = Color.HSVToRGB(h, s, v);
+
+        Color.RGBToHSV(RenderSettings.ambientLight, out h, out s, out v);
+        v = Mathf.Lerp(0.25f, 0.0f, lightLevel);
+        RenderSettings.ambientLight = Color.HSVToRGB(h, s, v);
     }
 }

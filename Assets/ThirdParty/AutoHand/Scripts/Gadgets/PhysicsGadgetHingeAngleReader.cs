@@ -14,9 +14,27 @@ namespace Autohand{
         Quaternion startRot;
         Quaternion deltaParentRotation;
 
+        bool isFlipped;
+
+        public UnityEvent OnFlippedOn, OnFlippedOff;
+
         protected void Start(){
             joint = GetComponent<HingeJoint>(); 
             startRot = transform.localRotation;
+        }
+
+        private void Update()
+        {
+            if(!isFlipped && GetValue() == 1)
+            {
+                isFlipped = true;
+                OnFlippedOn.Invoke();
+            }
+            else if(isFlipped && GetValue() == 0)
+            {
+                isFlipped = false;
+                OnFlippedOff.Invoke();
+            }
         }
 
         /// <summary>Returns a -1 to 1 value representing the hinges angle from min-max</summary>
