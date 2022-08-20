@@ -38,6 +38,8 @@ namespace Autohand{
 
             if (pressed && lockOnPressed && GetValue() + threshold < pressedValue)
                 transform.localPosition = pressedPos;
+
+            Debug.Log("Value: " + GetValue());
         }
 
         protected void OnCollisionEnter(Collision collision)
@@ -57,6 +59,8 @@ namespace Autohand{
             OnPressed?.Invoke();
 
             HapticsManager.instance.TriggerHaptic(isTouchingHandLeft);
+
+            Debug.Log("Pressed!");
         }
 
         public void Unpressed(){

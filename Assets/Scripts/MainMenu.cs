@@ -10,7 +10,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Transform[] playerPositions;
 
-    [SerializeField] private TMP_Text partyCodeText, inviteYourFriendsText, connectingText, connectionErrorText;
+    [SerializeField] private TMP_Text partyCodeText, linkText, inviteYourFriendsText, connectingText, connectionErrorText;
 
     [SerializeField] private const float TIMEOUT_TIME = 5.0f;
 
@@ -21,6 +21,13 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] GameObject playerNamesList;
     [SerializeField] GameObject playerIconPrefab;
+
+    [SerializeField] Color[] backgroundColors;
+    [SerializeField] Color[] discoBallMainColors, discoBallHighlightColors;
+    int currentColorIndex;
+
+    [SerializeField] GameObject discoBall;
+
 
     // Start is called before the first frame update
     void Start()
@@ -52,6 +59,8 @@ public class MainMenu : MonoBehaviour
         {
             Display.displays[i].Activate();
         }
+
+        ToggleBackgroundColor(0);
     }
 
     private void Update()
@@ -126,5 +135,29 @@ public class MainMenu : MonoBehaviour
         {
             partyCodeText.text = "Party Code: " + code;
         }
+    }
+
+    public void ToggleBackgroundColor(int index = -1)
+    {
+        if (index == -1 || index > backgroundColors.Length || index < 0)
+        {
+            if (currentColorIndex == backgroundColors.Length)
+            {
+                currentColorIndex = 0;
+            }
+            else
+            {
+                currentColorIndex++;
+            }
+        }
+        else
+        {
+            currentColorIndex = index;
+        }
+
+        Camera.main.backgroundColor = backgroundColors[currentColorIndex];
+        linkText.color = discoBallHighlightColors[currentColorIndex];
+        discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("BaseColor", discoBallMainColors[currentColorIndex]);
+        discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("Highlight", discoBallHighlightColors[currentColorIndex]);
     }
 }
