@@ -40,6 +40,9 @@ public class ClientManagerWeb : MonoBehaviour
     private static extern void ReloadPage();
     private bool reloadingPage = false;
 
+    //Check to make sure we do not load main menu consecutively
+    private bool isInMainMenu = true;
+
     private void Awake()
     {
         //Singleton instantiation
@@ -256,11 +259,16 @@ public class ClientManagerWeb : MonoBehaviour
 
     public void LoadMainMenu()
     {
-        StartCoroutine("LoadSceneWithFade", "MainMenuClient");
+        if (!isInMainMenu)
+        {
+            StartCoroutine("LoadSceneWithFade", "MainMenuClient");
+        }
     }
 
     IEnumerator LoadSceneWithFade(string sceneName)
     {
+        isInMainMenu = sceneName.Equals("MainMenuClient");
+
         //Fade out
         float val = Screen.width + (Screen.width / 2);
         fadeRect.position = new Vector2(-val, fadeRect.position.y);
