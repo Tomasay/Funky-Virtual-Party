@@ -14,7 +14,7 @@ public class GameManagerWeb : MonoBehaviour
 
     protected bool endingGame = false; //Set to true when coroutine has been started to load main menu. Used to prevent trying to load more than once
 
-    public Vector3 VRPlayerPos { get => VRPlayer.GetComponentInChildren<AutoHandPlayer>(true).transform.position; }
+    public Vector3 VRPlayerHeadPos { get => VRPlayer.GetComponent<XRSyncer>().Head.transform.position; }
 
     private GameState state;
     public GameState State { get => state; set => state = value; }

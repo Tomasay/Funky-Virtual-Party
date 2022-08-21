@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Transform[] playerSpawns;
     [SerializeField] GameObject VRPlayer;
 
-    public Vector3 VRPlayerPos { get => VRPlayer.GetComponentInChildren<AutoHandPlayer>().transform.position; }
+    public Vector3 VRPlayerHeadPos { get => VRPlayer.GetComponent<XRSyncer>().Head.transform.position; }
 
     private GameState state;
     public GameState State { get => state; set{ state = value; ClientManager.instance.Manager.Socket.Emit("gameStateFromHost", "" + state); } }

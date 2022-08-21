@@ -19,6 +19,8 @@ public class XRSyncer : MonoBehaviour
     [SerializeField] GameObject head;
     [SerializeField] Hand leftHand, rightHand;
 
+    public GameObject Head { get => head;}
+
     [Serializable]
     public class XRData
     {
@@ -29,7 +31,6 @@ public class XRSyncer : MonoBehaviour
     }
 
     XRData currentData;
-
 
     void Start()
     {
