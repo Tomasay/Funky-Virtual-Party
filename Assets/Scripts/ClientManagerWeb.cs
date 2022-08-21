@@ -121,14 +121,22 @@ public class ClientManagerWeb : MonoBehaviour
 
     public void SyncPlayerPos(string id, float x, float y, float z, bool lerp)
     {
+        ClientPlayer cp = GetPlayerByID(id);
+
+        //If player is too far away from real position, override lerp
+        if (lerp && Vector3.Distance(new Vector3(x, y, z), cp.transform.position) > 1)
+        {
+            lerp = false;
+        }
+
         if (!lerp)
         {
-            GetPlayerByID(id).transform.position = new Vector3(x, y, z);
+            cp.transform.position = new Vector3(x, y, z);
         }
         else
         {
             //GetPlayerByID(id).transform.position = Vector3.Lerp(GetPlayerByID(id).transform.position, new Vector3(x, y, z), Time.deltaTime);
-            GetPlayerByID(id).posFromHost = new Vector3(x, y, z);
+            cp.posFromHost = new Vector3(x, y, z);
         }
     }
 
