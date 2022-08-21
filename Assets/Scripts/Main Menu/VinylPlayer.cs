@@ -9,8 +9,6 @@ using UnityEngine.UI;
 
 public class VinylPlayer : MonoBehaviour
 {
-    [SerializeField] ClientManager cm;
-
     [SerializeField] Transform vinylParent;
     [SerializeField] float vinylSpinSpeed = 0.2f;
 
@@ -98,6 +96,6 @@ public class VinylPlayer : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
-        cm.OnMinigameStart(sceneName);
+        ClientManager.instance.OnMinigameStart(sceneName);
     }
 }
