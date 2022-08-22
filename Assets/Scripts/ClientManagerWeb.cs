@@ -40,6 +40,9 @@ public class ClientManagerWeb : MonoBehaviour
     private static extern void ReloadPage();
     private bool reloadingPage = false;
 
+    //Check to make sure we do not load main menu consecutively
+    private bool isInMainMenu = true;
+
     private void Awake()
     {
         //Singleton instantiation
@@ -118,14 +121,24 @@ public class ClientManagerWeb : MonoBehaviour
 
     public void SyncPlayerPos(string id, float x, float y, float z, bool lerp)
     {
+        ClientPlayer cp = GetPlayerByID(id);
+
+        //If player is too far away from real position, override lerp
+        /*
+        if (lerp && Vector3.Distance(new Vector3(x, y, z), cp.transform.position) > 1)
+        {
+            lerp = false;
+        }
+        */
+
         if (!lerp)
         {
-            GetPlayerByID(id).transform.position = new Vector3(x, y, z);
+            cp.transform.position = new Vector3(x, y, z);
         }
         else
         {
             //GetPlayerByID(id).transform.position = Vector3.Lerp(GetPlayerByID(id).transform.position, new Vector3(x, y, z), Time.deltaTime);
-            GetPlayerByID(id).posFromHost = new Vector3(x, y, z);
+            cp.posFromHost = new Vector3(x, y, z);
         }
     }
 
@@ -256,11 +269,16 @@ public class ClientManagerWeb : MonoBehaviour
 
     public void LoadMainMenu()
     {
-        StartCoroutine("LoadSceneWithFade", "MainMenuClient");
+        if (!isInMainMenu)
+        {
+            StartCoroutine("LoadSceneWithFade", "MainMenuClient");
+        }
     }
 
     IEnumerator LoadSceneWithFade(string sceneName)
     {
+        isInMainMenu = sceneName.Equals("MainMenuClient");
+
         //Fade out
         float val = Screen.width + (Screen.width / 2);
         fadeRect.position = new Vector2(-val, fadeRect.position.y);

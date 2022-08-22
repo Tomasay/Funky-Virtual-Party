@@ -88,19 +88,28 @@ public class Fireball : MonoBehaviour
             terrain.Explosion(collision, this);
             TriggerExplosion();
         }
+        else if(collision.gameObject.name.Contains("IceTower"))
+        {
+            TriggerSmokePuff();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.name.Contains("Water"))
         {
-            smokePuff.Play();
-            Reset();
+            TriggerSmokePuff();
+        }
+    }
 
-            if (ClientManager.instance)
-            {
-                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SmokePuffEvent", syncer.CurrentFireballData.objectID.ToString());
-            }
+    private void TriggerSmokePuff()
+    {
+        smokePuff.Play();
+        Reset();
+
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SmokePuffEvent", syncer.CurrentFireballData.objectID.ToString());
         }
     }
 
