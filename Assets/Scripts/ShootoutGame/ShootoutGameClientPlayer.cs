@@ -170,8 +170,21 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     }
 
+    // Jumping fields
+    [SerializeField] private int jumpForce = 1000;
+    [SerializeField] int jumpCooldown = 4;
+    float timeJumped = 0;
     public override void Action()
     {
-        
+
+        if (timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown)
+        {
+            timeJumped = Time.time;
+            anim.SetTrigger("Jump");
+
+            // Jump!
+            GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
+        }
     }
+
 }

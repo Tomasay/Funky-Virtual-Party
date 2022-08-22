@@ -92,7 +92,7 @@ public class ChaseGameClientPlayer : ClientPlayer
             {
                 //Get direction towards VR player
                 Vector3 dir = ((isWebGL ? gmw.VRPlayerPos : gm.VRPlayerPos) - transform.position).normalized;
-                //Debug.Log("DIRECTION TOWARDS VR PLAYER: " + dir);
+                Debug.Log("DIRECTION TOWARDS VR PLAYER: " + dir);
 
                 //Rotate to look at player, only on Y axis
                 Quaternion lookDir = Quaternion.LookRotation(dir);
@@ -104,6 +104,8 @@ public class ChaseGameClientPlayer : ClientPlayer
             else //If not, lunge in direction player is facing
             {
                 GetComponent<Rigidbody>().AddForce(anim.transform.forward * tackleForce);
+                Debug.Log("DIRECTION TOWARDS VR PLAYER: " + anim.transform.forward );
+
             }
         }
     }
