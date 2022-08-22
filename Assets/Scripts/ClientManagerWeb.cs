@@ -124,10 +124,12 @@ public class ClientManagerWeb : MonoBehaviour
         ClientPlayer cp = GetPlayerByID(id);
 
         //If player is too far away from real position, override lerp
+        /*
         if (lerp && Vector3.Distance(new Vector3(x, y, z), cp.transform.position) > 1)
         {
             lerp = false;
         }
+        */
 
         if (!lerp)
         {
