@@ -193,7 +193,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     }
 
     // Jumping fields
-    [SerializeField] private int jumpForce = 1000;
+    [SerializeField] private int jumpForce = 500;
     [SerializeField] int jumpCooldown = 4;
     float timeJumped = 0;
     public override void Action()
