@@ -130,6 +130,13 @@ namespace Autohand {
         public UnityHandGrabEvent onUnhighlight;
         [Space, Space]
 
+        [Space, Space]
+        [ShowIf("showEvents")]
+        public UnityHandGrabEvent OnUIPointerHighlight;
+        [ShowIf("showEvents")]
+        public UnityHandGrabEvent OnUIPointerUnhighlight;
+        [Space, Space]
+
         [Tooltip("Whether or not the break call made only when holding with multiple hands - if this is false the break event can be called by forcing an object into a static collider")]
         [ShowIf("showEvents")]
         public bool pullApartBreakOnly = true;

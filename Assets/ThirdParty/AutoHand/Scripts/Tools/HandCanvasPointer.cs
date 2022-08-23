@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using Autohand;
 
 public class HandCanvasPointer : MonoBehaviour
 {
@@ -32,6 +33,8 @@ public class HandCanvasPointer : MonoBehaviour
     static Camera cam;
 
     int pointerIndex;
+
+    GameObject lastCollision;
 
     void OnEnable() {
         if (cam == null)
@@ -149,7 +152,32 @@ public class HandCanvasPointer : MonoBehaviour
 
         Vector3 endPosition = transform.position + (transform.forward * targetLength);
 
-        if(hit.collider) endPosition = hit.point;
+        if (hit.collider)
+        {
+            if (!hit.collider.gameObject.Equals(lastCollision))
+            {
+                if(hit.collider.gameObject.TryGetComponent<Grabbable>(out Grabbable g))
+                {
+                    g.OnUIPointerHighlight.Invoke(GetComponentInParent<Hand>(), g);
+                }
+
+                if (lastCollision && lastCollision.TryGetComponent<Grabbable>(out Grabbable gr))
+                {
+                    gr.OnUIPointerUnhighlight.Invoke(GetComponentInParent<Hand>(), gr);
+                }
+                lastCollision = hit.collider.gameObject;
+            }
+        }
+        else
+        {
+            if (lastCollision && lastCollision.TryGetComponent<Grabbable>(out Grabbable gr))
+            {
+                gr.OnUIPointerUnhighlight.Invoke(GetComponentInParent<Hand>(), gr);
+            }
+            lastCollision = null;
+        }
+
+        if (hit.collider) endPosition = hit.point;
 
         //Handle the hitmarker
         hitPointMarker.transform.position = endPosition;
