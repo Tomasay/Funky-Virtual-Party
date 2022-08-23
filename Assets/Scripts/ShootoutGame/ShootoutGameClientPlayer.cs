@@ -17,8 +17,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     const float collisionTimerDefault = 0.5f;
     Vector2 collisionVector;
 
-
-    [SerializeField] ParticleSystem waterSplash;
+    [SerializeField] ParticleSystem waterSplash, iceTrail;
 
     public bool isAlive = true;
 
@@ -77,6 +76,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
             collisionTimer = collisionTimerDefault;
 
+            CheckIceTrailVisibility();
+
         }
         else if (IsLocal && isColliding)
         {
@@ -95,6 +96,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         else
         { 
             transform.Translate(movement * Time.deltaTime);
+
+            CheckIceTrailVisibility();
         }
 
         if (isLocal && isExplosion)
@@ -122,6 +125,25 @@ public class ShootoutGameClientPlayer : ClientPlayer
             GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+    }
+
+    void CheckIceTrailVisibility()
+    {
+        if ((Time.time - timeJumped) < jumpCooldown)
+        {
+            iceTrail.Stop();
+        }
+        else
+        {
+            if (iceTrail.isPlaying && movement.magnitude < 0.1f)
+            {
+                iceTrail.Stop();
+            }
+            else if (!iceTrail.isPlaying && movement.magnitude > 0.1f)
+            {
+                iceTrail.Play();
+            }
+        }
     }
 
     protected override void OnCollisionEnter(Collision collision)
@@ -176,7 +198,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
     float timeJumped = 0;
     public override void Action()
     {
-
         if (timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown)
         {
             timeJumped = Time.time;
@@ -186,5 +207,4 @@ public class ShootoutGameClientPlayer : ClientPlayer
             GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
         }
     }
-
 }
