@@ -57,6 +57,7 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void Awake()
     {
+        
         //Instantiate list of available colors from palette
         if(availableColors == null)
         {
@@ -255,8 +256,14 @@ public class ClientPlayer : MonoBehaviour
 
             //Magnitude of movement for animations
             float val = Mathf.Abs(new Vector2(x, y).magnitude);
-            anim.SetFloat("Speed", val);
-
+            if ((val > 0.05) || (val < -0.05))
+            {
+                anim.SetFloat("Speed", val);
+            }
+            else
+            {
+                anim.SetFloat("Speed", 0);
+            }
             //Update rotation
             if (changeDirection)
             {
