@@ -26,6 +26,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
+        startingSpeed = 7.5f;
+
         base.Awake();
 
 #if UNITY_WEBGL
