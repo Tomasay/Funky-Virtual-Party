@@ -8,7 +8,7 @@ public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] public Texture2D colorPalette;
     private static List<Color> availableColors; //Colors not used from the available palette
-    [SerializeField] TMP_Text playerNameText, playerNameTextBack;
+    [SerializeField] protected TMP_Text playerNameText, playerNameTextBack;
     [SerializeField] SkinnedMeshRenderer smr;
     [SerializeField] protected Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player

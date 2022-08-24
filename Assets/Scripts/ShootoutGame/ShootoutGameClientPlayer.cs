@@ -19,6 +19,9 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     [SerializeField] ParticleSystem waterSplash, iceTrail;
 
+    [SerializeField] GameObject iceCube;
+
+
     public bool isAlive = true;
 
     protected override void Awake()
@@ -37,7 +40,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector3 pos = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
             SpawnSplashEffect(pos);
-            SetPlayerActive(false);
+            TriggerIceCubeAnimation();
             isAlive = false;
             OnDeath.Invoke();
 
@@ -206,5 +209,49 @@ public class ShootoutGameClientPlayer : ClientPlayer
             // Jump!
             GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
         }
+    }
+
+    void TriggerIceCubeAnimation()
+    {
+        iceCube.SetActive(true);
+
+        playerNameText.enabled = false;
+        playerNameTextBack.enabled = false;
+
+        Col.enabled = false;
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+
+        iceCube.GetComponent<Renderer>().material.EnableKeyword("_NORMALMAP");
+        iceCube.GetComponent<Renderer>().material.EnableKeyword("_DETAIL_MULX2");
+
+        CanMove = false;
+
+        anim.SetTrigger("StandingPose");
+
+        //Put player under water
+        transform.position = new Vector3(transform.position.x, 20.0f, transform.position.z);
+
+        StartCoroutine("BringToTop");
+    }
+
+    IEnumerator BringToTop()
+    {
+        for (int i = 0; i <= 60; i++)
+        {
+            transform.position = new Vector3(transform.position.x, Mathf.Lerp(20.0f, 25.0f, (float)i/60.0f), transform.position.z);
+            yield return new WaitForSeconds(0.025f);
+        }
+
+        //Continually bob up and down
+        InvokeRepeating("Bob", 0, 0.025f);
+    }
+
+    void Bob()
+    {
+        float t = Mathf.PingPong(Time.time, 1);
+
+        transform.position = Vector3.Slerp(new Vector3(transform.position.x, 24, transform.position.z), new Vector3(transform.position.x, 25, transform.position.z), t);
+        //transform.rotation = Quaternion.Slerp(Quaternion.Euler(0, 0, -5), Quaternion.Euler(0, 0, 5), t);
     }
 }
