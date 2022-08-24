@@ -201,7 +201,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     float timeJumped = 0;
     public override void Action()
     {
-        if (timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown)
+        if (CanMove && timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown)
         {
             timeJumped = Time.time;
             anim.SetTrigger("Jump");
