@@ -83,7 +83,7 @@ public class ShootoutGameManager : GameManager
 
         if(playersAlive == 0)
         {
-            //State = GameState.VRPlayerWins;
+            State = GameState.VRPlayerWins;
         }
     }
 
