@@ -21,7 +21,8 @@ public class VRPlayerIndicator : MonoBehaviour
             return canvasGroup;
         }
     }
-
+    
+    [SerializeField]
     private RectTransform rectTransform = null;
     protected RectTransform RectTransform
     {
@@ -70,5 +71,6 @@ public class VRPlayerIndicator : MonoBehaviour
         tRot.x = 0;
         tRot.y = 0;
 
+        RectTransform.rotation = tRot;
     }
 }
