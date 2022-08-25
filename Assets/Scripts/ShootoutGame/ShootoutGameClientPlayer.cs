@@ -42,7 +42,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector3 pos = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
             SpawnSplashEffect(pos);
-            TriggerIceCubeAnimation();
+            //TriggerIceCubeAnimation();
+            SetPlayerActive(false);
             isAlive = false;
             OnDeath.Invoke();
 
