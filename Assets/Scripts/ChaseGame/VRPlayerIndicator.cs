@@ -42,19 +42,38 @@ public class VRPlayerIndicator : MonoBehaviour
     }
     
     public GameManagerWeb Target { get; set; } = null;
-    public Transform player = null;
+    private Transform player = null;
 
     private Quaternion tRot = Quaternion.identity;
     private Vector3 tPos = Vector3.zero;
+
+    [SerializeField]
+    private Camera camera;
     private void Start()
     {
             
         Target = GameObject.Find("GameManager").GetComponent<GameManagerWeb>();
+        if(!Target)
+        {
+            Debug.Log("GameManager not Found in VRPLAYERINDICATOR");
+        }
+        else
+        {
+            Debug.Log(Target.VRPlayerHeadPos);
+        }
         player = ClientManagerWeb.instance.LocalPlayer.transform;
     }
     private void Update()
     {
-        RotateToTarget();
+        if (!InSight())
+        {
+            gameObject.SetActive(true);
+            RotateToTarget();
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     void RotateToTarget()
@@ -62,8 +81,8 @@ public class VRPlayerIndicator : MonoBehaviour
         if(Target)
         {
             tPos = Target.VRPlayerHeadPos;
-        }    
-        Vector3 direction = player.position - tPos;
+        }
+        Vector3 direction = player ? player.position - tPos : -tPos;
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
@@ -72,5 +91,11 @@ public class VRPlayerIndicator : MonoBehaviour
         tRot.y = 0;
 
         RectTransform.rotation = tRot;
+    }
+
+    bool InSight()
+    {
+        Vector3 ScreenPoint = camera.WorldToScreenPoint(Target.VRPlayerHeadPos);
+        return ScreenPoint.z > 0 && ScreenPoint.x > 0 && ScreenPoint.x < 1 && ScreenPoint.y > 0 && ScreenPoint.y < 1;
     }
 }
