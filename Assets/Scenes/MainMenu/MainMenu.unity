@@ -413,6 +413,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &189920165 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6707951067419483808, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+  m_PrefabInstance: {fileID: 577683495}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8a35128610d1b34892726ec96e587d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &226205117
 GameObject:
   m_ObjectHideFlags: 0
@@ -1075,7 +1086,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 579722560795514825, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1639125106728771988, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_IsActive
@@ -3285,6 +3296,10 @@ PrefabInstance:
       value: Virtual Pursuit
       objectReference: {fileID: 0}
     - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
+      propertyPath: vrPlayer
+      value: 
+      objectReference: {fileID: 189920165}
+    - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: Description
       value: Outrun your friends!
       objectReference: {fileID: 0}
@@ -3495,6 +3510,10 @@ PrefabInstance:
       propertyPath: Title
       value: Maze Game
       objectReference: {fileID: 0}
+    - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
+      propertyPath: vrPlayer
+      value: 
+      objectReference: {fileID: 189920165}
     - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: Description
       value: Survive in the maze!
@@ -4874,6 +4893,10 @@ PrefabInstance:
       propertyPath: Title
       value: Icy Ignition
       objectReference: {fileID: 0}
+    - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
+      propertyPath: vrPlayer
+      value: 
+      objectReference: {fileID: 189920165}
     - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: Description
       value: Cast fireballs to blast your friends off the iceberg!
