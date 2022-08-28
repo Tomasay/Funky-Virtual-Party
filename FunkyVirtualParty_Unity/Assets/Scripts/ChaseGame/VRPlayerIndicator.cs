@@ -83,6 +83,12 @@ public class VRPlayerIndicator : MonoBehaviour
             tPos = Target.VRPlayerHeadPos;
         }
         Vector3 direction = player ? player.position - tPos : -tPos;
+        // check if we're null and set
+        if(!player)
+        {
+            player = ClientManagerWeb.instance.LocalPlayer.transform;
+            Debug.Log("Player set: " + player);
+        }
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
