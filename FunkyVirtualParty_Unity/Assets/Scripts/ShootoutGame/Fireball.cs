@@ -44,6 +44,11 @@ public class Fireball : MonoBehaviour
         pool.Add(this);
     }
 
+    private void OnDisable()
+    {
+        pool = null;
+    }
+
     void Update()
     {
         if((hasExploded && explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))

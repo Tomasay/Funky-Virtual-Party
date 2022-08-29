@@ -26,7 +26,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 7.5f;
+        startingSpeed = 10.0f;
 
         base.Awake();
 

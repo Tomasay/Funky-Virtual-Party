@@ -1,16 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ObjectSyncer : MonoBehaviour
 {
     //How often data is sent to be synced
     public float UpdatesPerSecond = 10;
 
+    [Serializable]
     public class ObjectData
     {
-        public Vector3 Position;
-        public Quaternion Rotation;
+        public SerializedVector3 Position;
+        public SerializedQuaternion Rotation;
         public static int objectIndex;
         public int objectID;
 
@@ -30,7 +32,7 @@ public class ObjectSyncer : MonoBehaviour
         currentData.Awake();
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string>("ObjectDataToClient", ReceiveData);
+        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
 #endif
 
 #if !UNITY_WEBGL
@@ -48,11 +50,12 @@ public class ObjectSyncer : MonoBehaviour
         //Rotation
         currentData.Rotation = transform.rotation;
 
-        string json = JsonUtility.ToJson(currentData);
+        //string json = JsonUtility.ToJson(currentData);
+        byte[] bytes = ByteArrayConverter.ObjectToByteArray<ObjectData>(currentData);
 
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", json);
+            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", bytes);
         }
     }
 #endif
@@ -61,6 +64,11 @@ public class ObjectSyncer : MonoBehaviour
     public virtual void ReceiveData(string json)
     {
         ApplyNewData(JsonUtility.FromJson<ObjectData>(json));
+    }
+
+    public void ReceiveData(byte[] arrBytes)
+    {
+        ApplyNewData(ByteArrayConverter.ByteArrayToObject<ObjectData>(arrBytes));
     }
 
     protected virtual void ApplyNewData<T>(T data) where T : ObjectData

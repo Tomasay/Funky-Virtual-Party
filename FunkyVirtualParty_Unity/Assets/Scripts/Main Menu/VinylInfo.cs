@@ -31,6 +31,7 @@ public class VinylInfo : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         Physics.IgnoreCollision(col, vrPlayer.headModel.GetComponent<Collider>());
+        Physics.IgnoreCollision(col, vrPlayer.capsuleColl);
 
         grabbable = GetComponent<Grabbable>();
         grabbable.onHighlight.AddListener(OnHighlight);
