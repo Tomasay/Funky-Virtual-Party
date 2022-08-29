@@ -23,7 +23,7 @@ public class ChaseGameManagerWeb : GameManagerWeb
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
         playerCamera.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
-        playerCamera.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+        playerCamera.LookAt = GameObject.Find("GameManager").GetComponent<GameManagerWeb>().VRPlayerTransform;
     }
 
     void Update()

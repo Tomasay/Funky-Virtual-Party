@@ -16,6 +16,8 @@ public class GameManagerWeb : MonoBehaviour
 
     public Vector3 VRPlayerHeadPos { get => VRPlayer.GetComponent<XRSyncer>().Head.transform.position; }
 
+    public Transform VRPlayerTransform { get => VRPlayer.GetComponent<XRSyncer>().Head.transform; }
+
     private GameState state;
     public GameState State { get => state; set => state = value; }
 
