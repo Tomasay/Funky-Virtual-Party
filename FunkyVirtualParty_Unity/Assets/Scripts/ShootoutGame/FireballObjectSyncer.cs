@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+
 public class FireballObjectSyncer : ObjectSyncer
 {
     [SerializeField] GameObject fireballMesh, fireballTrail;
@@ -17,6 +21,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
     private bool lastActiveSent; //Value of isActive last sent to clients
 
+    [Serializable]
     public class FireballObjectData : ObjectData
     {
         public float currentScale; //Value between 0 and 1
@@ -34,7 +39,7 @@ public class FireballObjectSyncer : ObjectSyncer
         currentFireballData.Awake();
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string>("ObjectDataToClient", ReceiveData);
+        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
 
         //indicator.transform.parent = null;
@@ -122,10 +127,12 @@ public class FireballObjectSyncer : ObjectSyncer
             currentFireballData.boosted = f.boosted;
 
             //Send Data
-            string json = JsonUtility.ToJson(currentFireballData);
+            //string json = JsonUtility.ToJson(currentFireballData);
+            byte[] bytes = ByteArrayConverter.ObjectToByteArray<FireballObjectData>(currentFireballData);
+
             if (ClientManager.instance)
             {
-                ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", json);
+                ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", bytes);
             }
         }
     }
@@ -134,6 +141,11 @@ public class FireballObjectSyncer : ObjectSyncer
     public override void ReceiveData(string json)
     {
         ApplyNewFireballData(JsonUtility.FromJson<FireballObjectData>(json));
+    }
+
+    public void ReceiveData(byte[] arrBytes)
+    {
+        ApplyNewFireballData(ByteArrayConverter.ByteArrayToObject<FireballObjectData>(arrBytes));
     }
 
     protected void ApplyNewFireballData(FireballObjectData data)
