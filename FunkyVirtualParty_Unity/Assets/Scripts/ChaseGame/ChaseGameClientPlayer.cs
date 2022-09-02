@@ -33,6 +33,42 @@ public class ChaseGameClientPlayer : ClientPlayer
         }
     }
 
+    protected override void Update()
+    {
+        if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
+        {
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+
+            //Input should be relative to camera, which is always facing forward from the player
+            Vector3 temp = new Vector3(input.x, 0, input.y);
+            Vector3 inversed = transform.InverseTransformDirection(temp);
+            input = new Vector2(inversed.x, inversed.z);
+
+            if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
+            {
+                ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y);
+            }
+
+            Move(input.x, input.y);
+
+            Vector3 positionDifference = posFromHost - transform.position;
+            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+        }
+        else
+        {
+            transform.Translate(movement * Time.deltaTime);
+        }
+
+        // check if we are below the floor
+        if (transform.position.y < -10 && transform.position.y != posFromHost.y)
+        {
+            transform.position = posFromHost;
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
+
+        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+    }
+
 
     protected override void OnCollisionEnter(Collision collision)
     {
