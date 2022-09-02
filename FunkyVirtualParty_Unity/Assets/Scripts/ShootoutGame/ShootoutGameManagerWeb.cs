@@ -52,7 +52,7 @@ public class ShootoutGameManagerWeb : GameManagerWeb
             case GameState.GameLoop:
                 SetPlayerMovement(true);
                 countingDown = false;
-                timeRemaining -= Time.deltaTime;
+                if (timeRemaining > 0) { timeRemaining -= Time.deltaTime; }
                 gameTimeText.text = FormatTime(timeRemaining);
                 break;
             case GameState.VRPlayerWins:
