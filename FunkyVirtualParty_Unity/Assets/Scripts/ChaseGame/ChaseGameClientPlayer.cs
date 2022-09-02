@@ -14,6 +14,8 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     bool isInWater;
 
+    [SerializeField] Vector2 testInput;
+
     protected override void Start()
     {
         base.Start();
@@ -40,9 +42,27 @@ public class ChaseGameClientPlayer : ClientPlayer
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
             //Input should be relative to camera, which is always facing forward from the player
+
+            //Attempt#1
+            /*
             Vector3 temp = new Vector3(input.x, 0, input.y);
-            Vector3 inversed = transform.InverseTransformDirection(temp);
+            Vector3 inversed = anim.transform.InverseTransformDirection(temp);
             input = new Vector2(inversed.x, inversed.z);
+            */
+
+            //Attempt#2
+            Vector2 forward = new Vector2(anim.transform.forward.x, anim.transform.forward.z);
+            float angle = Vector2.Angle(input, forward);
+            input = Quaternion.AngleAxis(angle, Vector3.forward) * input;
+
+            //Attempt #3
+            /*
+            Vector3 dir = new Vector3(input.x, 0, input.y);
+            Vector3 forward = new Vector3(anim.transform.forward.x, 0, anim.transform.forward.z);
+            float angle = Vector3.Angle(Vector3.forward, forward);
+            Vector3 moveVec = Quaternion.AngleAxis(angle, Vector3.up) * dir;
+            input = new Vector2(moveVec.x, moveVec.z);
+            */
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
