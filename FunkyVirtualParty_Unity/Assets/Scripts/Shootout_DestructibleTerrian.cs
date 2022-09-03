@@ -38,6 +38,8 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
             Destroy(this);
         }
 
+        digger.DeleteAllPersistedData();
+
         ResetHeight();
 
         //digger.ModifyAsyncBuffured(new Vector3(-55, 26, 50), BrushType.Sphere, ActionType.Dig, 0, 1, 4);
