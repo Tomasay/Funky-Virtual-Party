@@ -12,6 +12,7 @@ public class ChaseGameClientPlayer : ClientPlayer
     private bool tackling;
     private float timeTackled = 0;
 
+    float turnSmoothVelocity;
     bool isInWater;
 
     [SerializeField] Vector2 testInput;
@@ -51,18 +52,21 @@ public class ChaseGameClientPlayer : ClientPlayer
             */
 
             //Attempt#2
-            Vector2 forward = new Vector2(anim.transform.forward.x, anim.transform.forward.z);
+            /*Vector2 forward = new Vector2(anim.transform.forward.x, anim.transform.forward.z);
             float angle = Vector2.Angle(input, forward);
             input = Quaternion.AngleAxis(angle, Vector3.forward) * input;
 
             //Attempt #3
-            /*
+            
             Vector3 dir = new Vector3(input.x, 0, input.y);
             Vector3 forward = new Vector3(anim.transform.forward.x, 0, anim.transform.forward.z);
             float angle = Vector3.Angle(Vector3.forward, forward);
             Vector3 moveVec = Quaternion.AngleAxis(angle, Vector3.up) * dir;
-            input = new Vector2(moveVec.x, moveVec.z);
-            */
+            input = new Vector2(moveVec.x, moveVec.z);*/
+
+            // Attempt #4
+            float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y; // + camera eulerAngles y
+            input = (Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward).normalized;
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
