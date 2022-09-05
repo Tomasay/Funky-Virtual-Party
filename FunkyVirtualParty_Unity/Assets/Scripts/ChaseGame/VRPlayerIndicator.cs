@@ -92,11 +92,12 @@ public class VRPlayerIndicator : MonoBehaviour
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
-        tRot.z = -tRot.y + Camera.main.transform.rotation.y;
+        tRot.z = -tRot.y;
         tRot.x = 0;
         tRot.y = 0;
 
-        RectTransform.rotation = tRot;
+        Vector3 forwardAngle = new Vector3(0, 0, Camera.main.transform.eulerAngles.y);
+        RectTransform.rotation = tRot * Quaternion.Euler(forwardAngle);
     }
 
     bool InSight()
