@@ -92,7 +92,7 @@ public class VRPlayerIndicator : MonoBehaviour
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
-        tRot.z = -tRot.y;
+        tRot.z = -tRot.y + Camera.main.transform.rotation.y;
         tRot.x = 0;
         tRot.y = 0;
 
