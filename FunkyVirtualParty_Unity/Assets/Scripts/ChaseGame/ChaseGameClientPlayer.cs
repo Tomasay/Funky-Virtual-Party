@@ -42,10 +42,11 @@ public class ChaseGameClientPlayer : ClientPlayer
             //Input should be relative to camera, which is always facing forward from the player
             if (input.magnitude > 0.1f)
             {
+                float magnitude = input.magnitude;
                 input = input.normalized;
                 float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y; // + camera eulerAngles y
                 Vector3 newInput = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-                input = new Vector2(newInput.x, newInput.z);
+                input = new Vector2(newInput.x, newInput.z) * magnitude;
             }
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
