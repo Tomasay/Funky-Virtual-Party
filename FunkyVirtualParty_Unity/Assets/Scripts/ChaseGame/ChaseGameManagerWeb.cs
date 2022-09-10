@@ -10,6 +10,7 @@ using Cinemachine;
 public class ChaseGameManagerWeb : GameManagerWeb
 {
     [SerializeField] CinemachineFreeLook playerCamera;
+    [SerializeField] Camera cam;
 
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
@@ -24,6 +25,8 @@ public class ChaseGameManagerWeb : GameManagerWeb
         gameTimeText.text = FormatTime(timeRemaining);
         playerCamera.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
         playerCamera.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+
+        (ClientManagerWeb.instance.LocalPlayer as ChaseGameClientPlayer).cam = cam;
     }
 
     void Update()

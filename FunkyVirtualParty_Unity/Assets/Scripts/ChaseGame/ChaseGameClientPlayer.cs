@@ -12,6 +12,8 @@ public class ChaseGameClientPlayer : ClientPlayer
     private bool tackling;
     private float timeTackled = 0;
 
+    public Camera cam;
+
     bool isInWater;
 
     protected override void Start()
@@ -44,7 +46,7 @@ public class ChaseGameClientPlayer : ClientPlayer
             {
                 float magnitude = input.magnitude;
                 input = input.normalized;
-                float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + Camera.main.transform.eulerAngles.y; // + camera eulerAngles y
+                float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + cam.transform.eulerAngles.y; // + camera eulerAngles y
                 Vector3 newInput = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
                 input = new Vector2(newInput.x, newInput.z) * magnitude;
             }
