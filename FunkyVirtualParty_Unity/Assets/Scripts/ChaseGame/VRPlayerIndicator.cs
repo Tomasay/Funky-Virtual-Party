@@ -96,7 +96,7 @@ public class VRPlayerIndicator : MonoBehaviour
         tRot.x = 0;
         tRot.y = 0;
 
-        Vector3 forwardAngle = new Vector3(0, 0, cam.main.transform.eulerAngles.y);
+        Vector3 forwardAngle = new Vector3(0, 0, cam.transform.eulerAngles.y);
         RectTransform.rotation = tRot * Quaternion.Euler(forwardAngle);
     }
 
