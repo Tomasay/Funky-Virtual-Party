@@ -48,7 +48,7 @@ public class VRPlayerIndicator : MonoBehaviour
     private Vector3 tPos = Vector3.zero;
 
     [SerializeField]
-    private Camera camera;
+    private Camera cam;
     private void Start()
     {
             
@@ -96,13 +96,13 @@ public class VRPlayerIndicator : MonoBehaviour
         tRot.x = 0;
         tRot.y = 0;
 
-        Vector3 forwardAngle = new Vector3(0, 0, Camera.main.transform.eulerAngles.y);
+        Vector3 forwardAngle = new Vector3(0, 0, cam.main.transform.eulerAngles.y);
         RectTransform.rotation = tRot * Quaternion.Euler(forwardAngle);
     }
 
     bool InSight()
     {
-        Vector3 ScreenPoint = camera.WorldToScreenPoint(Target.VRPlayerHeadPos);
+        Vector3 ScreenPoint = cam.WorldToScreenPoint(Target.VRPlayerHeadPos);
         return ScreenPoint.z > 0 && ScreenPoint.x > 0 && ScreenPoint.x < 1 && ScreenPoint.y > 0 && ScreenPoint.y < 1;
     }
 }
