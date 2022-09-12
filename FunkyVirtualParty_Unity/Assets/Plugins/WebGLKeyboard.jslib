@@ -55,5 +55,18 @@ mergeInto(LibraryManager.library, {
 	ReloadPage: function ()
 	{
 		window.location.reload();
+	},
+	CheckURLPartyCode: function ()
+	{
+		if(location.search.includes('?partyCode=')){
+			var code = location.search.split('?partyCode=')[1];
+			var bufferSize = lengthBytesUTF8(code) + 1;
+		    var buffer = _malloc(bufferSize);
+		    stringToUTF8(code, buffer, bufferSize);
+			return buffer;
+        }
+		else{
+			return null;
+		}
 	}
 });
