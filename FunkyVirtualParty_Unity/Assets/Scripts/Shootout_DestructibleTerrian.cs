@@ -40,13 +40,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
         ResetHeight();
 
-        CleanTerrain();
-
-        //digger.ModifyAsyncBuffured(new Vector3(-55, 26, 50), BrushType.Sphere, ActionType.Dig, 0, 1, 4);
-    }
-
-    void CleanTerrain()
-    {
+        //Performing empty dig operation on terrain to reset and fix persisting holes bug
         digger.ModifyAsyncBuffured(new Vector3(-55.5f, 27, 50), BrushType.Sphere, ActionType.Dig, 0, 0, 20);
     }
 
