@@ -3097,7 +3097,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Invite your friends to join at <color=#3398FB><u>vrpartygame.herokuapp.com/new</u></color=#3398FB>
+  m_text: Invite your friends to join at <color=#3398FB><u>vrpartygame.herokuapp.com</u></color=#3398FB>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b4ac9673f1cdfad44a7c33366167cf57, type: 2}
   m_sharedMaterial: {fileID: 8470341567610444652, guid: b4ac9673f1cdfad44a7c33366167cf57, type: 2}
@@ -3203,6 +3203,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc9f122b21b2bf4fba754d3d786c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input_field: {fileID: 0}
+  raw_image_qr_code: {fileID: 0}
 --- !u!4 &1311646741
 Transform:
   m_ObjectHideFlags: 0
@@ -3880,6 +3882,10 @@ PrefabInstance:
     - target: {fileID: 376541852131382824, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: m_Name
       value: Vinyl_MazeGame
+      objectReference: {fileID: 0}
+    - target: {fileID: 376541852131382824, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1041015948400364690, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: m_RootOrder

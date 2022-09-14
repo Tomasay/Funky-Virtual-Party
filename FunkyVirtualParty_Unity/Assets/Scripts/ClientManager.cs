@@ -34,7 +34,7 @@ public class ClientManager : MonoBehaviour
 
     SocketManager manager;
     private string unityClientID = "";
-    private const string url = "https://vrpartygame.herokuapp.com/new";
+    private const string url = "https://vrpartygame.herokuapp.com/";
     private const string socketUrl = url + "socket.io/";
 
     private const int PASSCODE_LENGTH = 4;
