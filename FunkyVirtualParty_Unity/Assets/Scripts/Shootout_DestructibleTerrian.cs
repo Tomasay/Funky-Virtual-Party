@@ -47,7 +47,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     void CleanTerrain()
     {
-        digger.ModifyAsyncBuffured(new Vector3(-73, 22, 32.5f), BrushType.Sphere, ActionType.Dig, 0, 0, 20);
+        digger.ModifyAsyncBuffured(new Vector3(-55.5f, 27, 50), BrushType.Sphere, ActionType.Dig, 0, 0, 20);
     }
 
     void MethodCalledFromServer(string methodName, string data)

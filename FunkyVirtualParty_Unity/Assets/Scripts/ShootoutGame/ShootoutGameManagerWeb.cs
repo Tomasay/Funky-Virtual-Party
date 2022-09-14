@@ -34,6 +34,8 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         gameTimeText.text = FormatTime(timeRemaining);
 
         cam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
+
+        ClientManagerWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
     }
 
     void Update()

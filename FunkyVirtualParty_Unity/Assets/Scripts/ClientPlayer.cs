@@ -8,7 +8,8 @@ public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] public Texture2D colorPalette;
     private static List<Color> availableColors; //Colors not used from the available palette
-    [SerializeField] protected TMP_Text playerNameText, playerNameTextBack;
+    [SerializeField] protected TMP_Text playerNameText;
+    [SerializeField] protected TMP_Text playerIndicatorText;
     [SerializeField] SkinnedMeshRenderer smr;
     [SerializeField] protected Animator anim;
     [SerializeField] GameObject spineBone; //Used to change height of player
@@ -38,7 +39,7 @@ public class ClientPlayer : MonoBehaviour
 
     public string PlayerID { get => playerID; set => playerID = value; }
     public string PlayerIP { get => playerIP; set => playerIP = value; }
-    public string PlayerName { get => playerName; set { playerNameText.text = playerNameTextBack.text = playerName = value; } }
+    public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
     public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
     public float PlayerHeight { get => height; set{ height = value; spineBone.transform.localPosition = spinePos + new Vector3(0, height, 0); } }
@@ -286,9 +287,14 @@ public class ClientPlayer : MonoBehaviour
     {
         smr.enabled = active;
         playerNameText.enabled = active;
-        playerNameTextBack.enabled = active;
 
         CanMove = active;
+    }
+
+    //Sets player indicator
+    public void SetPlayerIndicatorVisibility(bool active)
+    {
+        playerIndicatorText.enabled = active;
     }
 
     //Default action, dance of course
