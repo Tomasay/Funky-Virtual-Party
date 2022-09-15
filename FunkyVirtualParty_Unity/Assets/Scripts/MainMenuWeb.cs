@@ -13,6 +13,7 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] GameObject playerNamesList;
     [SerializeField] GameObject playerIconPrefab;
     [SerializeField] GameObject VRPlayer;
+    [SerializeField] GameObject stage;
 
     [SerializeField] Canvas joinRoomCanvas, controllerCanvas;
     [SerializeField] GameObject partyCodeInvalidDebug;
@@ -20,6 +21,8 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] Button submitButton;
 
     [SerializeField] Button enableCustomizationsButton;
+
+    [SerializeField] Image titleBG;
 
     [SerializeField] Material dotsMat;
 
@@ -40,6 +43,7 @@ public class MainMenuWeb : MonoBehaviour
 
         ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
         VRPlayer.SetActive(false);
+        stage.SetActive(false);
 
         //Functionality for spawning new players who enter
         //ClientManagerWeb.instance.onClientConnect += SpawnPlayer;
@@ -53,12 +57,12 @@ public class MainMenuWeb : MonoBehaviour
         if (ClientManagerWeb.instance.Players.Count > 0)
         {
             SwitchToController(null);
-            VRPlayer.SetActive(true);
         }
 
         GetNewBackgroundColors();
 
         Camera.main.backgroundColor = currentBackgroundColor;
+        titleBG.color = currentBackgroundColor;
         dotsMat.color = currentDotsColor;
 
         GetNewBackgroundColors();
@@ -76,6 +80,7 @@ public class MainMenuWeb : MonoBehaviour
 
         Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, currentBackgroundColor, colorChangeSpeed * Time.deltaTime);
         dotsMat.color = Color.Lerp(dotsMat.color, currentDotsColor, colorChangeSpeed * Time.deltaTime);
+        titleBG.color = Color.Lerp(titleBG.color, currentBackgroundColor, colorChangeSpeed * Time.deltaTime);
     }
 
     private void EnableFailedConnectDebug()
@@ -146,6 +151,7 @@ public class MainMenuWeb : MonoBehaviour
     private void SwitchToController(GameObject player)
     {
         VRPlayer.SetActive(true);
+        stage.SetActive(true);
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
