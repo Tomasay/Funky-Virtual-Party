@@ -31,6 +31,9 @@ public class KeyboardController : MonoBehaviour
     [DllImport("__Internal")]
     private static extern string GetNameData();
 
+    [DllImport("__Internal")]
+    private static extern string CheckURLPartyCode();
+
     [SerializeField] TMP_InputField nameField, codeField;
     [SerializeField] ButtonEvents nameFieldButton, codeFieldButton;
 
@@ -53,6 +56,12 @@ public class KeyboardController : MonoBehaviour
         if (storedName != null)
         {
             nameField.text = GetNameData();
+        }
+
+        string URLCode = CheckURLPartyCode();
+        if(URLCode != null)
+        {
+            codeField.text = URLCode;
         }
     }
 

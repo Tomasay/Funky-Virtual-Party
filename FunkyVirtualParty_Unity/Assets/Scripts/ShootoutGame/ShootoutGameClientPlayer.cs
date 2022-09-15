@@ -219,7 +219,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
         iceCube.SetActive(true);
 
         playerNameText.enabled = false;
-        playerNameTextBack.enabled = false;
 
         Col.enabled = false;
         GetComponent<Rigidbody>().useGravity = false;

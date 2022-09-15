@@ -26,6 +26,7 @@ public class TutorialMenuClient : MonoBehaviour
 
         cm.onVRReadyUp += ReadyUpVR;
         cm.onReadyUp += ReadyUp;
+        cm.onClientDisonnect += RemovePlayerIcon;
     }
 
     private void OnDestroy()
@@ -46,6 +47,13 @@ public class TutorialMenuClient : MonoBehaviour
             clientPlayerIcons.Add(cm.Players[i].PlayerID, newPlayerIcon);
         }
     }
+
+    private void RemovePlayerIcon(string id)
+    {
+        Destroy(clientPlayerIcons[id]);
+        clientPlayerIcons.Remove(id);
+    }
+
     public void ReadyUpButtonPressed()
     {
         ReadyUp(ClientManagerWeb.instance.LocalPlayer);

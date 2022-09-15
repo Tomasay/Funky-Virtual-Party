@@ -26,6 +26,7 @@ public class TutorialMenu : MonoBehaviour
         if (ClientManager.instance)
         {
             ClientManager.instance.onReadyUp += ReadyUp;
+            ClientManager.instance.onClientDisonnect += RemovePlayerIcon;
         }
         
         if(VrPlayerReady != null )
@@ -39,6 +40,7 @@ public class TutorialMenu : MonoBehaviour
         if (ClientManager.instance)
         {
             ClientManager.instance.onReadyUp -= ReadyUp;
+            ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
         }
     }
 
@@ -56,6 +58,12 @@ public class TutorialMenu : MonoBehaviour
                 vrPlayerIcons.Add(ClientManager.instance.Players[i].PlayerID, newPlayerIcon);
             }
         }
+    }
+
+    private void RemovePlayerIcon(string id)
+    {
+        Destroy(vrPlayerIcons[id]);
+        vrPlayerIcons.Remove(id);
     }
 
     private void ReadyUp(ClientPlayer p)
