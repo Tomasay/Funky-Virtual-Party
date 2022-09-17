@@ -21,12 +21,15 @@ public class ShootoutGameManager : GameManager
         timeRemaining = GAME_TIME_AMOUNT;
         vrGameTimeText.text = FormatTime(timeRemaining);
 
-        DiggerSocketManagerGetter.instance.manager = ClientManager.instance.Manager;
-
-        foreach (ClientPlayer p in ClientManager.instance.Players)
+        if (ClientManager.instance)
         {
-            ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
-            sp.OnDeath.AddListener(CheckPlayersLeft);
+            DiggerSocketManagerGetter.instance.manager = ClientManager.instance.Manager;
+
+            foreach (ClientPlayer p in ClientManager.instance.Players)
+            {
+                ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
+                sp.OnDeath.AddListener(CheckPlayersLeft);
+            }
         }
     }
 

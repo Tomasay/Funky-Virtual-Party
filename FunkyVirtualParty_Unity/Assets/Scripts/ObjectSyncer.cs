@@ -41,6 +41,13 @@ public class ObjectSyncer : MonoBehaviour
 
     }
 
+    protected void OnDestroy()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("ObjectDataToClient");
+#endif
+    }
+
 #if !UNITY_WEBGL
     protected virtual void SendData()
     {

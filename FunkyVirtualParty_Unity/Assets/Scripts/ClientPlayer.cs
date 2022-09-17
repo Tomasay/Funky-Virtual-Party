@@ -10,10 +10,10 @@ public class ClientPlayer : MonoBehaviour
     private static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] protected TMP_Text playerNameText;
     [SerializeField] protected TMP_Text playerIndicatorText;
-    [SerializeField] SkinnedMeshRenderer smr;
+    [SerializeField] protected SkinnedMeshRenderer smr;
     [SerializeField] protected Animator anim;
-    [SerializeField] GameObject spineBone; //Used to change height of player
-    [SerializeField] Collider col; //Used to change height of player
+    [SerializeField] protected GameObject spineBone; //Used to change height of player
+    [SerializeField] protected Collider col; //Used to change height of player
 
     [SerializeField] public GameObject[] hats;
     [SerializeField] GameObject hatAttachPoint;
@@ -58,7 +58,6 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void Awake()
     {
-        
         //Instantiate list of available colors from palette
         if(availableColors == null)
         {
@@ -110,6 +109,11 @@ public class ClientPlayer : MonoBehaviour
         }
 
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+
+        if (Camera.main)
+        {
+            playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
+        }
     }
 
     public void InitialCustomize()

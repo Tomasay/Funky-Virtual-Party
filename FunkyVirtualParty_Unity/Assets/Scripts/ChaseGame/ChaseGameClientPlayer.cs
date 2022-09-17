@@ -74,6 +74,15 @@ public class ChaseGameClientPlayer : ClientPlayer
         }
 
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+
+#if UNITY_WEBGL
+        playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+#else
+        if (Camera.main)
+        {
+            playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
+        }
+#endif
     }
 
 

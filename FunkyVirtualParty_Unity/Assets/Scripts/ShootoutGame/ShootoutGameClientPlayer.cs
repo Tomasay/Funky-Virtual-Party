@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Cinemachine;
 
 public class ShootoutGameClientPlayer : ClientPlayer
 {
@@ -16,6 +17,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
     float collisionTimer = 0.5f;
     const float collisionTimerDefault = 0.5f;
     Vector2 collisionVector;
+
+    public Camera cam;
 
     [SerializeField] ParticleSystem waterSplash, iceTrail;
 
@@ -42,15 +45,15 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector3 pos = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
             SpawnSplashEffect(pos);
-            //TriggerIceCubeAnimation();
             SetPlayerActive(false);
+            TriggerIceCubeAnimation();
             isAlive = false;
             OnDeath.Invoke();
 
             WaterSplashData data = new WaterSplashData();
             data.splashPos = pos;
             data.playerID = playerID;
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "WaterSplashEvent", JsonUtility.ToJson(data));
+            if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "WaterSplashEvent", JsonUtility.ToJson(data));
         }
     }
 #endif
@@ -83,7 +86,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
             collisionTimer = collisionTimerDefault;
 
             CheckIceTrailVisibility();
-
         }
         else if (IsLocal && isColliding)
         {
@@ -131,6 +133,15 @@ public class ShootoutGameClientPlayer : ClientPlayer
             GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
         anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+
+#if UNITY_WEBGL
+        playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+#else
+        if (Camera.main)
+        {
+            playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
+        }
+#endif
     }
 
     void CheckIceTrailVisibility()
@@ -224,8 +235,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         GetComponent<Rigidbody>().useGravity = false;
         GetComponent<Rigidbody>().isKinematic = true;
 
-        iceCube.GetComponent<Renderer>().material.EnableKeyword("_NORMALMAP");
-        iceCube.GetComponent<Renderer>().material.EnableKeyword("_DETAIL_MULX2");
+        smr.enabled = true;
 
         CanMove = false;
 

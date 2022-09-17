@@ -17,13 +17,12 @@ public class ShootoutGameManagerWeb : GameManagerWeb
 
     [SerializeField] DiggerSystem digger;
 
-    [SerializeField] CinemachineVirtualCamera cam;
+    [SerializeField] CinemachineVirtualCamera cinemachineCam;
+    [SerializeField] Camera cam;
 
     private void Awake()
     {
-#if UNITY_WEBGL
-            ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-#endif
+        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
     }
 
     protected override void Start()
@@ -33,9 +32,14 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
 
-        cam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
+        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
 
         ClientManagerWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
+
+        foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
+        {
+            (cp as ShootoutGameClientPlayer).cam = cam;
+        }
     }
 
     void Update()
@@ -77,7 +81,7 @@ public class ShootoutGameManagerWeb : GameManagerWeb
 
         //Camera offset
         float t = (((ClientManagerWeb.instance.LocalPlayer.transform.position.x - -55) / 17)+1)/2;
-        cam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathOffset = new Vector3(0, 0, Mathf.Lerp(-12, 12, t));
+        cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathOffset = new Vector3(0, 0, Mathf.Lerp(-12, 12, t));
     }
 
     IEnumerator StartCountdownTimer(int countdown)
