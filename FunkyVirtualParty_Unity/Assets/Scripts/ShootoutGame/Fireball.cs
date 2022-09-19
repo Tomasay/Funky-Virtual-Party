@@ -208,6 +208,7 @@ public class Fireball : MonoBehaviour
         isDropped = true;
         isInLeftHand = false;
         isInRightHand = false;
+        chargeIndicator.enabled = false;
     }
 
     private void Reset()
