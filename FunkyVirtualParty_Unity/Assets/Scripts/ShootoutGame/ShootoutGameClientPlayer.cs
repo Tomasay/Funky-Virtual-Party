@@ -186,6 +186,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
             ShootoutGameClientPlayer player = ClientManagerWeb.instance.GetPlayerByID(newData.playerID) as ShootoutGameClientPlayer;
             player.SetPlayerActive(false);
             player.isAlive = false;
+
+            player.TriggerIceCubeAnimation();
         }
     }
 
@@ -225,7 +227,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
     }
 
-    void TriggerIceCubeAnimation()
+    public void TriggerIceCubeAnimation()
     {
         iceCube.SetActive(true);
 

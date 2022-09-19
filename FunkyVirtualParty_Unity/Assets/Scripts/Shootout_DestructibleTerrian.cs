@@ -73,7 +73,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         float[,] heights = ter.terrainData.GetHeights(0, 0, ter.terrainData.heightmapResolution, ter.terrainData.heightmapResolution);
 
         Vector3 explodePos = new Vector3(ray.point.x, ray.point.y - blastDepth, ray.point.z);
-        float fireballSize = Mathf.Max(2, fireball.currentScale * blastRadius);
+        float fireballSize = Mathf.Max(3, fireball.currentScale * blastRadius);
         digger.ModifyAsyncBuffured(explodePos, BrushType.Sphere, ActionType.Dig, 0, 1, fireballSize);
 
         //Send explosion data to clients
