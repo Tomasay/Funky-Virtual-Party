@@ -4,64 +4,77 @@ using UnityEngine;
 
 namespace Autohand{
     public class GrabbablePoseCombiner : MonoBehaviour{
-        public float positionWeight = 1;
-        public float rotationWeight = 1;
-        public GrabbablePose[] poses;
+        public List<GrabbablePose> poses = new List<GrabbablePose>();
 
-        public void Start() {
-            if(poses.Length == 0)
-                poses = GetComponents<GrabbablePose>();
-        }
+        HandPoseData pose;
 
         public bool CanSetPose(Hand hand) {
             foreach(var pose in poses) {
-                if(pose.CanSetPose(hand))
+                if(pose != null && pose.CanSetPose(hand))
                     return true;
             }
             return false;
         }
 
-        public GrabbablePose GetClosestPose(Hand hand, Grabbable grab){
-            if(this.poses.Length == 0)
-                Debug.LogError("AUTO HAND: No poses connected to multi pose", gameObject);
+        public void AddPose(GrabbablePose pose) {
+            if(!poses.Contains(pose))
+                poses.Add(pose);
+        }
 
-            List<GrabbablePose> poses = new List<GrabbablePose>();
+        private void OnDestroy()
+        {
+            for (int i = poses.Count - 1; i >= 0; i--)
+            {
+                Destroy(poses[i]);
+            }
+        }
+
+        public GrabbablePose GetClosestPose(Hand hand){
+            List<GrabbablePose> possiblePoses = new List<GrabbablePose>();
             foreach(var handPose in this.poses)
-                if(handPose.CanSetPose(hand))
-                    poses.Add(handPose);
+                if(handPose != null && handPose.CanSetPose(hand))
+                    possiblePoses.Add(handPose);
             
-            var closestValue = float.MaxValue;
+            float closestValue = float.MaxValue;
             int closestIndex = 0;
 
-            var handParent = hand.transform.parent;
-            hand.transform.parent = grab.transform;
-            Quaternion localRotation = hand.transform.localRotation;
-            Vector3 localPosition = hand.transform.localPosition;
-            hand.transform.parent = handParent;
 
-            var startPose = hand.GetHandPose();
+            for (int i = 0; i < possiblePoses.Count; i++){
+                var pregrabPos = hand.transform.position;
+                var pregrabRot = hand.transform.rotation;
 
-            HandPoseData pose;
-            for(int i = 0; i < poses.Count; i++){
-                startPose.SetPose(hand);
+                var tempContainer = AutoHandExtensions.transformRuler;
+                tempContainer.rotation = Quaternion.identity;
+                tempContainer.position = possiblePoses[i].transform.position;
+                tempContainer.localScale = possiblePoses[i].transform.lossyScale;
 
-                pose = poses[i].GetHandPoseData(hand);
-                pose.SetPose(hand);
+                var handMatch = AutoHandExtensions.transformRulerChild;
+                handMatch.position = hand.transform.position;
+                handMatch.rotation = hand.transform.rotation;
 
-                var distance = Vector3.Distance(pose.handOffset, localPosition);
+                pose = possiblePoses[i].GetHandPoseData(hand);
 
-                localRotation = Quaternion.Inverse(grab.transform.rotation) * hand.transform.rotation;
-                var angleDistance = Quaternion.Angle(pose.localQuaternionOffset, localRotation);
+                handMatch.localPosition = pose.handOffset;
+                handMatch.localRotation = pose.localQuaternionOffset;
 
-                var closenessValue = distance * positionWeight + angleDistance * rotationWeight;
+                var distance = Vector3.Distance(handMatch.position, pregrabPos);
+                var angleDistance = Quaternion.Angle(handMatch.rotation, pregrabRot) / 90f;
+
+                var closenessValue = distance / possiblePoses[i].positionWeight + angleDistance / possiblePoses[i].rotationWeight;
                 if(closenessValue < closestValue) {
                     closestIndex = i;
                     closestValue = closenessValue;
                 }
-                
+
+                hand.transform.position = pregrabPos;
+                hand.transform.rotation = pregrabRot;
             }
 
-            return poses[closestIndex];
+            return possiblePoses[closestIndex];
+        }
+
+        internal int PoseCount() {
+            return poses.Count;
         }
     }
 }

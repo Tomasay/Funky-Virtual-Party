@@ -17,8 +17,6 @@ namespace Autohand{
         Vector3 pressedPos;
         float pressedValue;
 
-        bool isTouchingHandLeft;
-
         new protected void Start(){
             base.Start();
             startPos = transform.localPosition;
@@ -26,27 +24,19 @@ namespace Autohand{
 
 
         protected void FixedUpdate(){
-            if(!pressed && GetValue()+threshold >= 1) {
+            var value = GetValue();
+            if(!pressed && value+threshold >= 1) {
                 Pressed();
             }
-            else if(!lockOnPressed && pressed && GetValue()-threshold <= 0){
+            else if(!lockOnPressed && pressed && value-threshold <= 0){
                 Unpressed();
             }
 
-            if (GetValue() < 0)
+            if (value < 0)
                 transform.localPosition = startPos;
 
-            if (pressed && lockOnPressed && GetValue() + threshold < pressedValue)
+            if (pressed && lockOnPressed && value + threshold < pressedValue)
                 transform.localPosition = pressedPos;
-        }
-
-        protected void OnCollisionEnter(Collision collision)
-        {
-            Hand h;
-            if(collision.gameObject.TryGetComponent<Hand>(out h))
-            {
-                isTouchingHandLeft = h.left;
-            }
         }
 
 
@@ -55,10 +45,6 @@ namespace Autohand{
             pressedValue = GetValue();
             pressedPos = transform.localPosition;
             OnPressed?.Invoke();
-
-            HapticsManager.instance.TriggerHaptic(isTouchingHandLeft);
-
-            Debug.Log("Pressed!");
         }
 
         public void Unpressed(){

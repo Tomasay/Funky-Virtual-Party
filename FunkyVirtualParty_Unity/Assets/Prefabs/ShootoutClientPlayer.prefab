@@ -41,7 +41,7 @@ ParticleSystem:
   m_GameObject: {fileID: 1011533965692479549}
   serializedVersion: 8
   lengthInSec: 0.5
-  simulationSpeed: 1
+  simulationSpeed: 0.75
   stopAction: 0
   cullingMode: 0
   ringBufferMode: 0
@@ -107,7 +107,7 @@ ParticleSystem:
       m_RotationOrder: 4
   moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
-  scalingMode: 1
+  scalingMode: 0
   randomSeed: 0
   InitialModule:
     serializedVersion: 3
@@ -168,7 +168,7 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 4
+      scalar: 10
       minScalar: 5
       maxCurve:
         serializedVersion: 2
@@ -607,7 +607,7 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 1
+      scalar: 0.2
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -666,7 +666,7 @@ ParticleSystem:
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
     donutRadius: 0.2
-    m_Position: {x: 0, y: -0.96, z: 0}
+    m_Position: {x: 0, y: -1.7, z: 0}
     m_Rotation: {x: -90, y: 0, z: 0}
     m_Scale: {x: 0.76, y: 0.5, z: 0.1}
     placementMode: 0
@@ -1595,7 +1595,7 @@ ParticleSystem:
     z:
       serializedVersion: 2
       minMaxState: 0
-      scalar: -2
+      scalar: -7.59
       minScalar: 0
       maxCurve:
         serializedVersion: 2
@@ -4843,12 +4843,13 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   isColliding: 0
+  cam: {fileID: 0}
   waterSplash: {fileID: 5531231052371847848, guid: 60c88e966a0f8324da766221921ee65f, type: 3}
   iceTrail: {fileID: 2732590188110306956}
   iceCube: {fileID: 7032091265331159820}
   isAlive: 1
   prevVector: {x: 0, y: 0}
-  jumpForce: 500
+  jumpForce: 250
   jumpCooldown: 4
 --- !u!1 &7032091265331159820
 GameObject:
@@ -5206,6 +5207,18 @@ PrefabInstance:
     - target: {fileID: 8143653906893471120, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8143653906893471120, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8143653906893471120, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 8143653906893471120, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 8143653906893471120, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_LocalPosition.x

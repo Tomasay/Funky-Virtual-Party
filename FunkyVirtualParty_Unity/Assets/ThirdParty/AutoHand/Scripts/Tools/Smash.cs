@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,6 +10,7 @@ namespace Autohand.Demo{
         [Tooltip("Whether or not to destroy this object on smash")]
         public bool destroyOnSmash = false;
         [Tooltip("Whether or not to release this object on smash")]
+        [HideIf("destroyOnSmash")]
         public bool releaseOnSmash = false;
 
         [Header("Particle Effect")]
@@ -61,8 +63,9 @@ namespace Autohand.Demo{
                     particles = Instantiate(effect, grabbable.transform.position, grabbable.transform.rotation);
                 else
                     particles = effect;
-        
-                effect.Play();
+
+                particles.transform.parent = null;
+                particles.Play();
 
                 Rigidbody rb;
                 if(applyVelocityOnSmash && ((rb = grabbable.body) || gameObject.CanGetComponent(out rb))){

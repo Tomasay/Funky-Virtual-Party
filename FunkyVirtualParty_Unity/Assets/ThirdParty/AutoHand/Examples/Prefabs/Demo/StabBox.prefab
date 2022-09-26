@@ -109,10 +109,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 7239006006343667697}
+  grabbable: {fileID: 0}
   stabIndex: 0
-  maxStabbables: 1
+  maxStabbers: 1
   positionDamper: 1000
   rotationDamper: 1000
+  parentOnStab: 1
   StartStab:
     m_PersistentCalls:
       m_Calls: []
@@ -135,7 +137,6 @@ GameObject:
   - component: {fileID: 7239006006343667699}
   - component: {fileID: 7239006006343667700}
   - component: {fileID: 7239006006343667701}
-  - component: {fileID: 7239006006343667702}
   m_Layer: 0
   m_Name: StabBox
   m_TagString: Untagged
@@ -235,39 +236,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 0}
-  heldPositionOffset: {x: 0, y: 0, z: 0}
-  heldRotationOffset: {x: 0, y: 0, z: 0}
-  releaseOnTeleport: 0
-  throwMultiplyer: 1
-  handType: 0
-  singleHandOnly: 0
-  instantGrab: 0
-  parentOnGrab: 1
-  lockHandOnGrab: 0
-  maintainGrabOffset: 0
-  ignoreReleaseTime: 0.01
   hightlightMaterial: {fileID: 2100000, guid: 5f2dd013d4c137746ad1d43ef197affe, type: 2}
-  pullApartBreakOnly: 1
-  makeChildrenGrabbable: 1
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
+  singleHandOnly: 0
+  allowHeldSwapping: 1
+  instantGrab: 0
+  ignoreWeight: 0
+  maintainGrabOffset: 0
+  parentOnGrab: 1
+  throwPower: 1
   jointBreakForce: 5000
-  jointBreakTorque: 3000
+  showAdvancedSettings: 0
+  grabType: 0
+  handType: 0
+  makeChildrenGrabbable: 1
+  pullApartBreakOnly: 1
+  customGrabJoint: {fileID: 0}
+  ignoreReleaseTime: 0.01
+  grabPriorityWeight: 1
+  jointedBodies: []
+  heldIgnoreColliders: []
+  showEvents: 1
   onGrab:
     m_PersistentCalls:
       m_Calls: []
   onRelease:
     m_PersistentCalls:
       m_Calls: []
+  showAdvancedEvents: 0
   onSqueeze:
     m_PersistentCalls:
       m_Calls: []
   onUnsqueeze:
     m_PersistentCalls:
       m_Calls: []
+  onHighlight:
+    m_PersistentCalls:
+      m_Calls: []
+  onUnhighlight:
+    m_PersistentCalls:
+      m_Calls: []
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
-  hideEvents: 0
+  lockHandOnGrab: 0
+  heldPositionOffset: {x: 0, y: 0, z: 0}
+  heldRotationOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &7239006006343667699
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,6 +326,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  volumeAmp: 0.8
+  velocityAmp: 0.5
+  soundRepeatDelay: 0.2
 --- !u!82 &7239006006343667700
 AudioSource:
   m_ObjectHideFlags: 0
@@ -418,45 +438,3 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000005, y: 1.0000006, z: 1.0000007}
   m_Center: {x: -0.000005722046, y: -0.0000019073486, z: 0.0000019073486}
---- !u!114 &7239006006343667702
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7239006006343667705}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9274dcfa13fb4e84794fc30ca5eab7d4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetable: 1
-  ignoreHighlights: 0
-  targetedMaterial: {fileID: 0}
-  selectedMaterial: {fileID: 0}
-  instantPull: 1
-  archMultiplier: 0.6
-  stopLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  gravitate: 1
-  distanceBeforeGravitation: 0.4
-  gravitationVelocityMultiplier: 1.01
-  rotate: 1
-  rotationSpeed: 5
-  percentDistanceBeforeRotation: 0.12
-  OnPull:
-    m_PersistentCalls:
-      m_Calls: []
-  StartTargeting:
-    m_PersistentCalls:
-      m_Calls: []
-  StopTargeting:
-    m_PersistentCalls:
-      m_Calls: []
-  StartSelecting:
-    m_PersistentCalls:
-      m_Calls: []
-  StopSelecting:
-    m_PersistentCalls:
-      m_Calls: []

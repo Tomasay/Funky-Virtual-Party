@@ -11,5 +11,6 @@ namespace Autohand{
         
         //THIS SCRIPT ALLOWS YOU TO HOLD AN OBJECT AFTER TRIGGER RELEASE AND CALL THIS EVENT WITH TRIGGER PRESS
         public UnityEvent OnGrabPressed;
+
     }
 }

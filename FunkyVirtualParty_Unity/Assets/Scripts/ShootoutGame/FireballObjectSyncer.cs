@@ -17,7 +17,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
     [SerializeField] SpriteRenderer indicator;
     private int maxIndicatorDistance = 20;
-    private int fireballExplosionRange = 10;
+    private int fireballExplosionRange = 1;
 
     private bool lastActiveSent; //Value of isActive last sent to clients
 

@@ -7,6 +7,7 @@ namespace Autohand{
     public class Stabbable : MonoBehaviour{
         public Rigidbody body;
         public Grabbable grabbable;
+
         [Tooltip("The index that must match the stabbers index to allow stabbing")]
         public int stabIndex = 0;
         public int maxStabbers = 1;

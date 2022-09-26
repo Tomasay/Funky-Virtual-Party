@@ -10,23 +10,28 @@ public class ChaseGameVRPlayerController : VRPlayerController
     private float currentHandMovementSpeed;
     [SerializeField] private Image sprintMeter;
 
-    private Vector3 movement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
+    private Vector3 movement, newMovement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;
     private float sprintAmount, minimumSprintPercent = 0.5f;
     private bool handMovement = true, sprintCooldown;
     private float movementCooldown;
     private float walkSpeed;
 
+    private bool inWater;
+
     private void Start()
     {
         sprintAmount = maxSprint;
-        walkSpeed = ahp.moveSpeed;
+        walkSpeed = ahp.maxMoveSpeed;
         currentHandMovementSpeed = handMovementSpeed;
     }
 
     void Update()
     {
-        if(handMovement)
+        Vector3 forward = ahp.headCamera.transform.forward;
+        forward.y = 0;
+
+        if (handMovement)
         {
             handDistance = Vector3.Distance(leftHandPos, ahp.handLeft.transform.localPosition) + Vector3.Distance(rightHandPos, ahp.handRight.transform.localPosition);
 
@@ -34,14 +39,13 @@ public class ChaseGameVRPlayerController : VRPlayerController
             rightHandPos = ahp.handRight.transform.localPosition;
         }
 
-        if (handMovement && !sprintCooldown && /*ahp.handLeft.IsSqueezing() && ahp.handRight.IsSqueezing()*/ handDistance > handMovementThreshold)
+        if (handMovement && !inWater && !sprintCooldown && /*ahp.handLeft.IsSqueezing() && ahp.handRight.IsSqueezing()*/ handDistance > handMovementThreshold)
         {
             movementCooldown = 0;
 
             if (handDistance < 1)
             {
-                movement = Vector3.Lerp(movement, -(forwardDirection.transform.forward * handDistance * currentHandMovementSpeed), 5 * Time.deltaTime);
-                ahp.AddMove(movement);
+                newMovement = (forward * handDistance * 5 * currentHandMovementSpeed);
 
                 sprintAmount = Mathf.Max(sprintAmount - Time.deltaTime, 0);
             }
@@ -54,6 +58,8 @@ public class ChaseGameVRPlayerController : VRPlayerController
         }
         else
         {
+            newMovement = Vector3.zero;
+
             //Player must stop pumping arms for a second to start recharing sprint meter
             movementCooldown += Time.deltaTime;
             if (movementCooldown > 1)
@@ -75,17 +81,23 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
         //Update sprint sprite
         sprintMeter.fillAmount = sprintAmount / maxSprint;
+
+        //Update movement from hands
+        movement = Vector3.Lerp(movement, newMovement, 5 * Time.deltaTime);
+        ahp.transform.parent.Translate(movement);
     }
 
     public void EnteredWater()
     {
-        ahp.moveSpeed = walkSpeed * 0.5f;
+        inWater = true;
+        ahp.maxMoveSpeed = walkSpeed * 0.5f;
         currentHandMovementSpeed = handMovementSpeed * 0.5f;
     }
 
     public void ExitedWater()
     {
-        ahp.moveSpeed = walkSpeed;
+        inWater = false;
+        ahp.maxMoveSpeed = walkSpeed;
         currentHandMovementSpeed = handMovementSpeed;
     }
 }

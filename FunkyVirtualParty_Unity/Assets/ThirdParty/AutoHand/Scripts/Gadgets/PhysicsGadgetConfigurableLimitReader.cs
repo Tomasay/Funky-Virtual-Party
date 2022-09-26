@@ -9,18 +9,19 @@ namespace Autohand{
         [Tooltip("For objects slightly off center. " +
             "\nThe minimum abs value required to return a value nonzero value\n " +
             "- if playRange is 0.1, you have to move the gadget 10% to get a result")]
-        public float playRange = 0.025f; 
+        public float playRange = 0.025f;
         protected ConfigurableJoint joint;
 
         protected Vector3 axisPos;
         float value;
         Vector3 limitAxis;
 
-        protected void Start(){
+        protected virtual void Start(){
             joint = GetComponent<ConfigurableJoint>();
             limitAxis = new Vector3(joint.xMotion == ConfigurableJointMotion.Locked ? 0 : 1, joint.yMotion == ConfigurableJointMotion.Locked ? 0 : 1, joint.zMotion == ConfigurableJointMotion.Locked ? 0 : 1);
             axisPos = Vector3.Scale(transform.localPosition, limitAxis);
         }
+
 
         /// <summary>Returns a -1 to 1 value that represents the point of the slider</summary>
         public float GetValue() {
@@ -40,5 +41,7 @@ namespace Autohand{
                 value = 0;
             return Mathf.Clamp(value, -1f, 1f);
         }
+
+        public ConfigurableJoint GetJoint() => joint;
     }
 }

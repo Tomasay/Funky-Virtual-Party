@@ -20,7 +20,7 @@ namespace Autohand{
         // Start is called before the first frame update
         void Start(){
             collisionGuard.enabled = false;
-            hand.OnHeldConnectionBreak += OnRelease;
+            hand.OnGrabJointBreak += OnRelease;
             hand.OnBeforeGrabbed += BeforeGrab;
         }
 

@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
 
     protected void SetVRPlayerMovement(bool canPlayerMove)
     {
-        VRPlayer.GetComponentInChildren<AutoHandPlayer>().canMove = canPlayerMove;
+        VRPlayer.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
     }
 
     public string FormatTime(float time)

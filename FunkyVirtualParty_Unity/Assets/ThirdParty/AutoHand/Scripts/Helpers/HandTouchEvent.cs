@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.Events;
 
 namespace Autohand{
+    [HelpURL("https://www.notion.so/Touch-Events-1341b3e627dd443a99593ff7f0412aa6")]
     public class HandTouchEvent : MonoBehaviour{
         [Header("For Solid Collision")]
         [Tooltip("Whether or not first hand to enter should take ownership and be the only one to call events")]
         public bool oneHanded = true;
+        public HandType handType = HandType.both;
 
         [Header("Events")]
         public UnityHandEvent HandStartTouch;
@@ -30,6 +32,9 @@ namespace Autohand{
         List<Hand> hands;
 
         public void Touch(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(!hands.Contains(hand)) {
                 if(oneHanded && hands.Count == 0)
                     HandStartTouchEvent?.Invoke(hand);
@@ -41,12 +46,12 @@ namespace Autohand{
         }
         
         public void Untouch(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(hands.Contains(hand)) {
                 if(oneHanded && hands[0] == hand){
                     HandStopTouchEvent?.Invoke(hand);
-                    
-                    if(hands.Count > 1)
-                        HandStartTouchEvent?.Invoke(hand);
                 }
                 else if(!oneHanded){
                     HandStopTouchEvent?.Invoke(hand);

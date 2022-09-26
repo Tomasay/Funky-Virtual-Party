@@ -58,6 +58,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -131,26 +132,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 0}
-  handType: 0
-  ignoreWeight: 0
-  maintainGrabOffset: 0
+  hightlightMaterial: {fileID: 0}
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
   singleHandOnly: 0
   allowHeldSwapping: 1
   instantGrab: 0
+  ignoreWeight: 0
+  maintainGrabOffset: 0
   parentOnGrab: 1
-  throwMultiplyer: 1
-  lookAssistMultiplyer: 1
-  hightlightMaterial: {fileID: 0}
+  throwPower: 1
   jointBreakForce: 1700
   showAdvancedSettings: 0
-  lockHandOnGrab: 0
+  handType: 0
+  grabType: 0
+  useGentleGrab: 0
   makeChildrenGrabbable: 1
-  jointedBodies: []
+  pullApartBreakOnly: 1
+  customGrabJoint: {fileID: 0}
   ignoreReleaseTime: 0.25
-  grabDistancePriority: 1
+  grabPriorityWeight: 1
   heldPositionOffset: {x: 0, y: 0, z: 0}
   heldRotationOffset: {x: 0, y: 0, z: 0}
+  jointedBodies: []
+  heldIgnoreColliders: []
   showEvents: 1
   onGrab:
     m_PersistentCalls:
@@ -158,6 +165,7 @@ MonoBehaviour:
   onRelease:
     m_PersistentCalls:
       m_Calls: []
+  showAdvancedEvents: 0
   onSqueeze:
     m_PersistentCalls:
       m_Calls:
@@ -182,7 +190,6 @@ MonoBehaviour:
   onUnhighlight:
     m_PersistentCalls:
       m_Calls: []
-  pullApartBreakOnly: 1
   OnJointBreak:
     m_PersistentCalls:
       m_Calls:
@@ -198,7 +205,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  isGrabbable: 1
+  lockHandOnGrab: 0
 --- !u!114 &6932398145551033132
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,7 +372,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   source: {fileID: 1516706841087569224}
-  clip: {fileID: 8300000, guid: 7feee639aeb05964e81645f7e7831e1c, type: 3}
+  clip: {fileID: 8300000, guid: 66169591194e7f8479424e3b0136b459, type: 3}
   velocityVolumeCurve:
     serializedVersion: 2
     m_Curve:

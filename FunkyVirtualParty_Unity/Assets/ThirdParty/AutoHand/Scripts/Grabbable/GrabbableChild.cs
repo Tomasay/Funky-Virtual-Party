@@ -13,8 +13,8 @@ namespace Autohand{
 
         private void Start() {
             grabParent.SetGrabbableChild(this);
-            //Delete these layer setters if you want to use your own custom layer set
-            gameObject.layer = grabParent.gameObject.layer;
+            if(gameObject.layer == LayerMask.NameToLayer("Default") || LayerMask.LayerToName(gameObject.layer) == "")
+                gameObject.layer = LayerMask.NameToLayer(Hand.grabbableLayerNameDefault);
         }
     }
 }

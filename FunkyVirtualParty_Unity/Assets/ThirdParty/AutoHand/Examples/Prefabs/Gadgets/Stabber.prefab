@@ -60,7 +60,6 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -117,29 +116,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 0}
-  heldPositionOffset: {x: 0, y: 0, z: 0}
-  heldRotationOffset: {x: 0, y: 0, z: 0}
-  handType: 0
-  ignoreWeight: 1
+  hightlightMaterial: {fileID: 0}
   isGrabbable: 1
+  CopySettings: {fileID: 0}
   singleHandOnly: 0
   allowHeldSwapping: 1
   instantGrab: 0
+  ignoreWeight: 1
   maintainGrabOffset: 0
-  makeChildrenGrabbable: 1
   parentOnGrab: 1
-  lockHandOnGrab: 0
-  grabDistancePriority: 1
-  jointedBodies: []
-  throwMultiplyer: 1
-  throwAngleMultiplyer: 1
-  releaseOnTeleport: 0
+  throwPower: 1
+  jointBreakForce: 7500
+  showAdvancedSettings: 0
+  grabType: 0
+  handType: 0
+  makeChildrenGrabbable: 1
+  pullApartBreakOnly: 1
+  customGrabJoint: {fileID: 0}
   ignoreReleaseTime: 0.25
-  lookAssistMultiplyer: 1
-  hightlightMaterial: {fileID: 0}
-  jointBreakForce: 5000
-  jointBreakTorque: 3000
+  grabPriorityWeight: 1
+  jointedBodies: []
+  heldIgnoreColliders: []
   showEvents: 1
   onGrab:
     m_PersistentCalls:
@@ -147,6 +146,7 @@ MonoBehaviour:
   onRelease:
     m_PersistentCalls:
       m_Calls: []
+  showAdvancedEvents: 0
   onSqueeze:
     m_PersistentCalls:
       m_Calls: []
@@ -159,10 +159,12 @@ MonoBehaviour:
   onUnhighlight:
     m_PersistentCalls:
       m_Calls: []
-  pullApartBreakOnly: 1
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
+  lockHandOnGrab: 0
+  heldPositionOffset: {x: 0, y: 0, z: 0}
+  heldRotationOffset: {x: 0, y: 0, z: 0}
 --- !u!114 &8542799878212124652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,10 +242,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49b27d5a0e0d4dd8ab20e2bed42e835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   poseName: 
   poseIndex: 0
+  showEditorTools: 1
+  poseScriptable: {fileID: 0}
   editorHand: {fileID: 0}
-  useEditorAutoGrab: 1
   rightPose:
     handOffset: {x: 1.153109, y: -0.059428677, z: 0.59961563}
     rotationOffset: {x: 0, y: 0, z: 0}
@@ -340,13 +344,13 @@ MonoBehaviour:
   leftPoseSet: 1
   centerObject: {fileID: 0}
   up: {x: 0, y: 1, z: 0}
+  useInvertPose: 1
   minAngle: 0
   maxAngle: 360
   maxRange: 0.1
   minRange: -0.1
   testAngle: 0
   testRange: 0
-  showGizmos: 1
 --- !u!114 &5048372466115904823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,10 +363,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49b27d5a0e0d4dd8ab20e2bed42e835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   poseName: 
   poseIndex: 0
+  showEditorTools: 1
+  poseScriptable: {fileID: 0}
   editorHand: {fileID: 0}
-  useEditorAutoGrab: 1
   rightPose:
     handOffset: {x: -1.3691629, y: 0.054223742, z: 0.6251161}
     rotationOffset: {x: 0, y: 0, z: 0}
@@ -461,13 +467,13 @@ MonoBehaviour:
   leftPoseSet: 1
   centerObject: {fileID: 0}
   up: {x: 0, y: 1, z: 0}
+  useInvertPose: 1
   minAngle: 0
   maxAngle: 360
   maxRange: 0.1
   minRange: -0.1
   testAngle: 0
   testRange: 0.1
-  showGizmos: 1
 --- !u!114 &5486566030440543045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -480,10 +486,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49b27d5a0e0d4dd8ab20e2bed42e835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   poseName: 
   poseIndex: 1
+  showEditorTools: 1
+  poseScriptable: {fileID: 0}
   editorHand: {fileID: 0}
-  useEditorAutoGrab: 1
   rightPose:
     handOffset: {x: -0.69647425, y: 0.058581103, z: -0.4981376}
     rotationOffset: {x: 0, y: 0, z: 0}
@@ -580,13 +588,13 @@ MonoBehaviour:
   leftPoseSet: 1
   centerObject: {fileID: 0}
   up: {x: 0, y: 1, z: 0}
+  useInvertPose: 1
   minAngle: 0
   maxAngle: 360
   maxRange: 0.1
   minRange: -0.1
   testAngle: 0
   testRange: 0
-  showGizmos: 1
 --- !u!114 &8741336463249146913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -599,10 +607,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49b27d5a0e0d4dd8ab20e2bed42e835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   poseName: 
   poseIndex: 1
+  showEditorTools: 1
+  poseScriptable: {fileID: 0}
   editorHand: {fileID: 0}
-  useEditorAutoGrab: 1
   rightPose:
     handOffset: {x: 0.3513751, y: -0.058793217, z: -0.64698976}
     rotationOffset: {x: 0, y: 0, z: 0}
@@ -701,10 +711,10 @@ MonoBehaviour:
   leftPoseSet: 1
   centerObject: {fileID: 0}
   up: {x: 0, y: 1, z: 0}
+  useInvertPose: 1
   minAngle: 0
   maxAngle: 360
   maxRange: 0.1
   minRange: -0.1
   testAngle: 0
   testRange: 0
-  showGizmos: 1

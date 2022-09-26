@@ -55,6 +55,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -80,6 +81,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &4934991640574632234
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,7 +153,6 @@ GameObject:
   - component: {fileID: 4897143139090113384}
   - component: {fileID: 4934991641699697848}
   - component: {fileID: 4934991641699697849}
-  - component: {fileID: 4934991641699697798}
   - component: {fileID: 4934991641699697799}
   m_Layer: 0
   m_Name: NormalCar
@@ -209,21 +210,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.74, y: 1.3, z: 4.18}
   m_Center: {x: 0, y: 0.57, z: 0}
---- !u!114 &4934991641699697798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5241614997796518354}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87983d197c7792d41bfe8d052530a439, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rightPoint: {fileID: 4934991641882634956}
-  leftPoint: {fileID: 4934991640574632235}
-  editorHand: {fileID: 0}
 --- !u!114 &4934991641699697799
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -236,34 +222,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 4934991641699697848}
-  heldPositionOffset: {x: 0, y: 0, z: 0}
-  heldRotationOffset: {x: 0, y: 0, z: 0}
-  handType: 0
-  singleHandOnly: 1
-  releaseOnTeleport: 0
   hightlightMaterial: {fileID: 0}
-  throwMultiplyer: 1
-  pullApartBreakOnly: 1
-  makeChildrenGrabbable: 0
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
+  singleHandOnly: 1
+  allowHeldSwapping: 1
+  instantGrab: 0
+  ignoreWeight: 0
+  maintainGrabOffset: 0
+  parentOnGrab: 1
+  throwPower: 1
   jointBreakForce: 1000
-  jointBreakTorque: 1000
+  showAdvancedSettings: 0
+  grabType: 0
+  handType: 0
+  makeChildrenGrabbable: 0
+  pullApartBreakOnly: 1
+  customGrabJoint: {fileID: 0}
+  ignoreReleaseTime: 0.5
+  grabPriorityWeight: 1
+  jointedBodies: []
+  heldIgnoreColliders: []
+  showEvents: 1
   onGrab:
     m_PersistentCalls:
       m_Calls: []
   onRelease:
     m_PersistentCalls:
       m_Calls: []
+  showAdvancedEvents: 0
   onSqueeze:
     m_PersistentCalls:
       m_Calls: []
   onUnsqueeze:
     m_PersistentCalls:
       m_Calls: []
+  onHighlight:
+    m_PersistentCalls:
+      m_Calls: []
+  onUnhighlight:
+    m_PersistentCalls:
+      m_Calls: []
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
-  hideEvents: 1
+  lockHandOnGrab: 0
+  heldPositionOffset: {x: 0, y: 0, z: 0}
+  heldRotationOffset: {x: 0, y: 0, z: 0}
 --- !u!1 &5752238226868965108
 GameObject:
   m_ObjectHideFlags: 0
@@ -319,6 +326,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -344,6 +352,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &7250241978822680946
 GameObject:
   m_ObjectHideFlags: 0
@@ -399,6 +408,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -424,6 +434,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &8171461526117795902
 GameObject:
   m_ObjectHideFlags: 0
@@ -479,6 +490,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -508,3 +520,4 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}

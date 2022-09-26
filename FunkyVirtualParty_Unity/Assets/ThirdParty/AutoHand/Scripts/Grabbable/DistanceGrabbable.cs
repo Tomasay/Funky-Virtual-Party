@@ -1,48 +1,52 @@
-using CustomAttributes;
 using NaughtyAttributes;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Autohand{
+    public enum DistanceGrabType {
+        Velocity,
+        Linear
+    }
+
     [RequireComponent(typeof(Grabbable))]
+    [HelpURL("https://earnestrobot.notion.site/Distance-Grabbing-19e4e8b14f00428295eca75fca752787")]
     public class DistanceGrabbable : MonoBehaviour{
-        
+        [AutoHeader("Distance Grabbable")]
+        public bool ignoreMe;
         
         [Header("Pull")]
-        public bool instantPull = false;
+        public bool instantPull = true;
 
-        [Header("Velocity Shoot")]
+
+        public DistanceGrabType grabType;
+
         [Range(0.4f, 1.1f)]
         [Tooltip("Use this to adjust the angle of the arch that the gameobject follows while shooting towards your hand.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public float archMultiplier = .6f;
-
         [Tooltip("Slow down or speed up gravitation to your liking.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public float gravitationVelocity = 1f;
 
 
 
         [Header("Rotation")]
         [Tooltip("This enables rotation which makes the gameobject orient to the rotation of you hand as it moves through the air. All below rotation variables have no use when this is false.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public bool rotate = true;
 
         [Tooltip("Speed that the object orients to the rotation of your hand.")]
-        [HideIf("instantPull")]
+        [ShowIf("grabType", DistanceGrabType.Velocity)]
         public float rotationSpeed = 1;
         
-        [Header("Highlight Options")]
-        [Space, Tooltip("Whether or not to ignore all highlights include default highlights on HandPointGrab")]
-        public bool ignoreHighlights = false;
-        [HideIf("ignoreHighlights"), Tooltip("Highlight targeted material to use - defaults to HandPointGrab materials if none")]
+        [AutoToggleHeader("Enable Highlighting")]
+        [Tooltip("Whether or not to ignore all highlights including default highlights on HandPointGrab")]
+        public bool ignoreHighlights = true;
+        [EnableIf("ignoreHighlights"), Tooltip("Highlight targeted material to use - defaults to HandPointGrab materials if none")]
         public Material targetedMaterial;
-        [HideIf("ignoreHighlights"), Tooltip("Highlight selected material to use - defaults to HandPointGrab materials if none")]
+        [EnableIf("ignoreHighlights"), Tooltip("Highlight selected material to use - defaults to HandPointGrab materials if none")]
         public Material selectedMaterial;
 
-        [Header("Events")]
+        [AutoToggleHeader("Show Events")]
         public bool showEvents = true;
         [ShowIf("showEvents")]
         public UnityHandGrabEvent OnPull;
@@ -64,7 +68,7 @@ namespace Autohand{
         internal Grabbable grabbable;
     
 
-        private Transform Target;
+        private Transform target = null;
         private Vector3 calculatedNecessaryVelocity;
         private bool gravitationEnabled;
         private bool gravitationMethodBegun;
@@ -74,12 +78,13 @@ namespace Autohand{
 
         private void Start() {
             grabbable = GetComponent<Grabbable>();
+            grabbable.OnGrabEvent += (Hand hand, Grabbable grab) => { gravitationEnabled = false; };
             body = grabbable.body;
         }
     
         void FixedUpdate(){
-            if(!instantPull){
-                if (Target == null)
+            if(!instantPull && grabType == DistanceGrabType.Velocity) {
+                if (target == null)
                     return;
 
                 InitialVelocityPushToHand();
@@ -87,13 +92,13 @@ namespace Autohand{
                     FollowHandRotation();
                 if (gravitationEnabled)
                     GravitateTowardsHand();
-                timePassedSincePull += Time.deltaTime;
+                timePassedSincePull += Time.fixedDeltaTime;
             }
         }
 
 
         private void FollowHandRotation(){
-            transform.rotation = Quaternion.Slerp(transform.rotation, Target.rotation, rotationSpeed * Time.fixedDeltaTime); 
+            transform.rotation = Quaternion.Slerp(transform.rotation, target.rotation, rotationSpeed * Time.fixedDeltaTime); 
         }
 
         Vector3 lastGravitationVelocity;
@@ -104,7 +109,7 @@ namespace Autohand{
                     gravitationMethodBegun = true;
                 }
                     
-                lastGravitationVelocity = (Target.position- transform.position).normalized*Time.fixedDeltaTime*gravitationVelocity;
+                lastGravitationVelocity = (target.position- transform.position).normalized*Time.fixedDeltaTime*gravitationVelocity;
                 body.velocity += lastGravitationVelocity*10;
             }
             else{
@@ -117,7 +122,7 @@ namespace Autohand{
             //This way I can ensure that the initial shot with velocity is only shot once
             if (pullStarted){
                 if(archMultiplier > 0)
-                    calculatedNecessaryVelocity = CalculateTrajectoryVelocity(transform.position, Target.transform.position, archMultiplier);
+                    calculatedNecessaryVelocity = CalculateTrajectoryVelocity(transform.position, target.transform.position, archMultiplier);
 
                 timePassedSincePull = 0;
                 body.velocity = calculatedNecessaryVelocity;
@@ -127,7 +132,7 @@ namespace Autohand{
         }
 
         private void OnCollisionEnter(Collision collision){
-            if (timePassedSincePull > 0.5f)
+            if (timePassedSincePull > 0.2f)
             {
                 pullStarted = false;
                 gravitationEnabled = false;
@@ -143,7 +148,7 @@ namespace Autohand{
             return new Vector3(vx, vy, vz);
         }
 
-        public void SetTarget(Transform theObject) { Target = theObject; pullStarted = true; }
-        public void CancelTarget() { Target = null; pullStarted = false; }
+        public void SetTarget(Transform theObject) { target = theObject; pullStarted = true; }
+        public void CancelTarget() { target = null; pullStarted = false; }
     }
 }

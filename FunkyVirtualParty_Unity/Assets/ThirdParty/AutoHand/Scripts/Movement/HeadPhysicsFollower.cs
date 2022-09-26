@@ -14,29 +14,51 @@ namespace Autohand{
         [Header("Follow Settings")]
         public float followStrength = 50f;
         [Tooltip("The maximum allowed distance from the body for the headCamera to still move")]
-        public float maxBodyDistance = 0.5f;
+        //public float maxBodyDistance = 0.5f;
 
         internal SphereCollider headCollider;
         Vector3 startHeadPos;
-        Vector3 startedHeadPos;
         bool started;
-        
-        List<GameObject> collisions;
-        Transform moveTo;
+
+        Transform _moveTo = null;
+        Transform moveTo {
+            get {
+                if(!gameObject.activeInHierarchy)
+                    return null;
+                if(_moveTo == null) {
+                    _moveTo = new GameObject().transform;
+                    _moveTo.transform.rotation = transform.rotation;
+                    _moveTo.rotation = transform.rotation;
+                    _moveTo.name = "HEAD FOLLOW POINT";
+                    _moveTo.parent = AutoHandExtensions.transformParent;
+                }
+
+                return _moveTo;
+            }
+        }
         internal Rigidbody body;
+        CollisionTracker collisionTracker = null;
 
         public void Start() {
-            if(moveTo == null){
-                moveTo = new GameObject().transform;
-                moveTo.name = gameObject.name + " FOLLOW POINT";
-                moveTo.parent = headCamera.transform.parent;
-                moveTo.position = headCamera.transform.transform.position;
-                moveTo.rotation = headCamera.transform.transform.rotation;
-                body = GetComponent<Rigidbody>();
+            if(collisionTracker == null) {
+                collisionTracker = gameObject.AddComponent<CollisionTracker>();
+                collisionTracker.disableTriggersTracking = true;
             }
-            
-            collisions = new List<GameObject>();
-            gameObject.layer = LayerMask.NameToLayer("HandPlayer");
+            body = GetComponent<Rigidbody>();
+            gameObject.layer = LayerMask.NameToLayer(AutoHandPlayer.HandPlayerLayer);
+            transform.position = headCamera.transform.position;
+            transform.rotation = headCamera.transform.rotation;
+            headCollider = GetComponent<SphereCollider>();
+            startHeadPos = headCamera.transform.position;
+        }
+
+
+        internal void Init() {
+            if(collisionTracker == null) {
+                collisionTracker = gameObject.AddComponent<CollisionTracker>();
+                collisionTracker.disableTriggersTracking = true;
+            }
+            gameObject.layer = LayerMask.NameToLayer(AutoHandPlayer.HandPlayerLayer);
             transform.position = headCamera.transform.position;
             transform.rotation = headCamera.transform.rotation;
             headCollider = GetComponent<SphereCollider>();
@@ -55,7 +77,6 @@ namespace Autohand{
                 return;
             
             
-            moveTo.position = headCamera.transform.position;
             MoveTo();
         }
 
@@ -64,28 +85,33 @@ namespace Autohand{
         }
         
         internal virtual void MoveTo() {
+            moveTo.position = headCamera.transform.position;
             var movePos = moveTo.position;
             var distance = Vector3.Distance(movePos, transform.position);
             
             //Sets velocity linearly based on distance from hand
             var vel = (movePos - transform.position).normalized * followStrength * distance;
             body.velocity = vel;
+            lastUpdateTime = Time.realtimeSinceStartup;
         }
 
-        private void OnCollisionEnter(Collision collision) {
-            if(!collisions.Contains(collision.gameObject)) {
-                collisions.Add(collision.gameObject);
+        float lastUpdateTime;
+        protected virtual void Update() {
+            if(CollisionCount() == 0 && moveTo != null && !body.isKinematic) {
+                var deltaTime = (Time.realtimeSinceStartup - lastUpdateTime);
+
+                MoveTo();
+                transform.position = Vector3.MoveTowards(transform.position, moveTo.position, body.velocity.magnitude * deltaTime);
+                body.velocity = Vector3.MoveTowards(body.velocity, Vector3.zero, body.velocity.magnitude * deltaTime);
+                body.position = transform.position;
             }
+
+            lastUpdateTime = Time.realtimeSinceStartup;
         }
 
-        private void OnCollisionExit(Collision collision) {
-            if(collisions.Contains(collision.gameObject)) {
-                collisions.Remove(collision.gameObject);
-            }
-        }
-        
+
         public int CollisionCount() {
-            return collisions.Count;
+            return collisionTracker.collisionCount;
         }
 
     }

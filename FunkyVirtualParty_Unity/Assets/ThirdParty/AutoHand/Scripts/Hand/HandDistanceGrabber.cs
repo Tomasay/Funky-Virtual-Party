@@ -2,20 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using CustomAttributes;
 using NaughtyAttributes;
 
-namespace Autohand{
+namespace Autohand {
     [DefaultExecutionOrder(2)]
-    public class HandDistanceGrabber : MonoBehaviour{
+    [HelpURL("https://earnestrobot.notion.site/Distance-Grabbing-19e4e8b14f00428295eca75fca752787")]
+    public class HandDistanceGrabber : MonoBehaviour {
         [Header("Hands")]
         [Tooltip("The primaryHand used to trigger pulling or flicking")]
         public Hand primaryHand;
         [Tooltip("This is important for catch assistance")]
         public Hand secondaryHand;
 
-        [Header("Grabbable")]
-        [Header("Pointer Options")]
+        [Header("Pointing Options")]
         public Transform forwardPointer;
         public LineRenderer line;
         [Space]
@@ -34,12 +33,12 @@ namespace Autohand{
 
 
         [Tooltip("The magnitude of your hands angular velocity for \"flick\" to start")]
-        [ConditionalHide("useFlickPull")]
-        public float flickThreshold = 7f; 
+        [ShowIf("useFlickPull")]
+        public float flickThreshold = 7f;
 
-        
+
         [Tooltip("The amount you need to move your hand from the select position to trigger the grab")]
-        [ConditionalShow("useFlickPull")]
+        [HideIf("useFlickPull")]
         public float pullGrabDistance = 0.1f;
 
         [Space]
@@ -48,28 +47,26 @@ namespace Autohand{
         [Tooltip("The radius around of thrown object")]
         public float catchAssistRadius = 0.2f;
 
-        [Space]
-        [Foldout("Events")]
+        [AutoToggleHeader("Show Events")]
+        public bool showEvents = true;
+
+        [ShowIf("showEvents")]
         public UnityHandGrabEvent OnPull;
-        [Space]
-        [Space]
-        [Foldout("Events")]
+        [ShowIf("showEvents")]
         public UnityHandEvent StartPoint;
-        [Foldout("Events")]
+        [ShowIf("showEvents")]
         public UnityHandEvent StopPoint;
-        [Space]
-        [Space]
-        [Foldout("Events")]
+        [ShowIf("showEvents"), Tooltip("Targeting is started when object is highlighted")]
         public UnityHandGrabEvent StartTarget;
-        [Foldout("Events")]
+        [ShowIf("showEvents")]
         public UnityHandGrabEvent StopTarget;
-        [Space]
-        [Space]
-        [Foldout("Events")]
+        [ Tooltip("Selecting is started when grab is selected on highlight object")]
+        [ShowIf("showEvents")]
         public UnityHandGrabEvent StartSelect;
-        [Foldout("Events")]
+        [ShowIf("showEvents")]
         public UnityHandGrabEvent StopSelect;
-        
+
+
         List<CatchAssistData> catchAssisted;
 
         DistanceGrabbable targetingDistanceGrabbable;
@@ -91,58 +88,56 @@ namespace Autohand{
         private DistanceGrabbable catchAsistGrabbable;
         private CatchAssistData catchAssistData;
 
-        GameObject hitPoint { 
+        GameObject hitPoint {
             get {
-                if (!gameObject.activeInHierarchy)
+                if(!gameObject.activeInHierarchy)
                     return null;
 
-                if (_hitPoint == null){
+                if(_hitPoint == null) {
                     _hitPoint = new GameObject();
                     _hitPoint.name = "Distance Hit Point";
                     return _hitPoint;
                 }
 
                 return _hitPoint;
-            } 
+            }
         }
 
-        void Start(){
+        void Start() {
             catchAssisted = new List<CatchAssistData>();
             if(layers == 0)
                 layers = LayerMask.GetMask(Hand.grabbableLayerNameDefault);
-
-            startLookAssist = primaryHand.lookAssistSpeed;
 
             if(useInstantPull)
                 SetInstantPull();
         }
 
-        private void OnEnable(){
+        private void OnEnable() {
             primaryHand.OnTriggerGrab += TryCatchAssist;
             if(secondaryHand != null)
                 secondaryHand.OnTriggerGrab += TryCatchAssist;
             primaryHand.OnBeforeGrabbed += (hand, grabbable) => { StopPointing(); CancelSelect(); };
-            
+
         }
 
-        private void OnDisable(){
+        private void OnDisable() {
             primaryHand.OnTriggerGrab -= TryCatchAssist;
-            if (secondaryHand != null)
+            if(secondaryHand != null)
                 secondaryHand.OnTriggerGrab -= TryCatchAssist;
             primaryHand.OnBeforeGrabbed -= (hand, grabbable) => { StopPointing(); CancelSelect(); };
 
-            if(catchAssistRoutine != null){
+            if(catchAssistRoutine != null) {
                 StopCoroutine(catchAssistRoutine);
                 catchAssistRoutine = null;
-                catchAsistGrabbable.grabbable.OnGrabEvent -= (hand, grabbable) => { if (catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
-                catchAsistGrabbable.OnPullCanceled -= (hand, grabbable) => { if (catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
+                catchAsistGrabbable.grabbable.OnGrabEvent -= (hand, grabbable) => { if(catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
+                catchAsistGrabbable.OnPullCanceled -= (hand, grabbable) => { if(catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
             }
         }
 
         void Update() {
             CheckDistanceGrabbable();
-            if (lastInstantPull != useInstantPull) {
-                if (useInstantPull) {
+            if(lastInstantPull != useInstantPull) {
+                if(useInstantPull) {
                     useFlickPull = false;
                     pullGrabDistance = 0;
                 }
@@ -150,10 +145,10 @@ namespace Autohand{
             }
         }
 
-        private void OnDestroy(){
+        private void OnDestroy() {
             Destroy(hitPoint);
         }
-        public void SetInstantPull(){
+        public void SetInstantPull() {
             useInstantPull = true;
         }
 
@@ -171,22 +166,28 @@ namespace Autohand{
 
 
         void CheckDistanceGrabbable() {
-            if(!pulling && pointing && primaryHand.holdingObj == null){
+            if(!pulling && pointing && primaryHand.holdingObj == null) {
                 bool didHit = Physics.SphereCast(forwardPointer.position, 0.03f, forwardPointer.forward, out hit, maxRange, layers);
                 DistanceGrabbable hitGrabbable;
                 GrabbableChild hitGrabbableChild;
                 if(didHit) {
                     if(hit.transform.CanGetComponent(out hitGrabbable)) {
-                        if(hitGrabbable != targetingDistanceGrabbable) {
+                        if(targetingDistanceGrabbable == null || hitGrabbable.GetInstanceID() != targetingDistanceGrabbable.GetInstanceID())
+                        {
                             StartTargeting(hitGrabbable);
                         }
                     }
                     else if(hit.transform.CanGetComponent(out hitGrabbableChild)) {
                         if(hitGrabbableChild.grabParent.transform.CanGetComponent(out hitGrabbable)) {
-                            if(hitGrabbable != targetingDistanceGrabbable) {
+                            if(targetingDistanceGrabbable == null || hitGrabbable.GetInstanceID() != targetingDistanceGrabbable.GetInstanceID())
+                            {
                                 StartTargeting(hitGrabbable);
                             }
                         }
+                    }
+                    else if(targetingDistanceGrabbable != null && hit.transform.gameObject.GetInstanceID() != targetingDistanceGrabbable.gameObject.GetInstanceID())
+                    {
+                        StopTargeting();
                     }
                 }
                 else {
@@ -196,39 +197,37 @@ namespace Autohand{
                 if(line != null) {
                     if(didHit) {
                         line.positionCount = 2;
-                        line.SetPositions(new Vector3[]{forwardPointer.position, hit.point});
+                        line.SetPositions(new Vector3[] { forwardPointer.position, hit.point });
                     }
-                    else{
+                    else {
                         line.positionCount = 2;
-                        line.SetPositions(new Vector3[]{forwardPointer.position, forwardPointer.position + forwardPointer.forward*maxRange});
+                        line.SetPositions(new Vector3[] { forwardPointer.position, forwardPointer.position + forwardPointer.forward * maxRange });
                     }
                 }
             }
             else if(pulling && primaryHand.holdingObj == null) {
-                if(useFlickPull){
+                if(useFlickPull) {
                     TryFlickPull();
                 }
-                else{
+                else {
                     TryDistancePull();
                 }
             }
-            else if(targetingDistanceGrabbable != null){
+            else if(targetingDistanceGrabbable != null) {
                 StopTargeting();
             }
         }
 
-        
 
 
-        public virtual void StartPointing(){
+
+        public virtual void StartPointing() {
             pointing = true;
-            primaryHand.lookAssistSpeed = 0;
             StartPoint?.Invoke(primaryHand);
         }
 
         public virtual void StopPointing() {
             pointing = false;
-            primaryHand.lookAssistSpeed = startLookAssist;
             if(line != null) {
                 line.positionCount = 0;
                 line.SetPositions(new Vector3[0]);
@@ -240,7 +239,7 @@ namespace Autohand{
 
 
         public virtual void StartTargeting(DistanceGrabbable target) {
-            if(target.enabled && primaryHand.CanGrab(target.grabbable)){
+            if(target.enabled && primaryHand.CanGrab(target.grabbable)) {
                 if(targetingDistanceGrabbable != null)
                     StopTargeting();
                 targetingDistanceGrabbable = target;
@@ -251,7 +250,7 @@ namespace Autohand{
         }
 
         public virtual void StopTargeting() {
-            targetingDistanceGrabbable?.grabbable.Unhighlight(primaryHand);
+            targetingDistanceGrabbable?.grabbable.Unhighlight(primaryHand, GetTargetedMaterial(targetingDistanceGrabbable));
             targetingDistanceGrabbable?.StopTargeting?.Invoke(primaryHand, targetingDistanceGrabbable.grabbable);
             if(targetingDistanceGrabbable != null)
                 StopTarget?.Invoke(primaryHand, targetingDistanceGrabbable.grabbable);
@@ -259,20 +258,20 @@ namespace Autohand{
                 StopTarget?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
             targetingDistanceGrabbable = null;
         }
-        
+
         public virtual void SelectTarget() {
-            if(targetingDistanceGrabbable != null){
+            if(targetingDistanceGrabbable != null) {
                 pulling = true;
                 startPullPosition = primaryHand.transform.localPosition;
                 lastRotation = transform.rotation;
                 selectionHit = hit;
-                if (catchAssistRoutine == null){
+                if(catchAssistRoutine == null) {
                     hitPoint.transform.position = selectionHit.point;
                     hitPoint.transform.parent = selectionHit.transform;
                 }
                 selectingDistanceGrabbable = targetingDistanceGrabbable;
                 selectedEstimatedRadius = Vector3.Distance(hitPoint.transform.position, selectingDistanceGrabbable.transform.position);
-                selectingDistanceGrabbable.grabbable.Unhighlight(primaryHand);
+                selectingDistanceGrabbable.grabbable.Unhighlight(primaryHand, GetTargetedMaterial(selectingDistanceGrabbable));
                 selectingDistanceGrabbable.grabbable.Highlight(primaryHand, GetSelectedMaterial(selectingDistanceGrabbable));
                 selectingDistanceGrabbable?.StartSelecting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
                 targetingDistanceGrabbable?.StopTargeting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
@@ -281,39 +280,57 @@ namespace Autohand{
                 StopPointing();
             }
         }
-        
+
         public virtual void CancelSelect() {
             StopTargeting();
             pulling = false;
-            selectingDistanceGrabbable?.grabbable.Unhighlight(primaryHand);
-            selectingDistanceGrabbable?.StopSelecting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable); 
-            if (selectingDistanceGrabbable != null)
+            selectingDistanceGrabbable?.grabbable.Unhighlight(primaryHand, GetSelectedMaterial(selectingDistanceGrabbable));
+            selectingDistanceGrabbable?.StopSelecting?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
+            if(selectingDistanceGrabbable != null)
                 StopSelect?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
             selectingDistanceGrabbable = null;
         }
 
-        public virtual void ActivatePull(){
-            if(selectingDistanceGrabbable){
+        public virtual void ActivatePull() {
+            if(selectingDistanceGrabbable) {
                 OnPull?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
                 selectingDistanceGrabbable.OnPull?.Invoke(primaryHand, selectingDistanceGrabbable.grabbable);
-                if(selectingDistanceGrabbable.instantPull){ 
+                if(selectingDistanceGrabbable.instantPull) {
                     selectingDistanceGrabbable.grabbable.body.velocity = Vector3.zero;
                     selectingDistanceGrabbable.grabbable.body.angularVelocity = Vector3.zero;
                     selectionHit.point = hitPoint.transform.position;
+                    if (selectingDistanceGrabbable.grabbable.placePoint != null)
+                        selectingDistanceGrabbable.grabbable.placePoint.Remove();
                     primaryHand.Grab(selectionHit, selectingDistanceGrabbable.grabbable);
                     CancelSelect();
                     selectingDistanceGrabbable?.CancelTarget();
                 }
-                else{
+                else if(selectingDistanceGrabbable.grabType == DistanceGrabType.Velocity) {
                     catchAssistRoutine = StartCoroutine(StartCatchAssist(selectingDistanceGrabbable, selectedEstimatedRadius));
                     catchAsistGrabbable = selectingDistanceGrabbable;
+                    if (selectingDistanceGrabbable.grabbable.placePoint != null)
+                    {
+                        
+                        selectingDistanceGrabbable.grabbable.placePoint.Remove();
+                    }
                     selectingDistanceGrabbable.SetTarget(primaryHand.palmTransform);
                 }
+                else if(selectingDistanceGrabbable.grabType == DistanceGrabType.Linear) {
+                    selectingDistanceGrabbable.grabbable.body.velocity = Vector3.zero;
+                    selectingDistanceGrabbable.grabbable.body.angularVelocity = Vector3.zero;
+                    selectionHit.point = hitPoint.transform.position;
+                    if (selectingDistanceGrabbable.grabbable.placePoint != null)
+                        selectingDistanceGrabbable.grabbable.placePoint.Remove();
+                    primaryHand.Grab(selectionHit, selectingDistanceGrabbable.grabbable, GrabType.GrabbableToHand);
+                    CancelSelect();
+                    selectingDistanceGrabbable?.CancelTarget();
 
-                CancelSelect();
+                }
+
+                    CancelSelect();
             }
         }
-        
+
 
         void TryDistancePull() {
             if(Vector3.Distance(startPullPosition, primaryHand.transform.localPosition) > pullGrabDistance) {
@@ -321,7 +338,7 @@ namespace Autohand{
             }
         }
 
-        void TryFlickPull(){
+        void TryFlickPull() {
             Quaternion deltaRotation = transform.rotation * Quaternion.Inverse(lastRotation);
             lastRotation = transform.rotation;
             var getAngle = 0f;
@@ -329,37 +346,35 @@ namespace Autohand{
             deltaRotation.ToAngleAxis(out getAngle, out getAxis);
             getAngle *= Mathf.Deg2Rad;
             float speed = (getAxis * getAngle * (1f / Time.deltaTime)).magnitude;
-            
-            if (speed > flickThreshold){
-                if(selectingDistanceGrabbable){
+
+            if(speed > flickThreshold || useInstantPull) {
+                if(selectingDistanceGrabbable) {
                     ActivatePull();
                 }
             }
         }
 
 
-        
+
 
         Material GetSelectedMaterial(DistanceGrabbable grabbable) {
             if(grabbable.ignoreHighlights)
                 return null;
-            return grabbable.selectedMaterial != null ? grabbable.selectedMaterial : defaultSelectedMaterial; 
+            return grabbable.selectedMaterial != null ? grabbable.selectedMaterial : defaultSelectedMaterial;
         }
         Material GetTargetedMaterial(DistanceGrabbable grabbable) {
             if(grabbable.ignoreHighlights)
                 return null;
-            return grabbable.selectedMaterial != null ? grabbable.targetedMaterial : defaultTargetedMaterial; 
+            return grabbable.selectedMaterial != null ? grabbable.targetedMaterial : defaultTargetedMaterial;
         }
 
         void TryCatchAssist(Hand hand, Grabbable grab) {
             for(int i = 0; i < catchAssisted.Count; i++) {
-
-                var distance = Vector3.Distance(hand.palmTransform.position+ hand.palmTransform.forward*catchAssistRadius, catchAssisted[i].grab.transform.position)-catchAssisted[i].estimatedRadius;
+                var distance = Vector3.Distance(hand.palmTransform.position + hand.palmTransform.forward * catchAssistRadius, catchAssisted[i].grab.transform.position) - catchAssisted[i].estimatedRadius;
                 if(distance < catchAssistRadius) {
-                    Ray ray = new Ray(hand.palmTransform.position, hitPoint.transform.position-hand.palmTransform.position);
-                    if(Physics.SphereCast(ray, 0.03f, out var catchHit, catchAssistRadius*2, LayerMask.GetMask(Hand.grabbableLayerNameDefault, Hand.grabbingLayerName))){
-                        if(catchHit.transform.gameObject == catchAssisted[i].grab.gameObject)
-                        {
+                    Ray ray = new Ray(hand.palmTransform.position, hitPoint.transform.position - hand.palmTransform.position);
+                    if(Physics.SphereCast(ray, 0.03f, out var catchHit, catchAssistRadius * 2, LayerMask.GetMask(Hand.grabbableLayerNameDefault, Hand.grabbingLayerName))) {
+                        if(catchHit.transform.gameObject == catchAssisted[i].grab.gameObject) {
                             catchAssisted[i].grab.body.velocity = Vector3.zero;
                             catchAssisted[i].grab.body.angularVelocity = Vector3.zero;
                             hand.Grab(catchHit, catchAssisted[i].grab);
@@ -377,27 +392,24 @@ namespace Autohand{
             grab.grabbable.OnGrabEvent += (hand, grabbable) => { if(catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
             grab.OnPullCanceled += (hand, grabbable) => { if(catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
 
-            if (instantGrabAssist){
+            if(instantGrabAssist) {
                 bool cancelInstantGrab = false;
                 var time = 0f;
                 primaryHand.OnTriggerRelease += (hand, grabbable) => { cancelInstantGrab = true; };
 
-                while (time < catchAssistSeconds && !cancelInstantGrab){
+                while(time < catchAssistSeconds && !cancelInstantGrab) {
                     time += Time.fixedDeltaTime;
 
-                    if (TryCatch(primaryHand))
+                    if(TryCatch(primaryHand))
                         break;
 
-                    bool TryCatch(Hand hand){
+                    bool TryCatch(Hand hand) {
                         var distance = Vector3.Distance(hand.palmTransform.position + hand.palmTransform.forward * catchAssistRadius, grab.transform.position) - estimatedRadius;
-                        if (distance < catchAssistRadius)
-                        {
+                        if(distance < catchAssistRadius) {
                             Ray ray = new Ray(hand.palmTransform.position, hitPoint.transform.position - hand.palmTransform.position);
                             var hits = Physics.SphereCastAll(ray, 0.03f, catchAssistRadius * 2, LayerMask.GetMask(Hand.grabbableLayerNameDefault, Hand.grabbingLayerName));
-                            for (int i = 0; i < hits.Length; i++)
-                            {
-                                if (hits[i].transform.gameObject == grab.gameObject)
-                                {
+                            for(int i = 0; i < hits.Length; i++) {
+                                if(hits[i].transform.gameObject == grab.gameObject) {
                                     grab.grabbable.body.velocity = Vector3.zero;
                                     grab.grabbable.body.angularVelocity = Vector3.zero;
                                     hand.Grab(hits[i], grab.grabbable);
@@ -424,13 +436,13 @@ namespace Autohand{
             grab.OnPullCanceled -= (hand, grabbable) => { if(catchAssisted.Contains(catchAssistData)) catchAssisted.Remove(catchAssistData); };
             if(catchAssisted.Contains(catchAssistData))
                 catchAssisted.Remove(catchAssistData);
-            
+
             catchAssistRoutine = null;
         }
 
         private void OnDrawGizmosSelected() {
             if(primaryHand)
-                Gizmos.DrawWireSphere(primaryHand.palmTransform.position + primaryHand.palmTransform.forward*catchAssistRadius*4/5f + primaryHand.palmTransform.up*catchAssistRadius*1/4f, catchAssistRadius);
+                Gizmos.DrawWireSphere(primaryHand.palmTransform.position + primaryHand.palmTransform.forward * catchAssistRadius * 4 / 5f + primaryHand.palmTransform.up * catchAssistRadius * 1 / 4f, catchAssistRadius);
         }
     }
 

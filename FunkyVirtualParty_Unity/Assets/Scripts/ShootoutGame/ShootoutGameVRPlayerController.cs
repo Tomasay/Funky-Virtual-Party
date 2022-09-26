@@ -40,8 +40,17 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         Fireball fireball = hand.left ? currentFireballLeft.GetComponent<Fireball>() : currentFireballRight.GetComponent<Fireball>();
         fireball.col.enabled = true;
         fireball.constraint.enabled = false;
+        fireball.rb.isKinematic = false;
 
-        hand.TryGrab(hand.left ? currentFireballLeft.GetComponent<Grabbable>() : currentFireballRight.GetComponent<Grabbable>());
+        Vector3 dir = (fireball.transform.position - hand.transform.position).normalized;
+        Physics.Raycast(hand.transform.position, dir, out RaycastHit hit, 10);
+
+        if (hit.collider.TryGetComponent<Grabbable>(out Grabbable g))
+        {
+            hand.Grab(hit, g);
+        }
+
+        //hand.TryGrab(hand.left ? currentFireballLeft.GetComponent<Grabbable>() : currentFireballRight.GetComponent<Grabbable>());
 
         if (hand.left)
         {

@@ -17,7 +17,8 @@ public class XRSyncer : MonoBehaviour
 
     //References
     [SerializeField] GameObject head;
-    [SerializeField] Hand leftHand, rightHand;
+    [SerializeField] GameObject leftHand, rightHand;
+    [SerializeField] Finger[] leftFingers, rightFingers;
 
     public GameObject Head { get => head;}
 
@@ -62,17 +63,17 @@ public class XRSyncer : MonoBehaviour
         rightHand.transform.rotation = Quaternion.Lerp(rightHand.transform.rotation, currentData.RightHandRotation, t);
 
         //Fingies
-        leftHand.fingers[0].SetFingerBend(Mathf.Lerp(leftHand.fingers[0].GetCurrentBend(), currentData.LeftThumbBend, t));
-        leftHand.fingers[1].SetFingerBend(Mathf.Lerp(leftHand.fingers[1].GetCurrentBend(), currentData.LeftIndexBend, t));
-        leftHand.fingers[2].SetFingerBend(Mathf.Lerp(leftHand.fingers[2].GetCurrentBend(), currentData.LeftMiddleBend, t));
-        leftHand.fingers[3].SetFingerBend(Mathf.Lerp(leftHand.fingers[3].GetCurrentBend(), currentData.LeftRingBend, t));
-        leftHand.fingers[4].SetFingerBend(Mathf.Lerp(leftHand.fingers[4].GetCurrentBend(), currentData.LeftPinkyBend, t));
+        leftFingers[0].SetFingerBend(Mathf.Lerp(leftFingers[0].GetCurrentBend(), currentData.LeftThumbBend, t));
+        leftFingers[1].SetFingerBend(Mathf.Lerp(leftFingers[1].GetCurrentBend(), currentData.LeftIndexBend, t));
+        leftFingers[2].SetFingerBend(Mathf.Lerp(leftFingers[2].GetCurrentBend(), currentData.LeftMiddleBend, t));
+        leftFingers[3].SetFingerBend(Mathf.Lerp(leftFingers[3].GetCurrentBend(), currentData.LeftRingBend, t));
+        leftFingers[4].SetFingerBend(Mathf.Lerp(leftFingers[4].GetCurrentBend(), currentData.LeftPinkyBend, t));
 
-        rightHand.fingers[0].SetFingerBend(Mathf.Lerp(rightHand.fingers[0].GetCurrentBend(), currentData.RightThumbBend, t));
-        rightHand.fingers[1].SetFingerBend(Mathf.Lerp(rightHand.fingers[1].GetCurrentBend(), currentData.RightIndexBend, t));
-        rightHand.fingers[2].SetFingerBend(Mathf.Lerp(rightHand.fingers[2].GetCurrentBend(), currentData.RightMiddleBend, t));
-        rightHand.fingers[3].SetFingerBend(Mathf.Lerp(rightHand.fingers[3].GetCurrentBend(), currentData.RightRingBend, t));
-        rightHand.fingers[4].SetFingerBend(Mathf.Lerp(rightHand.fingers[4].GetCurrentBend(), currentData.RightPinkyBend, t));
+        rightFingers[0].SetFingerBend(Mathf.Lerp(rightFingers[0].GetCurrentBend(), currentData.RightThumbBend, t));
+        rightFingers[1].SetFingerBend(Mathf.Lerp(rightFingers[1].GetCurrentBend(), currentData.RightIndexBend, t));
+        rightFingers[2].SetFingerBend(Mathf.Lerp(rightFingers[2].GetCurrentBend(), currentData.RightMiddleBend, t));
+        rightFingers[3].SetFingerBend(Mathf.Lerp(rightFingers[3].GetCurrentBend(), currentData.RightRingBend, t));
+        rightFingers[4].SetFingerBend(Mathf.Lerp(rightFingers[4].GetCurrentBend(), currentData.RightPinkyBend, t));
 #endif
     }
 
@@ -99,17 +100,17 @@ public class XRSyncer : MonoBehaviour
         currentData.RightHandRotation = rightHand.transform.rotation;
 
         //Fingies
-        currentData.LeftThumbBend = leftHand.fingers[0].GetCurrentBend();
-        currentData.LeftIndexBend = leftHand.fingers[1].GetCurrentBend();
-        currentData.LeftMiddleBend = leftHand.fingers[2].GetCurrentBend();
-        currentData.LeftRingBend = leftHand.fingers[3].GetCurrentBend();
-        currentData.LeftPinkyBend = leftHand.fingers[4].GetCurrentBend();
+        currentData.LeftThumbBend = leftFingers[0].GetCurrentBend();
+        currentData.LeftIndexBend = leftFingers[1].GetCurrentBend();
+        currentData.LeftMiddleBend = leftFingers[2].GetCurrentBend();
+        currentData.LeftRingBend = leftFingers[3].GetCurrentBend();
+        currentData.LeftPinkyBend = leftFingers[4].GetCurrentBend();
 
-        currentData.RightThumbBend = rightHand.fingers[0].GetCurrentBend();
-        currentData.RightIndexBend = rightHand.fingers[1].GetCurrentBend();
-        currentData.RightMiddleBend = rightHand.fingers[2].GetCurrentBend();
-        currentData.RightRingBend = rightHand.fingers[3].GetCurrentBend();
-        currentData.RightPinkyBend = rightHand.fingers[4].GetCurrentBend();
+        currentData.RightThumbBend = rightFingers[0].GetCurrentBend();
+        currentData.RightIndexBend = rightFingers[1].GetCurrentBend();
+        currentData.RightMiddleBend = rightFingers[2].GetCurrentBend();
+        currentData.RightRingBend = rightFingers[3].GetCurrentBend();
+        currentData.RightPinkyBend = rightFingers[4].GetCurrentBend();
 
         byte[] bytes = ByteArrayConverter.ObjectToByteArray<XRData>(currentData);
 

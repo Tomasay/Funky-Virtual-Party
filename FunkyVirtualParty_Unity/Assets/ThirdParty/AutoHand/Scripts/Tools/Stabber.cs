@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace Autohand{
+namespace Autohand {
     public delegate void StabEvent(Stabber stabber, Stabbable stab);
 
-    public class Stabber : MonoBehaviour{
-        [Tooltip("Can be left null")]
+    public class Stabber : MonoBehaviour {
+        [Tooltip("Can be left empty/null")]
         public Grabbable grabbable;
         [Header("Stab Settings")]
         public CapsuleCollider stabCapsule;
@@ -15,7 +15,8 @@ namespace Autohand{
         public LayerMask stabbableLayers;
         [Tooltip("The index that must match the stabbables index to allow stabbing")]
         public int stabIndex;
-        public int maxStabs = 10;
+        public int maxStabs = 3;
+
 
         [Header("Joint Settings")]
         public Vector3 axis;
@@ -33,7 +34,7 @@ namespace Autohand{
         [Header("Events")]
         public UnityEvent StartStab;
         public UnityEvent EndStab;
-    
+
         //Progammer Events <3
         public StabEvent StartStabEvent;
         public StabEvent EndStabEvent;
@@ -62,8 +63,8 @@ namespace Autohand{
             stabbedJoints = new List<ConfigurableJoint>();
             resultsNonAlloc = new Collider[25];
             if(stabbableLayers == 0)
-                stabbableLayers = LayerMask.GetMask(Hand.grabbableLayerNameDefault, Hand.grabbingLayerName, Hand.releasingLayerName);
-            
+                stabbableLayers = LayerMask.GetMask(Hand.grabbableLayers);
+
             StartStabEvent += (stabber, stabbable) => { StartStab?.Invoke(); };
             EndStabEvent += (stabber, stabbable) => { EndStab?.Invoke(); };
 
@@ -75,9 +76,10 @@ namespace Autohand{
             StartCoroutine(StartWait());
         }
 
+
         //This will keep the stabbables in place for the start stab
-        IEnumerator StartWait(){
-            for (int i = 0; i < STABFRAMES; i++){
+        IEnumerator StartWait() {
+            for(int i = 0; i < STABFRAMES; i++) {
                 transform.position = startPos;
                 transform.rotation = startRot;
                 yield return new WaitForFixedUpdate();
@@ -85,9 +87,12 @@ namespace Autohand{
         }
 
         private void FixedUpdate() {
-            if (transform.position != lastPos || lastRot != transform.rotation)
+            if(transform.position != lastPos || lastRot != transform.rotation) {
                 frames = 0;
-            if (frames < STABFRAMES){
+                lastPos = transform.position;
+                lastRot = transform.rotation;
+            }
+            if(frames < STABFRAMES) {
                 CheckStabArea();
                 frames++;
             }
@@ -105,44 +110,44 @@ namespace Autohand{
                 height *= stabCapsule.transform.lossyScale.x;
                 radius *= stabCapsule.transform.lossyScale.y > stabCapsule.transform.lossyScale.z ? stabCapsule.transform.lossyScale.y : stabCapsule.transform.lossyScale.z;
             }
-            else if(stabCapsule.direction == 1){
+            else if(stabCapsule.direction == 1) {
                 capsuleAxis = Vector3.up;
                 height *= stabCapsule.transform.lossyScale.y;
                 radius *= stabCapsule.transform.lossyScale.z > stabCapsule.transform.lossyScale.x ? stabCapsule.transform.lossyScale.z : stabCapsule.transform.lossyScale.x;
             }
-            else{
+            else {
                 capsuleAxis = Vector3.forward;
                 height *= stabCapsule.transform.lossyScale.z;
                 radius *= stabCapsule.transform.lossyScale.y > stabCapsule.transform.lossyScale.x ? stabCapsule.transform.lossyScale.y : stabCapsule.transform.lossyScale.x;
             }
-        
-            if(height/2 <= radius){
+
+            if(height / 2 <= radius) {
                 height = 0;
             }
             else {
-                height/=2;
+                height /= 2;
                 height -= radius;
             }
 
-            point1 = stabCapsule.bounds.center+stabCapsule.transform.rotation*capsuleAxis*(height);
-            point2 = stabCapsule.bounds.center-stabCapsule.transform.rotation*capsuleAxis*(height);
-            int collisionCount = Physics.OverlapCapsuleNonAlloc(point1, point2, radius, resultsNonAlloc, stabbableLayers);
-        
+            point1 = stabCapsule.bounds.center + stabCapsule.transform.rotation * capsuleAxis * (height);
+            point2 = stabCapsule.bounds.center - stabCapsule.transform.rotation * capsuleAxis * (height);
+            Physics.OverlapCapsuleNonAlloc(point1, point2, radius, resultsNonAlloc, stabbableLayers, QueryTriggerInteraction.Ignore);
+
             List<Stabbable> newStabbed = new List<Stabbable>();
 
             for(int i = 0; i < resultsNonAlloc.Length; i++) {
                 Stabbable tempStab;
-                if(resultsNonAlloc[i] != null){
+                if(resultsNonAlloc[i] != null) {
                     if(resultsNonAlloc[i].CanGetComponent(out tempStab))
                         if(tempStab.gameObject != gameObject)
                             newStabbed.Add(tempStab);
                 }
             }
-        
-            for(int i = stabbed.Count-1; i >= 0; i--)
+
+            for(int i = stabbed.Count - 1; i >= 0; i--)
                 if(!newStabbed.Contains(stabbed[i]))
                     OnStabbableExit(stabbed[i]);
-        
+
             if(stabbed.Count < maxStabs)
                 for(int i = 0; i < newStabbed.Count; i++)
                     if(!stabbed.Contains(newStabbed[i]) && newStabbed[i].CanStab(this))
@@ -151,11 +156,11 @@ namespace Autohand{
             for(int i = 0; i < resultsNonAlloc.Length; i++)
                 resultsNonAlloc[i] = null;
 
-            if (stabbedFrames.Count > 0){
+            if(stabbedFrames.Count > 0) {
                 var stabFrameKeys = new Stabbable[stabbedFrames.Count];
                 stabbedFrames.Keys.CopyTo(stabFrameKeys, 0);
-                foreach (var stabFrame in stabFrameKeys)
-                    if (!stabbed.Contains(stabFrame) && !newStabbed.Contains(stabFrame))
+                foreach(var stabFrame in stabFrameKeys)
+                    if(!stabbed.Contains(stabFrame) && !newStabbed.Contains(stabFrame))
                         stabbedFrames.Remove(stabFrame);
             }
 
@@ -163,12 +168,12 @@ namespace Autohand{
         }
 
         protected virtual void OnStabbableEnter(Stabbable stab) {
-            if (stabbedFrames.ContainsKey(stab))
+            if(stabbedFrames.ContainsKey(stab))
                 stabbedFrames[stab]++;
             else
                 stabbedFrames.Add(stab, 1);
 
-            if (stabbedFrames[stab] < STABFRAMES)
+            if(stabbedFrames[stab] < STABFRAMES)
                 return;
 
 
@@ -182,18 +187,18 @@ namespace Autohand{
             joint.angularXMotion = angularXMotion;
             joint.angularYMotion = angularYMotion;
             joint.angularZMotion = angularZMotion;
-            
-            joint.linearLimit = new SoftJointLimit(){ limit = this.limit };
-            joint.linearLimitSpring = new SoftJointLimitSpring(){ damper = stab.positionDamper*positionDampeningMultiplyer };
-            joint.xDrive = new JointDrive(){ positionDamper = stab.positionDamper*positionDampeningMultiplyer, maximumForce = float.MaxValue };
-            joint.yDrive = new JointDrive(){ positionDamper = stab.positionDamper*positionDampeningMultiplyer, maximumForce = float.MaxValue };
-            joint.zDrive = new JointDrive(){ positionDamper = stab.positionDamper*positionDampeningMultiplyer, maximumForce = float.MaxValue };
-            joint.slerpDrive = new JointDrive(){ positionDamper = stab.positionDamper*positionDampeningMultiplyer };
-            
-            joint.angularXLimitSpring = new SoftJointLimitSpring(){ damper = stab.rotationDamper*rotationDampeningMultiplyer };
-            joint.angularYZLimitSpring = new SoftJointLimitSpring(){ damper = stab.rotationDamper*rotationDampeningMultiplyer };
-            joint.angularXDrive = new JointDrive(){ positionDamper = stab.rotationDamper*rotationDampeningMultiplyer, maximumForce = float.MaxValue };
-            joint.angularYZDrive = new JointDrive(){ positionDamper = stab.rotationDamper*rotationDampeningMultiplyer, maximumForce = float.MaxValue };
+
+            joint.linearLimit = new SoftJointLimit() { limit = this.limit };
+            joint.linearLimitSpring = new SoftJointLimitSpring() { damper = stab.positionDamper * positionDampeningMultiplyer };
+            joint.xDrive = new JointDrive() { positionDamper = stab.positionDamper * positionDampeningMultiplyer, maximumForce = float.MaxValue };
+            joint.yDrive = new JointDrive() { positionDamper = stab.positionDamper * positionDampeningMultiplyer, maximumForce = float.MaxValue };
+            joint.zDrive = new JointDrive() { positionDamper = stab.positionDamper * positionDampeningMultiplyer, maximumForce = float.MaxValue };
+            joint.slerpDrive = new JointDrive() { positionDamper = stab.positionDamper * positionDampeningMultiplyer };
+
+            joint.angularXLimitSpring = new SoftJointLimitSpring() { damper = stab.rotationDamper * rotationDampeningMultiplyer };
+            joint.angularYZLimitSpring = new SoftJointLimitSpring() { damper = stab.rotationDamper * rotationDampeningMultiplyer };
+            joint.angularXDrive = new JointDrive() { positionDamper = stab.rotationDamper * rotationDampeningMultiplyer, maximumForce = float.MaxValue };
+            joint.angularYZDrive = new JointDrive() { positionDamper = stab.rotationDamper * rotationDampeningMultiplyer, maximumForce = float.MaxValue };
             joint.projectionDistance /= 4f;
 
             joint.enablePreprocessing = true;
@@ -206,12 +211,15 @@ namespace Autohand{
 
             stab.body.WakeUp();
             jointBody.WakeUp();
-            
+
             stabbedJoints.Add(joint);
             stab.OnStab(this);
             StartStabEvent?.Invoke(this, stab);
-            if (stab.parentOnStab && grabbable){
+            if(stab.parentOnStab && grabbable) {
                 grabbable.AddJointedBody(stab.body);
+            }
+            else if(grabbable) {
+                grabbable.ignoreParent = true;
             }
         }
 
@@ -224,8 +232,11 @@ namespace Autohand{
             stab.OnEndStab(this);
             stabbedFrames.Remove(stab);
             EndStabEvent?.Invoke(this, stab);
-            if(stab.parentOnStab && grabbable){
+            if(stab.parentOnStab && grabbable) {
                 grabbable.RemoveJointedBody(stab.body);
+            }
+            else if(grabbable) {
+                grabbable.ignoreParent = false;
             }
         }
 
@@ -238,7 +249,7 @@ namespace Autohand{
         }
 
 
-        
+
         void OnDrawGizmosSelected() {
             Vector3 point1;
             Vector3 point2;
@@ -251,28 +262,28 @@ namespace Autohand{
                 height *= stabCapsule.transform.lossyScale.x;
                 radius *= stabCapsule.transform.lossyScale.y > stabCapsule.transform.lossyScale.z ? stabCapsule.transform.lossyScale.y : stabCapsule.transform.lossyScale.z;
             }
-            else if(stabCapsule.direction == 1){
+            else if(stabCapsule.direction == 1) {
                 capsuleAxis = Vector3.up;
                 height *= stabCapsule.transform.lossyScale.y;
                 radius *= stabCapsule.transform.lossyScale.z > stabCapsule.transform.lossyScale.x ? stabCapsule.transform.lossyScale.z : stabCapsule.transform.lossyScale.x;
             }
-            else{
+            else {
                 capsuleAxis = Vector3.forward;
                 height *= stabCapsule.transform.lossyScale.z;
                 radius *= stabCapsule.transform.lossyScale.y > stabCapsule.transform.lossyScale.x ? stabCapsule.transform.lossyScale.y : stabCapsule.transform.lossyScale.x;
             }
-        
-            if(height/2 <= radius){
+
+            if(height / 2 <= radius) {
                 height = 0;
             }
             else {
-                height/=2;
+                height /= 2;
                 height -= radius;
             }
 
-            point1 = stabCapsule.bounds.center+stabCapsule.transform.rotation*capsuleAxis*(height);
-            point2 = stabCapsule.bounds.center-stabCapsule.transform.rotation*capsuleAxis*(height);
-        
+            point1 = stabCapsule.bounds.center + stabCapsule.transform.rotation * capsuleAxis * (height);
+            point2 = stabCapsule.bounds.center - stabCapsule.transform.rotation * capsuleAxis * (height);
+
             Gizmos.color = Color.blue;
             Gizmos.DrawSphere(point1, radius);
             Gizmos.DrawSphere(point2, radius);

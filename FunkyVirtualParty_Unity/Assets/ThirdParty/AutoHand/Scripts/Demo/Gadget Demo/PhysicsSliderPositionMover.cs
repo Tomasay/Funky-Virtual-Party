@@ -21,7 +21,7 @@ namespace Autohand.Demo{
             startPos = move.position;
         }
 
-        void FixedUpdate(){
+        public void FixedUpdate(){
             if(useRange){
                 var value = GetValue();
 
@@ -31,7 +31,7 @@ namespace Autohand.Demo{
                     move.position = Vector3.Lerp(startPos, startPos+maxRange, -value);
             }
             else
-                move.position += axis*GetValue()*Time.deltaTime;
+                move.position += axis*GetValue()*Time.fixedDeltaTime;
         }
     }
 }

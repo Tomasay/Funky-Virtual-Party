@@ -4,19 +4,23 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Autohand.Demo{
-public class PlayerFallCatcher : MonoBehaviour{
-    public AutoHandPlayer player;
-    Vector3 startPos;
+    public class PlayerFallCatcher : MonoBehaviour{
+        Vector3 startPos;
 
-    void Awake(){
-        startPos = player.transform.position;
-        if (SceneManager.GetActiveScene().name != "Demo")
-            enabled = false;
-    }
+        void Start(){
+            if(AutoHandPlayer.Instance != null) {
+                startPos = AutoHandPlayer.Instance.transform.position;
+                if(!SceneManager.GetActiveScene().name.ToLower().Contains("demo"))
+                    enabled = false;
+            }
+        }
         
-    void Update(){
-        if(player.transform.position.y < -10f)
-            player.SetPosition(startPos+Vector3.up);
+        void Update() {
+            if(AutoHandPlayer.Instance != null) {
+                if(AutoHandPlayer.Instance.transform.position.y < -10f) {
+                    AutoHandPlayer.Instance.SetPosition(startPos);
+                }
+            }
+        }
     }
-}
 }

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class CollisionSound : MonoBehaviour{
     [Tooltip("The layers that cause the sound to play")]
     public LayerMask collisionTriggers = ~0;
@@ -35,13 +34,18 @@ public class CollisionSound : MonoBehaviour{
     }
 
     void OnCollisionEnter(Collision collision) {
+        if (body == null)
+            return;
+
         if(canPlaySound && collisionTriggers == (collisionTriggers | (1 << collision.gameObject.layer))) {
-            if(source.enabled && body != null)
-            {
-                source.PlayOneShot(clip == null ? source.clip : clip, velocityVolumeCurve.Evaluate(collision.relativeVelocity.magnitude * velocityAmp)*volumeAmp);
-                if (playSoundRoutine != null)
-                    StopCoroutine(playSoundRoutine);
-                playSoundRoutine = StartCoroutine(SoundPlayBuffer());
+            if(source != null && source.enabled){
+                if (collision.collider.attachedRigidbody == null || collision.collider.attachedRigidbody.mass > 0.0000001f){
+                    if(clip != null || source.clip != null)
+                        source.PlayOneShot(clip == null ? source.clip : clip, velocityVolumeCurve.Evaluate(collision.relativeVelocity.magnitude * velocityAmp) * volumeAmp);
+                    if (playSoundRoutine != null)
+                        StopCoroutine(playSoundRoutine);
+                    playSoundRoutine = StartCoroutine(SoundPlayBuffer());
+                }
             }
         }
     }

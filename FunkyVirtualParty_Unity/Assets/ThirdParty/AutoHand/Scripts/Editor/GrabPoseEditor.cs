@@ -19,90 +19,178 @@ namespace Autohand {
         public override void OnInspectorGUI() {
             DrawDefaultInspector();
 
-            if(grabbablePose.gameObject.scene.name == null){
+            var startBackground = GUI.backgroundColor;
+
+            if(grabbablePose.gameObject.scene.name == null) {
                 EditorGUILayout.LabelField("This must be saved in the scene");
-                EditorGUILayout.LabelField("-> then use override to prefab");
+                EditorGUILayout.LabelField("-> then use override to prefab to save");
+                return;
+            }
+            else if(Application.isPlaying) {
+                EditorGUILayout.LabelField("Cannot edit during runtime");
                 return;
             }
 
-            if(grabbablePose.gameObject != null && PrefabStageUtility.GetPrefabStage(grabbablePose.gameObject) == null){
-                EditorUtility.SetDirty(grabbablePose);
+            if(grabbablePose.gameObject != null && PrefabStageUtility.GetPrefabStage(grabbablePose.gameObject) == null) {
+                grabbablePose.showEditorTools = DrawAutoToggleHeader("Show Editor Tools", grabbablePose.showEditorTools);
 
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
-                grabbablePose.editorHand = (Hand)EditorGUILayout.ObjectField("Editor Hand", grabbablePose.editorHand, typeof(Hand), true);
-                grabbablePose.useEditorAutoGrab = EditorGUILayout.Toggle("Use Editor Auto Grab", grabbablePose.useEditorAutoGrab);
+                if(grabbablePose.showEditorTools) {
 
-                var rect = EditorGUILayout.GetControlRect();
-                if(grabbablePose.rightPoseSet)
-                    EditorGUI.DrawRect(rect, Color.green);
-                else
-                    EditorGUI.DrawRect(rect, Color.red);
+                    ShowScriptableSaveButton();
 
-                rect.width -= 4;
-                rect.height -= 2;
-                rect.x += 2;
-                rect.y += 1;
+                    ShowHandEditorHand();
 
-                if(GUI.Button(rect, "Save Right Pose"))
-                    grabbablePose.EditorSaveGrabPose(grabbablePose.editorHand, false);
+                    ShowSaveButtons();
 
+                    DrawHorizontalLine();
 
-                rect = EditorGUILayout.GetControlRect();
-                if(grabbablePose.leftPoseSet)
-                    EditorGUI.DrawRect(rect, Color.green);
-                else
-                    EditorGUI.DrawRect(rect, Color.red);
-
-                rect.x += 2;
-                rect.y += 1;
-                rect.width -= 4;
-                rect.height -= 2;
-
-                if(GUI.Button(rect, "Save Left Pose"))
-                    grabbablePose.EditorSaveGrabPose(grabbablePose.editorHand, true);
-
-            
-                
-
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
-                EditorGUILayout.Space();
-            
-                GUILayout.Label(new GUIContent("-------- For tweaking poses --------"), new GUIStyle(){ fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter });
-                GUILayout.Label(new GUIContent("This will create a copy that should be deleted"), new GUIStyle(){ fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter });
-            
-                if(GUILayout.Button("Create Copy - Set Pose")) { 
-                    grabbablePose.EditorCreateCopySetPose(grabbablePose.editorHand, grabbablePose.transform);
-                }
-                if(GUILayout.Button("Select Copy")) { 
-                    Selection.activeGameObject = grabbablePose.editorHand.gameObject;
-                }
-
-                    if (GUILayout.Button("Reset Hand"))
-                    grabbablePose.editorHand.RelaxHand();
-
-                EditorGUILayout.Space();
-                rect = EditorGUILayout.GetControlRect();
-                EditorGUI.DrawRect(rect, Color.red);
-
-                if(GUILayout.Button("Delete Copy")){
-                    if(string.Equals(grabbablePose.editorHand.transform.parent.name, "HAND COPY CONTAINER DELETE"))
-                        DestroyImmediate(grabbablePose.editorHand.transform.parent.gameObject);
-                    else
-                        Debug.LogError("Not a copy - Will not delete");
-                }
-                if(GUILayout.Button("Clear Poses")){
-                    grabbablePose.EditorClearPoses();
+                    ShowDeleteOptions();
                 }
             }
-            else {
-                GUILayout.Label(new GUIContent(" - This will not work in prefab mode - "), new GUIStyle(){ fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter });
-                GUILayout.Label(new GUIContent("Use scene to create poses"), new GUIStyle(){ alignment = TextAnchor.MiddleCenter });
+
+            GUI.backgroundColor = startBackground;
+        }
+
+
+        public void ShowScriptableSaveButton() {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            grabbablePose.poseScriptable = (HandPoseScriptable)EditorGUILayout.ObjectField(new GUIContent("Pose Scriptable", "Allows you to save the pose to a scriptable pose, create scriptable pose by right clicking in project [Create > Auto hand > Custom Pose]"), grabbablePose.poseScriptable, typeof(HandPoseScriptable), true);
+
+            if(grabbablePose.poseScriptable != null) {
+                var rect = EditorGUILayout.GetControlRect();
+
+                if(GUI.Button(rect, "Overwrite Scriptable")) {
+                    EditorUtility.SetDirty(grabbablePose.poseScriptable);
+                    grabbablePose.SaveScriptable();
+                }
+
+                EditorGUILayout.Space();
+            }
+            EditorGUILayout.Space();
+        }
+
+        public void ShowDeleteOptions() {
+            GUI.backgroundColor = Color.red;
+
+            if(GUILayout.Button("Delete Hand Copy")) {
+                if(string.Equals(grabbablePose.editorHand.transform.parent.name, "HAND COPY CONTAINER DELETE"))
+                    DestroyImmediate(grabbablePose.editorHand.transform.parent.gameObject);
+                else
+                    Debug.LogError("Not a copy - Will not delete");
+            }
+            if(GUILayout.Button("Clear Saved Poses")) {
+                EditorUtility.SetDirty(grabbablePose);
+                grabbablePose.EditorClearPoses();
+            }
+
+        }
+
+        public void ShowHandEditorHand() {
+            grabbablePose.editorHand = (Hand)EditorGUILayout.ObjectField(new GUIContent("Editor Hand", "This will be used as a reference to create a hand copy that can be used to model your new pose"), grabbablePose.editorHand, typeof(Hand), true);
+
+            if(GUILayout.Button("Create Hand Copy")) {
+                EditorUtility.SetDirty(grabbablePose);
+                grabbablePose.EditorCreateCopySetPose(grabbablePose.editorHand, grabbablePose.transform);
+            }
+
+            if(GUILayout.Button("Select Hand Copy")) {
+                EditorUtility.SetDirty(grabbablePose);
+                Selection.activeGameObject = grabbablePose.editorHand.gameObject;
             }
         }
+
+        public void DrawHorizontalLine() {
+
+            var rect = EditorGUILayout.GetControlRect();
+            rect.y += rect.height / 2f;
+            rect.height /= 10f;
+
+            EditorGUI.DrawRect(rect, Color.grey);
+        }
+
+        public bool DrawAutoToggleHeader(string label, bool value) {
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+
+            // draw header background and label
+            var headerRect = EditorGUILayout.GetControlRect();
+
+            var biggerRect = new Rect(headerRect);
+            biggerRect.width += biggerRect.x * 2;
+            biggerRect.x = 0;
+            biggerRect.y -= 5f;
+            biggerRect.height += 10f;
+            EditorGUI.DrawRect(biggerRect, Constants.BackgroundColor);
+
+
+            var labelStyle = Constants.LabelStyle;
+
+            var oldColor1 = GUI.color;
+            if(!value) {
+                var newColor = new Color(0.65f, 0.65f, 0.65f, 1f);
+                newColor.a = 1;
+                GUI.contentColor = newColor;
+            }
+
+            EditorGUI.LabelField(headerRect, new GUIContent("   " + label), labelStyle);
+
+            GUI.contentColor = oldColor1;
+
+            var oldColor = GUI.color;
+            GUI.color = value ? new Color(0.7f, 1f, 0.7f) : new Color(1f, 0.7f, 0.7f);
+
+            var newRect = new Rect(headerRect);
+            newRect.position = new Vector2(newRect.x + newRect.width - 18, newRect.y);
+            value = EditorGUI.Toggle(newRect, value);
+
+            GUI.color = oldColor;
+
+
+            return value;
+        }
+
+        public void ShowSaveButtons() {
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            EditorGUILayout.BeginHorizontal();
+
+            if(grabbablePose.leftPoseSet || (grabbablePose.poseScriptable != null && grabbablePose.poseScriptable.leftSaved))
+                GUI.backgroundColor = Color.green;
+            else
+                GUI.backgroundColor = Color.red;
+
+
+            if(GUILayout.Button("Save Left")) {
+                EditorUtility.SetDirty(grabbablePose);
+                if(grabbablePose.poseIndex != grabbablePose.editorHand.poseIndex)
+                    Debug.LogError("CANNOT SAVE: Your hand's \"Pose Index\" value does not match the local \"Pose Index\" value");
+                else
+                    grabbablePose.EditorSaveGrabPose(grabbablePose.editorHand, true);
+            }
+
+
+            if(grabbablePose.rightPoseSet || (grabbablePose.poseScriptable != null && grabbablePose.poseScriptable.rightSaved))
+                GUI.backgroundColor = Color.green;
+            else
+                GUI.backgroundColor = Color.red;
+
+
+            if(GUILayout.Button("Save Right")) {
+                EditorUtility.SetDirty(grabbablePose);
+                if(grabbablePose.poseIndex != grabbablePose.editorHand.poseIndex)
+                    Debug.LogError("CANNOT SAVE: Your hand's \"Pose Index\" value does not match the local \"Pose Index\" value");
+                else
+                    grabbablePose.EditorSaveGrabPose(grabbablePose.editorHand, false);
+            }
+
+
+            GUILayout.EndHorizontal();
+        }
+
     }
 }

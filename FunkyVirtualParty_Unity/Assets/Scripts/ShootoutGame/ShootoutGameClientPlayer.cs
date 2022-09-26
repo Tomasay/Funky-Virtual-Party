@@ -29,7 +29,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 10.0f;
+        startingSpeed = 1;
 
         base.Awake();
 
@@ -193,7 +193,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     void SpawnSplashEffect(Vector3 collisionPoint)
     {
-        Instantiate(waterSplash, collisionPoint, Quaternion.identity);
+        ParticleSystem ps = Instantiate(waterSplash, collisionPoint, Quaternion.identity);
+        ps.gameObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
         waterSplash.Play();
     }
 
@@ -244,7 +245,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         anim.SetTrigger("StandingPose");
 
         //Put player under water
-        transform.position = new Vector3(transform.position.x, 20.0f, transform.position.z);
+        transform.position = new Vector3(transform.position.x, 24.5f, transform.position.z);
 
         StartCoroutine("BringToTop");
     }
@@ -253,7 +254,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         for (int i = 0; i <= 60; i++)
         {
-            transform.position = new Vector3(transform.position.x, Mathf.Lerp(20.0f, 25.0f, (float)i/60.0f), transform.position.z);
+            transform.position = new Vector3(transform.position.x, Mathf.Lerp(24.5f, 24.9f, (float)i/60.0f), transform.position.z);
             yield return new WaitForSeconds(0.025f);
         }
 
@@ -265,7 +266,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         float t = Mathf.PingPong(Time.time, 1);
 
-        transform.position = Vector3.Slerp(new Vector3(transform.position.x, 24, transform.position.z), new Vector3(transform.position.x, 25, transform.position.z), t);
+        transform.position = Vector3.Slerp(new Vector3(transform.position.x, 24.8f, transform.position.z), new Vector3(transform.position.x, 24.9f, transform.position.z), t);
         //transform.rotation = Quaternion.Slerp(Quaternion.Euler(0, 0, -5), Quaternion.Euler(0, 0, 5), t);
     }
 }

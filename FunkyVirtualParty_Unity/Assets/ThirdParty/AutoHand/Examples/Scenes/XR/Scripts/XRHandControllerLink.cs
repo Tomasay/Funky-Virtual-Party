@@ -33,8 +33,7 @@ namespace Autohand.Demo{
         none
     }
 
-    public class XRHandControllerLink : MonoBehaviour{
-        public Hand hand;
+    public class XRHandControllerLink : HandControllerLink {
         public CommonButton grabButton = CommonButton.triggerButton;
         [Tooltip("This axis will bend all the fingers on the hand -> replaced with finger bender scripts")]
         public CommonAxis grabAxis = CommonAxis.trigger;
@@ -44,7 +43,7 @@ namespace Autohand.Demo{
         bool squeezing;
         bool grabbing;
         InputDevice device;
-        List<InputDevice> devices;
+        List<InputDevice> devices = new List<InputDevice>();
 
         private void Start(){
             if(grabButton == squeezeButton) {
@@ -55,7 +54,11 @@ namespace Autohand.Demo{
                 role = XRNode.LeftHand;
             else
                 role = XRNode.RightHand;
-            devices = new List<InputDevice>();
+
+            if(hand.left)
+                handLeft = this;
+            else
+                handRight = this;
         }
 
         void Update(){
@@ -92,6 +95,8 @@ namespace Autohand.Demo{
             }
         }
 
+        public List<InputDevice> Devices() { return devices; }
+
 
         public bool ButtonPressed(CommonButton button) {
             if (button == CommonButton.none)
@@ -125,7 +130,16 @@ namespace Autohand.Demo{
             }
             return Vector2.zero;
         }
-        
+
+        /// <param name="freq">not supported on XR?</param>
+        public override void TryHapticImpulse(float duration, float amp, float freq = 0) {
+            foreach(var device in Devices()) {
+                if(device.TryGetHapticCapabilities(out var capabilities) && capabilities.supportsImpulse) {
+                    device.SendHapticImpulse(0u, amp, duration);
+                }
+            }
+        }
+
 
         public static InputFeatureUsage<bool> GetCommonButton(CommonButton button) {
             if(button == CommonButton.gripButton)

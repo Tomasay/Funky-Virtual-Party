@@ -135,7 +135,7 @@ public class Fireball : MonoBehaviour
                 if(f.readyToSpawn)
                 {
                     //Set pos to current explosion
-                    f.transform.position = transform.position + (Vector3.up*2);
+                    f.transform.position = transform.position + Vector3.up;
 
                     //Enable them and set scale
                     f.readyToSpawn = false;
@@ -149,13 +149,13 @@ public class Fireball : MonoBehaviour
                     switch (spawnedCount)
                     {
                         case 0:
-                            f.rb.AddForce(-250, 400, 0);
+                            f.rb.AddForce(-175, 200, 0);
                             break;
                         case 1:
-                            f.rb.AddForce(250, 500, 0);
+                            f.rb.AddForce(175, 250, 0);
                             break;
                         case 2:
-                            f.rb.AddForce(0, 600, 250);
+                            f.rb.AddForce(0, 300, 175);
                             break;
                         default:
                             break;

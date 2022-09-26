@@ -10,6 +10,7 @@ namespace Autohand{
         [Header("Trigger Events Settings")]
         [Tooltip("Whether or not first hand to enter should take ownership and be the only one to call events")]
         public bool oneHanded = true;
+        public HandType handType = HandType.both;
         [Tooltip("Whether or not to call the release event if exiting while grab event activated")]
         public bool exitTriggerRelease = true;
         [Tooltip("Whether or not to call the release event if exiting while grab event activated")]
@@ -35,7 +36,7 @@ namespace Autohand{
         bool grabbing;
         bool squeezing;
 
-        private void OnEnable() {
+        protected virtual void OnEnable() {
             hands = new List<Hand>();
             HandEnterEvent += (hand) => HandEnter?.Invoke(hand);
             HandExitEvent += (hand) => HandExit?.Invoke(hand);
@@ -45,16 +46,19 @@ namespace Autohand{
             HandUnsqueezeEvent += (hand) => HandUnsqueeze?.Invoke(hand);
         }
 
-        private void OnDisable() {
+        protected virtual void OnDisable() {
             HandEnterEvent -= (hand) => HandEnter?.Invoke(hand);
             HandExitEvent -= (hand) => HandExit?.Invoke(hand);
             HandGrabEvent -= (hand) => HandGrab?.Invoke(hand);
             HandReleaseEvent -= (hand) => HandRelease?.Invoke(hand);
             HandSqueezeEvent -= (hand) => HandSqueeze?.Invoke(hand);
             HandUnsqueezeEvent -= (hand) => HandUnsqueeze?.Invoke(hand);
+            for (int i = hands.Count - 1; i >= 0; i--){
+                hands[i].RemoveHandTriggerArea(this);
+            }
         }
 
-        private void Update(){
+        protected virtual void Update(){
             foreach (var hand in hands){
                 if (!hand.enabled) {
                     Exit(hand);
@@ -63,7 +67,10 @@ namespace Autohand{
             }
         }
 
-        public void Enter(Hand hand) {
+        public virtual void Enter(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(!hands.Contains(hand)) {
                 hands.Add(hand);
                 if(oneHanded && hands.Count == 1)
@@ -73,7 +80,10 @@ namespace Autohand{
             }
         }
 
-        public void Exit(Hand hand) {
+        public virtual void Exit(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(hands.Contains(hand)) {
                 if(oneHanded && hands[0] == hand){
                     HandExit?.Invoke(hand);
@@ -89,7 +99,8 @@ namespace Autohand{
 
                     //If there is another hand, it enters
                     if(hands.Count > 1)
-                        HandEnterEvent?.Invoke(hand);
+                        HandEnterEvent?.Invoke(hands[1]);
+
                 }
                 else if(!oneHanded){
                     HandExitEvent?.Invoke(hand);
@@ -101,6 +112,7 @@ namespace Autohand{
                         HandUnsqueezeEvent?.Invoke(hand);
                         squeezing = false;
                     }
+
                 }
 
                 hands.Remove(hand);
@@ -108,7 +120,10 @@ namespace Autohand{
         }
 
 
-        public void Grab(Hand hand) {
+        public virtual void Grab(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(grabbing)
                 return;
 
@@ -122,7 +137,10 @@ namespace Autohand{
             }
         }
 
-        public void Release(Hand hand) {
+        public virtual void Release(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(!grabbing)
                 return;
 
@@ -137,7 +155,10 @@ namespace Autohand{
         }
 
 
-        public void Squeeze(Hand hand) {
+        public virtual void Squeeze(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(squeezing)
                 return;
 
@@ -151,7 +172,10 @@ namespace Autohand{
             }
         }
 
-        public void Unsqueeze(Hand hand) {
+        public virtual void Unsqueeze(Hand hand) {
+            if (enabled == false || handType == HandType.none || (hand.left && handType == HandType.right) || (!hand.left && handType == HandType.left))
+                return;
+
             if(!squeezing)
                 return;
 

@@ -10,10 +10,4 @@ public class TMPSizeProtector : MonoBehaviour{
         if(GetComponent<TMPro.TextMeshPro>() != null)
             GetComponent<TMPro.TextMeshPro>().fontSize = size;
     }
-
-    
-    private void OnDrawGizmos() {
-        if(GetComponent<TMPro.TextMeshPro>() != null)
-            GetComponent<TMPro.TextMeshPro>().fontSize = size;
-    }
 }

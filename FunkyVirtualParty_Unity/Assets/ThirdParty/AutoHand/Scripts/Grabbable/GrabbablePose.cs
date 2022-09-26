@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,21 +13,40 @@ namespace Autohand{
 #if UNITY_EDITOR
     [CanEditMultipleObjects]
 #endif
-    [RequireComponent(typeof(Grabbable))]
+    [HelpURL("https://earnestrobot.notion.site/Custom-Poses-868c1fa0590542a0b5b7937b5feb6b0d")]
     public class GrabbablePose : MonoBehaviour{
-        [Header("Pose")]
-        [Tooltip("Purely for orginizational purposes in the editor")]
+        [AutoHeader("Grabbable Pose")]
+        public bool ignoreMe;
+        public bool poseEnabled = true;
+        [Tooltip("Purely for organizational purposes in the editor")]
         public string poseName = "";
+        [Tooltip("This value must match the pose index of the a hand in order for the pose to work")]
         public int poseIndex = 0;
-#if UNITY_EDITOR
-        [Header("Editor")]
+        [Tooltip("Whether or not this pose can be used by both hands at once or only one hand at a time")]
+        public bool singleHanded = false;
+
+
+        [AutoToggleHeader("Advanced Settings")]
+        public bool showAdvanced = true;
+        public float positionWeight = 1;
+        public float rotationWeight = 1;
+        [Tooltip("These poses will only be enabled when this pose is active. Great for secondary poses like holding the front of a gun with your second hand, only while holding the trigger")]
+        public GrabbablePose[] linkedPoses;
+
+
+
+        [HideInInspector]
+        public bool showEditorTools = true;
+        [Tooltip("Scriptable options NOT REQUIRED -> Create scriptable throught [Auto Hand/Custom Pose]")]
+        [HideInInspector]
+        public HandPoseScriptable poseScriptable;
+
         [Tooltip("Used to pose for the grabbable")]
         [HideInInspector]
         public Hand editorHand;
-        [Tooltip("This will be set false when setting already saved poses, you can turn it on manually through the hand")]
-        [HideInInspector]
-        public bool useEditorAutoGrab = true;
-#endif
+
+
+
         [HideInInspector]
         public HandPoseData rightPose;
         [HideInInspector]
@@ -36,60 +56,72 @@ namespace Autohand{
         [HideInInspector]
         public bool leftPoseSet = false;
 
+        List<Hand> posingHands = new List<Hand>();
 
-        Grabbable grabbable;
 
-        public void Start() {
-            OnStart();
+        protected virtual void Awake() {
+            if (poseScriptable != null)
+            {
+                if (poseScriptable.leftSaved)
+                    leftPoseSet = true;
+                if (poseScriptable.rightSaved)
+                    rightPoseSet = true;
+            }
+
+            for (int i = 0; i < linkedPoses.Length; i++)
+                linkedPoses[i].poseEnabled = false;
         }
 
-        protected virtual void OnStart() {
-
-
-            grabbable = GetComponent<Grabbable>();
-            if (!leftPoseSet && !rightPoseSet) {
-                Debug.LogError("Grabbable Pose has not been set for either hand", this);
-                grabbable.enabled = false;
-            }
-            else if (!leftPoseSet && rightPoseSet && !(grabbable.handType == HandType.right)) {
-                Debug.Log("Setting Grabbable to right hand only because left handed pose not set", this);
-                grabbable.handType = HandType.right;
-            }
-            else if (leftPoseSet && !rightPoseSet && !(grabbable.handType == HandType.left)) {
-                Debug.Log("Setting Grabbable to left hand only because right handed pose not set", this);
-                grabbable.handType = HandType.left;
-            }
-
-            var poses = GetComponents<GrabbablePose>();
-            if(poses.Length > 0){
-                if(gameObject.CanGetComponent(out GrabbablePoseCombiner combiner)) {
-                    combiner.poses = poses;
-                }
-                else{
-                    gameObject.AddComponent<GrabbablePoseCombiner>().poses = poses;
-                }
-
-            }
-        }
 
         public bool CanSetPose(Hand hand) {
+            if(singleHanded && posingHands.Count > 0 && !posingHands.Contains(hand))
+                return false;
             if(hand.poseIndex != poseIndex)
                 return false;
             if(hand.left && !leftPoseSet)
                 return false;
             if(!hand.left && !rightPoseSet)
                 return false;
-            return true;
+
+            return poseEnabled;
         }
 
+
         public virtual HandPoseData GetHandPoseData(Hand hand) {
+            if(poseScriptable != null)
+                return (hand.left) ? poseScriptable.leftPose : poseScriptable.rightPose;
+
             return (hand.left) ? leftPose : rightPose;
         }
 
 
-        public virtual void SetHandPose(Hand hand) {
+        /// <summary>
+        /// Sets the hand to this pose, make sure to check CanSetPose() flag for proper use
+        /// </summary>
+        /// <param name="isProjection">for pose projections, so they wont fill condition for single handed before grab</param>
+        public virtual void SetHandPose(Hand hand, bool isProjection = false) {
+
+            if(!isProjection) {
+                if(!posingHands.Contains(hand))
+                    posingHands.Add(hand);
+
+                for(int i = 0; i < linkedPoses.Length; i++) {
+                    linkedPoses[i].poseEnabled = true;
+                }
+            }
+
             GetHandPoseData(hand).SetPose(hand, transform);
+
         }
+
+
+        public virtual void CancelHandPose(Hand hand) {
+            if(posingHands.Contains(hand))
+                posingHands.Remove(hand);
+            for(int i = 0; i < linkedPoses.Length; i++)
+                linkedPoses[i].poseEnabled = false;
+        }
+
 
         public HandPoseData GetNewPoseData(Hand hand) {
             var pose = new HandPoseData();
@@ -97,11 +129,19 @@ namespace Autohand{
             var posePositionsList = new List<Vector3>();
             var poseRotationsList = new List<Quaternion>();
 
-            var handParent = hand.transform.parent;
-            hand.transform.parent = transform;
-            pose.handOffset = hand.transform.localPosition;
-            pose.localQuaternionOffset = hand.transform.localRotation;
-            hand.transform.parent = handParent;
+            var tempContainer = AutoHandExtensions.transformRuler;
+            tempContainer.position = transform.position;
+            tempContainer.rotation = transform.rotation;
+            tempContainer.localScale = transform.lossyScale;
+
+            var handMatch = AutoHandExtensions.transformRulerChild;
+            handMatch.position = hand.transform.position;
+            handMatch.rotation = hand.transform.rotation;
+
+            pose.handOffset = handMatch.localPosition;
+            pose.localQuaternionOffset = handMatch.localRotation;
+
+            tempContainer.localScale = Vector3.one;
 
             foreach (var finger in hand.fingers) {
                 AssignChildrenPose(finger.transform);
@@ -126,15 +166,43 @@ namespace Autohand{
                 pose.poseRotations[i] = poseRotationsList[i];
             }
 
+#if UNITY_EDITOR
+            if(Application.isEditor && !Application.isPlaying)
+                DestroyImmediate(tempContainer.gameObject);
+#endif
             return pose;
         }
-        
+
+
 #if UNITY_EDITOR
+        [ContextMenu("SAVE RIGHT")]
+        public void EditorSavePoseRight() {
+            if(editorHand != null)
+                EditorSaveGrabPose(editorHand, false);
+            else
+                Debug.Log("Editor Hand must be assigned");
+        }
+
+        [ContextMenu("SAVE LEFT")]
+        public void EditorSavePoseLeft() {
+            if(editorHand != null)
+                EditorSaveGrabPose(editorHand, true);
+            else
+                Debug.Log("Editor Hand must be assigned");
+        }
+
+        [ContextMenu("OVERWRITE SCRIPTABLE")]
+        public void SaveScriptable(){
+            if (poseScriptable != null){
+                if (rightPoseSet)
+                    poseScriptable.SaveRightPose(rightPose);
+                if (leftPoseSet)
+                    poseScriptable.SaveLeftPose(leftPose);
+            }
+        }
+
         //This is because parenting is used at runtime, but cannot be used on prefabs in editor so a copy is required
         public void EditorCreateCopySetPose(Hand hand, Transform relativeTo){
-            var useEditorGrab = useEditorAutoGrab;
-
-            
             Hand handCopy;
             if (hand.name != "HAND COPY DELETE")
                 handCopy = Instantiate(hand, relativeTo.transform.position, hand.transform.rotation);
@@ -142,14 +210,19 @@ namespace Autohand{
                 handCopy = hand;
 
             handCopy.name = "HAND COPY DELETE";
+            var referenceHand = handCopy.gameObject.AddComponent<EditorHand>();
+            referenceHand.grabbablePoseArea = null;
+            referenceHand.grabbablePose = this;
+
             editorHand = handCopy;
 
+            Selection.activeGameObject = editorHand.gameObject; 
+            SceneView.lastActiveSceneView.FrameSelected();
+
             if(hand.left && leftPoseSet){
-                useEditorGrab = false;
                 leftPose.SetPose(handCopy, transform);
             }
             else if(!hand.left && rightPoseSet){
-                useEditorGrab = false;
                 rightPose.SetPose(handCopy, transform);
             }
             else
@@ -157,8 +230,6 @@ namespace Autohand{
                 handCopy.transform.position = relativeTo.transform.position; 
                 editorHand.RelaxHand();
             }
-            
-            handCopy.editorAutoGrab = useEditorGrab;
 
             var contrainer = new GameObject();
             contrainer.name = "HAND COPY CONTAINER DELETE";
@@ -166,6 +237,7 @@ namespace Autohand{
             contrainer.transform.rotation = relativeTo.transform.rotation;
             handCopy.transform.parent = contrainer.transform;
             EditorGUIUtility.PingObject(handCopy);
+            SceneView.lastActiveSceneView.FrameSelected();
         }
 
         public void EditorSaveGrabPose(Hand hand, bool left){
@@ -209,11 +281,17 @@ namespace Autohand{
                 leftPose = pose;
                 leftPoseSet = true;
                 Debug.Log("Pose Saved - Left");
-            }
+                if (poseScriptable != null)
+                    if (!poseScriptable.leftSaved)
+                        poseScriptable.SaveLeftPose(leftPose);
+                }
             else{
                 rightPose = pose;
                 rightPoseSet = true;
                 Debug.Log("Pose Saved - Right");
+                if (poseScriptable != null)
+                    if (!poseScriptable.rightSaved)
+                        poseScriptable.SaveRightPose(rightPose);
             }
         }
         
@@ -226,6 +304,8 @@ namespace Autohand{
 #endif
 
         public bool HasPose(bool left) {
+            if(poseScriptable != null && ((left) ? poseScriptable.leftSaved : poseScriptable.rightSaved))
+                return (left) ? poseScriptable.leftSaved : poseScriptable.rightSaved;
             return left ? leftPoseSet : rightPoseSet;
         }
     }
