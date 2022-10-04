@@ -40,6 +40,7 @@ public class ShootoutGameManager : GameManager
             case GameState.Tutorial:
                 SetPlayerMovement(false);
                 SetVRPlayerMovement(false);
+                SetVRPlayerCanThrowFireballs(false);
                 break;
             case GameState.Countdown:
                 if (!countingDown)
@@ -93,7 +94,7 @@ public class ShootoutGameManager : GameManager
     IEnumerator StartCountdownTimer(int countdown)
     {
         countingDown = true;
-        SetVRPlayerMovement(true);
+        SetVRPlayerCanThrowFireballs(true);
 
         for (int i = countdown; i > 0; i--)
         {
@@ -123,5 +124,10 @@ public class ShootoutGameManager : GameManager
     public override void OnAction(string id)
     {
         ClientManager.instance.GetPlayerByID(id).GetComponent<ShootoutGameClientPlayer>().Action();
+    }
+
+    private void SetVRPlayerCanThrowFireballs(bool canThrow)
+    {
+        VRPlayer.GetComponent<ShootoutGameVRPlayerController>().canThrowFireballs = canThrow;
     }
 }

@@ -16,6 +16,8 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     private bool isGrabbingLeft, isGrabbingRight;
 
+    public bool canThrowFireballs = false;
+
     void Awake()
     {
         if (ClientManager.instance)
@@ -37,6 +39,9 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     private void OnGrabbed(Hand hand, Grabbable grabbable)
     {
+        if (!canThrowFireballs)
+            return;
+
         Fireball fireball = hand.left ? currentFireballLeft.GetComponent<Fireball>() : currentFireballRight.GetComponent<Fireball>();
         fireball.col.enabled = true;
         fireball.constraint.enabled = false;
