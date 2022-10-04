@@ -125,6 +125,7 @@ public class MainMenuWeb : MonoBehaviour
             player.GetComponent<ClientPlayer>().InitialCustomize();
         }
         player.transform.position = playerPositions[ClientManagerWeb.instance.Players.Count - 1].position;
+        player.GetComponent<ClientPlayer>().PlayerNameColor = Color.white;
     }
 
     private void SpawnPlayerIcon(GameObject player)

@@ -28,6 +28,7 @@ public class ChaseGameManager : GameManager
             case GameState.Tutorial:
                 SetPlayerMovement(false);
                 SetVRPlayerMovement(false);
+                SetVRPlayerHandMovement(false);
                 break;
             case GameState.Countdown:
                 if (!countingDown)
@@ -63,8 +64,9 @@ public class ChaseGameManager : GameManager
     {
         countingDown = true;
 
-        vrInfoText.text = "RUN!";
+        vrInfoText.text = "RUN AWAY!";
         SetVRPlayerMovement(true);
+        SetVRPlayerHandMovement(true);
         yield return new WaitForSeconds(1);
 
         for (int i = countdown; i > 0; i--)
@@ -101,5 +103,10 @@ public class ChaseGameManager : GameManager
     public override void OnAction(string id)
     {
         ClientManager.instance.GetPlayerByID(id).GetComponent<ChaseGameClientPlayer>().Action();
+    }
+
+    private void SetVRPlayerHandMovement(bool enabled)
+    {
+        VRPlayer.GetComponent<ChaseGameVRPlayerController>().HandMovement = enabled;
     }
 }

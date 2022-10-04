@@ -18,9 +18,9 @@ public enum GameState
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] GameObject playerPrefab;
-    [SerializeField] Transform[] playerSpawns;
-    [SerializeField] GameObject VRPlayer;
+    [SerializeField] protected GameObject playerPrefab;
+    [SerializeField] protected Transform[] playerSpawns;
+    [SerializeField] protected GameObject VRPlayer;
 
     public Vector3 VRPlayerHeadPos { get => VRPlayer.GetComponent<XRSyncer>().Head.transform.position; }
 

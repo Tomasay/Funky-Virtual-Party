@@ -41,6 +41,7 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerIP { get => playerIP; set => playerIP = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
+    public Color PlayerNameColor { get => playerNameText.color; set => playerNameText.color = value; }
     public int PlayerHeadType { get => headType; set{ headType = value; if (headType > -1) { smr.SetBlendShapeWeight(value, 100); } } }
     public float PlayerHeight { get => height; set{ height = value; spineBone.transform.localPosition = spinePos + new Vector3(0, height, 0); } }
     public int PlayerHatIndex { get => currentHatIndex; set{ UpdateHat(value); } }

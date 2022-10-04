@@ -431,8 +431,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   forwardDirection: {fileID: 4562025865744945624}
   ahp: {fileID: 3270633542346178656}
-  handMovementSpeed: 1.5
-  maxSprint: 2
+  handMovementSpeed: 3
+  maxSprintSeconds: 2
   handMovementThreshold: 0.025
   sprintMeter: {fileID: 3368231206423510503}
 --- !u!114 &1459602370694366106
@@ -666,7 +666,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6707951067419483808, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: maxMoveSpeed
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 6707951067419483808, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: useGrounding
