@@ -19,6 +19,10 @@ public class ChaseGameManager : GameManager
 
         timeRemaining = GAME_TIME_AMOUNT;
         vrGameTimeText.text = FormatTime(timeRemaining);
+
+        SetPlayerMovement(false);
+        SetVRPlayerMovementDelayed(false, 1);
+        SetVRPlayerHandMovement(false);
     }
 
     void Update()
@@ -26,9 +30,7 @@ public class ChaseGameManager : GameManager
         switch (State)
         {
             case GameState.Tutorial:
-                SetPlayerMovement(false);
-                SetVRPlayerMovement(false);
-                SetVRPlayerHandMovement(false);
+                
                 break;
             case GameState.Countdown:
                 if (!countingDown)

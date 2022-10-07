@@ -31,6 +31,10 @@ public class ShootoutGameManager : GameManager
                 sp.OnDeath.AddListener(CheckPlayersLeft);
             }
         }
+
+        SetPlayerMovement(false);
+        SetVRPlayerMovementDelayed(false, 1);
+        SetVRPlayerCanThrowFireballs(false);
     }
 
     void Update()
@@ -38,9 +42,7 @@ public class ShootoutGameManager : GameManager
         switch (State)
         {
             case GameState.Tutorial:
-                SetPlayerMovement(false);
-                SetVRPlayerMovement(false);
-                SetVRPlayerCanThrowFireballs(false);
+                
                 break;
             case GameState.Countdown:
                 if (!countingDown)

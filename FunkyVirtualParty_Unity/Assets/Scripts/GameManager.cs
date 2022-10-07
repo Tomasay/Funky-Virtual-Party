@@ -72,6 +72,22 @@ public class GameManager : MonoBehaviour
         VRPlayer.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
     }
 
+    /// <summary>
+    /// Using a small delay is useful if disabling movement at the start of the scene, as it allows for the player to be properly grounded
+    /// </summary>
+    /// <param name="canPlayerMove"></param>
+    /// <param name="delay"></param>
+    protected void SetVRPlayerMovementDelayed(bool canPlayerMove, int delay)
+    {
+        StartCoroutine(SetVRPlayerMovementDelayedCoroutine(canPlayerMove, delay));
+    }
+
+    IEnumerator SetVRPlayerMovementDelayedCoroutine(bool canPlayerMove, int delay)
+    {
+        yield return new WaitForSeconds(delay);
+        SetVRPlayerMovement(canPlayerMove);
+    }
+
     public string FormatTime(float time)
     {
         int minutes = (int)time / 60;
