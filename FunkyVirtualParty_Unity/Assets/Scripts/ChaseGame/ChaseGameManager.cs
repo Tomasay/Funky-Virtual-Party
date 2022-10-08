@@ -65,8 +65,6 @@ public class ChaseGameManager : GameManager
     IEnumerator StartCountdownTimer(int countdown)
     {
         countingDown = true;
-
-        vrInfoText.text = "RUN AWAY!";
         SetVRPlayerMovement(true);
         SetVRPlayerHandMovement(true);
         yield return new WaitForSeconds(1);
@@ -77,6 +75,7 @@ public class ChaseGameManager : GameManager
             yield return new WaitForSeconds(1);
         }
 
+        vrInfoText.text = "RUN AWAY!";
         yield return new WaitForSeconds(1);
         vrInfoText.text = "";
 
