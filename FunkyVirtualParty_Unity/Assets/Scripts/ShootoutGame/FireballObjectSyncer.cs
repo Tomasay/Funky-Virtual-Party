@@ -58,7 +58,7 @@ public class FireballObjectSyncer : ObjectSyncer
             //Check to see if above terrain
             if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, maxIndicatorDistance))
             {
-                if (hit.transform.TryGetComponent<Terrain>(out Terrain ter))
+                if (hit.transform.TryGetComponent<Terrain>(out Terrain ter) || hit.transform.gameObject.name.Contains("Chunk"))
                 {
                     //Enable indicator
                     indicator.enabled = true;
