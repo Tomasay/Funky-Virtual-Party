@@ -278,7 +278,7 @@ public class ClientManager : MonoBehaviour
                 {
                     players[i].transform.SetParent(locations[i]);
                     players[i].transform.localRotation = Quaternion.identity;
-                    players[i].transform.localScale = Vector3.one;
+                    //players[i].transform.localScale = Vector3.one;
                     players[i].transform.localPosition = Vector3.zero;
                 }
                 else

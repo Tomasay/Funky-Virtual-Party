@@ -11,6 +11,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] public GameObject fireball;
     [SerializeField] public Rigidbody rb;
+    [SerializeField] public Canvas chargeCanvas;
     [SerializeField] public Image chargeIndicator;
     [SerializeField] public float minSize, maxSize;
     [SerializeField] Color minColor, maxColor;
@@ -42,6 +43,8 @@ public class Fireball : MonoBehaviour
             pool = new List<Fireball>();
         }
         pool.Add(this);
+
+        chargeCanvas.transform.parent = null;
     }
 
     private void OnDisable()
@@ -51,7 +54,9 @@ public class Fireball : MonoBehaviour
 
     void Update()
     {
-        if((hasExploded && explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
+        chargeCanvas.transform.position = transform.position;
+
+        if ((hasExploded && explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
         {
             Reset();
         }

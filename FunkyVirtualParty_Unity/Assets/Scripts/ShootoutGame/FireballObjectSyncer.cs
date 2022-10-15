@@ -16,7 +16,7 @@ public class FireballObjectSyncer : ObjectSyncer
     [SerializeField] Color boostedMainColor, boostedSecondaryColor;
 
     [SerializeField] SpriteRenderer indicator;
-    private int maxIndicatorDistance = 20;
+    private int maxIndicatorDistance = 4;
     private int fireballExplosionRange = 1;
 
     private bool lastActiveSent; //Value of isActive last sent to clients
@@ -67,7 +67,7 @@ public class FireballObjectSyncer : ObjectSyncer
 
                     //Color and size
                     float t = hit.distance / maxIndicatorDistance;
-                    transform.localScale = Vector3.one * Mathf.Lerp(0.1f, 2, t);
+                    transform.localScale = Vector3.one * Mathf.Lerp(0.05f, 0.5f, t);
                     indicator.color = Color.Lerp(Color.red, Color.yellow, t);
 
                 }

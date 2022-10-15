@@ -254,7 +254,7 @@ public class ClientPlayer : MonoBehaviour
         return -1;
     }
 
-    public void Move(float x, float y, bool changeDirection = true)
+    public virtual void Move(float x, float y, bool changeDirection = true)
     {
         if (canMove)
         {

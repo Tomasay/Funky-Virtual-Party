@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2056377434}
-  m_IndirectSpecularColor: {r: 0.36981785, g: 0.5671755, b: 0.85925514, a: 1}
+  m_IndirectSpecularColor: {r: 0.34783232, g: 0.5839964, b: 0.88408977, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: d74ef4d7f78da2443bc45eca6af69f9e, type: 2}
+  m_LightingDataAsset: {fileID: 0}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 91184d0dd6175f04791aa1f531ce85a8, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -416,7 +416,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -676,7 +676,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!54 &315182873
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -705,27 +705,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 315182873}
+  hightlightMaterial: {fileID: 0}
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
+  grabType: 0
   handType: 0
-  ignoreWeight: 0
-  maintainGrabOffset: 0
   singleHandOnly: 1
   allowHeldSwapping: 1
   instantGrab: 0
+  useGentleGrab: 0
+  maintainGrabOffset: 0
+  ignoreWeight: 0
   parentOnGrab: 1
-  throwMultiplyer: 1
-  lookAssistMultiplyer: 0
-  hightlightMaterial: {fileID: 0}
+  throwPower: 1
   jointBreakForce: 2500
   showAdvancedSettings: 0
-  lockHandOnGrab: 0
   makeChildrenGrabbable: 0
-  jointedBodies: []
-  handIgnoreColliders: []
+  grabPriorityWeight: 1
   ignoreReleaseTime: 0.25
-  grabDistancePriority: 1
   heldPositionOffset: {x: 0, y: 0, z: 0}
   heldRotationOffset: {x: 0, y: 0, z: 0}
+  customGrabJoint: {fileID: 0}
+  jointedBodies: []
+  heldIgnoreColliders: []
+  pullApartBreakOnly: 1
   showEvents: 1
   onGrab:
     m_PersistentCalls:
@@ -769,12 +774,10 @@ MonoBehaviour:
   onUnhighlight:
     m_PersistentCalls:
       m_Calls: []
-  pullApartBreakOnly: 1
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
-  isGrabbable: 1
-  hideEvents: 0
+  lockHandOnGrab: 0
 --- !u!4 &315182875
 Transform:
   m_ObjectHideFlags: 0
@@ -782,8 +785,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 315182872}
-  m_LocalRotation: {x: 0.09208123, y: -0.8579613, z: 0.14810833, w: 0.48320544}
-  m_LocalPosition: {x: -4.4460015, y: 1.205, z: -12.931002}
+  m_LocalRotation: {x: 0.17177151, y: 0.1281379, z: -0.030160632, w: 0.976302}
+  m_LocalPosition: {x: 0, y: 0, z: 0.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1082290525}
@@ -794,7 +797,7 @@ Transform:
   - {fileID: 1789042859}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 20.068, y: -121.384, z: -0.907}
+  m_LocalEulerAnglesHint: {x: 20.068, y: 14.794, z: -0.907}
 --- !u!1 &338507691
 GameObject:
   m_ObjectHideFlags: 0
@@ -920,6 +923,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 5379739014452712362, guid: 8cb3180029a1baa4ea655e21305cb2e3, type: 3}
   playerSpawns:
   - {fileID: 1204093169}
+  VRPlayer: {fileID: 2074098958}
+  maze: {fileID: 1872234904}
 --- !u!4 &466098077
 Transform:
   m_ObjectHideFlags: 0
@@ -1469,7 +1474,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2346,7 +2351,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1217136618}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -3, z: -9.33}
+  m_LocalPosition: {x: 0, y: -1.54, z: -0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -2982,15 +2987,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2998,11 +3003,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.49
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -9.08
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7942002210973373747, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3038,6 +3043,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
+--- !u!1 &2074098958 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7942002210973373748, guid: a0aed12cf77bdce46bd649f369a9701d, type: 3}
+  m_PrefabInstance: {fileID: 2074098957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2091671421
 GameObject:
   m_ObjectHideFlags: 0
@@ -3212,27 +3222,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 0}
+  hightlightMaterial: {fileID: 0}
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
+  grabType: 0
   handType: 0
-  ignoreWeight: 0
-  maintainGrabOffset: 0
   singleHandOnly: 0
   allowHeldSwapping: 1
   instantGrab: 0
+  useGentleGrab: 0
+  maintainGrabOffset: 0
+  ignoreWeight: 0
   parentOnGrab: 1
-  throwMultiplyer: 1
-  lookAssistMultiplyer: 1
-  hightlightMaterial: {fileID: 0}
+  throwPower: 1
   jointBreakForce: Infinity
   showAdvancedSettings: 1
-  lockHandOnGrab: 0
   makeChildrenGrabbable: 1
-  jointedBodies: []
-  handIgnoreColliders: []
+  grabPriorityWeight: 1
   ignoreReleaseTime: 0.25
-  grabDistancePriority: 1
   heldPositionOffset: {x: 0, y: 0, z: 0}
   heldRotationOffset: {x: 0, y: 0, z: 0}
+  customGrabJoint: {fileID: 0}
+  jointedBodies: []
+  heldIgnoreColliders: []
+  pullApartBreakOnly: 0
   showEvents: 1
   onGrab:
     m_PersistentCalls:
@@ -3276,12 +3291,10 @@ MonoBehaviour:
   onUnhighlight:
     m_PersistentCalls:
       m_Calls: []
-  pullApartBreakOnly: 0
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
-  isGrabbable: 1
-  hideEvents: 0
+  lockHandOnGrab: 0
 --- !u!1001 &1097079119089737972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3294,16 +3307,28 @@ PrefabInstance:
       value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.013465205
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.013465205
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.013465205
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.00849998
+      value: 0.0151
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.834
+      value: -0.55936
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.858
+      value: 0.81204
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3396,6 +3421,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1204093169, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0648
+      objectReference: {fileID: 0}
+    - target: {fileID: 1204093169, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0133
+      objectReference: {fileID: 0}
     - target: {fileID: 2363442965236056164, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
       propertyPath: m_Name
       value: HandheldMaze
@@ -3410,11 +3443,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2363442965236056167, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.7733333
+      value: -0.571
       objectReference: {fileID: 0}
     - target: {fileID: 2363442965236056167, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.876454
+      value: 0.81
       objectReference: {fileID: 0}
     - target: {fileID: 2363442965236056167, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
       propertyPath: m_LocalRotation.w

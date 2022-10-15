@@ -5,18 +5,25 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class MazeGameManager : MonoBehaviour
+public class MazeGameManager : GameManager
 {
-    [SerializeField] GameObject playerPrefab;
-    [SerializeField] Transform[] playerSpawns;
+    [SerializeField] GameObject maze;
 
-    void Start()
+    protected override void Start()
     {
-        ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns, true);
-    }
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns, true);
+            State = GameState.Tutorial;
 
-    void Update()
-    {
-        
+            foreach (ClientPlayer cp in ClientManager.instance.Players)
+            {
+                (cp as MazeGameClientPlayer).maze = maze;
+            }
+        }
+        else
+        {
+            Debug.LogError("Client Manager Instance Not Found!");
+        }
     }
 }
