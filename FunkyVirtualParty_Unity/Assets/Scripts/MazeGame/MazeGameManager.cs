@@ -9,6 +9,9 @@ public class MazeGameManager : GameManager
 {
     [SerializeField] GameObject maze;
 
+    [SerializeField] Collider[] vrIgnoreColliders, mazeIgnoreColliders;
+
+
     protected override void Start()
     {
         if (ClientManager.instance)
@@ -24,6 +27,14 @@ public class MazeGameManager : GameManager
         else
         {
             Debug.LogError("Client Manager Instance Not Found!");
+        }
+
+        foreach (Collider col in vrIgnoreColliders)
+        {
+            foreach (Collider col2 in mazeIgnoreColliders)
+            {
+                Physics.IgnoreCollision(col, col2);
+            }
         }
     }
 }
