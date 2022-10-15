@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class MazeGameClientPlayer : ClientPlayer
 {
+    private bool collidingWithWall;
+
     public GameObject maze;
 
     //The last non zero input by player
@@ -64,5 +66,18 @@ public class MazeGameClientPlayer : ClientPlayer
         Vector3 localPos = transform.localPosition;
         localPos.y = 0;
         transform.localPosition = localPos;
+
+        CustomCollision();
+    }
+
+    void CustomCollision()
+    {
+        if (Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
+        {
+            if(hit.collider.transform.tag.Equals("Wall"))
+            {
+                transform.Translate(-movement * Time.deltaTime);
+            }
+        }
     }
 }
