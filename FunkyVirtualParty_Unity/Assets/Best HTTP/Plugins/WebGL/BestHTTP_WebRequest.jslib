@@ -99,7 +99,7 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 				if (!!http.response)
 					responseLength = http.response.byteLength;
 
-				Runtime.dynCall('viiiii', onresponse, [request, http.status, 0, responseLength, 0]);
+				Module['dynCall_viiiii'](onresponse, request, http.status, 0, responseLength, 0);
 			}
 		};
 
@@ -113,7 +113,7 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 
 					stringToUTF8Array(err, HEAPU8, buffer, length);
 
-					Runtime.dynCall('vii', onerror, [request, buffer]);
+					Module['dynCall_vii'](onerror, request, buffer);
 
 					_free(buffer);
 				}
@@ -127,12 +127,12 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 
 		if (ontimeout)
 			http.ontimeout = function http_onerror(e) {
-				Runtime.dynCall('vi', ontimeout, [request]);
+				Module['dynCall_vi'](ontimeout, request);
 			};
 
 		if (onaborted)
 			http.onabort = function http_onerror(e) {
-				Runtime.dynCall('vi', onaborted, [request]);
+				Module['dynCall_vi'](onaborted, request);
 			};
 	},
 
@@ -150,7 +150,7 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 						console.log(request + ' XHR_SetProgressHandler - onProgress ' + e.loaded + ' ' + e.total);
 
 					if (e.lengthComputable)
-						Runtime.dynCall('viii', onprogress, [request, e.loaded, e.total]);
+						Module['dynCall_viii'](onprogress, request, e.loaded, e.total);
 				};
 
 			if (onuploadprogress)
@@ -159,7 +159,7 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 						console.log(request + ' XHR_SetProgressHandler - onUploadProgress ' + e.loaded + ' ' + e.total);
 
 					if (e.lengthComputable)
-						Runtime.dynCall('viii', onuploadprogress, [request, e.loaded, e.total]);
+						Module['dynCall_viii'](onuploadprogress, request, e.loaded, e.total);
 				}, true);
 		}
 	},
@@ -212,7 +212,7 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 		var buffer = _malloc(byteArray.length);
 		HEAPU8.set(byteArray, buffer);
 
-		Runtime.dynCall('viii', callback, [request, buffer, byteArray.length]);
+		Module['dynCall_viii'](callback, request, buffer, byteArray.length);
 
 		_free(buffer);
 	},
@@ -234,7 +234,7 @@ var Lib_BEST_HTTP_WebGL_HTTP_Bridge =
 		var buffer = _malloc(byteArray.length);
 		HEAPU8.set(byteArray, buffer);
 
-		Runtime.dynCall('viii', callback, [request, buffer, byteArray.length]);
+		Module['dynCall_viii'](callback, request, buffer, byteArray.length);
 
 		_free(buffer);
 	},

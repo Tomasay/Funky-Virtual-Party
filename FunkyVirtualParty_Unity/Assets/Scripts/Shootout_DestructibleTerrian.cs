@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Digger.Modules.Runtime.Sources;
 using Digger.Modules.Core.Sources;
+using MemoryPack;
+
+[MemoryPackable]
+public partial class ExplosionData
+{
+    public Vector3 pos;
+    public float size;
+}
 
 public class Shootout_DestructibleTerrian : MonoBehaviour
 {
-    public class ExplosionData
-    {
-        public Vector3 pos;
-        public float size;
-    }
-
     [SerializeField] float blastDepth = 2;
     [SerializeField] float minBlastRadius, maxBlastRadius;
     [SerializeField] float startingHeight = 30;
@@ -23,7 +25,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
     private void Awake()
     {
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClient", MethodCalledFromServer);
 #endif
     }
 
@@ -45,11 +47,12 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         digger.ModifyAsyncBuffured(new Vector3(-55.5f, 27, 50), BrushType.Sphere, ActionType.Dig, 0, 0, 20);
     }
 
-    void MethodCalledFromServer(string methodName, string data)
+    void MethodCalledFromServer(string methodName, byte[] data)
     {
         if(methodName.Equals("ExplosionEvent"))
         {
-            ExplosionData newData = JsonUtility.FromJson<ExplosionData>(data);
+            //ExplosionData newData = JsonUtility.FromJson<ExplosionData>(data);
+            ExplosionData newData = MemoryPackSerializer.Deserialize<ExplosionData>(data);
             digger.ModifyAsyncBuffured(newData.pos, BrushType.Sphere, ActionType.Dig, 0, 1, newData.size);
             CinemachineShake.Instance.ShakeCamera(1, 1);
         }
@@ -84,7 +87,8 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
+            //ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", MemoryPackSerializer.Serialize<ExplosionData>(newData));
         }
     }
 
