@@ -145,6 +145,7 @@ MonoBehaviour:
   videoPreview: {fileID: 0}
   highlightOutline: {fileID: 6337127811713015814}
   vrPlayer: {fileID: 0}
+  poofEffect: {fileID: 4568621449396615745, guid: 836f721988a69e64b8c023130a7268dc, type: 3}
 --- !u!114 &6982595000861948571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,27 +158,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 2506488580921175628}
+  hightlightMaterial: {fileID: 0}
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
+  grabType: 0
   handType: 0
-  ignoreWeight: 1
-  maintainGrabOffset: 0
   singleHandOnly: 1
   allowHeldSwapping: 1
   instantGrab: 0
+  useGentleGrab: 0
+  maintainGrabOffset: 0
+  ignoreWeight: 1
   parentOnGrab: 1
-  throwMultiplyer: 1
-  lookAssistMultiplyer: 1
-  hightlightMaterial: {fileID: 0}
+  throwPower: 1
   jointBreakForce: Infinity
   showAdvancedSettings: 1
-  lockHandOnGrab: 0
   makeChildrenGrabbable: 0
-  jointedBodies: []
-  handIgnoreColliders: []
+  grabPriorityWeight: 1
   ignoreReleaseTime: 0.25
-  grabDistancePriority: 1
   heldPositionOffset: {x: 0, y: 0, z: 0}
   heldRotationOffset: {x: 0, y: 0, z: 0}
+  customGrabJoint: {fileID: 0}
+  jointedBodies: []
+  heldIgnoreColliders: []
+  pullApartBreakOnly: 1
   showEvents: 1
   onGrab:
     m_PersistentCalls:
@@ -197,18 +203,10 @@ MonoBehaviour:
   onUnhighlight:
     m_PersistentCalls:
       m_Calls: []
-  OnUIPointerHighlight:
-    m_PersistentCalls:
-      m_Calls: []
-  OnUIPointerUnhighlight:
-    m_PersistentCalls:
-      m_Calls: []
-  pullApartBreakOnly: 1
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
-  isGrabbable: 1
-  hideEvents: 0
+  lockHandOnGrab: 0
 --- !u!114 &528049329206279739
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -221,7 +219,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935aaf7da50abf94697c8d70a7a71efe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   instantPull: 1
+  grabType: 0
   archMultiplier: 0.6
   gravitationVelocity: 1
   rotate: 1
@@ -281,10 +281,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c49b27d5a0e0d4dd8ab20e2bed42e835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
+  poseEnabled: 1
   poseName: 
   poseIndex: 0
+  singleHanded: 0
+  showAdvanced: 1
+  positionWeight: 1
+  rotationWeight: 1
+  linkedPoses: []
+  showEditorTools: 1
+  poseScriptable: {fileID: 0}
   editorHand: {fileID: 0}
-  useEditorAutoGrab: 1
   rightPose:
     handOffset: {x: 0.9713767, y: -0.3734089, z: -0.8103699}
     rotationOffset: {x: 0, y: 0, z: 0}
@@ -381,13 +389,13 @@ MonoBehaviour:
   leftPoseSet: 1
   centerObject: {fileID: 0}
   up: {x: 0, y: 1, z: 0}
+  useInvertPose: 0
   minAngle: 0
   maxAngle: 360
   maxRange: 0
   minRange: 0
   testAngle: 0
   testRange: 0
-  showGizmos: 1
 --- !u!114 &7460321804510483054
 MonoBehaviour:
   m_ObjectHideFlags: 0

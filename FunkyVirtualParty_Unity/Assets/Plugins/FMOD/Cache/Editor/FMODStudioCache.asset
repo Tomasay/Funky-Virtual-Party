@@ -1,5 +1,32 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-3489532395887286795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Pop
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Pop
+  Guid:
+    Data1: -163441999
+    Data2: 1251328224
+    Data3: -242444367
+    Data4: -1868836969
+  Banks:
+  - {fileID: 8547906298644744342}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 73
 --- !u!114 &-1657200388165055800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,10 +42,10 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 637985106310123831
+  lastModified: 638022406725938028
   FileSizes:
   - Name: Desktop
-    Value: 762
+    Value: 812
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -36,15 +63,16 @@ MonoBehaviour:
   - {fileID: -1657200388165055800}
   - {fileID: 8547906298644744342}
   EditorEvents:
-  - {fileID: 4059570896026963574}
+  - {fileID: 596740172380866313}
+  - {fileID: -3489532395887286795}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8547906298644744342}
   StringsBanks:
   - {fileID: -1657200388165055800}
-  cacheTime: 637985106310123831
+  cacheTime: 638022406725938028
   cacheVersion: 131591
---- !u!114 &4059570896026963574
+--- !u!114 &596740172380866313
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,8 +114,8 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 637985106310123831
+  lastModified: 638022406725933066
   FileSizes:
   - Name: Desktop
-    Value: 1522112
+    Value: 1524352
   Exists: 1

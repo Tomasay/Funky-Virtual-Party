@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
 using Autohand;
+using FMODUnity;
 
 public class VinylInfo : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class VinylInfo : MonoBehaviour
     Vector3 startingPos;
     Quaternion startingRot;
 
+
+    [SerializeField] GameObject poofEffect;
     float distanceToRespawn = 7;
 
     private void Awake()
@@ -51,6 +54,9 @@ public class VinylInfo : MonoBehaviour
 
     void RespawnDisc()
     {
+        RuntimeManager.PlayOneShotAttached("event:/SFX/Pop", gameObject);
+        Instantiate(poofEffect, transform.position, transform.rotation);
+
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.position = startingPos;
