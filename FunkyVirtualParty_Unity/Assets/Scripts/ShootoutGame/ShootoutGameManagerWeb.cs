@@ -56,7 +56,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
                 }
                 break;
             case GameState.GameLoop:
-                SetPlayerMovement(true);
                 countingDown = false;
                 if (timeRemaining > 0) { timeRemaining -= Time.deltaTime; }
                 gameTimeText.text = FormatTime(timeRemaining);
@@ -100,6 +99,7 @@ public class ShootoutGameManagerWeb : GameManagerWeb
 
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
+        SetPlayerMovement(true);
     }
 
     IEnumerator GameOver(int countdown, string txt)
