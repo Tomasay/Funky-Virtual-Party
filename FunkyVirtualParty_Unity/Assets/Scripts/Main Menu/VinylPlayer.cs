@@ -7,6 +7,10 @@ using UnityEngine.Video;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+#if UNITY_EDITOR
+using UnityEngine.InputSystem;
+#endif
+
 public class VinylPlayer : MonoBehaviour
 {
     [SerializeField] Transform vinylParent;
@@ -90,6 +94,21 @@ public class VinylPlayer : MonoBehaviour
         {
             currentVinyl.transform.Rotate(0, vinylSpinSpeed, 0);
         }
+
+#if UNITY_EDITOR
+        if(Keyboard.current.vKey.wasPressedThisFrame)
+        {
+            ClientManager.instance.OnMinigameStart("ChaseGame");
+        }
+        else if (Keyboard.current.iKey.wasPressedThisFrame)
+        {
+            ClientManager.instance.OnMinigameStart("Shootout");
+        }
+        else if (Keyboard.current.mKey.wasPressedThisFrame)
+        {
+            ClientManager.instance.OnMinigameStart("MazeGame");
+        }
+#endif
     }
 
     IEnumerator LoadSceneDelayed(string sceneName, int delay)

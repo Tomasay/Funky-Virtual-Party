@@ -4,6 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+#if UNITY_EDITOR
+using UnityEngine.InputSystem;
+#endif
+
 public class TutorialMenu : MonoBehaviour
 {
     [SerializeField] Canvas vrCanvas;
@@ -33,6 +37,16 @@ public class TutorialMenu : MonoBehaviour
         {
             VrPlayerReady.onClick.AddListener(ReadyUpVR);
         }
+    }
+
+    private void Update()
+    {
+#if UNITY_EDITOR
+        if (Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            ReadyUpVR();
+        }
+#endif
     }
 
     private void OnDestroy()
