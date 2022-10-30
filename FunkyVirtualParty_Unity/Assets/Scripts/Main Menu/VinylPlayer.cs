@@ -108,6 +108,10 @@ public class VinylPlayer : MonoBehaviour
         {
             ClientManager.instance.OnMinigameStart("MazeGame");
         }
+        else if (Keyboard.current.kKey.wasPressedThisFrame)
+        {
+            ClientManager.instance.OnMinigameStart("Kaiju");
+        }
 #endif
     }
 
