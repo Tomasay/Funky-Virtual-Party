@@ -32,14 +32,14 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
 
-        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
-
         ClientManagerWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
 
         foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
         {
             (cp as ShootoutGameClientPlayer).cam = cam;
         }
+
+        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
     }
 
     void Update()
@@ -77,10 +77,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
             default:
                 break;
         }
-
-        //Camera offset
-        float t = (((ClientManagerWeb.instance.LocalPlayer.transform.position.x - -55) / 17)+1)/2;
-        cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_PathOffset = new Vector3(0, 0, Mathf.Lerp(-12, 12, t));
     }
 
     IEnumerator StartCountdownTimer(int countdown)
@@ -100,6 +96,9 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
         SetPlayerMovement(true);
+
+        cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_YDamping = 1;
+        cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_ZDamping = 1;
     }
 
     IEnumerator GameOver(int countdown, string txt)

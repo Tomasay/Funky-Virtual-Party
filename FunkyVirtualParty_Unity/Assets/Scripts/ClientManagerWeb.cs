@@ -337,6 +337,8 @@ public class ClientManagerWeb : MonoBehaviour
             {
                 localPlayer = players[i];
             }
+
+            manager.Socket.Emit("requestPlayerPosFromClient", ID);
         }
     }
 }

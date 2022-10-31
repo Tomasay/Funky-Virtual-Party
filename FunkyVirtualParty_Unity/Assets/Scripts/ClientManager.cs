@@ -77,6 +77,7 @@ public class ClientManager : MonoBehaviour
             manager.Socket.On<string>("readyUp", OnReadyUp);
             manager.Socket.On<string>("action", OnAction);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
+            manager.Socket.On<string>("requestPlayerPosToHost", SyncPlayerPos);
 
             DontDestroyOnLoad(gameObject);
         }
@@ -219,6 +220,12 @@ public class ClientManager : MonoBehaviour
         GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
+    public void SyncPlayerPos(string id)
+    {
+        ClientPlayer cp = GetPlayerByID(id);
+        manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
+    }
+
     public void SyncAllPlayerPos()
     {
         foreach (ClientPlayer cp in players)
@@ -289,8 +296,6 @@ public class ClientManager : MonoBehaviour
         }
 
         onPlayerSpawned.Invoke();
-
-        SyncAllPlayerPos();
     }
 
     private string GetTime()

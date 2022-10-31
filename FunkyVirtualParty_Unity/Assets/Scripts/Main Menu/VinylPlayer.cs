@@ -25,6 +25,8 @@ public class VinylPlayer : MonoBehaviour
     private Animator anim;
     private GameObject currentVinyl = null;
 
+    private bool isSceneLoading = false;
+
     private void Start()
     {
         if(!TryGetComponent<Animator>(out anim))
@@ -96,21 +98,28 @@ public class VinylPlayer : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        if(Keyboard.current.vKey.wasPressedThisFrame)
+        if (!isSceneLoading)
         {
-            ClientManager.instance.OnMinigameStart("ChaseGame");
-        }
-        else if (Keyboard.current.iKey.wasPressedThisFrame)
-        {
-            ClientManager.instance.OnMinigameStart("Shootout");
-        }
-        else if (Keyboard.current.mKey.wasPressedThisFrame)
-        {
-            ClientManager.instance.OnMinigameStart("MazeGame");
-        }
-        else if (Keyboard.current.kKey.wasPressedThisFrame)
-        {
-            ClientManager.instance.OnMinigameStart("Kaiju");
+            if (Keyboard.current.vKey.wasPressedThisFrame)
+            {
+                isSceneLoading = true;
+                ClientManager.instance.OnMinigameStart("ChaseGame");
+            }
+            else if (Keyboard.current.iKey.wasPressedThisFrame)
+            {
+                isSceneLoading = true;
+                ClientManager.instance.OnMinigameStart("Shootout");
+            }
+            else if (Keyboard.current.mKey.wasPressedThisFrame)
+            {
+                isSceneLoading = true;
+                ClientManager.instance.OnMinigameStart("MazeGame");
+            }
+            else if (Keyboard.current.kKey.wasPressedThisFrame)
+            {
+                isSceneLoading = true;
+                ClientManager.instance.OnMinigameStart("Kaiju");
+            }
         }
 #endif
     }
@@ -119,6 +128,7 @@ public class VinylPlayer : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
+        isSceneLoading = true;
         ClientManager.instance.OnMinigameStart(sceneName);
     }
 }
