@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] public Texture2D colorPalette;
-    private static List<Color> availableColors; //Colors not used from the available palette
+    public static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] protected TMP_Text playerNameText;
     [SerializeField] protected TMP_Text playerIndicatorText;
     [SerializeField] protected SkinnedMeshRenderer smr;
@@ -51,6 +51,7 @@ public class ClientPlayer : MonoBehaviour
 
     public Animator Anim { get => anim;}
     public Collider Col { get => col; }
+    public SkinnedMeshRenderer Smr { get => smr; }
 
     protected virtual void Start()
     {

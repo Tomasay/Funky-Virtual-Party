@@ -45,6 +45,12 @@ public class ClientManager : MonoBehaviour
     public SocketManager Manager { get => manager; }
     public string URL { get => url; }
     public string Passcode { get => passcode; }
+
+#if UNITY_EDITOR
+    [SerializeField]
+    private string[] debugPlayersToAdd;
+#endif
+
     void Awake()
     {
         //Singleton instantiation
@@ -84,6 +90,13 @@ public class ClientManager : MonoBehaviour
 
         InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
         InvokeRepeating("SendHeartbeat", 0, 2.0f);
+
+#if UNITY_EDITOR
+        for (int i = 0; i < debugPlayersToAdd.Length; i++)
+        {
+            SpawnDebugPlayer("test" + (i + 1), debugPlayersToAdd[i]);
+        }
+#endif
     }
 
     private void Update()
@@ -189,6 +202,33 @@ public class ClientManager : MonoBehaviour
             onClientConnect(newPlayer.gameObject);
         }
     }
+
+#if UNITY_EDITOR
+    private void SpawnDebugPlayer(string id, string name)
+    {
+        ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
+
+        StartCoroutine("AddDebugDelayed", id);
+
+        players.Add(newPlayer);
+        newPlayer.PlayerID = id;
+        
+        newPlayer.PlayerName = name;
+
+        if (onClientConnect != null)
+        {
+            onClientConnect(newPlayer.gameObject);
+        }
+    }
+
+    //Not sure why this is necessary but doesn't work unless delayed... cool
+    IEnumerator AddDebugDelayed(string id)
+    {
+        yield return new WaitForSeconds(1);
+        GetPlayerByID(id).PlayerIP = "test";
+        GetPlayerByID(id).gameObject.AddComponent<ClientPlayerDebug>();
+    }
+#endif
 
     public event Action<string> onClientDisonnect;
     private void OnClientDisconnect(string id, string ip)
