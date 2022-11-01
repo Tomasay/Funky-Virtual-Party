@@ -53,6 +53,10 @@ public class ClientPlayer : MonoBehaviour
     public Collider Col { get => col; }
     public SkinnedMeshRenderer Smr { get => smr; }
 
+#if UNITY_EDITOR
+    public bool isDebugPlayer;
+#endif
+
     protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);

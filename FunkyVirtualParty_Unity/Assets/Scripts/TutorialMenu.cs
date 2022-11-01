@@ -37,7 +37,28 @@ public class TutorialMenu : MonoBehaviour
         {
             VrPlayerReady.onClick.AddListener(ReadyUpVR);
         }
+
+#if UNITY_EDITOR
+        StartCoroutine("ReadyUpDelayed");
+#endif
     }
+
+#if UNITY_EDITOR
+    IEnumerator ReadyUpDelayed()
+    {
+        yield return new WaitForSeconds(2);
+
+        Debug.Log("gang");
+
+        foreach (ClientPlayer cp in ClientManager.instance.Players)
+        {
+            if (cp.isDebugPlayer)
+            {
+                ClientManager.instance.Manager.Socket.Emit("ReadyUpDebug", cp.PlayerID);
+            }
+        }
+    }
+#endif
 
     private void Update()
     {

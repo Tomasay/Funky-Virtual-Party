@@ -207,7 +207,7 @@ public class ClientManager : MonoBehaviour
     private void SpawnDebugPlayer(string id, string name)
     {
         ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
-
+        
         StartCoroutine("AddDebugDelayed", id);
 
         players.Add(newPlayer);
@@ -226,6 +226,7 @@ public class ClientManager : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         GetPlayerByID(id).PlayerIP = "test";
+        GetPlayerByID(id).isDebugPlayer = true;
         GetPlayerByID(id).gameObject.AddComponent<ClientPlayerDebug>();
     }
 #endif
@@ -310,6 +311,11 @@ public class ClientManager : MonoBehaviour
             float playerHeight = players[i].PlayerHeight;
             int hatIndex = players[i].PlayerHatIndex;
 
+#if UNITY_EDITOR
+            bool isDebug = players[i].isDebugPlayer;
+#endif
+
+
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
             players[i].PlayerID = ID;
@@ -333,6 +339,13 @@ public class ClientManager : MonoBehaviour
                     players[i].transform.position = locations[i].position;
                 }
             }
+
+#if UNITY_EDITOR
+            if(isDebug)
+            {
+                StartCoroutine("AddDebugDelayed", ID);
+            }
+#endif
         }
 
         onPlayerSpawned.Invoke();
