@@ -89,8 +89,14 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if (IsLocal && isColliding)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x, collisionVector.normalized.y);
-            Move(collisionVector.normalized.x, collisionVector.normalized.y, false);
+#if UNITY_EDITOR
+            if (isDebugPlayer)
+            {
+                ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, playerID);
+            }
+#endif
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f);
+            Move(collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, false);
 
             Vector3 positionDifference = posFromHost - transform.position;   
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
@@ -110,6 +116,13 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
         if (isLocal && isExplosion)
         {
+#if UNITY_EDITOR
+            if (isDebugPlayer)
+            {
+                ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, playerID);
+            }
+#endif
+
             ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f );
             Move(collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, false);
 

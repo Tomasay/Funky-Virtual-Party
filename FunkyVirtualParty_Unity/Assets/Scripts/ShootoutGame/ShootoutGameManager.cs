@@ -14,6 +14,12 @@ public class ShootoutGameManager : GameManager
     private bool countingDown = false;
     private float timeRemaining;
 
+#if UNITY_EDITOR
+    [SerializeField] private Transform[] debugWaypoints;
+    private Vector3[] currentWaypoints;
+    private float[] currentWaypointDistances;
+#endif
+
     protected override void Start()
     {
         base.Start();
@@ -35,6 +41,11 @@ public class ShootoutGameManager : GameManager
         SetPlayerMovement(false);
         SetVRPlayerMovementDelayed(false, 1);
         SetVRPlayerCanThrowFireballs(false);
+
+#if UNITY_EDITOR
+        currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
+        currentWaypointDistances = new float[ClientManager.instance.Players.Count];
+#endif
     }
 
     void Update()
@@ -73,6 +84,10 @@ public class ShootoutGameManager : GameManager
             default:
                 break;
         }
+
+#if UNITY_EDITOR
+        UpdateDebugPlayers();
+#endif
     }
 
     void CheckPlayersLeft()
@@ -132,4 +147,40 @@ public class ShootoutGameManager : GameManager
     {
         VRPlayer.GetComponent<ShootoutGameVRPlayerController>().canThrowFireballs = canThrow;
     }
+
+#if UNITY_EDITOR
+    private void UpdateDebugPlayers()
+    {
+        for (int i = 0; i < ClientManager.instance.Players.Count; i++)
+        {
+            if(ClientManager.instance.Players[i].isDebugPlayer)
+            {
+                UpdateDebugPlayerWaypoint(ClientManager.instance.Players[i], i);
+            }
+        }
+    }
+
+    private void UpdateDebugPlayerWaypoint(ClientPlayer cp, int index)
+    {
+        //If player does not have a waypoint, or has made it to their waypoint
+        if (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f)
+        {
+            //Get new waypoint
+            currentWaypoints[index] = debugWaypoints[Random.Range(0, debugWaypoints.Length)].position;
+            currentWaypointDistances[index] = Vector3.Distance(currentWaypoints[index], cp.transform.position);
+        }
+        //Else move towards next waypoint
+        else
+        {
+            Vector3 dir = (currentWaypoints[index] - cp.transform.position).normalized;
+
+            //Ease in & out speed
+            float dist = Vector3.Distance(currentWaypoints[index], cp.transform.position);
+            dir *= Mathf.Clamp(1/(dist / currentWaypointDistances[index]), 0.1f, 1f);
+
+            cp.Move(dir.x, dir.z);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", dir.x, dir.z, cp.PlayerID);
+        }
+    }
+#endif
 }
