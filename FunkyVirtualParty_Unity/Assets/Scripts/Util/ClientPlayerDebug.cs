@@ -15,11 +15,6 @@ public class ClientPlayerDebug : MonoBehaviour
         ClientManager.instance.onClientConnect += NewPlayerJoined;
     }
 
-    private void Update()
-    {
-        ClientManager.instance.Manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
-    }
-
     void NewPlayerJoined(GameObject newPlayer)
     {
         ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), cp.PlayerHeadType, cp.PlayerHeight, -1);

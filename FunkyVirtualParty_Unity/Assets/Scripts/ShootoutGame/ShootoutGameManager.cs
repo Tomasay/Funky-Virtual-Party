@@ -53,7 +53,6 @@ public class ShootoutGameManager : GameManager
         switch (State)
         {
             case GameState.Tutorial:
-                
                 break;
             case GameState.Countdown:
                 if (!countingDown)
@@ -112,6 +111,8 @@ public class ShootoutGameManager : GameManager
     {
         countingDown = true;
         SetVRPlayerCanThrowFireballs(true);
+
+        yield return new WaitForSeconds(1);
 
         for (int i = countdown; i > 0; i--)
         {
@@ -178,7 +179,6 @@ public class ShootoutGameManager : GameManager
             float dist = Vector3.Distance(currentWaypoints[index], cp.transform.position);
             dir *= Mathf.Clamp(1/(dist / currentWaypointDistances[index]), 0.1f, 1f);
 
-            cp.Move(dir.x, dir.z);
             ClientManager.instance.Manager.Socket.Emit("inputDebug", dir.x, dir.z, cp.PlayerID);
         }
     }

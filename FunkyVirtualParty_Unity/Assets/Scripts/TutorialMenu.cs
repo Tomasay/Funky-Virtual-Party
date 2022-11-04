@@ -48,8 +48,6 @@ public class TutorialMenu : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
-        Debug.Log("gang");
-
         foreach (ClientPlayer cp in ClientManager.instance.Players)
         {
             if (cp.isDebugPlayer)
