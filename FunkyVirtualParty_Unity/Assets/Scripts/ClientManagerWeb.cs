@@ -312,7 +312,7 @@ public class ClientManagerWeb : MonoBehaviour
         StartCoroutine("FadeIn");
     }
 
-    public void SpawnPlayers(GameObject prefab)
+    public void SpawnPlayers(GameObject prefab, bool parentToLocation = false, Transform[] locationParents = null)
     {
         for (int i = 0; i < players.Count; i++)
         {
@@ -336,6 +336,13 @@ public class ClientManagerWeb : MonoBehaviour
             if(isLocal)
             {
                 localPlayer = players[i];
+            }
+
+            if (parentToLocation)
+            {
+                players[i].transform.SetParent(locationParents[i]);
+                players[i].transform.localRotation = Quaternion.identity;
+                players[i].transform.localPosition = Vector3.zero;
             }
 
             manager.Socket.Emit("requestPlayerPosFromClient", ID);

@@ -9,7 +9,10 @@ public class MazeGameManagerWeb : GameManagerWeb
 
     protected override void Start()
     {
-        base.Start();
+        ClientManagerWeb.instance.SpawnPlayers(playerPrefab, true, spawnPoints);
+        State = GameState.Tutorial;
+
+        ClientManagerWeb.instance.Manager.Socket.On<string>("gameStateToClient", OnStateChange);
 
         for (int i = 0; i < ClientManagerWeb.instance.Players.Count; i++)
         {

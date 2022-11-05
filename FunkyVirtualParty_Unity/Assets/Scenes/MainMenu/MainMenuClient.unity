@@ -6190,8 +6190,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -200, y: 285}
-  m_SizeDelta: {x: 300, y: 300}
+  m_AnchoredPosition: {x: -150, y: 150}
+  m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1788419342
 MonoBehaviour:
@@ -7410,6 +7410,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 607464388}
     m_Modifications:
+    - target: {fileID: 5490360201634060129, guid: 226da065fe306ce42a638a75f214ed83, type: 3}
+      propertyPath: transformsToFlip.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5490360201634060129, guid: 226da065fe306ce42a638a75f214ed83, type: 3}
+      propertyPath: transformsToFlip.Array.data[2]
+      value: 
+      objectReference: {fileID: 1788419341}
     - target: {fileID: 6405218446345633857, guid: 226da065fe306ce42a638a75f214ed83, type: 3}
       propertyPath: m_Name
       value: ClientInput_Controller

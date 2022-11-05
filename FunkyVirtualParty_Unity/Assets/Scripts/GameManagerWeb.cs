@@ -8,9 +8,9 @@ using Autohand;
 
 public class GameManagerWeb : MonoBehaviour
 {
-    [SerializeField] GameObject playerPrefab;
+    [SerializeField] protected GameObject playerPrefab;
 
-    [SerializeField] GameObject VRPlayer;
+    [SerializeField] protected GameObject VRPlayer;
 
     protected bool endingGame = false; //Set to true when coroutine has been started to load main menu. Used to prevent trying to load more than once
 
