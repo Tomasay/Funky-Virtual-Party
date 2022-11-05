@@ -114,15 +114,25 @@ public class ShootoutGameClientPlayer : ClientPlayer
             CheckIceTrailVisibility();
         }
 
+
+#if UNITY_EDITOR
+        if (isDebugPlayer && isExplosion)
+        {
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, playerID);
+
+            explosionTimer -= Time.deltaTime;
+            if (explosionTimer <= 0)
+            {
+                isExplosion = false;
+            }
+        }
+        else
+        {
+            explosionTimer = explosionTimerDefault;
+        }
+#endif
         if (isLocal && isExplosion)
         {
-#if UNITY_EDITOR
-            if (isDebugPlayer)
-            {
-                ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, playerID);
-            }
-#endif
-
             ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f );
             Move(collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, false);
 

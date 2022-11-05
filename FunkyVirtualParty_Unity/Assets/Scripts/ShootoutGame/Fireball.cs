@@ -180,6 +180,17 @@ public class Fireball : MonoBehaviour
         if (ClientManager.instance)
         {
             ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", syncer.CurrentFireballData.objectID.ToString());
+
+#if UNITY_EDITOR
+            foreach (ClientPlayer cp in ClientManager.instance.Players)
+            {
+                if (cp.isDebugPlayer)
+                {
+                    ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)cp;
+                    sp.CheckCollisionWithFireball(syncer.CurrentFireballData.Position, Mathf.Max(2, syncer.CurrentFireballData.currentScale));
+                }
+            }
+#endif
         }
     }
 
