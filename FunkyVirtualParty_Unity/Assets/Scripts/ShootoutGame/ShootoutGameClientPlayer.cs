@@ -18,6 +18,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
     const float collisionTimerDefault = 0.5f;
     Vector2 collisionVector;
 
+    const float frictionCoefficient = 0.015f;
+
     public Camera cam;
 
     [SerializeField] ParticleSystem waterSplash, iceTrail;
@@ -61,10 +63,34 @@ public class ShootoutGameClientPlayer : ClientPlayer
     public Vector2 prevVector = Vector2.zero;
     protected override void Update()
     {
+#if UNITY_EDITOR
+        if (isDebugPlayer && !isColliding)
+        {
+            Vector2 input = new Vector2(movement.x, movement.z);
+
+            if (prevVector == Vector2.zero)
+                prevVector = input;
+
+            Vector2 delta = (input - prevVector) * frictionCoefficient;
+            Vector2 target = prevVector + delta;
+            prevVector = target;
+
+            collisionTimer = collisionTimerDefault;
+        }
+        else if(isDebugPlayer && isColliding)
+        {
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, playerID);
+
+            collisionTimer -= Time.deltaTime;
+            if (collisionTimer <= 0)
+            {
+                isColliding = false;
+            }
+        }
+#endif
         if (IsLocal && !isColliding) //Only read values from analog stick, and emit movement if being done from local device
         {
             // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
-            float frictionCoefficient = 0.015f;
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
             if (prevVector == Vector2.zero)
@@ -89,12 +115,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if (IsLocal && isColliding)
         {
-#if UNITY_EDITOR
-            if (isDebugPlayer)
-            {
-                ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, playerID);
-            }
-#endif
             ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f);
             Move(collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, false);
 
@@ -118,7 +138,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, playerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, playerID);
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -133,8 +153,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f );
-            Move(collisionVector.normalized.x * -2.5f, collisionVector.normalized.y * -2.5f, false);
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2 );
+            Move(collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, false);
 
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime); 
