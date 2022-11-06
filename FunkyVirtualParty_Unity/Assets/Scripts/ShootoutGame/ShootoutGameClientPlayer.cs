@@ -15,7 +15,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     public UnityEvent OnDeath;
     public bool isColliding = false;
     float collisionTimer = 0.5f;
-    const float collisionTimerDefault = 0.5f;
+    const float collisionTimerDefault = 1;
     Vector2 collisionVector;
 
     const float frictionCoefficient = 0.015f;
