@@ -68,5 +68,12 @@ mergeInto(LibraryManager.library, {
 		else{
 			return null;
 		}
+	},
+	TriggerHaptic: function (hapticTime)
+	{
+	    //Works on every browser and platform except IOS :)
+		if(window.navigator.vibrate){
+			navigator.vibrate(hapticTime);
+		}
 	}
 });

@@ -3,9 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Cinemachine;
+#if UNITY_WEBGL
+using System.Runtime.InteropServices;
+#endif
 
 public class ShootoutGameClientPlayer : ClientPlayer
 {
+#if UNITY_WEBGL
+        [DllImport("__Internal")]
+        private static extern void TriggerHaptic(int hapticTime);
+#endif
+
     class WaterSplashData
     {
         public Vector3 splashPos; //Where the splash should display
@@ -217,6 +225,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
     }
 
+    #if UNITY_WEBGL
     void MethodCalledFromServer(string methodName, string data)
     {
         if (methodName.Equals("WaterSplashEvent"))
@@ -231,8 +240,11 @@ public class ShootoutGameClientPlayer : ClientPlayer
             player.isAlive = false;
 
             player.TriggerIceCubeAnimation();
+
+            TriggerHaptic(500);
         }
     }
+#endif
 
     void SpawnSplashEffect(Vector3 collisionPoint)
     {

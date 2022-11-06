@@ -1,13 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+#if UNITY_WEBGL
+using System.Runtime.InteropServices;
+#endif
 
 public class FireballObjectSyncer : ObjectSyncer
 {
+#if UNITY_WEBGL
+        [DllImport("__Internal")]
+        private static extern void TriggerHaptic(int hapticTime);
+#endif
+
     [SerializeField] GameObject fireballMesh, fireballTrail;
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] float minSize, maxSize;
@@ -88,6 +95,7 @@ public class FireballObjectSyncer : ObjectSyncer
 #endif
     }
 
+#if UNITY_WEBGL
     void MethodCalledFromServer(string methodName, string data)
     {
         if (int.TryParse(data, out int id) && id == currentFireballData.objectID)
@@ -100,14 +108,15 @@ public class FireballObjectSyncer : ObjectSyncer
             {
                 explosion.Play();
 
-#if UNITY_WEBGL
+
                 ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.LocalPlayer;
                 sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, currentFireballData.currentScale * fireballExplosionRange) ); 
-#endif
 
+                TriggerHaptic(200);
             }
         }
     }
+#endif
 
 #if !UNITY_WEBGL
     protected override void SendData()
