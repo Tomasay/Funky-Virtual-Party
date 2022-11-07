@@ -72,6 +72,7 @@ public class MazeGameClientPlayer : ClientPlayer
 
     void CustomCollision()
     {
+#if UNITY_ANDROID
         if (Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
         {
             if(hit.collider.transform.tag.Equals("Wall"))
@@ -79,5 +80,16 @@ public class MazeGameClientPlayer : ClientPlayer
                 transform.Translate(-movement * Time.deltaTime);
             }
         }
+
+#elif UNITY_WEBGL
+        if (isLocal && Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
+        {
+            if (hit.collider.transform.tag.Equals("Wall"))
+            {
+                transform.Translate(-movement * Time.deltaTime);
+            }
+        }
+#endif
+
     }
 }
