@@ -43,7 +43,7 @@ public class FireballObjectSyncer : ObjectSyncer
     protected override void Awake()
     {
         currentFireballData = new FireballObjectData();
-        currentFireballData.Awake();
+        currentData.Init(objectID);
 
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);

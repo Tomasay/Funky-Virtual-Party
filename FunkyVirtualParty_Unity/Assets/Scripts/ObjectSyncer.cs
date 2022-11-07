@@ -5,7 +5,10 @@ using System;
 
 public class ObjectSyncer : MonoBehaviour
 {
-    //How often data is sent to be synced
+    [Tooltip("ID of object to track in scene. Must be the same ID on mobile vs VR scenes")]
+    public int objectID;
+
+    [Tooltip("How often data is sent to be synced")]
     public float UpdatesPerSecond = 10;
 
     [Serializable]
@@ -13,13 +16,11 @@ public class ObjectSyncer : MonoBehaviour
     {
         public SerializedVector3 Position;
         public SerializedQuaternion Rotation;
-        public static int objectIndex;
         public int objectID;
 
-        public void Awake()
+        public void Init(int ID)
         {
-            objectIndex++;
-            objectID = objectIndex;
+            objectID = ID;
         }
     }
 
@@ -29,7 +30,7 @@ public class ObjectSyncer : MonoBehaviour
     protected virtual void Awake()
     {
         currentData = new ObjectData();
-        currentData.Awake();
+        currentData.Init(objectID);
 
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
