@@ -1,9 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_WEBGL
+using System.Runtime.InteropServices;
+#endif
 
 public class MazeGameClientPlayer : ClientPlayer
 {
+#if UNITY_WEBGL
+        [DllImport("__Internal")]
+        private static extern void TriggerHaptic(int hapticTime);
+#endif
+
     private bool collidingWithWall;
 
     public GameObject maze;
@@ -16,6 +24,10 @@ public class MazeGameClientPlayer : ClientPlayer
         base.Awake();
 
         startingSpeed = speed = 0.05f; //Smol map = smol speed
+
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+#endif
     }
 
     public override void Move(float x, float y, bool changeDirection = true)
@@ -70,6 +82,28 @@ public class MazeGameClientPlayer : ClientPlayer
         CustomCollision();
     }
 
+
+#if UNITY_WEBGL
+    void MethodCalledFromServer(string methodName, string data)
+    {
+        if (methodName.Equals("MarbleCollision"))
+        {
+            //Player falls over
+            ClientPlayer player = ClientManagerWeb.instance.GetPlayerByID(data);
+            player.Anim.SetTrigger("Fall");
+            TriggerBlinkingAnimation(3);
+
+            if(player.IsLocal)
+            {
+                TriggerHaptic(200);
+            }
+
+            //TODO: Reduce score for appropriate player
+
+        }
+    }
+#endif
+
     void CustomCollision()
     {
 #if UNITY_ANDROID
@@ -91,5 +125,21 @@ public class MazeGameClientPlayer : ClientPlayer
         }
 #endif
 
+    }
+
+    public void TriggerBlinkingAnimation(int time)
+    {
+        StartCoroutine("TriggerBlinkingAnimationCoroutine", time);
+    }
+
+    IEnumerator TriggerBlinkingAnimationCoroutine(int time)
+    {
+        for (int i = 0; i < time*2; i++)
+        {
+            smr.enabled = false;
+            yield return new WaitForSeconds(0.25f);
+            smr.enabled = true;
+            yield return new WaitForSeconds(0.25f);
+        }
     }
 }

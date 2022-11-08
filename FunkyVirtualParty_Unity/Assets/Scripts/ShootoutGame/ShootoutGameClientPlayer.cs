@@ -225,7 +225,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
     }
 
-    #if UNITY_WEBGL
+#if UNITY_WEBGL
     void MethodCalledFromServer(string methodName, string data)
     {
         if (methodName.Equals("WaterSplashEvent"))

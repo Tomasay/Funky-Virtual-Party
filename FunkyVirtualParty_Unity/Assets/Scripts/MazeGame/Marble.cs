@@ -37,6 +37,20 @@ public class Marble : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        //Collision should be dictated by host
+#if UNITY_ANDROID
+        if (collision.gameObject.TryGetComponent<MazeGameClientPlayer>(out MazeGameClientPlayer player))
+        {
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MarbleCollision", player.PlayerID);
+
+            player.Anim.SetTrigger("Fall");
+            player.TriggerBlinkingAnimation(3);
+        }
+#endif
+    }
+
     private Vector3 GetPosRelativeToMaze()
     {
         Vector3 relativePoint = handheldMaze.transform.InverseTransformPoint(transform.position);
