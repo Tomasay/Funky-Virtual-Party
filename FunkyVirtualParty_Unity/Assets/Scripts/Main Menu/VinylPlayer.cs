@@ -120,6 +120,11 @@ public class VinylPlayer : MonoBehaviour
                 isSceneLoading = true;
                 ClientManager.instance.OnMinigameStart("Kaiju");
             }
+            else if (Keyboard.current.pKey.wasPressedThisFrame)
+            {
+                isSceneLoading = true;
+                ClientManager.instance.OnMinigameStart("3DPaintGame");
+            }
         }
 #endif
     }

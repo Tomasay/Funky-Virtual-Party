@@ -14,29 +14,68 @@ public class ThreeDPen : MonoBehaviour
     [SerializeField]
     Transform tip;
 
+#if UNITY_ANDROID
     [SerializeField]
     Rigidbody rb;
+#endif
 
     bool isPainting;
 
     //The amount of time that has to pass before another point can be created
-    const float pointSecondDelay = 0.01f;
+    const float pointSecondDelay = 0.1f;
 
     float lastPointTime;
 
     const int maxPointCount = 10000;
     int currentPointCount;
 
+    private void Awake()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+#endif
+    }
+
+#if UNITY_ANDROID
     void Update()
     {
         if(isPainting && rb.velocity.magnitude > 0.1f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
         {
-            Vector3 pos = currentLine.transform.InverseTransformPoint(tip.position);
-            currentLine.AddPoint(pos);
-            currentPointCount++;
-            lastPointTime = Time.time;
+            AddNewLinePoint();
+            if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
         }
     }
+
+    public void OnTriggerPressed(Hand h, Grabbable g)
+    {
+        isPainting = true;
+
+        CreateNewLine();
+        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenCreateNewLine", "");
+
+        HapticsManager.instance.TriggerHaptic(h.left, 999, 0.1f);
+    }
+
+    public void OnTriggerReleased(Hand h, Grabbable g)
+    {
+        isPainting = false;
+        HapticsManager.instance.StopHaptics(h.left);
+    }
+#endif
+
+#if UNITY_WEBGL
+    void MethodCalledFromServer(string methodName, string data)
+    {
+        if (methodName.Equals("PenCreateNewLine"))
+        {
+            CreateNewLine();
+        }
+        else if(methodName.Equals("PenAddLinePoint"))
+        {
+            AddNewLinePoint();
+        }
+    }
+#endif
 
     private void CreateNewLine()
     {
@@ -55,18 +94,11 @@ public class ThreeDPen : MonoBehaviour
         currentLine = pl;
     }
 
-    public void OnTriggerPressed(Hand h, Grabbable g)
+    private void AddNewLinePoint()
     {
-        isPainting = true;
-
-        CreateNewLine();
-
-        HapticsManager.instance.TriggerHaptic(h.left, 999, 0.1f);
-    }
-
-    public void OnTriggerReleased(Hand h, Grabbable g)
-    {
-        isPainting = false;
-        HapticsManager.instance.StopHaptics(h.left);
+        Vector3 pos = currentLine.transform.InverseTransformPoint(tip.position);
+        currentLine.AddPoint(pos);
+        currentPointCount++;
+        lastPointTime = Time.time;
     }
 }
