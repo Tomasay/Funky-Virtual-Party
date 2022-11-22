@@ -9,10 +9,17 @@ public class ThreeDPen : MonoBehaviour
     Polyline currentLine;
 
     [SerializeField]
+    Color[] colors;
+    int colorIndex = 0;
+
+    [SerializeField]
     Transform linesParent;
 
     [SerializeField]
     Transform tip;
+
+    [SerializeField]
+    MeshRenderer tipMesh;
 
 #if UNITY_ANDROID
     [SerializeField]
@@ -24,6 +31,8 @@ public class ThreeDPen : MonoBehaviour
 
     bool isPainting;
 
+    bool isInHand;
+
     //The amount of time that has to pass before another point can be created
     const float pointSecondDelay = 0.1f;
 
@@ -34,11 +43,15 @@ public class ThreeDPen : MonoBehaviour
 
     public bool canPaint = true;
 
+    public bool IsInHand { get => isInHand; set => isInHand = value; }
+
     private void Awake()
     {
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
 #endif
+
+        tipMesh.material.color = colors[colorIndex];
     }
 
 #if UNITY_ANDROID
@@ -85,6 +98,10 @@ public class ThreeDPen : MonoBehaviour
         {
             AddNewLinePoint();
         }
+        else if(methodName.Equals("ChangeColorPen"))
+        {
+            ChangeColor();
+        }
     }
 #endif
 
@@ -96,7 +113,7 @@ public class ThreeDPen : MonoBehaviour
         Polyline pl = newLine.AddComponent<Polyline>();
         pl.BlendMode = ShapesBlendMode.Opaque;
         pl.Thickness = 0.01f;
-        pl.Color = Color.black;
+        pl.Color = colors[colorIndex];
         pl.Geometry = PolylineGeometry.Billboard;
         pl.DetailLevel = DetailLevel.Minimal;
         pl.Joins = PolylineJoins.Round;
@@ -120,5 +137,38 @@ public class ThreeDPen : MonoBehaviour
         {
             Destroy(pl.gameObject);
         }
+    }
+
+    public void ChangeColor()
+    {
+#if UNITY_ANDROID
+        if (IsInHand)
+        {
+            if(colorIndex < colors.Length-1)
+            {
+                colorIndex++;
+            }
+            else
+            {
+                colorIndex = 0;
+            }
+
+            tipMesh.material.color = colors[colorIndex];
+
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorPen", "");
+        }
+#endif
+#if UNITY_WEBGL
+        if (colorIndex < colors.Length - 1)
+            {
+                colorIndex++;
+            }
+            else
+            {
+                colorIndex = 0;
+            }
+
+            tipMesh.material.color = colors[colorIndex];
+#endif
     }
 }
