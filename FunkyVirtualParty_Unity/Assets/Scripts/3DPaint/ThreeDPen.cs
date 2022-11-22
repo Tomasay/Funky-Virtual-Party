@@ -17,6 +17,9 @@ public class ThreeDPen : MonoBehaviour
 #if UNITY_ANDROID
     [SerializeField]
     Rigidbody rb;
+
+    [SerializeField]
+    ThreeDPaintGameManager gm;
 #endif
 
     bool isPainting;
@@ -28,6 +31,8 @@ public class ThreeDPen : MonoBehaviour
 
     const int maxPointCount = 10000;
     int currentPointCount;
+
+    public bool canPaint = true;
 
     private void Awake()
     {
@@ -42,24 +47,30 @@ public class ThreeDPen : MonoBehaviour
         if(isPainting && rb.velocity.magnitude > 0.1f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
-            if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
+            if(ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
         }
     }
 
     public void OnTriggerPressed(Hand h, Grabbable g)
     {
-        isPainting = true;
+        if (canPaint)
+        {
+            isPainting = true;
 
-        CreateNewLine();
-        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenCreateNewLine", "");
+            CreateNewLine();
+            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenCreateNewLine", "");
 
-        HapticsManager.instance.TriggerHaptic(h.left, 999, 0.1f);
+            HapticsManager.instance.TriggerHaptic(h.left, 999, 0.1f);
+        }
     }
 
     public void OnTriggerReleased(Hand h, Grabbable g)
     {
-        isPainting = false;
-        HapticsManager.instance.StopHaptics(h.left);
+        if (canPaint)
+        {
+            isPainting = false;
+            HapticsManager.instance.StopHaptics(h.left);
+        }
     }
 #endif
 
@@ -83,6 +94,7 @@ public class ThreeDPen : MonoBehaviour
         newLine.transform.parent = linesParent;
 
         Polyline pl = newLine.AddComponent<Polyline>();
+        pl.BlendMode = ShapesBlendMode.Opaque;
         pl.Thickness = 0.01f;
         pl.Color = Color.black;
         pl.Geometry = PolylineGeometry.Billboard;
@@ -100,5 +112,13 @@ public class ThreeDPen : MonoBehaviour
         currentLine.AddPoint(pos);
         currentPointCount++;
         lastPointTime = Time.time;
+    }
+
+    public void EraseAllLines()
+    {
+        foreach (Polyline pl in linesParent.GetComponentsInChildren<Polyline>())
+        {
+            Destroy(pl.gameObject);
+        }
     }
 }

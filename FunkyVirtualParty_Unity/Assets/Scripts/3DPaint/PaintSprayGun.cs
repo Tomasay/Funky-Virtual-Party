@@ -7,6 +7,11 @@ public class PaintSprayGun : MonoBehaviour
     [SerializeField]
     ParticleSystem ps;
 
+    [SerializeField]
+    ThreeDPaintGameManager gm;
+
+    public bool canPaint = true;
+
     private void Awake()
     {
 #if UNITY_WEBGL
@@ -17,14 +22,20 @@ public class PaintSprayGun : MonoBehaviour
 #if UNITY_ANDROID
     public void OnSqueeze()
     {
-        ps.Play();
-        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStartSpray", "");
+        if (canPaint)
+        {
+            ps.Play();
+            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStartSpray", "");
+        }
     }
 
     public void OnUnsqueeze()
     {
-        ps.Stop();
-        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStopSpray", "");
+        if (canPaint)
+        {
+            ps.Stop();
+            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStopSpray", "");
+        }
     }
 #endif
 
