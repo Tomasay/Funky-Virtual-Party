@@ -26,7 +26,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     TMP_Text headerText;
 
     [SerializeField]
-    Canvas inputCanvas;
+    Canvas inputCanvas, guessingCanvas, resultsCanvas;
 
     [SerializeField]
     GameObject playerInputParent;
@@ -43,14 +43,32 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     [SerializeField]
     Button submitButton;
 
+    [SerializeField]
+    GameObject answerButtonPrefab, answerButtonParent;
+
+    [SerializeField]
+    GameObject playerNameIconPrefab, playerNamesIconParent;
+
+    [SerializeField]
+    GameObject drawingModel, linesParent;
+
+    [SerializeField]
+    Camera drawingPhaseCamera, guessingPhaseCamera;
+
     bool typingAnswer = false;
+    bool guessing = false;
+
+    Dictionary<string, string> playerAnswers;
 
     private void Awake()
     {
+        playerAnswers = new Dictionary<string, string>();
+
         answerInputButton.onPointerDown.AddListener(ButtonPointerDown);
         answerInputButton.onPointerUp.AddListener(ButtonPointerUp);
 
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        if(ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
     }
 
     void Update()
@@ -60,6 +78,17 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             answerInputField.ActivateInputField();
             answerInputField.caretPosition = answerInputField.text.Length;
         }
+
+        if(guessing)
+        {
+            drawingModel.transform.Rotate(0, Time.deltaTime * 20, 0);
+            linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
+        }
+    }
+
+    void InfoReceived(string info, string playerID)
+    {
+        playerAnswers.Add(playerID, info);
     }
 
     void MethodCalledFromServer(string methodName, string data)
@@ -69,9 +98,40 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             headerText.text = data; //Set prompt text
             playerInputParent.SetActive(true); //Enable input
         }
-        if (methodName.Equals("ShowBlurredView"))
+        else if (methodName.Equals("ShowBlurredView"))
         {
             inputCanvas.enabled = false;
+        }
+        else if (methodName.Equals("DoneDrawing"))
+        {
+            guessing = true;
+
+            guessingCanvas.enabled = true;
+
+            drawingPhaseCamera.gameObject.SetActive(false);
+            guessingPhaseCamera.gameObject.SetActive(true);
+
+            foreach (KeyValuePair<string, string> entry in playerAnswers)
+            {
+                GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                ab.GetComponentInChildren<TMP_Text>().text = entry.Value;
+                ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(entry.Value, entry.Key); });
+            }
+        }
+        else if(methodName.Equals("GuessedRight"))
+        {
+            AddPlayerToResults(data, true);
+        }
+        else if (methodName.Equals("GuessedWrong"))
+        {
+            AddPlayerToResults(data, false);
+        }
+        else if (methodName.Equals("GameOver"))
+        {
+            guessingCanvas.enabled = false;
+            resultsCanvas.enabled = true;
+
+            StartCoroutine("EndGame");
         }
     }
 
@@ -122,5 +182,24 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
         headerText.text = "Waiting for all players to submit their answer...";
         playerInputParent.SetActive(false);
+    }
+
+    void SubmitGuess(string guess, string guessPlayerID)
+    {
+        if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.Emit("InfoFromPlayer", guessPlayerID);
+    }
+
+    void AddPlayerToResults(string playerID, bool correct)
+    {
+        GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
+        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManagerWeb.instance.GetPlayerByID(playerID).PlayerName;
+        pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+    }
+
+    IEnumerator EndGame()
+    {
+        yield return new WaitForSeconds(5);
+
+        ClientManagerWeb.instance.LoadMainMenu();
     }
 }

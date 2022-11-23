@@ -23,10 +23,13 @@ public class GameManagerWeb : MonoBehaviour
 
     protected virtual void Start()
     {
-        ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
-        State = GameState.Tutorial;
+        if (ClientManagerWeb.instance)
+        {
+            ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
+            State = GameState.Tutorial;
 
-        ClientManagerWeb.instance.Manager.Socket.On<string>("gameStateToClient", OnStateChange);
+            ClientManagerWeb.instance.Manager.Socket.On<string>("gameStateToClient", OnStateChange);
+        }
     }
 
     protected void SetPlayerMovement(bool canPlayerMove)

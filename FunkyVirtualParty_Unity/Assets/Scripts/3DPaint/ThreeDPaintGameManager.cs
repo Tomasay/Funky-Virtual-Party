@@ -9,7 +9,8 @@ public enum ThreeDPaintGameState
     ClientsAnswering,
     VRPainting,
     ClientsGuessing,
-    VRGuessing
+    VRGuessing,
+    GameOver
 }
 
 public class ThreeDPaintGameManager : GameManager
@@ -34,7 +35,9 @@ public class ThreeDPaintGameManager : GameManager
 
     Dictionary<string, string> answers;
 
-    private string chosenAnswer;
+    private string chosenAnswer, chosenAnswerOwner;
+
+    private int playersGuessed = 0;
 
     float drawTimeRemaining;
     const int DRAW_TIME_AMOUNT = 120;
@@ -102,20 +105,22 @@ public class ThreeDPaintGameManager : GameManager
 
                 break;
             case ThreeDPaintGameState.ClientsGuessing:
+                //Communicate to clients
+                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "DoneDrawing", "");
+
                 //Disable VR tools
                 pen.canPaint = false;
                 sprayGun.canPaint = false;
 
                 //Display all answers
 
-                //Show what clients are voting for
-
-                //When all votes are in, show right answer
-
                 break;
             case ThreeDPaintGameState.VRGuessing:
                 //Show each answer over the appropriate player
 
+                break;
+            case ThreeDPaintGameState.GameOver:
+                StartCoroutine("EndGame");
                 break;
             default:
                 break;
@@ -130,16 +135,47 @@ public class ThreeDPaintGameManager : GameManager
         State = ThreeDPaintGameState.ClientsAnswering;
     }
 
+    IEnumerator EndGame()
+    {
+        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GameOver", "");
+
+        yield return new WaitForSeconds(5);
+
+        ClientManager.instance.LoadMainMenu();
+    }
+
     void InfoReceived(string info, string playerID)
     {
-        answers.Add(playerID, info);
-
-        if (answers.Count >= ClientManager.instance.Players.Count)
+        if (State == ThreeDPaintGameState.ClientsAnswering)
         {
-            string randomPlayer = ClientManager.instance.Players[Random.Range(0, ClientManager.instance.Players.Count)].PlayerID;
-            chosenAnswer = answers[randomPlayer];
+            answers.Add(playerID, info);
 
-            State = ThreeDPaintGameState.VRPainting;
+            if (answers.Count >= ClientManager.instance.Players.Count)
+            {
+                string randomPlayer = ClientManager.instance.Players[Random.Range(0, ClientManager.instance.Players.Count)].PlayerID;
+                chosenAnswer = answers[randomPlayer];
+                chosenAnswerOwner = randomPlayer;
+
+                State = ThreeDPaintGameState.VRPainting;
+            }
+        }
+        else if (State == ThreeDPaintGameState.ClientsGuessing)
+        {
+            //If player guessed right
+            if (info.Equals(answers[chosenAnswerOwner]))
+            {
+                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedRight", playerID);
+            }
+            else
+            {
+                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedWrong", playerID);
+            }
+
+            playersGuessed++;
+            if(playersGuessed >= ClientManager.instance.Players.Count)
+            {
+                State = ThreeDPaintGameState.GameOver;
+            }
         }
     }
 
