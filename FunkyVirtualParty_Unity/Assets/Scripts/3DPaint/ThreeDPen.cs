@@ -34,11 +34,14 @@ public class ThreeDPen : MonoBehaviour
     bool isInHand;
 
     //The amount of time that has to pass before another point can be created
-    const float pointSecondDelay = 0.1f;
+    const float pointSecondDelay = 0.01f;
+    //Skips this many points beforing sending a new one. Higher = better performance. Lower = more accurate results for clients
+    const int networkedPointsOffset = 7;
+    int pointSkipCounter = 0;
 
     float lastPointTime;
 
-    const int maxPointCount = 10000;
+    const int maxPointCount = 100000;
     int currentPointCount;
 
     public bool canPaint = true;
@@ -60,7 +63,13 @@ public class ThreeDPen : MonoBehaviour
         if(isPainting && rb.velocity.magnitude > 0.1f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
-            if(ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
+            if(pointSkipCounter == 0 && ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
+
+            pointSkipCounter++;
+            if(pointSkipCounter >= networkedPointsOffset)
+            {
+                pointSkipCounter = 0;
+            }
         }
     }
 

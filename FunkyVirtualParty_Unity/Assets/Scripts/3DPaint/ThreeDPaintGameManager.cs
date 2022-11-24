@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using PaintIn3D;
 
@@ -33,6 +34,9 @@ public class ThreeDPaintGameManager : GameManager
     [SerializeField]
     PaintSprayGun sprayGun;
 
+    [SerializeField]
+    GameObject playerNameIconPrefab, playerNamesIconParent;
+
     Dictionary<string, string> answers;
 
     private string chosenAnswer, chosenAnswerOwner;
@@ -40,7 +44,7 @@ public class ThreeDPaintGameManager : GameManager
     private int playersGuessed = 0;
 
     float drawTimeRemaining;
-    const int DRAW_TIME_AMOUNT = 120;
+    const int DRAW_TIME_AMOUNT = 30;
 
     private void Awake()
     {
@@ -113,7 +117,9 @@ public class ThreeDPaintGameManager : GameManager
                 sprayGun.canPaint = false;
 
                 //Display all answers
-
+                headerText.enabled = false;
+                timerText.enabled = false;
+                playerNamesIconParent.SetActive(true);
                 break;
             case ThreeDPaintGameState.VRGuessing:
                 //Show each answer over the appropriate player
@@ -162,13 +168,15 @@ public class ThreeDPaintGameManager : GameManager
         else if (State == ThreeDPaintGameState.ClientsGuessing)
         {
             //If player guessed right
-            if (info.Equals(answers[chosenAnswerOwner]))
+            if (answers[info].Equals(answers[chosenAnswerOwner]))
             {
                 if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedRight", playerID);
+                AddPlayerToResults(playerID, true);
             }
             else
             {
                 if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedWrong", playerID);
+                AddPlayerToResults(playerID, false);
             }
 
             playersGuessed++;
@@ -183,5 +191,13 @@ public class ThreeDPaintGameManager : GameManager
     {
         string[] prompts = promptList.ToString().Split('\n');
         return prompts[Random.Range(0, prompts.Length)];
+    }
+
+    void AddPlayerToResults(string playerID, bool correct)
+    {
+        GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
+        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerByID(playerID).PlayerName;
+        pi.GetComponentInChildren<Button>(true).interactable = false;
+        pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
     }
 }

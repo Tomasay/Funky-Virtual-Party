@@ -55,8 +55,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     [SerializeField]
     Camera drawingPhaseCamera, guessingPhaseCamera;
 
-    bool typingAnswer = false;
-    bool guessing = false;
+    bool typingAnswer = false; //Is player typing their answer?
+    bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
+    bool guessing = false; //Are players guessing?
 
     Dictionary<string, string> playerAnswers;
 
@@ -69,6 +70,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
         if(ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
         if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
+
+        inputCanvas.enabled = true;
+        guessingCanvas.enabled = false;
+        resultsCanvas.enabled = false;
     }
 
     void Update()
@@ -88,7 +93,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
     void InfoReceived(string info, string playerID)
     {
-        playerAnswers.Add(playerID, info);
+        if (playersAnswering)
+        {
+            playerAnswers.Add(playerID, info);
+        }
     }
 
     void MethodCalledFromServer(string methodName, string data)
@@ -97,6 +105,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         {
             headerText.text = data; //Set prompt text
             playerInputParent.SetActive(true); //Enable input
+            playersAnswering = true;
         }
         else if (methodName.Equals("ShowBlurredView"))
         {
@@ -104,6 +113,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         }
         else if (methodName.Equals("DoneDrawing"))
         {
+            playersAnswering = false;
             guessing = true;
 
             guessingCanvas.enabled = true;
@@ -128,7 +138,6 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         }
         else if (methodName.Equals("GameOver"))
         {
-            guessingCanvas.enabled = false;
             resultsCanvas.enabled = true;
 
             StartCoroutine("EndGame");
@@ -187,12 +196,14 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     void SubmitGuess(string guess, string guessPlayerID)
     {
         if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.Emit("InfoFromPlayer", guessPlayerID);
+        guessingCanvas.enabled = false;
     }
 
     void AddPlayerToResults(string playerID, bool correct)
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
         pi.GetComponentInChildren<TMP_Text>(true).text = ClientManagerWeb.instance.GetPlayerByID(playerID).PlayerName;
+        pi.GetComponentInChildren<Button>(true).interactable = false;
         pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
     }
 
