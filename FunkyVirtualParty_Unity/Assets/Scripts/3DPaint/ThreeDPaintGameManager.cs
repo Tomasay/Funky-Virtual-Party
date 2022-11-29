@@ -118,7 +118,7 @@ public class ThreeDPaintGameManager : GameManager
         {
             case ThreeDPaintGameState.ClientsAnswering:
                 //Display text that players are answering
-                headerText.text = "Players are typing their answers \nUse this time to practice painting!";
+                headerText.text = "Players are typing their answers \nUse this time to practice painting! \nTurn around for controls";
 
                 //Animate client players to look like they are on their phones
 
