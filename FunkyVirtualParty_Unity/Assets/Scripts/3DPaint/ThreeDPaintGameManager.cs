@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using PaintIn3D;
+using Autohand;
 
 public enum ThreeDPaintGameState
 {
@@ -35,7 +36,14 @@ public class ThreeDPaintGameManager : GameManager
     PaintSprayGun sprayGun;
 
     [SerializeField]
+    Hand leftHand, rightHand;
+
+    [SerializeField]
+    GameObject UIPointer;
+
+    [SerializeField]
     GameObject playerNameIconPrefab, playerNamesIconParent;
+    List<GameObject> playerNameIcons;
 
     Dictionary<string, string> answers;
 
@@ -46,16 +54,35 @@ public class ThreeDPaintGameManager : GameManager
     float drawTimeRemaining;
     const int DRAW_TIME_AMOUNT = 30;
 
+    float vrPlayerPoints;
+    Dictionary<string, int> playerPoints;
+
+    const int POINTS_VR_CORRECT_GUESSES = 50; //Every player that correctly guesses what the VR player's drawing is
+    const int POINTS_VR_CORRECT_PLAYER = 50; //Correctly guessing which player wrote the chosen answer
+    const int POINTS_CLIENT_CORRECT_GUESS = 100; //Correctly guessing what the VR player drew
+    const int POINTS_CLIENT_OTHER_CORRECT_GUESSES = 50; //Every player the successfully chose the chosen player's answer
+
     private void Awake()
     {
         answers = new Dictionary<string, string>();
+        playerPoints = new Dictionary<string, int>();
+
+        playerNameIcons = new List<GameObject>();
 
         headerText.text = "";
         timerText.text = "";
 
         drawTimeRemaining = DRAW_TIME_AMOUNT;
 
-        if (ClientManager.instance) ClientManager.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
+        if (ClientManager.instance)
+        {
+            foreach (ClientPlayer cp in ClientManager.instance.Players)
+            {
+                playerPoints.Add(cp.PlayerID, 0);
+            }
+
+            ClientManager.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
+        }
 
         StartCoroutine("StartGame");
     }
@@ -117,12 +144,19 @@ public class ThreeDPaintGameManager : GameManager
                 sprayGun.canPaint = false;
 
                 //Display all answers
-                headerText.enabled = false;
+                headerText.text = "Clients are guessing what your art is";
                 timerText.enabled = false;
                 playerNamesIconParent.SetActive(true);
                 break;
             case ThreeDPaintGameState.VRGuessing:
-                //Show each answer over the appropriate player
+                headerText.text = "Which player do you think wrote that answer?";
+                foreach (GameObject g in playerNameIcons)
+                {
+                    g.GetComponentInChildren<Button>().interactable = true;
+                }
+                UIPointer.SetActive(true);
+                leftHand.Release();
+                rightHand.Release();
 
                 break;
             case ThreeDPaintGameState.GameOver:
@@ -172,6 +206,9 @@ public class ThreeDPaintGameManager : GameManager
             {
                 if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedRight", playerID);
                 AddPlayerToResults(playerID, true);
+
+                vrPlayerPoints += POINTS_VR_CORRECT_GUESSES;
+                playerPoints[playerID] += POINTS_CLIENT_CORRECT_GUESS;
             }
             else
             {
@@ -182,7 +219,7 @@ public class ThreeDPaintGameManager : GameManager
             playersGuessed++;
             if(playersGuessed >= ClientManager.instance.Players.Count)
             {
-                State = ThreeDPaintGameState.GameOver;
+                State = ThreeDPaintGameState.VRGuessing;
             }
         }
     }
@@ -197,7 +234,28 @@ public class ThreeDPaintGameManager : GameManager
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
         pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerByID(playerID).PlayerName;
+        pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
         pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+
+        playerNameIcons.Add(pi);
+    }
+
+    /// <summary>
+    /// Method called when VR player guesses which player wrote the selected prompt
+    /// </summary>
+    public void GuessPlayerVR(string playerID)
+    {
+        if(playerID.Equals(chosenAnswerOwner))
+        {
+            vrPlayerPoints += POINTS_VR_CORRECT_PLAYER;
+            headerText.text = "Correct!";
+        }
+        else
+        {
+            headerText.text = "Wrong! " + ClientManager.instance.GetPlayerByID(chosenAnswerOwner).PlayerName + " wrote the answer";
+        }
+
+        State = ThreeDPaintGameState.GameOver;
     }
 }
