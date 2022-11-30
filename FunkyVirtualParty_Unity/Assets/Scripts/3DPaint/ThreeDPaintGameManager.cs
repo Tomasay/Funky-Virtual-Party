@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using PaintIn3D;
 using Autohand;
+using System.Linq;
 
 public enum ThreeDPaintGameState
 {
@@ -12,6 +13,7 @@ public enum ThreeDPaintGameState
     VRPainting,
     ClientsGuessing,
     VRGuessing,
+    ShowingLeaderboard,
     GameOver
 }
 
@@ -40,6 +42,9 @@ public class ThreeDPaintGameManager : GameManager
 
     [SerializeField]
     GameObject UIPointer;
+
+    [SerializeField]
+    GameObject leaderboardParent, leaderboardPlayerCardParent;
 
     [SerializeField]
     GameObject playerNameIconPrefab, playerNamesIconParent;
@@ -159,6 +164,9 @@ public class ThreeDPaintGameManager : GameManager
                 rightHand.Release();
 
                 break;
+            case ThreeDPaintGameState.ShowingLeaderboard:
+                StartCoroutine("ShowLeaderboard");
+                break;
             case ThreeDPaintGameState.GameOver:
                 StartCoroutine("EndGame");
                 break;
@@ -182,6 +190,64 @@ public class ThreeDPaintGameManager : GameManager
         yield return new WaitForSeconds(5);
 
         ClientManager.instance.LoadMainMenu();
+    }
+
+    IEnumerator ShowLeaderboard()
+    {
+        //Clear the player buttons
+        foreach (GameObject g in playerNameIcons)
+        {
+            Destroy(g);
+        }
+        playerNameIcons = new List<GameObject>();
+
+        //Clear previous leaderboard
+        foreach (Button b in leaderboardParent.GetComponentsInChildren<Button>())
+        {
+            Destroy(b.gameObject);
+        }
+
+        //Show leaderboard
+        headerText.text = "";
+        timerText.text = "";
+        leaderboardParent.SetActive(true);
+        //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowLeaderboard", "");
+
+        //Sort player points
+        IOrderedEnumerable<KeyValuePair<string, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
+
+        Debug.Log("Players in unsorted dict: " + playerPoints.Count());
+        Debug.Log("Players in sorted dict: " + sortedDict.Count());
+
+        int vrPlayerPos = 0;
+        //Add player cards
+        foreach (KeyValuePair<string, int> entry in sortedDict)
+        {
+            GameObject newCard = Instantiate(leaderboardPlayerCardParent, leaderboardParent.transform);
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManager.instance.GetPlayerByID(entry.Key).PlayerName;
+            newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
+            newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
+
+            if(vrPlayerPoints < entry.Value)
+            {
+                vrPlayerPos++;
+            }
+        }
+
+        //Add VR Card
+        GameObject vrCard = Instantiate(leaderboardPlayerCardParent, leaderboardParent.transform);
+        vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
+        vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
+        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + vrPlayerPoints;
+        vrCard.transform.SetSiblingIndex(vrPlayerPos);
+
+
+        yield return new WaitForSeconds(5);
+
+        //Disable leaderboard
+        leaderboardParent.SetActive(false);
+
+        State = ThreeDPaintGameState.GameOver;
     }
 
     void InfoReceived(string info, string playerID)
@@ -256,6 +322,6 @@ public class ThreeDPaintGameManager : GameManager
             headerText.text = "Wrong! " + ClientManager.instance.GetPlayerByID(chosenAnswerOwner).PlayerName + " wrote the answer";
         }
 
-        State = ThreeDPaintGameState.GameOver;
+        State = ThreeDPaintGameState.ShowingLeaderboard;
     }
 }
