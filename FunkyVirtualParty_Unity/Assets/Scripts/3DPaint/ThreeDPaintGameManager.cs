@@ -24,6 +24,7 @@ public class ThreeDPaintGameManager : GameManager
 
     [SerializeField]
     TextAsset promptList;
+    string currentPrompt;
 
     [SerializeField]
     TMP_Text headerText, timerText;
@@ -44,7 +45,8 @@ public class ThreeDPaintGameManager : GameManager
     GameObject UIPointer;
 
     [SerializeField]
-    GameObject leaderboardParent, leaderboardPlayerCardParent;
+    GameObject leaderboardParent, leaderboardPlayerCardPrefab;
+    List<GameObject> currentLeaderboardCards;
 
     [SerializeField]
     GameObject playerNameIconPrefab, playerNamesIconParent;
@@ -57,15 +59,12 @@ public class ThreeDPaintGameManager : GameManager
     private int playersGuessed = 0;
 
     float drawTimeRemaining;
-    const int DRAW_TIME_AMOUNT = 30;
+    const int DRAW_TIME_AMOUNT = 120;
 
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
 
-    const int POINTS_VR_CORRECT_GUESSES = 50; //Every player that correctly guesses what the VR player's drawing is
-    const int POINTS_VR_CORRECT_PLAYER = 50; //Correctly guessing which player wrote the chosen answer
-    const int POINTS_CLIENT_CORRECT_GUESS = 100; //Correctly guessing what the VR player drew
-    const int POINTS_CLIENT_OTHER_CORRECT_GUESSES = 50; //Every player the successfully chose the chosen player's answer
+    int currentRound = 1;
 
     private void Awake()
     {
@@ -73,6 +72,7 @@ public class ThreeDPaintGameManager : GameManager
         playerPoints = new Dictionary<string, int>();
 
         playerNameIcons = new List<GameObject>();
+        currentLeaderboardCards = new List<GameObject>();
 
         headerText.text = "";
         timerText.text = "";
@@ -129,6 +129,12 @@ public class ThreeDPaintGameManager : GameManager
 
                 break;
             case ThreeDPaintGameState.VRPainting:
+                timerText.enabled = true;
+
+                //Enable VR tools
+                pen.canPaint = true;
+                sprayGun.canPaint = true;
+
                 //Display answer
                 headerText.text = "Paint: " + chosenAnswer;
 
@@ -141,6 +147,8 @@ public class ThreeDPaintGameManager : GameManager
 
                 break;
             case ThreeDPaintGameState.ClientsGuessing:
+                playersGuessed = 0;
+
                 //Communicate to clients
                 ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "DoneDrawing", "");
 
@@ -154,7 +162,7 @@ public class ThreeDPaintGameManager : GameManager
                 playerNamesIconParent.SetActive(true);
                 break;
             case ThreeDPaintGameState.VRGuessing:
-                headerText.text = "Which player do you think wrote that answer?";
+                headerText.text = "The prompt was: " + currentPrompt + "\nWhich player do you think wrote the given answer?";
                 foreach (GameObject g in playerNameIcons)
                 {
                     g.GetComponentInChildren<Button>().interactable = true;
@@ -202,10 +210,11 @@ public class ThreeDPaintGameManager : GameManager
         playerNameIcons = new List<GameObject>();
 
         //Clear previous leaderboard
-        foreach (Button b in leaderboardParent.GetComponentsInChildren<Button>())
+        foreach (GameObject g in currentLeaderboardCards)
         {
-            Destroy(b.gameObject);
+            Destroy(g);
         }
+        currentLeaderboardCards = new List<GameObject>();
 
         //Show leaderboard
         headerText.text = "";
@@ -216,38 +225,50 @@ public class ThreeDPaintGameManager : GameManager
         //Sort player points
         IOrderedEnumerable<KeyValuePair<string, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
 
-        Debug.Log("Players in unsorted dict: " + playerPoints.Count());
-        Debug.Log("Players in sorted dict: " + sortedDict.Count());
-
         int vrPlayerPos = 0;
         //Add player cards
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
-            GameObject newCard = Instantiate(leaderboardPlayerCardParent, leaderboardParent.transform);
+            GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
             newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManager.instance.GetPlayerByID(entry.Key).PlayerName;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 
-            if(vrPlayerPoints < entry.Value)
+            currentLeaderboardCards.Add(newCard);
+
+            if (vrPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
             }
         }
 
         //Add VR Card
-        GameObject vrCard = Instantiate(leaderboardPlayerCardParent, leaderboardParent.transform);
+        GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
         vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + vrPlayerPoints;
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
+        currentLeaderboardCards.Add(vrCard);
 
         yield return new WaitForSeconds(5);
 
         //Disable leaderboard
         leaderboardParent.SetActive(false);
 
-        State = ThreeDPaintGameState.GameOver;
+        if(currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
+        {
+            State = ThreeDPaintGameState.GameOver;
+        }
+        else
+        {
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SetNewPrompt", GetPrompt());
+            State = ThreeDPaintGameState.ClientsAnswering;
+            drawTimeRemaining = DRAW_TIME_AMOUNT;
+            answers = new Dictionary<string, string>();
+
+            currentRound++;
+        }
     }
 
     void InfoReceived(string info, string playerID)
@@ -273,8 +294,8 @@ public class ThreeDPaintGameManager : GameManager
                 if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedRight", playerID);
                 AddPlayerToResults(playerID, true);
 
-                vrPlayerPoints += POINTS_VR_CORRECT_GUESSES;
-                playerPoints[playerID] += POINTS_CLIENT_CORRECT_GUESS;
+                vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
+                playerPoints[playerID] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
             }
             else
             {
@@ -286,6 +307,7 @@ public class ThreeDPaintGameManager : GameManager
             if(playersGuessed >= ClientManager.instance.Players.Count)
             {
                 State = ThreeDPaintGameState.VRGuessing;
+                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "VRGuessing", "");
             }
         }
     }
@@ -293,7 +315,8 @@ public class ThreeDPaintGameManager : GameManager
     string GetPrompt()
     {
         string[] prompts = promptList.ToString().Split('\n');
-        return prompts[Random.Range(0, prompts.Length)];
+        currentPrompt = prompts[Random.Range(0, prompts.Length)];
+        return currentPrompt;
     }
 
     void AddPlayerToResults(string playerID, bool correct)
@@ -314,7 +337,7 @@ public class ThreeDPaintGameManager : GameManager
     {
         if(playerID.Equals(chosenAnswerOwner))
         {
-            vrPlayerPoints += POINTS_VR_CORRECT_PLAYER;
+            vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_PLAYER;
             headerText.text = "Correct!";
         }
         else
@@ -323,5 +346,7 @@ public class ThreeDPaintGameManager : GameManager
         }
 
         State = ThreeDPaintGameState.ShowingLeaderboard;
+
+        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "VRPlayerGuessed", ("" + vrPlayerPoints));
     }
 }
