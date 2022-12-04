@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Shapes;
 using Autohand;
+using UnityEngine.Events;
 
 public class ThreeDPen : MonoBehaviour
 {
     Polyline currentLine;
 
-    [SerializeField]
-    Color[] colors;
-    int colorIndex = 0;
+    Color currentColor = Color.black;
 
     [SerializeField]
     Transform linesParent;
@@ -19,9 +18,12 @@ public class ThreeDPen : MonoBehaviour
     Transform tip;
 
     [SerializeField]
-    MeshRenderer tipMesh;
+    MeshRenderer tipMesh, baseMesh;
 
 #if UNITY_ANDROID
+    [SerializeField]
+    Collider col, tipCol;
+
     [SerializeField]
     Rigidbody rb;
 
@@ -32,6 +34,8 @@ public class ThreeDPen : MonoBehaviour
     bool isPainting;
 
     bool isInHand;
+
+    public bool active;
 
     //The amount of time that has to pass before another point can be created
     const float pointSecondDelay = 0.01f;
@@ -48,13 +52,15 @@ public class ThreeDPen : MonoBehaviour
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
 
+    public UnityEvent OnDraw;
+
     private void Awake()
     {
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
 #endif
 
-        tipMesh.material.color = colors[colorIndex];
+        tipMesh.material.color = currentColor;
     }
 
 #if UNITY_ANDROID
@@ -70,6 +76,8 @@ public class ThreeDPen : MonoBehaviour
             {
                 pointSkipCounter = 0;
             }
+
+            OnDraw.Invoke();
         }
     }
 
@@ -109,7 +117,10 @@ public class ThreeDPen : MonoBehaviour
         }
         else if(methodName.Equals("ChangeColorPen"))
         {
-            ChangeColor();
+            if (ColorUtility.TryParseHtmlString(data, out Color col))
+            {
+                ChangeColor(col);
+            }
         }
     }
 #endif
@@ -122,7 +133,7 @@ public class ThreeDPen : MonoBehaviour
         Polyline pl = newLine.AddComponent<Polyline>();
         pl.BlendMode = ShapesBlendMode.Opaque;
         pl.Thickness = 0.01f;
-        pl.Color = colors[colorIndex];
+        pl.Color = currentColor;
         pl.Geometry = PolylineGeometry.Billboard;
         pl.DetailLevel = DetailLevel.Minimal;
         pl.Joins = PolylineJoins.Round;
@@ -148,36 +159,36 @@ public class ThreeDPen : MonoBehaviour
         }
     }
 
-    public void ChangeColor()
+    public void ChangeColor(Color c)
     {
 #if UNITY_ANDROID
         if (IsInHand)
         {
-            if(colorIndex < colors.Length-1)
-            {
-                colorIndex++;
-            }
-            else
-            {
-                colorIndex = 0;
-            }
+            currentColor = c;
+            tipMesh.material.color = c;
 
-            tipMesh.material.color = colors[colorIndex];
-
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorPen", "");
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorPen", ColorUtility.ToHtmlStringRGB(c));
         }
 #endif
 #if UNITY_WEBGL
-        if (colorIndex < colors.Length - 1)
-            {
-                colorIndex++;
-            }
-            else
-            {
-                colorIndex = 0;
-            }
+            currentColor = c;
+            tipMesh.material.color = c;
+#endif
+    }
 
-            tipMesh.material.color = colors[colorIndex];
+    public void SetActive(bool active)
+    {
+#if UNITY_ANDROID
+        tipMesh.enabled = active;
+        baseMesh.enabled = active;
+        col.enabled = active;
+        tipCol.enabled = active;
+        this.active = active;
+#endif
+#if UNITY_WEBGL
+        tipMesh.enabled = active;
+        baseMesh.enabled = active;
+        this.active = active;
 #endif
     }
 }

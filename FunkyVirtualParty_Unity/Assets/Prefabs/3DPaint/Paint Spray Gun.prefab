@@ -5073,6 +5073,8 @@ GameObject:
   - component: {fileID: 1320623855}
   - component: {fileID: 2533470627107766442}
   - component: {fileID: 5967974369228407090}
+  - component: {fileID: 707748359044679317}
+  - component: {fileID: 6361721950504437107}
   m_Layer: 29
   m_Name: Paint Spray Gun
   m_TagString: Untagged
@@ -5180,9 +5182,9 @@ MonoBehaviour:
   CopySettings: {fileID: 0}
   grabType: 0
   handType: 0
-  singleHandOnly: 0
-  allowHeldSwapping: 1
-  instantGrab: 0
+  singleHandOnly: 1
+  allowHeldSwapping: 0
+  instantGrab: 1
   useGentleGrab: 0
   maintainGrabOffset: 0
   ignoreWeight: 0
@@ -5500,4 +5502,44 @@ MonoBehaviour:
   ps: {fileID: 4590413093452200514}
   gm: {fileID: 0}
   paintSphere: {fileID: 4590413093452200516}
+  baseMesh: {fileID: 4590413094623354104}
+  col: {fileID: 4590413094623354108}
   canPaint: 1
+  active: 0
+--- !u!114 &707748359044679317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4590413094623354086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72ddecfd57951984cb3fe8b722d3f68b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnGrabPressed:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1773428102 &6361721950504437107
+ParentConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4590413094623354086}
+  m_Enabled: 1
+  m_Weight: 1
+  m_TranslationAtRest: {x: 0, y: -0.5, z: 0.681}
+  m_RotationAtRest: {x: 0, y: 0, z: 0}
+  m_TranslationOffsets: []
+  m_RotationOffsets: []
+  m_AffectTranslationX: 1
+  m_AffectTranslationY: 1
+  m_AffectTranslationZ: 1
+  m_AffectRotationX: 1
+  m_AffectRotationY: 1
+  m_AffectRotationZ: 1
+  m_IsContraintActive: 0
+  m_IsLocked: 0
+  m_Sources: []

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using PaintIn3D;
+using UnityEngine.Events;
 
 public class PaintSprayGun : MonoBehaviour
 {
@@ -21,11 +22,23 @@ public class PaintSprayGun : MonoBehaviour
     [SerializeField]
     P3dPaintSphere paintSphere;
 
+    [SerializeField]
+    MeshRenderer baseMesh;
+
+#if UNITY_ANDROID
+    [SerializeField]
+    Collider col;
+#endif
+
     public bool canPaint = true;
 
     bool isInHand;
 
+    public bool active;
+
     public bool IsInHand { get => isInHand; set => isInHand = value; }
+
+    public UnityEvent OnSpray;
 
     private void Awake()
     {
@@ -45,6 +58,7 @@ public class PaintSprayGun : MonoBehaviour
         {
             ps.Play();
             if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStartSpray", "");
+            OnSpray.Invoke();
         }
     }
 
@@ -71,45 +85,43 @@ public class PaintSprayGun : MonoBehaviour
         }
         else if(methodName.Equals("ChangeColorSprayGun"))
         {
-            ChangeColor();
+            if (ColorUtility.TryParseHtmlString(data, out Color col))
+            {
+                ChangeColor(col);
+            }
         }
     }
 #endif
 
-    public void ChangeColor()
+    public void ChangeColor(Color c)
     {
 #if UNITY_ANDROID
         if (IsInHand)
         {
-            if (colorIndex < colors.Length - 1)
-            {
-                colorIndex++;
-            }
-            else
-            {
-                colorIndex = 0;
-            }
+            paintColorMat.color = c;
+            ps.startColor = c;
+            paintSphere.Color = c;
 
-            paintColorMat.color = colors[colorIndex];
-            ps.startColor = colors[colorIndex];
-            paintSphere.Color = colors[colorIndex];
-
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorSprayGun", "");
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorSprayGun", ColorUtility.ToHtmlStringRGB(c));
         }
 #endif
 #if UNITY_WEBGL
-        if (colorIndex < colors.Length - 1)
-            {
-                colorIndex++;
-            }
-            else
-            {
-                colorIndex = 0;
-            }
+            paintColorMat.color = c;
+            ps.startColor = c;
+            paintSphere.Color = c;
+#endif
+    }
 
-            paintColorMat.color = colors[colorIndex];
-            ps.startColor = colors[colorIndex];
-            paintSphere.Color = colors[colorIndex];
+    public void SetActive(bool active)
+    {
+#if UNITY_ANDROID
+        baseMesh.enabled = active;
+        col.enabled = active;
+        this.active = active;
+#endif
+#if UNITY_WEBGL
+        baseMesh.enabled = active;
+        this.active = active;
 #endif
     }
 }

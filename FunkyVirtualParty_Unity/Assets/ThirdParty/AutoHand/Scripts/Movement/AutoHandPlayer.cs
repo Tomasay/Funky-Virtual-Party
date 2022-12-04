@@ -5,6 +5,7 @@ using Autohand.Demo;
 using System;
 using NaughtyAttributes;
 using UnityEngine.Serialization;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -181,7 +182,7 @@ namespace Autohand {
         Vector3 targetPosOffset;
         int handPlayerMask;
 
-
+        public UnityEvent OnMove, OnRotate;
 
         public virtual void Start() {
 
@@ -388,11 +389,15 @@ namespace Autohand {
             moveDirection.z = (!useDeadzone || Mathf.Abs(axis.y) > movementDeadzone) ? axis.y : 0;
             if(useRelativeDirection)
                 moveDirection = transform.rotation * moveDirection;
+
+            if(moveDirection.magnitude > 0) OnMove.Invoke();
         }
 
         public virtual void Turn(float turnAxis) {
             turnAxis = (Mathf.Abs(turnAxis) > turnDeadzone) ? turnAxis : 0;
             turningAxis = turnAxis;
+
+            if(turnAxis > 0) OnRotate.Invoke();
         }
 
         private void Update() {

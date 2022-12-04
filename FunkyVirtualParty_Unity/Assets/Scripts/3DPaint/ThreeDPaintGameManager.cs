@@ -6,6 +6,7 @@ using TMPro;
 using PaintIn3D;
 using Autohand;
 using System.Linq;
+using UnityEngine.Animations;
 
 public enum ThreeDPaintGameState
 {
@@ -39,7 +40,12 @@ public class ThreeDPaintGameManager : GameManager
     PaintSprayGun sprayGun;
 
     [SerializeField]
+    GameObject paintPalette;
+
+    [SerializeField]
     Hand leftHand, rightHand;
+    [SerializeField]
+    Transform leftHandGrabPoint, rightHandGrabPoint;
 
     [SerializeField]
     GameObject UIPointer;
@@ -66,6 +72,10 @@ public class ThreeDPaintGameManager : GameManager
 
     int currentRound = 1;
 
+    HandType toolHand = HandType.right;
+
+    bool vrTutorialCompleted;
+
     private void Awake()
     {
         answers = new Dictionary<string, string>();
@@ -87,9 +97,15 @@ public class ThreeDPaintGameManager : GameManager
             }
 
             ClientManager.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
-        }
 
-        StartCoroutine("StartGame");
+            StartCoroutine("StartGame");
+        }
+    }
+
+    public void GrabToolsStart()
+    {
+        GrabTool(true);
+        GrabPalette();
     }
 
     private void Update()
@@ -114,6 +130,16 @@ public class ThreeDPaintGameManager : GameManager
                 break;
             default:
                 break;
+        }
+    }
+
+    public void OnTutorialCompleted()
+    {
+        vrTutorialCompleted = true;
+
+        if (answers.Count >= ClientManager.instance.Players.Count)
+        {
+            State = ThreeDPaintGameState.VRPainting;
         }
     }
 
@@ -283,7 +309,10 @@ public class ThreeDPaintGameManager : GameManager
                 chosenAnswer = answers[randomPlayer];
                 chosenAnswerOwner = randomPlayer;
 
-                State = ThreeDPaintGameState.VRPainting;
+                if (vrTutorialCompleted)
+                {
+                    State = ThreeDPaintGameState.VRPainting;
+                }
             }
         }
         else if (State == ThreeDPaintGameState.ClientsGuessing)
@@ -348,5 +377,107 @@ public class ThreeDPaintGameManager : GameManager
         State = ThreeDPaintGameState.ShowingLeaderboard;
 
         ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "VRPlayerGuessed", ("" + vrPlayerPoints));
+    }
+
+    void GrabTool(bool isSprayGun)
+    {
+        bool isToolHandLeft = (toolHand == HandType.left);
+
+        //Drop current tool
+        if (isToolHandLeft)
+        {
+            leftHand.ForceReleaseGrab();
+        }
+        else
+        {
+            rightHand.ForceReleaseGrab();
+        }
+
+        //Enable proper tool
+        if (isSprayGun)
+        {
+            sprayGun.SetActive(true);
+            pen.SetActive(false);
+            //sprayGun.transform.position = isToolHandLeft ? leftHandGrabPoint.transform.position : rightHandGrabPoint.transform.position;
+        }
+        else
+        {
+            sprayGun.SetActive(false);
+            pen.SetActive(true);
+            //pen.transform.position = isToolHandLeft ? leftHandGrabPoint.transform.position : rightHandGrabPoint.transform.position;
+        }
+
+        //Grab proper tool
+        if (isToolHandLeft)
+        {
+            leftHand.Grab(GrabType.InstantGrab);
+        }
+        else
+        {
+            rightHand.Grab(GrabType.InstantGrab);
+        }
+
+        if (isSprayGun)
+        {
+            sprayGun.GetComponent<ParentConstraint>().constraintActive = false;
+            pen.GetComponent<ParentConstraint>().constraintActive = true;
+        }
+        else
+        {
+            pen.GetComponent<ParentConstraint>().constraintActive = false;
+            sprayGun.GetComponent<ParentConstraint>().constraintActive = true;
+        }
+    }
+
+    public void ToggleTool()
+    {
+        GrabTool(!sprayGun.active);
+    }
+
+    public void ToggleToolHand()
+    {
+
+    }
+
+    void GrabPalette()
+    {
+        foreach (MeshRenderer mr in paintPalette.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.enabled = true;
+        }
+        paintPalette.GetComponent<MeshCollider>().enabled = true;
+
+        bool isPaletteHandLeft = !(toolHand == HandType.left);
+
+        ParentConstraint c = paintPalette.GetComponent<ParentConstraint>();
+
+        c.RemoveSource(0);
+        ConstraintSource src = new ConstraintSource();
+        src.sourceTransform = isPaletteHandLeft ? leftHandGrabPoint : rightHandGrabPoint;
+        c.AddSource(src);
+        c.constraintActive = true;
+
+        //Drop whatever's in hand
+        if (isPaletteHandLeft)
+        {
+            leftHand.ForceReleaseGrab();
+        }
+        else
+        {
+            rightHand.ForceReleaseGrab();
+        }
+
+        //Grab palette
+        if (isPaletteHandLeft)
+        {
+            Debug.Log("Grabbing with left duh");
+            leftHand.Grab(GrabType.InstantGrab);
+        }
+        else
+        {
+            rightHand.Grab(GrabType.InstantGrab);
+        }
+
+        paintPalette.GetComponent<ParentConstraint>().constraintActive = false;
     }
 }
