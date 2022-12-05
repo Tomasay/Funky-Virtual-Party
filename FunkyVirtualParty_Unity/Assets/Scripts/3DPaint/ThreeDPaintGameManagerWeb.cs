@@ -76,6 +76,8 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
 
+    bool vrTutorialCompleted;
+
     private void Awake()
     {
         playerPoints = new Dictionary<string, int>();
@@ -120,7 +122,14 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     {
         if (playersAnswering)
         {
+            //Add answer to list
             answers.Add(playerID, info);
+
+            //If all answers are in but VR player is still going through tutorial
+            if (answers.Count == ClientManagerWeb.instance.Players.Count && vrTutorialCompleted == false)
+            {
+                headerText.text = "Waiting for VR player to complete tutorial...";
+            }
         }
     }
 
@@ -198,6 +207,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             }
 
             StartCoroutine("DisplayLeaderboard");
+        }
+        else if (methodName.Equals("VRDoneWithTutorial"))
+        {
+            vrTutorialCompleted = true;
         }
     }
 

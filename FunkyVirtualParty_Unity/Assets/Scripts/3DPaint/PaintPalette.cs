@@ -12,10 +12,17 @@ public class PaintPalette : MonoBehaviour
     MeshRenderer[] colorMeshes;
 
     [SerializeField]
+    Mesh leftHandMesh, rightHandMesh;
+    bool currentMeshRight;
+
+    [SerializeField]
     PaintSprayGun sprayGun;
 
     [SerializeField]
     ThreeDPen pen;
+
+    MeshFilter mf;
+    MeshCollider mc;
 
     Color colorToSet;
 
@@ -31,6 +38,9 @@ public class PaintPalette : MonoBehaviour
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(colors[i2]); });
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(ColorPressed);
         }
+
+        mf = GetComponent<MeshFilter>();
+        mc = GetComponent<MeshCollider>();
     }
 
     void SetColor(Color c)
@@ -50,5 +60,13 @@ public class PaintPalette : MonoBehaviour
         }
 
         OnColorChanged.Invoke();
+    }
+
+    public void Mirror()
+    {
+        currentMeshRight = !currentMeshRight;
+
+        mf.sharedMesh = currentMeshRight ? rightHandMesh : leftHandMesh;
+        mc.sharedMesh = currentMeshRight ? rightHandMesh : leftHandMesh;
     }
 }
