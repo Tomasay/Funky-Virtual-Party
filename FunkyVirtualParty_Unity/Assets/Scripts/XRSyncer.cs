@@ -27,11 +27,73 @@ public class XRSyncer : MonoBehaviour
     {
         public SerializedVector3 HeadPosition, LeftHandPosition, RightHandPosition;
         public SerializedQuaternion HeadRotation, LeftHandRotation, RightHandRotation;
-        public float LeftThumbBend, LeftIndexBend, LeftMiddleBend, LeftRingBend, LeftPinkyBend;
-        public float RightThumbBend, RightIndexBend, RightMiddleBend, RightRingBend, RightPinkyBend;
+        public byte LeftThumbBend, LeftIndexBend, LeftMiddleBend, LeftRingBend, LeftPinkyBend;
+        public byte RightThumbBend, RightIndexBend, RightMiddleBend, RightRingBend, RightPinkyBend;
     }
 
     XRData currentData;
+
+    public byte[] Serialize()
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(currentData.HeadPosition);
+                writer.Write(currentData.LeftHandPosition);
+                writer.Write(currentData.RightHandPosition);
+
+                writer.Write(currentData.HeadRotation);
+                writer.Write(currentData.LeftHandRotation);
+                writer.Write(currentData.RightHandRotation);
+
+                writer.Write(currentData.LeftThumbBend);
+                writer.Write(currentData.LeftIndexBend);
+                writer.Write(currentData.LeftMiddleBend);
+                writer.Write(currentData.LeftRingBend);
+                writer.Write(currentData.LeftPinkyBend);
+
+                writer.Write(currentData.RightThumbBend);
+                writer.Write(currentData.RightIndexBend);
+                writer.Write(currentData.RightMiddleBend);
+                writer.Write(currentData.RightRingBend);
+                writer.Write(currentData.RightPinkyBend);
+
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static XRData Deserialize(byte[] data)
+    {
+        XRData result = new XRData();
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                result.HeadPosition = reader.ReadVector3();
+                result.LeftHandPosition = reader.ReadVector3();
+                result.RightHandPosition = reader.ReadVector3();
+
+                result.HeadRotation = reader.ReadQuaternion();
+                result.LeftHandRotation = reader.ReadQuaternion();
+                result.RightHandRotation = reader.ReadQuaternion();
+
+                result.LeftThumbBend = reader.ReadByte();
+                result.LeftIndexBend = reader.ReadByte();
+                result.LeftMiddleBend = reader.ReadByte();
+                result.LeftRingBend = reader.ReadByte();
+                result.LeftPinkyBend = reader.ReadByte();
+
+                result.RightThumbBend = reader.ReadByte();
+                result.RightIndexBend = reader.ReadByte();
+                result.RightMiddleBend = reader.ReadByte();
+                result.RightRingBend = reader.ReadByte();
+                result.RightPinkyBend = reader.ReadByte();
+            }
+        }
+        return result;
+    }
 
     void Start()
     {
@@ -63,17 +125,17 @@ public class XRSyncer : MonoBehaviour
         rightHand.transform.rotation = Quaternion.Lerp(rightHand.transform.rotation, currentData.RightHandRotation, t);
 
         //Fingies
-        leftFingers[0].SetFingerBend(Mathf.Lerp(leftFingers[0].GetCurrentBend(), currentData.LeftThumbBend, t));
-        leftFingers[1].SetFingerBend(Mathf.Lerp(leftFingers[1].GetCurrentBend(), currentData.LeftIndexBend, t));
-        leftFingers[2].SetFingerBend(Mathf.Lerp(leftFingers[2].GetCurrentBend(), currentData.LeftMiddleBend, t));
-        leftFingers[3].SetFingerBend(Mathf.Lerp(leftFingers[3].GetCurrentBend(), currentData.LeftRingBend, t));
-        leftFingers[4].SetFingerBend(Mathf.Lerp(leftFingers[4].GetCurrentBend(), currentData.LeftPinkyBend, t));
+        leftFingers[0].SetFingerBend(Mathf.Lerp(leftFingers[0].GetCurrentBend(), ((float)currentData.LeftThumbBend) / 100, t));
+        leftFingers[1].SetFingerBend(Mathf.Lerp(leftFingers[1].GetCurrentBend(), ((float)currentData.LeftIndexBend), t));
+        leftFingers[2].SetFingerBend(Mathf.Lerp(leftFingers[2].GetCurrentBend(), ((float)currentData.LeftMiddleBend) / 100, t));
+        leftFingers[3].SetFingerBend(Mathf.Lerp(leftFingers[3].GetCurrentBend(), ((float)currentData.LeftRingBend) / 100, t));
+        leftFingers[4].SetFingerBend(Mathf.Lerp(leftFingers[4].GetCurrentBend(), ((float)currentData.LeftPinkyBend) / 100, t));
 
-        rightFingers[0].SetFingerBend(Mathf.Lerp(rightFingers[0].GetCurrentBend(), currentData.RightThumbBend, t));
-        rightFingers[1].SetFingerBend(Mathf.Lerp(rightFingers[1].GetCurrentBend(), currentData.RightIndexBend, t));
-        rightFingers[2].SetFingerBend(Mathf.Lerp(rightFingers[2].GetCurrentBend(), currentData.RightMiddleBend, t));
-        rightFingers[3].SetFingerBend(Mathf.Lerp(rightFingers[3].GetCurrentBend(), currentData.RightRingBend, t));
-        rightFingers[4].SetFingerBend(Mathf.Lerp(rightFingers[4].GetCurrentBend(), currentData.RightPinkyBend, t));
+        rightFingers[0].SetFingerBend(Mathf.Lerp(rightFingers[0].GetCurrentBend(), ((float)currentData.RightThumbBend) / 100, t));
+        rightFingers[1].SetFingerBend(Mathf.Lerp(rightFingers[1].GetCurrentBend(), ((float)currentData.RightIndexBend) / 100, t));
+        rightFingers[2].SetFingerBend(Mathf.Lerp(rightFingers[2].GetCurrentBend(), ((float)currentData.RightMiddleBend) / 100, t));
+        rightFingers[3].SetFingerBend(Mathf.Lerp(rightFingers[3].GetCurrentBend(), ((float)currentData.RightRingBend) / 100, t));
+        rightFingers[4].SetFingerBend(Mathf.Lerp(rightFingers[4].GetCurrentBend(), ((float)currentData.RightPinkyBend) / 100, t));
 #endif
     }
 
@@ -100,22 +162,24 @@ public class XRSyncer : MonoBehaviour
         currentData.RightHandRotation = rightHand.transform.rotation;
 
         //Fingies
-        currentData.LeftThumbBend = leftFingers[0].GetCurrentBend();
-        currentData.LeftIndexBend = leftFingers[1].GetCurrentBend();
-        currentData.LeftMiddleBend = leftFingers[2].GetCurrentBend();
-        currentData.LeftRingBend = leftFingers[3].GetCurrentBend();
-        currentData.LeftPinkyBend = leftFingers[4].GetCurrentBend();
+        currentData.LeftThumbBend = (byte)(leftFingers[0].GetCurrentBend() * 100);
+        currentData.LeftIndexBend = (byte)(leftFingers[1].GetCurrentBend() * 100);
+        currentData.LeftMiddleBend = (byte)(leftFingers[2].GetCurrentBend() * 100);
+        currentData.LeftRingBend = (byte)(leftFingers[3].GetCurrentBend() * 100);
+        currentData.LeftPinkyBend = (byte)(leftFingers[4].GetCurrentBend() * 100);
 
-        currentData.RightThumbBend = rightFingers[0].GetCurrentBend();
-        currentData.RightIndexBend = rightFingers[1].GetCurrentBend();
-        currentData.RightMiddleBend = rightFingers[2].GetCurrentBend();
-        currentData.RightRingBend = rightFingers[3].GetCurrentBend();
-        currentData.RightPinkyBend = rightFingers[4].GetCurrentBend();
+        currentData.RightThumbBend = (byte)(rightFingers[0].GetCurrentBend() * 100);
+        currentData.RightIndexBend = (byte)(rightFingers[1].GetCurrentBend() * 100);
+        currentData.RightMiddleBend = (byte)(rightFingers[2].GetCurrentBend() * 100);
+        currentData.RightRingBend = (byte)(rightFingers[3].GetCurrentBend() * 100);
+        currentData.RightPinkyBend = (byte)(rightFingers[4].GetCurrentBend() * 100);
 
-        byte[] bytes = ByteArrayConverter.ObjectToByteArray<XRData>(currentData);
+        byte[] bytes = Serialize();
 
         //string json = JsonUtility.ToJson(currentData);
         //Debug.Log("Size of json: " + json.Length * sizeof(char) + "   size of byte array: " + bytes.Length);
+        //Debug.Log("size of byte array: " + bytes.Length);
+        //Debug.Log("size of custom byte array: " + Serialize().Length);
 
         if (ClientManager.instance)
         {
@@ -125,14 +189,9 @@ public class XRSyncer : MonoBehaviour
 #endif
 
 
-    public void ReceiveData(string json)
-    {
-        ApplyNewData(JsonUtility.FromJson<XRData>(json));
-    }
-
     public void ReceiveData(byte[] arrBytes)
     {
-        ApplyNewData(ByteArrayConverter.ByteArrayToObject<XRData>(arrBytes));
+        ApplyNewData(Deserialize(arrBytes));
     }
 
     private void ApplyNewData(XRData data)
