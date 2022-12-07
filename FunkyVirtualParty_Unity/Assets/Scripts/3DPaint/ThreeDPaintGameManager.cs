@@ -80,6 +80,8 @@ public class ThreeDPaintGameManager : GameManager
 
     bool vrTutorialCompleted;
 
+    bool needToGrabPalette;
+
     private void Awake()
     {
         answers = new Dictionary<string, string>();
@@ -434,36 +436,58 @@ public class ThreeDPaintGameManager : GameManager
         {
             rightHand.Grab(GrabType.InstantGrab);
         }
+    }
 
-        ParentConstraint pc;
+    IEnumerator GrabDelayed(bool isToolHandLeft, float delay)
+    {
+        yield return new WaitForSeconds(delay);
 
-        if (isSprayGun)
+        if (isToolHandLeft)
         {
-            sprayGun.GetComponent<ParentConstraint>().constraintActive = false;
-            pc = pen.GetComponent<ParentConstraint>();
+            leftHand.Grab(GrabType.InstantGrab);
         }
         else
         {
-            pen.GetComponent<ParentConstraint>().constraintActive = false;
-            pc = sprayGun.GetComponent<ParentConstraint>();
+            rightHand.Grab(GrabType.InstantGrab);
         }
-
-        pc.RemoveSource(0);
-        ConstraintSource src = new ConstraintSource();
-        src.sourceTransform = isToolHandLeft ? leftHandGrabPoint : rightHandGrabPoint;
-        src.weight = 1;
-        pc.AddSource(src);
-        pc.constraintActive = true;
     }
 
     public void OnGrabbed(Hand h, Grabbable g)
     {
         if(g.gameObject.name.Equals("3DPen") || g.gameObject.name.Equals("Paint Spray Gun"))
         {
+            //Re-enable palette colliders
             foreach (Collider c in paintPalette.GetComponent<MeshCollider>().GetComponentsInChildren<Collider>())
             {
                 c.enabled = true;
             }
+
+            //Grab palette once tool has been grabbed if necessary
+            if (needToGrabPalette)
+            {
+                GrabPalette();
+            }
+
+            //Handle constraints
+            ParentConstraint pc;
+
+            if (sprayGun.active)
+            {
+                sprayGun.GetComponent<ParentConstraint>().constraintActive = false;
+                pc = pen.GetComponent<ParentConstraint>();
+            }
+            else
+            {
+                pen.GetComponent<ParentConstraint>().constraintActive = false;
+                pc = sprayGun.GetComponent<ParentConstraint>();
+            }
+
+            pc.RemoveSource(0);
+            ConstraintSource src = new ConstraintSource();
+            src.sourceTransform = (toolHand == HandType.left) ? leftHandGrabPoint : rightHandGrabPoint;
+            src.weight = 1;
+            pc.AddSource(src);
+            pc.constraintActive = true;
         }
         else if(g.gameObject.name.Equals("PaintPalette"))
         {
@@ -485,16 +509,28 @@ public class ThreeDPaintGameManager : GameManager
 
     public void ToggleToolHand()
     {
+        leftHand.ForceReleaseGrab();
+        rightHand.ForceReleaseGrab();
+
         toolHand = (toolHand == HandType.left) ? HandType.right : HandType.left;
 
         pen.GetComponent<Grabbable>().handType = toolHand;
         sprayGun.GetComponent<Grabbable>().handType = toolHand;
         paintPalette.GetComponent<Grabbable>().handType = (toolHand == HandType.left) ? HandType.right : HandType.left;
 
-        GrabPalette();
-        GrabTool(sprayGun.active);
+        ParentConstraint pc = (sprayGun.active) ? sprayGun.GetComponent<ParentConstraint>() : pen.GetComponent<ParentConstraint>();
+        pc.RemoveSource(0);
+        ConstraintSource src = new ConstraintSource();
+        src.sourceTransform = (toolHand == HandType.left) ? leftHandGrabPoint : rightHandGrabPoint;
+        src.weight = 1;
+        pc.AddSource(src);
+        pc.constraintActive = true;
 
-        if(toolHand == HandType.left)
+        //GrabTool(sprayGun.active);
+        StartCoroutine(GrabDelayed(toolHand == HandType.left, 0.1f));
+        needToGrabPalette = true;
+
+        if (toolHand == HandType.left)
         {
             //Remove previous listener
             YButtonEvent.Pressed.RemoveListener(ToggleToolHand);
@@ -522,9 +558,14 @@ public class ThreeDPaintGameManager : GameManager
         {
             mr.enabled = true;
         }
-        paintPalette.GetComponent<MeshCollider>().enabled = true;
-
+        
         bool isPaletteHandLeft = !(toolHand == HandType.left);
+
+        PaintPalette pp = paintPalette.GetComponent<PaintPalette>();
+        if(pp.currentMeshLeft != isPaletteHandLeft)
+        {
+            pp.Mirror();
+        }
 
         ParentConstraint pc = paintPalette.GetComponent<ParentConstraint>();
 
@@ -545,6 +586,17 @@ public class ThreeDPaintGameManager : GameManager
             rightHand.ForceReleaseGrab();
         }
 
+        if (sprayGun.active)
+        {
+            sprayGun.GetComponent<Collider>().enabled = false;
+        }
+        else
+        {
+            pen.GetComponent<Collider>().enabled = false;
+        }
+
+        paintPalette.GetComponent<MeshCollider>().enabled = true;
+
         //Grab palette
         if (isPaletteHandLeft)
         {
@@ -556,5 +608,7 @@ public class ThreeDPaintGameManager : GameManager
         }
 
         paintPalette.GetComponent<ParentConstraint>().constraintActive = false;
+
+        needToGrabPalette = false;
     }
 }

@@ -13,7 +13,7 @@ public class PaintPalette : MonoBehaviour
 
     [SerializeField]
     Mesh leftHandMesh, rightHandMesh;
-    bool currentMeshRight;
+    public bool currentMeshLeft = true;
 
     [SerializeField]
     PaintSprayGun sprayGun;
@@ -64,9 +64,16 @@ public class PaintPalette : MonoBehaviour
 
     public void Mirror()
     {
-        currentMeshRight = !currentMeshRight;
+        currentMeshLeft = !currentMeshLeft;
 
-        mf.sharedMesh = currentMeshRight ? rightHandMesh : leftHandMesh;
-        mc.sharedMesh = currentMeshRight ? rightHandMesh : leftHandMesh;
+        mf.sharedMesh = currentMeshLeft ? leftHandMesh : rightHandMesh;
+        mc.sharedMesh = currentMeshLeft ? leftHandMesh : rightHandMesh;
+
+        foreach (MeshRenderer mr in colorMeshes)
+        {
+            Vector3 newScale = mr.gameObject.transform.localScale;
+            newScale.Scale(new Vector3(-1, 1, 1));
+            mr.gameObject.transform.localScale = newScale;
+        }
     }
 }

@@ -66,8 +66,6 @@ public class VRTutorial : MonoBehaviour
         YButtonEvent.Pressed.AddListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
         ahp.OnMove.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
         ahp.OnRotate.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
-
-        StartCoroutine("DisableMovementDelayed");
     }
 
     public void ContinueButtonPressed()
@@ -106,7 +104,6 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "To switch handedness, press the primary button in the hand holding your color palette";
                 break;
             case TutorialStage.Movement:
-                ahp.useMovement = true;
                 swapHandsInstructions.SetActive(false);
                 movementInstructions.SetActive(true);
                 headerText.text = "Use the left joystick to move around, and the right joystick to rotate";
@@ -115,6 +112,7 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "You're ready to show off your skills! \nTurn around to look at the controls if you need any additional help";
 
                 controllerImagesParent.SetActive(false);
+                movementInstructions.SetActive(false);
 
                 sprayGun.OnSpray.RemoveListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
                 pen.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
@@ -135,12 +133,5 @@ public class VRTutorial : MonoBehaviour
         yield return new WaitForSeconds(3);
 
         gameObject.SetActive(false);
-    }
-
-    IEnumerator DisableMovementDelayed()
-    {
-        yield return new WaitForSeconds(1);
-
-        ahp.useMovement = false;
     }
 }
