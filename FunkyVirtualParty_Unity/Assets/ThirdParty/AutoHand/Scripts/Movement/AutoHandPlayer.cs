@@ -143,7 +143,7 @@ namespace Autohand {
         public CapsuleCollider bodyCollider { get { return bodyCapsule; } }
 
         public Rigidbody body { get; private set; }
-
+        public HeadPhysicsFollower HeadPhysicsFollower { get => headPhysicsFollower; }
 
         float turnResetzone = 0.3f;
         float groundedOffset = 0.05f;

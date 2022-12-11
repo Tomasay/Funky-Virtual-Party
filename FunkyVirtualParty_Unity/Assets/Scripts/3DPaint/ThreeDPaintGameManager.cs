@@ -62,6 +62,9 @@ public class ThreeDPaintGameManager : GameManager
     [SerializeField]
     XRControllerEvent YButtonEvent, BButtonEvent;
 
+    [SerializeField]
+    AutoHandPlayer ahp;
+
     Dictionary<string, string> answers;
 
     private string chosenAnswer, chosenAnswerOwner;
@@ -395,6 +398,8 @@ public class ThreeDPaintGameManager : GameManager
 
     void GrabTool(bool isSprayGun)
     {
+        SetColliders(false);
+
         bool isToolHandLeft = (toolHand == HandType.left);
 
         //Drop current tool
@@ -467,6 +472,10 @@ public class ThreeDPaintGameManager : GameManager
             {
                 GrabPalette();
             }
+            else
+            {
+                SetColliders(true);
+            }
 
             //Handle constraints
             ParentConstraint pc;
@@ -499,6 +508,8 @@ public class ThreeDPaintGameManager : GameManager
             {
                 pen.GetComponent<Collider>().enabled = true;
             }
+
+            SetColliders(true);
         }
     }
 
@@ -554,6 +565,8 @@ public class ThreeDPaintGameManager : GameManager
 
     void GrabPalette()
     {
+        SetColliders(false);
+
         foreach (MeshRenderer mr in paintPalette.GetComponentsInChildren<MeshRenderer>())
         {
             mr.enabled = true;
@@ -610,5 +623,12 @@ public class ThreeDPaintGameManager : GameManager
         paintPalette.GetComponent<ParentConstraint>().constraintActive = false;
 
         needToGrabPalette = false;
+    }
+
+    //Enable/Disable colliders that could get in the way of grabbing
+    void SetColliders(bool active)
+    {
+        ahp.HeadPhysicsFollower.headCollider.enabled = active;
+        ahp.capsuleColl.enabled = active;
     }
 }
