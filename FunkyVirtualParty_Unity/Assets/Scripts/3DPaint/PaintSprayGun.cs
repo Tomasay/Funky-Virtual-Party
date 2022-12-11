@@ -90,6 +90,14 @@ public class PaintSprayGun : MonoBehaviour
                 ChangeColor(col);
             }
         }
+        else if (methodName.Equals("SprayGunDisable"))
+        {
+            SetActive(false);
+        }
+        else if (methodName.Equals("SprayGunEnable"))
+        {
+            SetActive(true);
+        }
     }
 #endif
 
@@ -102,7 +110,7 @@ public class PaintSprayGun : MonoBehaviour
             ps.startColor = c;
             paintSphere.Color = c;
 
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorSprayGun", ColorUtility.ToHtmlStringRGB(c));
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorSprayGun", "#" + ColorUtility.ToHtmlStringRGB(c));
         }
 #endif
 #if UNITY_WEBGL
@@ -118,6 +126,7 @@ public class PaintSprayGun : MonoBehaviour
         baseMesh.enabled = active;
         col.enabled = active;
         this.active = active;
+        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", active ? "SprayGunEnable" : "SprayGunDisable", "");
 #endif
 #if UNITY_WEBGL
         baseMesh.enabled = active;

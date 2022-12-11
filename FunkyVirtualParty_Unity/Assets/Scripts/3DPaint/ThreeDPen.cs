@@ -122,6 +122,14 @@ public class ThreeDPen : MonoBehaviour
                 ChangeColor(col);
             }
         }
+        else if (methodName.Equals("PenDisable"))
+        {
+            SetActive(false);
+        }
+        else if (methodName.Equals("PenEnable"))
+        {
+            SetActive(true);
+        }
     }
 #endif
 
@@ -167,7 +175,7 @@ public class ThreeDPen : MonoBehaviour
             currentColor = c;
             tipMesh.material.color = c;
 
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorPen", ColorUtility.ToHtmlStringRGB(c));
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorPen", "#" + ColorUtility.ToHtmlStringRGB(c));
         }
 #endif
 #if UNITY_WEBGL
@@ -184,6 +192,7 @@ public class ThreeDPen : MonoBehaviour
         col.enabled = active;
         tipCol.enabled = active;
         this.active = active;
+        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", active ? "PenEnable" : "PenDisable", "");
 #endif
 #if UNITY_WEBGL
         tipMesh.enabled = active;
