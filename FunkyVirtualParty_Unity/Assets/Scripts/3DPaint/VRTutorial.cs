@@ -9,6 +9,9 @@ using Autohand;
 public class VRTutorial : MonoBehaviour
 {
     [SerializeField]
+    ThreeDPaintGameManager gm;
+
+    [SerializeField]
     GraphicRaycaster raycaster;
 
     [SerializeField]
@@ -133,5 +136,7 @@ public class VRTutorial : MonoBehaviour
         yield return new WaitForSeconds(3);
 
         gameObject.SetActive(false);
+
+        gm.OnTutorialCompleted();
     }
 }

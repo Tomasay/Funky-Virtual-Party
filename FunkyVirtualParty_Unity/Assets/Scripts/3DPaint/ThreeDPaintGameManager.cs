@@ -95,6 +95,7 @@ public class ThreeDPaintGameManager : GameManager
 
         headerText.text = "";
         timerText.text = "";
+        headerText.enabled = false;
 
         drawTimeRemaining = DRAW_TIME_AMOUNT;
 
@@ -158,6 +159,8 @@ public class ThreeDPaintGameManager : GameManager
 
             ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "VRDoneWithTutorial", "");
         }
+
+        headerText.enabled = true;
     }
 
     void OnStateChange()

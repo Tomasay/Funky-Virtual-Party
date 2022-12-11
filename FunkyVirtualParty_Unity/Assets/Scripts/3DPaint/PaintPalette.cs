@@ -14,35 +14,43 @@ public class PaintPalette : MonoBehaviour
     [SerializeField]
     Mesh leftHandMesh, rightHandMesh;
     public bool currentMeshLeft = true;
+    
+    MeshFilter mf;
+    MeshCollider mc;
 
+    public UnityEvent OnColorChanged;
+
+#if UNITY_ANDROID
     [SerializeField]
     PaintSprayGun sprayGun;
 
     [SerializeField]
     ThreeDPen pen;
 
-    MeshFilter mf;
-    MeshCollider mc;
-
     Color colorToSet;
+#endif
 
-    public UnityEvent OnColorChanged;
-
-    // Start is called before the first frame update
     void Start()
     {
         for (int i = 0; i < colorMeshes.Length; i++)
         {
             colorMeshes[i].material.color = colors[i];
+#if UNITY_ANDROID
             var i2 = i;
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(colors[i2]); });
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(ColorPressed);
+#endif
         }
 
         mf = GetComponent<MeshFilter>();
         mc = GetComponent<MeshCollider>();
+
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+#endif
     }
 
+#if UNITY_ANDROID
     void SetColor(Color c)
     {
         colorToSet = c;
@@ -61,7 +69,11 @@ public class PaintPalette : MonoBehaviour
 
         OnColorChanged.Invoke();
     }
+#endif
 
+    /// <summary>
+    /// Mirror the mesh so that it can be held in opposite hand with same hand pose
+    /// </summary>
     public void Mirror()
     {
         currentMeshLeft = !currentMeshLeft;
@@ -75,5 +87,19 @@ public class PaintPalette : MonoBehaviour
             newScale.Scale(new Vector3(-1, 1, 1));
             mr.gameObject.transform.localScale = newScale;
         }
+
+#if UNITY_ANDROID
+        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MirrorPalette", "");
+#endif
     }
+
+#if UNITY_WEBGL
+    void MethodCalledFromServer(string methodName, string data)
+    {
+        if (methodName.Equals("MirrorPalette"))
+        {
+            Mirror();
+        }
+    }
+#endif
 }
