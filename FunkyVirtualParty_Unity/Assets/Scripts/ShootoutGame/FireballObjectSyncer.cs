@@ -40,10 +40,56 @@ public class FireballObjectSyncer : ObjectSyncer
 
     public FireballObjectData CurrentFireballData { get => currentFireballData;}
 
+    public new byte[] Serialize()
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(currentFireballData.Position);
+                writer.Write(currentFireballData.Rotation);
+                writer.Write(currentFireballData.objectID);
+
+                writer.Write(currentFireballData.Position);
+
+                writer.Write(currentFireballData.Rotation);
+
+                writer.Write(currentFireballData.isActive);
+                writer.Write(currentFireballData.currentScale);
+                writer.Write(currentFireballData.boosted);
+
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static new FireballObjectData Deserialize(byte[] data)
+    {
+        FireballObjectData result = new FireballObjectData();
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                result.Position = reader.ReadVector3();
+                result.Rotation = reader.ReadQuaternion();
+                result.objectID = reader.ReadByte();
+
+                result.Position = reader.ReadVector3();
+
+                result.Rotation = reader.ReadQuaternion();
+
+                result.isActive = reader.ReadBoolean();
+                result.currentScale = reader.ReadSingle();
+                result.boosted = reader.ReadBoolean();
+            }
+        }
+        return result;
+    }
+
     protected override void Awake()
     {
         currentFireballData = new FireballObjectData();
-        currentData.Init(objectID);
+        currentFireballData.Init(objectID);
 
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
@@ -98,7 +144,7 @@ public class FireballObjectSyncer : ObjectSyncer
 #if UNITY_WEBGL
     void MethodCalledFromServer(string methodName, string data)
     {
-        if (int.TryParse(data, out int id) && id == currentFireballData.objectID)
+        if (byte.TryParse(data, out byte id) && id == currentFireballData.objectID)
         {
             if (methodName.Equals("SmokePuffEvent"))
             {
@@ -136,25 +182,17 @@ public class FireballObjectSyncer : ObjectSyncer
             currentFireballData.boosted = f.boosted;
 
             //Send Data
-            //string json = JsonUtility.ToJson(currentFireballData);
-            byte[] bytes = ByteArrayConverter.ObjectToByteArray<FireballObjectData>(currentFireballData);
-
             if (ClientManager.instance)
             {
-                ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", bytes);
+                ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", Serialize());
             }
         }
     }
 #endif
 
-    public override void ReceiveData(string json)
+    public override void ReceiveData(byte[] arrBytes)
     {
-        ApplyNewFireballData(JsonUtility.FromJson<FireballObjectData>(json));
-    }
-
-    public void ReceiveData(byte[] arrBytes)
-    {
-        ApplyNewFireballData(ByteArrayConverter.ByteArrayToObject<FireballObjectData>(arrBytes));
+        ApplyNewFireballData(Deserialize(arrBytes));
     }
 
     protected void ApplyNewFireballData(FireballObjectData data)

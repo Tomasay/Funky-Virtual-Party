@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Digger.Modules.Runtime.Sources;
 using Digger.Modules.Core.Sources;
+using System.IO;
 
 public class Shootout_DestructibleTerrian : MonoBehaviour
 {
@@ -20,10 +21,38 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
     Terrain ter = null;
 
+    public byte[] Serialize(ExplosionData data)
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(data.pos);
+                writer.Write(data.size);
+
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static ExplosionData Deserialize(byte[] data)
+    {
+        ExplosionData result = new ExplosionData();
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                result.pos = reader.ReadVector3();
+                result.size = reader.ReadSingle();
+            }
+        }
+        return result;
+    }
+
     private void Awake()
     {
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
 #endif
     }
 
@@ -45,11 +74,11 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
         digger.ModifyAsyncBuffured(new Vector3(-55.5f, 27, 50), BrushType.Sphere, ActionType.Dig, 0, 0, 20);
     }
 
-    void MethodCalledFromServer(string methodName, string data)
+    void MethodCalledFromServer(string methodName, byte[] data)
     {
         if(methodName.Equals("ExplosionEvent"))
         {
-            ExplosionData newData = JsonUtility.FromJson<ExplosionData>(data);
+            ExplosionData newData = Deserialize(data);
             digger.ModifyAsyncBuffured(newData.pos, BrushType.Sphere, ActionType.Dig, 0, 1, newData.size);
             CinemachineShake.Instance.ShakeCamera(1, 1);
         }
@@ -84,7 +113,7 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ExplosionEvent", JsonUtility.ToJson(newData));
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "ExplosionEvent", Serialize(newData));
         }
     }
 

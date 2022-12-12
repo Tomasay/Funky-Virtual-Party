@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.IO;
+
 
 public class ObjectSyncer : MonoBehaviour
 {
     [Tooltip("ID of object to track in scene. Must be the same ID on mobile vs VR scenes")]
-    public int objectID;
+    public byte objectID;
 
     [Tooltip("How often data is sent to be synced")]
     public float UpdatesPerSecond = 10;
@@ -16,15 +18,45 @@ public class ObjectSyncer : MonoBehaviour
     {
         public SerializedVector3 Position;
         public SerializedQuaternion Rotation;
-        public int objectID;
+        public byte objectID;
 
-        public void Init(int ID)
+        public void Init(byte ID)
         {
             objectID = ID;
         }
     }
 
     protected ObjectData currentData;
+
+    public byte[] Serialize()
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(currentData.Position);
+                writer.Write(currentData.Rotation);
+                writer.Write(currentData.objectID);
+
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static ObjectData Deserialize(byte[] data)
+    {
+        ObjectData result = new ObjectData();
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                result.Position = reader.ReadVector3();
+                result.Rotation = reader.ReadQuaternion();
+                result.objectID = reader.ReadByte();
+            }
+        }
+        return result;
+    }
 
 
     protected virtual void Awake()
@@ -58,12 +90,9 @@ public class ObjectSyncer : MonoBehaviour
         //Rotation
         currentData.Rotation = transform.rotation;
 
-        //string json = JsonUtility.ToJson(currentData);
-        byte[] bytes = ByteArrayConverter.ObjectToByteArray<ObjectData>(currentData);
-
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", bytes);
+            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", Serialize());
         }
     }
 #endif
@@ -74,9 +103,9 @@ public class ObjectSyncer : MonoBehaviour
         ApplyNewData(JsonUtility.FromJson<ObjectData>(json));
     }
 
-    public void ReceiveData(byte[] arrBytes)
+    public virtual void ReceiveData(byte[] arrBytes)
     {
-        ApplyNewData(ByteArrayConverter.ByteArrayToObject<ObjectData>(arrBytes));
+        ApplyNewData(Deserialize(arrBytes));
     }
 
     protected virtual void ApplyNewData<T>(T data) where T : ObjectData
