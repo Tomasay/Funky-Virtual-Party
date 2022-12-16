@@ -72,7 +72,6 @@ public class ThreeDPaintGameManager : GameManager
     private int playersGuessed = 0;
 
     float drawTimeRemaining;
-    const int DRAW_TIME_AMOUNT = 120;
 
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
@@ -97,7 +96,7 @@ public class ThreeDPaintGameManager : GameManager
         timerText.text = "";
         headerText.enabled = false;
 
-        drawTimeRemaining = DRAW_TIME_AMOUNT;
+        drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
 
         if (ClientManager.instance)
         {
@@ -168,6 +167,10 @@ public class ThreeDPaintGameManager : GameManager
         switch (state)
         {
             case ThreeDPaintGameState.ClientsAnswering:
+                //Enable VR tools
+                pen.canPaint = true;
+                sprayGun.canPaint = true;
+
                 //Display text that players are answering
                 headerText.text = "Players are typing their answers \nUse this time to practice painting! \nTurn around for controls";
 
@@ -176,10 +179,6 @@ public class ThreeDPaintGameManager : GameManager
                 break;
             case ThreeDPaintGameState.VRPainting:
                 timerText.enabled = true;
-
-                //Enable VR tools
-                pen.canPaint = true;
-                sprayGun.canPaint = true;
 
                 //Display answer
                 headerText.text = "Paint: " + chosenAnswer;
@@ -310,7 +309,7 @@ public class ThreeDPaintGameManager : GameManager
         {
             ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SetNewPrompt", GetPrompt());
             State = ThreeDPaintGameState.ClientsAnswering;
-            drawTimeRemaining = DRAW_TIME_AMOUNT;
+            drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
             answers = new Dictionary<string, string>();
 
             currentRound++;

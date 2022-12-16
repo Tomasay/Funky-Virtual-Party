@@ -28,6 +28,11 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     TMP_Text headerText;
 
     [SerializeField]
+    TMP_Text timerText;
+    float drawTimeRemaining;
+    bool timerCountingDown;
+
+    [SerializeField]
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
@@ -116,6 +121,12 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             drawingModel.transform.Rotate(0, Time.deltaTime * 20, 0);
             linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
         }
+
+        if(timerCountingDown && drawTimeRemaining >= 0)
+        {
+            drawTimeRemaining -= Time.deltaTime;
+            timerText.text = FormatTime(drawTimeRemaining);
+        }
     }
 
     void InfoReceived(string info, string playerID)
@@ -162,6 +173,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         {
             inputCanvas.enabled = false;
 
+            drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
+            timerText.text = FormatTime(drawTimeRemaining);
+            timerCountingDown = true;
+
             drawingPhaseCamera.gameObject.SetActive(true);
             guessingPhaseCamera.gameObject.SetActive(false);
         }
@@ -171,6 +186,8 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             guessing = true;
 
             guessingCanvas.enabled = true;
+
+            timerCountingDown = false;
 
             drawingPhaseCamera.gameObject.SetActive(false);
             guessingPhaseCamera.gameObject.SetActive(true);
