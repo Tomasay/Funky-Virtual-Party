@@ -89,7 +89,6 @@ public class ClientManager : MonoBehaviour
         }
 
         InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
-        InvokeRepeating("SendHeartbeat", 0, 2.0f);
 
 #if UNITY_EDITOR
         for (int i = 0; i < debugPlayersToAdd.Length; i++)
@@ -110,14 +109,11 @@ public class ClientManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        Debug.Log("OnApplicationQuit");
+
         manager.Socket.Emit("unityCloseRoom", passcode);
         manager?.Close();
         manager?.Socket?.Disconnect();
-    }
-
-    void SendHeartbeat()
-    {
-        manager.Socket.Emit("heartbeatToServer");
     }
 
     public void OnMinigameStart(string game)
