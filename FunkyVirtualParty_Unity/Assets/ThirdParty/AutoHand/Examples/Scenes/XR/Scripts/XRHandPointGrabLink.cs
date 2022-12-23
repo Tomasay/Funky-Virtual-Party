@@ -11,16 +11,39 @@ namespace Autohand.Demo{
         public CommonButton pointInput;
         public CommonButton selectInput;
 
+        public bool autoPoint = false;
+
         bool pointing;
+        bool autoPointing;
         bool selecting;
 
         void Update(){
+            if (autoPoint && Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out RaycastHit hit, Mathf.Infinity, (1 << LayerMask.NameToLayer("Grabbable"))))
+            {
+                if (hit.collider.gameObject.GetComponent<DistanceGrabbable>())
+                {
+                    autoPointing = true;
+                    pointGrab.StartPointing();
+                }
+                else
+                {
+                    autoPointing = false;
+                    pointGrab.StopPointing();
+                }
+            }
+            else if(autoPoint && !pointing)
+            {
+                autoPointing = false;
+                pointGrab.StopPointing();
+            }
+
             if (link.ButtonPressed(pointInput) && !pointing) {
                 pointing = true;
                 pointGrab.StartPointing();
             }
 
-            if (!link.ButtonPressed(pointInput) && pointing){
+            if (!link.ButtonPressed(pointInput) && pointing)
+            {
                 pointing = false;
                 pointGrab.StopPointing();
             }

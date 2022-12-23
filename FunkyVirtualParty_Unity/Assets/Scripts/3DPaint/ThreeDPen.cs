@@ -29,6 +29,9 @@ public class ThreeDPen : MonoBehaviour
 
     [SerializeField]
     ThreeDPaintGameManager gm;
+
+    [SerializeField]
+    AutoHandPlayer ahp;
 #endif
 
     bool isPainting;
@@ -66,7 +69,7 @@ public class ThreeDPen : MonoBehaviour
 #if UNITY_ANDROID
     void Update()
     {
-        if(isPainting && rb.velocity.magnitude > 0.1f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
+        if(isPainting && (rb.velocity.magnitude > 0.1f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             if(pointSkipCounter == 0 && ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
