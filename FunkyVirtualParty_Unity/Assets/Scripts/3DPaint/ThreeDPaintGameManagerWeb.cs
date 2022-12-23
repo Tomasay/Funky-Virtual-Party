@@ -57,10 +57,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     Button submitButton;
 
     [SerializeField]
-    GameObject answerButtonPrefab, answerButtonParent;
-
-    [SerializeField]
-    GameObject playerNameIconPrefab, playerNamesIconParent;
+    GameObject answerButtonPrefab, answerButtonParent, answerResultsParent;
 
     [SerializeField]
     GameObject drawingModel, linesParent;
@@ -76,7 +73,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
     bool guessing = false; //Are players guessing?
 
+    string chosenAnswerOwner;
     Dictionary<string, string> answers;
+    List<AnswerOptionButton> answerButtons, answerResults;
 
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
@@ -88,6 +87,8 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         playerPoints = new Dictionary<string, int>();
 
         currentLeaderboardCards = new List<GameObject>();
+        answerButtons = new List<AnswerOptionButton>();
+        answerResults = new List<AnswerOptionButton>();
 
         answerInputButton.onPointerDown.AddListener(ButtonPointerDown);
         answerInputButton.onPointerUp.AddListener(ButtonPointerUp);
@@ -180,6 +181,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             drawingPhaseCamera.gameObject.SetActive(true);
             guessingPhaseCamera.gameObject.SetActive(false);
         }
+        else if(methodName.Equals("ChosenAnswerOwner"))
+        {
+            chosenAnswerOwner = data;
+        }
         else if (methodName.Equals("DoneDrawing"))
         {
             playersAnswering = false;
@@ -192,24 +197,45 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             drawingPhaseCamera.gameObject.SetActive(false);
             guessingPhaseCamera.gameObject.SetActive(true);
 
+            //Answer buttons
             foreach (KeyValuePair<string, string> entry in answers)
             {
                 GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                ab.GetComponentInChildren<TMP_Text>().text = entry.Value;
                 ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(entry.Value, entry.Key); });
+                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                aob.SetText(entry.Value);
+                aob.playerID = entry.Key;
+                answerButtons.Add(aob);
+            }
+
+            //Answer results
+            foreach (KeyValuePair<string, string> entry in answers)
+            {
+                GameObject ab = Instantiate(answerButtonPrefab, answerResultsParent.transform);
+                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                aob.SetText(entry.Value);
+                aob.playerID = entry.Key;
+                answerResults.Add(aob);
             }
         }
-        else if(methodName.Equals("GuessedRight"))
+        else if(methodName.Equals("PlayerGuessed"))
         {
-            AddPlayerToResults(data, true);
-            playerPoints[data] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
-        }
-        else if (methodName.Equals("GuessedWrong"))
-        {
-            AddPlayerToResults(data, false);
+            //PlayerID:AnswerPlayerID
+            string[] info = data.Split(':');
+
+            AddPlayerToResults(info[0], info[1]);
+            if (info[1].Equals(chosenAnswerOwner))
+            {
+                playerPoints[info[0]] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
+            }
         }
         else if (methodName.Equals("VRGuessing"))
         {
+            foreach (AnswerOptionButton aob in answerResults)
+            {
+                aob.SetColor(aob.playerID.Equals(chosenAnswerOwner) ? Color.green : Color.red);
+            }
+
             resultsCanvas.enabled = true;
         }
         else if (methodName.Equals("GameOver"))
@@ -286,17 +312,24 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         guessingCanvas.enabled = false;
     }
 
-    void AddPlayerToResults(string playerID, bool correct)
+    void AddPlayerToResults(string playerID, string answerPlayerID)
     {
-        GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
-        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManagerWeb.instance.GetPlayerByID(playerID).PlayerName;
-        pi.GetComponentInChildren<Button>(true).interactable = false;
-        pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+        //Check each answer
+        foreach (AnswerOptionButton aob in answerResults)
+        {
+            //Find the answer that the player chose
+            if (aob.playerID.Equals(answerPlayerID))
+            {
+                ClientManagerWeb inst = ClientManagerWeb.instance;
+                aob.AddPlayerIcon(inst.GetPlayerByID(playerID).PlayerName, inst.GetPlayerByID(playerID).PlayerColor);
+                return;
+            }
+        }
     }
 
     void ClearPlayerResults()
     {
-        foreach (Button b in playerNamesIconParent.GetComponentsInChildren<Button>())
+        foreach (Button b in answerResultsParent.GetComponentsInChildren<Button>())
         {
             Destroy(b.gameObject);
         }
@@ -304,10 +337,17 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
     void ClearPlayerAnswers()
     {
-        foreach (Button b in answerButtonParent.GetComponentsInChildren<Button>())
+        foreach (AnswerOptionButton aob in answerButtons)
         {
-            Destroy(b.gameObject);
+            Destroy(aob.gameObject);
         }
+        answerButtons = new List<AnswerOptionButton>();
+
+        foreach (AnswerOptionButton aob in answerResults)
+        {
+            Destroy(aob.gameObject);
+        }
+        answerResults = new List<AnswerOptionButton>();
     }
 
     IEnumerator DisplayLeaderboard()

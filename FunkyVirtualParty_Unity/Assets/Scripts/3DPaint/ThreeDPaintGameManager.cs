@@ -172,7 +172,7 @@ public class ThreeDPaintGameManager : GameManager
                 sprayGun.canPaint = true;
 
                 //Display text that players are answering
-                headerText.text = "Players are typing their answers \nUse this time to practice painting! \nTurn around for controls";
+                headerText.text = "Players are typing their answers \nUse this time to practice painting!";
 
                 //Animate client players to look like they are on their phones
 
@@ -327,6 +327,7 @@ public class ThreeDPaintGameManager : GameManager
                 string randomPlayer = ClientManager.instance.Players[Random.Range(0, ClientManager.instance.Players.Count)].PlayerID;
                 chosenAnswer = answers[randomPlayer];
                 chosenAnswerOwner = randomPlayer;
+                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChosenAnswerOwner", chosenAnswerOwner);
 
                 if (vrTutorialCompleted)
                 {
@@ -336,10 +337,11 @@ public class ThreeDPaintGameManager : GameManager
         }
         else if (State == ThreeDPaintGameState.ClientsGuessing)
         {
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PlayerGuessed", playerID + ":" + info);
+
             //If player guessed right
             if (answers[info].Equals(answers[chosenAnswerOwner]))
             {
-                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedRight", playerID);
                 AddPlayerToResults(playerID, true);
 
                 vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
@@ -347,7 +349,6 @@ public class ThreeDPaintGameManager : GameManager
             }
             else
             {
-                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedWrong", playerID);
                 AddPlayerToResults(playerID, false);
             }
 
