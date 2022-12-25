@@ -15,6 +15,8 @@ public class VinylInfo : MonoBehaviour
 
     [SerializeField] public AutoHandPlayer vrPlayer;
 
+    [SerializeField] public Transform distanceChecker;
+
     Grabbable grabbable;
     Collider col;
     Rigidbody rb;
@@ -24,7 +26,7 @@ public class VinylInfo : MonoBehaviour
 
 
     [SerializeField] GameObject poofEffect;
-    float distanceToRespawn = 7;
+    float distanceToRespawn = 10;
 
     private void Awake()
     {
@@ -44,9 +46,8 @@ public class VinylInfo : MonoBehaviour
     private void Update()
     {
         Vector3 discPos = new Vector3(transform.position.x, 0, transform.position.z);
-        Vector3 playerPos = new Vector3(vrPlayer.headModel.transform.position.x, 0, vrPlayer.headModel.transform.position.z);
 
-        if (Vector3.Distance(discPos, playerPos) > distanceToRespawn)
+        if (Vector3.Distance(discPos, distanceChecker.position) > distanceToRespawn)
         {
             RespawnDisc();
         }
