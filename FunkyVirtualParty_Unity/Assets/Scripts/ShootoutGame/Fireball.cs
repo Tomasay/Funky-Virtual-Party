@@ -130,6 +130,7 @@ public class Fireball : MonoBehaviour
         rb.isKinematic = true;
         explosion.Play();
         hasExploded = true;
+        syncer.onTrajectory = false;
 
         if(boosted)
         {
@@ -225,6 +226,19 @@ public class Fireball : MonoBehaviour
         isInLeftHand = false;
         isInRightHand = false;
         chargeIndicator.enabled = false;
+
+        StartCoroutine("SendTrajectoryDelayed");
+    }
+
+    IEnumerator SendTrajectoryDelayed()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        if (ClientManager.instance)
+        {
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "FireballTrajectory", syncer.SerializeTrajectory(rb.position, rb.velocity));
+            syncer.onTrajectory = true;
+        }
     }
 
     private void Reset()

@@ -10,7 +10,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Transform[] playerPositions;
 
-    [SerializeField] private TMP_Text partyCodeText, partyCodeTextStatic, linkText, inviteYourFriendsText, connectingText, connectionErrorText;
+    [SerializeField] private TMP_Text partyCodeText, partyCodeTextStatic, inviteYourFriendsText, connectingText, connectionErrorText;
 
     [SerializeField] private const float TIMEOUT_TIME = 5.0f;
 
@@ -161,7 +161,6 @@ public class MainMenu : MonoBehaviour
         }
 
         Camera.main.backgroundColor = backgroundColors[currentColorIndex];
-        linkText.color = discoBallHighlightColors[currentColorIndex];
         discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("BaseColor", discoBallMainColors[currentColorIndex]);
         discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("Highlight", discoBallHighlightColors[currentColorIndex]);
     }

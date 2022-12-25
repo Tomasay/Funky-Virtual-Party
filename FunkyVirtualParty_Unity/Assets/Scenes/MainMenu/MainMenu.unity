@@ -1303,6 +1303,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 653373943827387914, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1639125106728771988, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -1382,10 +1386,6 @@ PrefabInstance:
     - target: {fileID: 7942002210973373748, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_Name
       value: XRPlayer
-      objectReference: {fileID: 0}
-    - target: {fileID: 7942002211172716363, guid: a5226a72c9553294abfe172a458b5805, type: 3}
-      propertyPath: pointInput
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7942002211172716363, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: selectInput
@@ -3618,6 +3618,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 12.799
       objectReference: {fileID: 0}
+    - target: {fileID: 7410739126510302217, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c3ba4e755bb493c409934db811713ea0, type: 2}
     - target: {fileID: 7460321804510483054, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: objectID
       value: 4
@@ -3645,7 +3649,7 @@ PrefabInstance:
     - target: {fileID: 8965567671962159261, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: videoPreview
       value: 
-      objectReference: {fileID: 32900000, guid: 25155b813375b194fbfefe7938aa9f71, type: 3}
+      objectReference: {fileID: 32900000, guid: 5d3a92fe37b645140a823f4dac078990, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
 --- !u!1 &1545672673
@@ -3795,7 +3799,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 376541852131382824, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1041015948400364690, guid: 5f71182da42166540b3b9f735d76ac66, type: 3}
       propertyPath: m_RootOrder
@@ -4645,7 +4649,6 @@ MonoBehaviour:
   - {fileID: 1865525777}
   partyCodeText: {fileID: 765775905}
   partyCodeTextStatic: {fileID: 291882790}
-  linkText: {fileID: 1305893383}
   inviteYourFriendsText: {fileID: 1305893383}
   connectingText: {fileID: 1302876349}
   connectionErrorText: {fileID: 975791583}

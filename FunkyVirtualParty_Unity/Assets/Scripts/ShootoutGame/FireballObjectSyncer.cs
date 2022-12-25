@@ -16,6 +16,7 @@ public class FireballObjectSyncer : ObjectSyncer
 #endif
 
     [SerializeField] GameObject fireballMesh, fireballTrail;
+    [SerializeField] Rigidbody rb;
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] float minSize, maxSize;
     [SerializeField] Color minColor, maxColor;
@@ -27,6 +28,8 @@ public class FireballObjectSyncer : ObjectSyncer
     private int fireballExplosionRange = 1;
 
     private bool lastActiveSent; //Value of isActive last sent to clients
+
+    public bool onTrajectory = false;
 
     [Serializable]
     public class FireballObjectData : ObjectData
@@ -86,6 +89,36 @@ public class FireballObjectSyncer : ObjectSyncer
         return result;
     }
 
+    public new byte[] SerializeTrajectory(Vector3 pos, Vector3 vel)
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(objectID);
+                writer.Write(pos);
+                writer.Write(vel);
+            }
+            return m.ToArray();
+        }
+    }
+
+    public void DeserializeTrajectory(byte[] data)
+    {
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                if (!reader.ReadByte().Equals(objectID)) return;
+
+                rb.isKinematic = false;
+                rb.useGravity = true;
+                rb.position = reader.ReadVector3();
+                rb.velocity = reader.ReadVector3();
+            }
+        }
+    }
+
     protected override void Awake()
     {
         currentFireballData = new FireballObjectData();
@@ -94,6 +127,7 @@ public class FireballObjectSyncer : ObjectSyncer
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
 
         //indicator.transform.parent = null;
 #endif
@@ -152,6 +186,9 @@ public class FireballObjectSyncer : ObjectSyncer
             }
             else if (methodName.Equals("FireballExplosionEvent"))
             {
+                rb.isKinematic = true;
+                rb.useGravity = false;
+
                 explosion.Play();
 
 
@@ -162,13 +199,21 @@ public class FireballObjectSyncer : ObjectSyncer
             }
         }
     }
+
+    void MethodCalledFromServer(string methodName, byte[] data)
+    {
+        if (methodName.Equals("FireballTrajectory"))
+        {
+            DeserializeTrajectory(data);
+        }
+    }
 #endif
 
 #if !UNITY_WEBGL
     protected override void SendData()
     {
         Fireball f = GetComponent<Fireball>();
-        if (f.fireball.activeSelf || lastActiveSent == true) //Only send data if fireball is active, make sure it is marked inactive on client first
+        if (!onTrajectory && (f.fireball.activeSelf || lastActiveSent == true)) //Only send data if fireball is active, make sure it is marked inactive on client first
         {
             //Position
             currentFireballData.Position = transform.position;
