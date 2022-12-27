@@ -17,7 +17,7 @@ public class Fireball : MonoBehaviour
     [SerializeField] Color minColor, maxColor;
     [SerializeField] Color emberColor, emberColorBoosted;
     [SerializeField] float fireballGrowSpeed = 0.25f;
-    [SerializeField] FireballObjectSyncer syncer;
+    [SerializeField] public FireballObjectSyncer syncer;
     [SerializeField] Shootout_DestructibleTerrian terrain;
 
     [SerializeField] Color boostedMainColor, boostedSecondaryColor;
@@ -83,6 +83,8 @@ public class Fireball : MonoBehaviour
                 boosted = true;
 
                 chargeIndicator.enabled = false;
+
+                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballBoost", syncer.objectID);
             }
             else if(!boosted)
             {
@@ -119,7 +121,7 @@ public class Fireball : MonoBehaviour
 
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SmokePuffEvent", syncer.CurrentFireballData.objectID.ToString());
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "SmokePuffEvent", syncer.objectID);
         }
     }
 
@@ -140,6 +142,9 @@ public class Fireball : MonoBehaviour
             {
                 if(f.readyToSpawn)
                 {
+                    if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateMini", f.syncer.objectID);
+                    StartCoroutine("SendTrajectoryAsync");
+
                     //Set pos to current explosion
                     f.transform.position = transform.position + Vector3.up;
 
@@ -180,7 +185,7 @@ public class Fireball : MonoBehaviour
 
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "FireballExplosionEvent", syncer.CurrentFireballData.objectID.ToString());
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballExplosionEvent", syncer.objectID);
 
 #if UNITY_EDITOR
             foreach (ClientPlayer cp in ClientManager.instance.Players)
@@ -188,7 +193,7 @@ public class Fireball : MonoBehaviour
                 if (cp.isDebugPlayer)
                 {
                     ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)cp;
-                    sp.CheckCollisionWithFireball(syncer.CurrentFireballData.Position, Mathf.Max(2, syncer.CurrentFireballData.currentScale));
+                    sp.CheckCollisionWithFireball(transform.position, Mathf.Max(2, currentScale));
                 }
             }
 #endif
@@ -227,12 +232,12 @@ public class Fireball : MonoBehaviour
         isInRightHand = false;
         chargeIndicator.enabled = false;
 
-        StartCoroutine("SendTrajectoryDelayed");
+        StartCoroutine("SendTrajectoryAsync");
     }
 
-    IEnumerator SendTrajectoryDelayed()
+    IEnumerator SendTrajectoryAsync()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0);
 
         if (ClientManager.instance)
         {
@@ -256,8 +261,6 @@ public class Fireball : MonoBehaviour
         boosted = false;
         chargeIndicator.fillAmount = 0;
         chargeIndicator.enabled = true;
-        //constraint.constraintActive = false;
-
         readyToSpawn = true;
     }
 }
