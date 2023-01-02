@@ -55,7 +55,7 @@ public class VinylInfo : MonoBehaviour
 
     void RespawnDisc()
     {
-        RuntimeManager.PlayOneShotAttached("event:/SFX/Pop", gameObject);
+        RuntimeManager.PlayOneShot("event:/SFX/Pop", transform.position);
         Instantiate(poofEffect, transform.position, transform.rotation);
 
         rb.velocity = Vector3.zero;
