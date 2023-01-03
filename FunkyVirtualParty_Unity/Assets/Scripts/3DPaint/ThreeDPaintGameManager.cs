@@ -374,7 +374,8 @@ public class ThreeDPaintGameManager : GameManager
         pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerByID(playerID).PlayerName;
         pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
-        pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+        //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+        pi.GetComponent<Image>().color = ClientManager.instance.GetPlayerByID(playerID).PlayerColor;
 
         playerNameIcons.Add(pi);
     }

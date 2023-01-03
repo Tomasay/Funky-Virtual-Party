@@ -43,7 +43,7 @@ public class ThreeDPen : MonoBehaviour
     //The amount of time that has to pass before another point can be created
     const float pointSecondDelay = 0.01f;
     //Skips this many points beforing sending a new one. Higher = better performance. Lower = more accurate results for clients
-    const int networkedPointsOffset = 7;
+    const int networkedPointsOffset = 10;
     int pointSkipCounter = 0;
 
     float lastPointTime;
