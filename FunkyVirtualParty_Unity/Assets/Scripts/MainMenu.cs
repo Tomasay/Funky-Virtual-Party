@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using epoching.easy_qr_code;
 using UnityEngine.InputSystem.EnhancedTouch;
+using Autohand;
 
 public class MainMenu : MonoBehaviour
 {
@@ -29,6 +30,10 @@ public class MainMenu : MonoBehaviour
     [SerializeField] GameObject discoBall;
 
     [SerializeField] GameObject lightDial;
+
+    [SerializeField] PhysicsGadgetHingeAngleReader discoBallSwitch;
+    private bool isDiscoBallOn;
+
 
 
     // Start is called before the first frame update
@@ -89,6 +94,7 @@ public class MainMenu : MonoBehaviour
             connectionErrorText.enabled = true;
         }
 
+        CheckDiscoBallSwitch();
         UpdateLight();
     }
 
@@ -182,5 +188,19 @@ public class MainMenu : MonoBehaviour
         Color.RGBToHSV(RenderSettings.ambientLight, out h, out s, out v);
         v = Mathf.Lerp(0.25f, 0.0f, lightLevel);
         RenderSettings.ambientLight = Color.HSVToRGB(h, s, v);
+    }
+
+    void CheckDiscoBallSwitch()
+    {
+        if(isDiscoBallOn && discoBallSwitch.GetValue() == 0)
+        {
+            ToggleDiscoBall(false);
+            isDiscoBallOn = false;
+        }
+        if(!isDiscoBallOn && discoBallSwitch.GetValue() == 1)
+        {
+            ToggleDiscoBall(true);
+            isDiscoBallOn = true;
+        }
     }
 }
