@@ -65,6 +65,9 @@ public class ThreeDPaintGameManager : GameManager
     [SerializeField]
     AutoHandPlayer ahp;
 
+    [SerializeField]
+    Button finishedPaintingEarlyButton;
+
     Dictionary<string, string> answers;
 
     private string chosenAnswer, chosenAnswerOwner;
@@ -95,6 +98,8 @@ public class ThreeDPaintGameManager : GameManager
         headerText.text = "";
         timerText.text = "";
         headerText.enabled = false;
+
+        finishedPaintingEarlyButton.gameObject.SetActive(false);
 
         drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
 
@@ -162,14 +167,19 @@ public class ThreeDPaintGameManager : GameManager
         headerText.enabled = true;
     }
 
+    public void FinishedPaintingEarly()
+    {
+        State = ThreeDPaintGameState.ClientsGuessing;
+    }
+
     void OnStateChange()
     {
         switch (state)
         {
             case ThreeDPaintGameState.ClientsAnswering:
                 //Enable VR tools
-                pen.canPaint = true;
-                sprayGun.canPaint = true;
+                pen.CanPaint = true;
+                sprayGun.CanPaint = true;
 
                 //Display text that players are answering
                 headerText.text = "Players are typing their answers \nUse this time to practice painting!";
@@ -179,6 +189,7 @@ public class ThreeDPaintGameManager : GameManager
                 break;
             case ThreeDPaintGameState.VRPainting:
                 timerText.enabled = true;
+                finishedPaintingEarlyButton.gameObject.SetActive(true);
 
                 //Display answer
                 headerText.text = "Paint: " + chosenAnswer;
@@ -198,13 +209,15 @@ public class ThreeDPaintGameManager : GameManager
                 ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "DoneDrawing", "");
 
                 //Disable VR tools
-                pen.canPaint = false;
-                sprayGun.canPaint = false;
+                pen.CanPaint = false;
+                sprayGun.CanPaint = false;
 
                 //Display all answers
                 headerText.text = "Clients are guessing what your art is";
                 timerText.enabled = false;
                 playerNamesIconParent.SetActive(true);
+
+                finishedPaintingEarlyButton.gameObject.SetActive(false);
                 break;
             case ThreeDPaintGameState.VRGuessing:
                 headerText.text = "The prompt was: " + currentPrompt + "\nWhich player do you think wrote the given answer?";

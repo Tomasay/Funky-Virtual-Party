@@ -35,6 +35,7 @@ public class ClientManager : MonoBehaviour
     SocketManager manager;
     private string unityClientID = "";
     private const string url = "https://vrpartygame.herokuapp.com/";
+    private const string QRurl = "https://www.partycrashers.app";
     private const string socketUrl = url + "socket.io/";
 
     private const int PASSCODE_LENGTH = 4;
@@ -44,6 +45,7 @@ public class ClientManager : MonoBehaviour
 
     public SocketManager Manager { get => manager; }
     public string URL { get => url; }
+    public string QRURL { get => QRurl; }
     public string Passcode { get => passcode; }
 
 #if UNITY_EDITOR

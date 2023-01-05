@@ -51,9 +51,10 @@ public class ThreeDPen : MonoBehaviour
     const int maxPointCount = 100000;
     int currentPointCount;
 
-    public bool canPaint = true;
+    private bool canPaint = true;
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
+    public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } }
 
     public UnityEvent OnDraw;
 

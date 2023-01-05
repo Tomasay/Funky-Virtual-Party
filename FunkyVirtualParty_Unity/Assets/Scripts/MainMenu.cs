@@ -56,7 +56,7 @@ public class MainMenu : MonoBehaviour
         if(qr != null)
         {
 #if !UNITY_WEBGL
-            qrCode.texture = qr.generate_qr_code(ClientManager.instance.URL + "/?partyCode=" + ClientManager.instance.Passcode);
+            qrCode.texture = qr.generate_qr_code(ClientManager.instance.QRURL + "/?partyCode=" + ClientManager.instance.Passcode);
 #endif
         }
 
