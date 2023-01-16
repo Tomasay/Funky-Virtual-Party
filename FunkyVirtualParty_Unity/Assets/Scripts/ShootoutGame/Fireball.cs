@@ -132,7 +132,6 @@ public class Fireball : MonoBehaviour
         rb.isKinematic = true;
         explosion.Play();
         hasExploded = true;
-        syncer.onTrajectory = false;
 
         if(boosted)
         {
@@ -143,7 +142,9 @@ public class Fireball : MonoBehaviour
                 if(f.readyToSpawn)
                 {
                     if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateMini", f.syncer.objectID);
-                    StartCoroutine("SendTrajectoryAsync");
+#if UNITY_ANDROID
+                    syncer.ManualSendTrajectory();
+#endif
 
                     //Set pos to current explosion
                     f.transform.position = transform.position + Vector3.up;
@@ -231,19 +232,6 @@ public class Fireball : MonoBehaviour
         isInLeftHand = false;
         isInRightHand = false;
         chargeIndicator.enabled = false;
-
-        StartCoroutine("SendTrajectoryAsync");
-    }
-
-    IEnumerator SendTrajectoryAsync()
-    {
-        yield return new WaitForSeconds(0);
-
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "FireballTrajectory", syncer.SerializeTrajectory(rb.position, rb.velocity));
-            syncer.onTrajectory = true;
-        }
     }
 
     private void Reset()

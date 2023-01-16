@@ -9,20 +9,18 @@ using UnityEngine.Animations;
 using System.Runtime.InteropServices;
 #endif
 
-public class FireballObjectSyncer : ObjectSyncer
+public class FireballObjectSyncer : GrabbableObjectSyncer
 {
 #if UNITY_WEBGL
         [DllImport("__Internal")]
         private static extern void TriggerHaptic(int hapticTime);
 #endif
 
-    private bool isActive, isBoosted, isDropped, isMini;
+    private bool isActive, isBoosted, isMini;
     private float currentScale;
     
     [SerializeField] GameObject fireballHandAnchorLeft, fireballHandAnchorRight;
     [SerializeField] GameObject fireballMesh, fireballTrail;
-    [SerializeField] Rigidbody rb;
-    [SerializeField] ParentConstraint constraint;
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] float minSize, maxSize, fireballGrowSpeed;
     [SerializeField] Color minColor, maxColor;
@@ -35,45 +33,12 @@ public class FireballObjectSyncer : ObjectSyncer
 
     private bool lastActiveSent; //Value of isActive last sent to clients
 
-    public bool onTrajectory = false;
-
-    public new byte[] SerializeTrajectory(Vector3 pos, Vector3 vel)
-    {
-        using (MemoryStream m = new MemoryStream())
-        {
-            using (BinaryWriter writer = new BinaryWriter(m))
-            {
-                writer.Write(objectID);
-                writer.Write(pos);
-                writer.Write(vel);
-            }
-            return m.ToArray();
-        }
-    }
-
-    public void DeserializeTrajectory(byte[] data)
-    {
-        using (MemoryStream m = new MemoryStream(data))
-        {
-            using (BinaryReader reader = new BinaryReader(m))
-            {
-                if (!reader.ReadByte().Equals(objectID)) return;
-
-                constraint.constraintActive = false;
-                constraint.enabled = false;
-                isDropped = true;
-
-                rb.isKinematic = false;
-                rb.useGravity = true;
-
-                rb.position = reader.ReadVector3();
-                rb.velocity = reader.ReadVector3();
-            }
-        }
-    }
-
     protected override void Awake()
     {
+#if UNITY_ANDROID
+        grabbable.onRelease.AddListener(OnDrop);
+#endif
+
 #if UNITY_WEBGL
         if (ClientManagerWeb.instance)
         {
@@ -180,14 +145,6 @@ public class FireballObjectSyncer : ObjectSyncer
             {
                 isBoosted = true;
             }
-        }
-    }
-
-    void MethodCalledFromServer(string methodName, byte[] data)
-    {
-        if (methodName.Equals("FireballTrajectory"))
-        {
-            DeserializeTrajectory(data);
         }
     }
 

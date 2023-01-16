@@ -223,12 +223,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectID: 0
   UpdatesPerSecond: 15
+  grabbable: {fileID: 3466704360205798773}
+  constraint: {fileID: 3865167073801075657}
+  rb: {fileID: 566606611587223269}
+  onTrajectory: 0
   fireballHandAnchorLeft: {fileID: 0}
   fireballHandAnchorRight: {fileID: 0}
   fireballMesh: {fileID: 4423289069885267050}
   fireballTrail: {fileID: 0}
-  rb: {fileID: 566606611587223269}
-  constraint: {fileID: 0}
   mainFireball: {fileID: 0}
   explosion: {fileID: 8065244542973703527}
   smokePuff: {fileID: 3435044216057484644}
@@ -244,7 +246,6 @@ MonoBehaviour:
   boostedMainColor: {r: 0, g: 0.36078432, b: 1, a: 1}
   boostedSecondaryColor: {r: 0.69803923, g: 0.22352941, b: 0.19215687, a: 1}
   indicator: {fileID: 0}
-  onTrajectory: 0
 --- !u!1 &719313112521586798
 GameObject:
   m_ObjectHideFlags: 0
