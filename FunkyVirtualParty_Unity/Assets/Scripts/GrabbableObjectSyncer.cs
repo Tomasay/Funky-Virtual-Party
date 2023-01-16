@@ -22,6 +22,7 @@ public class GrabbableObjectSyncer : ObjectSyncer
 
     [SerializeField] protected ParentConstraint constraint;
     [SerializeField] protected Rigidbody rb;
+    [SerializeField] protected GameObject handAnchorLeft, handAnchorRight;
 
     protected bool isDropped;
 
@@ -31,12 +32,14 @@ public class GrabbableObjectSyncer : ObjectSyncer
 
 #if UNITY_ANDROID
         grabbable.onRelease.AddListener(OnDrop);
+        grabbable.onGrab.AddListener(OnGrab);
 #endif
 
 #if UNITY_WEBGL
         if (ClientManagerWeb.instance)
         {
             ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
+            ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
         }
 #endif
     }
@@ -60,6 +63,23 @@ public class GrabbableObjectSyncer : ObjectSyncer
                 writer.Write(vel);
             }
             return m.ToArray();
+        }
+    }
+
+    /// <summary>
+    /// Called when grabbable is grabbed. Triggers constraint info to be set for clients
+    /// </summary>
+    /// <param name="h">Hand that grabbed grabbable</param>
+    /// <param name="g">Grabbbable that was grabbed</param>
+    protected void OnGrab(Hand h, Grabbable g)
+    {
+        if (h.left)
+        {
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "OnGrabLeft", objectID);
+        }
+        else
+        {
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "OnGrabRight", objectID);
         }
     }
 
@@ -93,10 +113,33 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #endif
 
 #if UNITY_WEBGL
-/// <summary>
-/// Decompresses trajectory data after receiving it over network
-/// </summary>
-/// <param name="data">byte array trajectory data</param>
+    protected virtual void MethodCalledFromServer(string methodName, byte[] data)
+    {
+        if (methodName.Equals("Trajectory"))
+        {
+            DeserializeTrajectory(data);
+        }
+    }
+
+    protected virtual void MethodCalledFromServer(string methodName, byte data)
+    {
+        if (objectID == data)
+        {
+            if (methodName.Equals("OnGrabLeft"))
+            {
+                EnableConstraint(true);
+            }
+            else if (methodName.Equals("OnGrabRight"))
+            {
+                EnableConstraint(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Decompresses trajectory data after receiving it over network
+    /// </summary>
+    /// <param name="data">byte array trajectory data</param>
     public void DeserializeTrajectory(byte[] data)
     {
         using (MemoryStream m = new MemoryStream(data))
@@ -105,10 +148,12 @@ public class GrabbableObjectSyncer : ObjectSyncer
             {
                 if (!reader.ReadByte().Equals(objectID)) return;
 
+                //Disable constraint to hand
                 constraint.constraintActive = false;
                 constraint.enabled = false;
                 isDropped = true;
 
+                //Physics
                 rb.isKinematic = false;
                 rb.useGravity = true;
 
@@ -118,12 +163,26 @@ public class GrabbableObjectSyncer : ObjectSyncer
         }
     }
 
-    protected void MethodCalledFromServer(string methodName, byte[] data)
+    /// <summary>
+    /// Enables constraint so that grabbable sticks to hand when we have received message from host that grabbable has been grabbed
+    /// </summary>
+    /// <param name="isLeft">Was the grabbable picked up with the left hand</param>
+    protected void EnableConstraint(bool isLeft)
     {
-        if (methodName.Equals("Trajectory"))
+        ConstraintSource src = new ConstraintSource();
+        src.sourceTransform = isLeft ? handAnchorLeft.transform : handAnchorRight.transform;
+        src.weight = 1;
+
+        if (constraint.sourceCount > 0)
         {
-            DeserializeTrajectory(data);
+            constraint.SetSource(0, src);
         }
+        else
+        {
+            constraint.AddSource(src);
+        }
+        constraint.constraintActive = true;
+        constraint.enabled = true;
     }
 #endif
 }

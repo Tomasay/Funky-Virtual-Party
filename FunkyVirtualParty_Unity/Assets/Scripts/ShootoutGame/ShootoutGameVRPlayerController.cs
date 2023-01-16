@@ -59,14 +59,12 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
         if (hand.left)
         {
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateLeft", fireball.syncer.objectID);
             handFireEffectLeft.SetActive(true);
             isGrabbingLeft = true;
             fireball.isInLeftHand = true;
         }
         else
         {
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateRight", fireball.syncer.objectID);
             handFireEffectRight.SetActive(true);
             isGrabbingRight = true;
             fireball.isInRightHand = true;

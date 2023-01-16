@@ -19,7 +19,6 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
     private bool isActive, isBoosted, isMini;
     private float currentScale;
     
-    [SerializeField] GameObject fireballHandAnchorLeft, fireballHandAnchorRight;
     [SerializeField] GameObject fireballMesh, fireballTrail;
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
     [SerializeField] float minSize, maxSize, fireballGrowSpeed;
@@ -37,6 +36,7 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
     {
 #if UNITY_ANDROID
         grabbable.onRelease.AddListener(OnDrop);
+        grabbable.onGrab.AddListener(OnGrab);
 #endif
 
 #if UNITY_WEBGL
@@ -104,9 +104,11 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
     }
 
 #if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, byte id)
+    protected override void MethodCalledFromServer(string methodName, byte data)
     {
-        if (id == objectID)
+        base.MethodCalledFromServer(methodName, data);
+
+        if (data == objectID)
         {
             if (methodName.Equals("SmokePuffEvent"))
             {
@@ -125,15 +127,13 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
 
                 TriggerHaptic(200);
             }
-            else if (methodName.Equals("FireballActivateLeft"))
+            else if (methodName.Equals("OnGrabLeft"))
             {
                 Activate();
-                EnableConstraint(true);
             }
-            else if (methodName.Equals("FireballActivateRight"))
+            else if (methodName.Equals("OnGrabRight"))
             {
                 Activate();
-                EnableConstraint(false);
             }
             else if (methodName.Equals("FireballActivateMini"))
             {
@@ -158,23 +158,7 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
         }
     }
 
-    private void EnableConstraint(bool isLeft)
-    {
-        ConstraintSource src = new ConstraintSource();
-        src.sourceTransform = isLeft ? fireballHandAnchorLeft.transform : fireballHandAnchorRight.transform;
-        src.weight = 1;
-
-        if (constraint.sourceCount > 0)
-        {
-            constraint.SetSource(0, src);
-        }
-        else
-        {
-            constraint.AddSource(src);
-        }
-        constraint.constraintActive = true;
-        constraint.enabled = true;
-    }
+    
 
     private void Reset()
     {
