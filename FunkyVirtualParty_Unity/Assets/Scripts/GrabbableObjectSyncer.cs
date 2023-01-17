@@ -20,9 +20,12 @@ public class GrabbableObjectSyncer : ObjectSyncer
     [SerializeField] protected Grabbable grabbable;
 #endif
 
+#if UNITY_WEBGL
     [SerializeField] protected ParentConstraint constraint;
-    [SerializeField] protected Rigidbody rb;
     [SerializeField] protected GameObject handAnchorLeft, handAnchorRight;
+#endif
+
+    [SerializeField] protected Rigidbody rb;
 
     protected bool isDropped;
 
@@ -38,8 +41,9 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #if UNITY_WEBGL
         if (ClientManagerWeb.instance)
         {
-            ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
+            ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
             ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
+            ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
         }
 #endif
     }
@@ -113,6 +117,10 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #endif
 
 #if UNITY_WEBGL
+    protected virtual void MethodCalledFromServer(string methodName, string data)
+    {
+    }
+
     protected virtual void MethodCalledFromServer(string methodName, byte[] data)
     {
         if (methodName.Equals("Trajectory"))

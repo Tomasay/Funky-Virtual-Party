@@ -10,7 +10,7 @@ public class ObjectSyncer : MonoBehaviour
     [Tooltip("ID of object to track in scene. Must be the same ID on mobile vs VR scenes")]
     public byte objectID;
 
-    [Tooltip("How often data is sent to be synced")]
+    [Tooltip("How often data is sent to be synced. Set to 0 for non dynamic syncing (improves performance)")]
     public float UpdatesPerSecond = 10;
 
     [Serializable]
@@ -65,11 +65,14 @@ public class ObjectSyncer : MonoBehaviour
         currentData.Init(objectID);
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
+        if(ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
 #endif
 
 #if !UNITY_WEBGL
-        InvokeRepeating("SendData", 0, 1/ UpdatesPerSecond);
+        if (UpdatesPerSecond > 0)
+        {
+            InvokeRepeating("SendData", 0, 1 / UpdatesPerSecond);
+        }
 #endif
 
     }
@@ -96,12 +99,6 @@ public class ObjectSyncer : MonoBehaviour
         }
     }
 #endif
-
-
-    public virtual void ReceiveData(string json)
-    {
-        ApplyNewData(JsonUtility.FromJson<ObjectData>(json));
-    }
 
     public virtual void ReceiveData(byte[] arrBytes)
     {

@@ -17,12 +17,11 @@ public class VinylInfo : MonoBehaviour
 
     [SerializeField] public Transform distanceChecker;
 
+    [SerializeField] public VinylDiscSyncer syncer;
+
     Grabbable grabbable;
     Collider col;
     Rigidbody rb;
-
-    Vector3 startingPos;
-    Quaternion startingRot;
 
 
     [SerializeField] GameObject poofEffect;
@@ -30,9 +29,6 @@ public class VinylInfo : MonoBehaviour
 
     private void Awake()
     {
-        startingPos = transform.position;
-        startingRot = transform.rotation;
-
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
         Physics.IgnoreCollision(col, vrPlayer.headModel.GetComponent<Collider>());
@@ -49,19 +45,13 @@ public class VinylInfo : MonoBehaviour
 
         if (Vector3.Distance(discPos, distanceChecker.position) > distanceToRespawn)
         {
-            RespawnDisc();
+            RuntimeManager.PlayOneShot("event:/SFX/Pop", transform.position);
+            Instantiate(poofEffect, transform.position, transform.rotation);
+
+            syncer.RespawnDisc();
+
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "RespawnDisc", syncer.objectID);
         }
-    }
-
-    void RespawnDisc()
-    {
-        RuntimeManager.PlayOneShot("event:/SFX/Pop", transform.position);
-        Instantiate(poofEffect, transform.position, transform.rotation);
-
-        rb.velocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
-        transform.position = startingPos;
-        transform.rotation = startingRot;
     }
 
     public void OnHighlight(Hand hand, Grabbable g)
