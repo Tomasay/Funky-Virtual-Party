@@ -5,12 +5,13 @@ using UnityEngine.UI;
 using TMPro;
 using epoching.easy_qr_code;
 using UnityEngine.InputSystem.EnhancedTouch;
+using Autohand;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Transform[] playerPositions;
 
-    [SerializeField] private TMP_Text partyCodeText, partyCodeTextStatic, linkText, inviteYourFriendsText, connectingText, connectionErrorText;
+    [SerializeField] private TMP_Text partyCodeText, partyCodeTextStatic, inviteYourFriendsText, connectingText, connectionErrorText;
 
     [SerializeField] private const float TIMEOUT_TIME = 5.0f;
 
@@ -29,6 +30,10 @@ public class MainMenu : MonoBehaviour
     [SerializeField] GameObject discoBall;
 
     [SerializeField] GameObject lightDial;
+
+    [SerializeField] PhysicsGadgetHingeAngleReader discoBallSwitch;
+    private bool isDiscoBallOn;
+
 
 
     // Start is called before the first frame update
@@ -51,7 +56,7 @@ public class MainMenu : MonoBehaviour
         if(qr != null)
         {
 #if !UNITY_WEBGL
-            qrCode.texture = qr.generate_qr_code(ClientManager.instance.URL + "/?partyCode=" + ClientManager.instance.Passcode);
+            qrCode.texture = qr.generate_qr_code(ClientManager.instance.QRURL + "/?partyCode=" + ClientManager.instance.Passcode);
 #endif
         }
 
@@ -89,6 +94,7 @@ public class MainMenu : MonoBehaviour
             connectionErrorText.enabled = true;
         }
 
+        CheckDiscoBallSwitch();
         UpdateLight();
     }
 
@@ -161,7 +167,6 @@ public class MainMenu : MonoBehaviour
         }
 
         Camera.main.backgroundColor = backgroundColors[currentColorIndex];
-        linkText.color = discoBallHighlightColors[currentColorIndex];
         discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("BaseColor", discoBallMainColors[currentColorIndex]);
         discoBall.GetComponent<Renderer>().sharedMaterial.SetColor("Highlight", discoBallHighlightColors[currentColorIndex]);
     }
@@ -183,5 +188,19 @@ public class MainMenu : MonoBehaviour
         Color.RGBToHSV(RenderSettings.ambientLight, out h, out s, out v);
         v = Mathf.Lerp(0.25f, 0.0f, lightLevel);
         RenderSettings.ambientLight = Color.HSVToRGB(h, s, v);
+    }
+
+    void CheckDiscoBallSwitch()
+    {
+        if(isDiscoBallOn && discoBallSwitch.GetValue() == 0)
+        {
+            ToggleDiscoBall(false);
+            isDiscoBallOn = false;
+        }
+        if(!isDiscoBallOn && discoBallSwitch.GetValue() == 1)
+        {
+            ToggleDiscoBall(true);
+            isDiscoBallOn = true;
+        }
     }
 }

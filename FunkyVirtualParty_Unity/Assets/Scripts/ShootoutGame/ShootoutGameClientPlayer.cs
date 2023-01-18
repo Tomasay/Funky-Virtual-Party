@@ -39,7 +39,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 1;
+        startingSpeed = 1.5f;
 
         base.Awake();
 
@@ -87,7 +87,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if(isDebugPlayer && isColliding)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, playerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, playerID);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -123,8 +123,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if (IsLocal && isColliding)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f);
-            Move(collisionVector.normalized.x * -1.5f, collisionVector.normalized.y * -1.5f, false);
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f);
+            Move(collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, false);
 
             Vector3 positionDifference = posFromHost - transform.position;   
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime);

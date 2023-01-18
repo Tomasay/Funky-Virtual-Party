@@ -59,6 +59,7 @@ public class MainMenuWeb : MonoBehaviour
             SwitchToController(null);
         }
 
+        /*
         GetNewBackgroundColors();
 
         Camera.main.backgroundColor = currentBackgroundColor;
@@ -66,10 +67,12 @@ public class MainMenuWeb : MonoBehaviour
         dotsMat.color = currentDotsColor;
 
         GetNewBackgroundColors();
+        */
     }
 
     private void Update()
     {
+        /*
         if((Time.time - currentColorSwatchTime) > timeOnColorSwatch &&
            Mathf.Abs(Camera.main.backgroundColor.r - currentBackgroundColor.r) < 0.1f &&
            Mathf.Abs(Camera.main.backgroundColor.g - currentBackgroundColor.g) < 0.1f &&
@@ -81,6 +84,7 @@ public class MainMenuWeb : MonoBehaviour
         Camera.main.backgroundColor = Color.Lerp(Camera.main.backgroundColor, currentBackgroundColor, colorChangeSpeed * Time.deltaTime);
         dotsMat.color = Color.Lerp(dotsMat.color, currentDotsColor, colorChangeSpeed * Time.deltaTime);
         titleBG.color = Color.Lerp(titleBG.color, currentBackgroundColor, colorChangeSpeed * Time.deltaTime);
+        */
     }
 
     private void EnableFailedConnectDebug()

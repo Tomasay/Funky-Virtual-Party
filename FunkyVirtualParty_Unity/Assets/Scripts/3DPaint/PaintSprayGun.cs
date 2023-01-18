@@ -30,13 +30,14 @@ public class PaintSprayGun : MonoBehaviour
     Collider col;
 #endif
 
-    public bool canPaint = true;
+    private bool canPaint = true;
 
     bool isInHand;
 
     public bool active;
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
+    public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { StopPainting(); } } }
 
     public UnityEvent OnSpray;
 
@@ -66,11 +67,16 @@ public class PaintSprayGun : MonoBehaviour
     {
         if (canPaint)
         {
-            ps.Stop();
-            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStopSpray", "");
+            StopPainting();
         }
     }
 #endif
+
+    void StopPainting()
+    {
+        ps.Stop();
+        if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStopSpray", "");
+    }
 
 #if UNITY_WEBGL
     void MethodCalledFromServer(string methodName, string data)

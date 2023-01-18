@@ -35,6 +35,7 @@ public class ClientManager : MonoBehaviour
     SocketManager manager;
     private string unityClientID = "";
     private const string url = "https://vrpartygame.herokuapp.com/";
+    private const string QRurl = "https://www.partycrashers.app";
     private const string socketUrl = url + "socket.io/";
 
     private const int PASSCODE_LENGTH = 4;
@@ -44,6 +45,7 @@ public class ClientManager : MonoBehaviour
 
     public SocketManager Manager { get => manager; }
     public string URL { get => url; }
+    public string QRURL { get => QRurl; }
     public string Passcode { get => passcode; }
 
 #if UNITY_EDITOR
@@ -89,7 +91,6 @@ public class ClientManager : MonoBehaviour
         }
 
         InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
-        InvokeRepeating("SendHeartbeat", 0, 2.0f);
 
 #if UNITY_EDITOR
         for (int i = 0; i < debugPlayersToAdd.Length; i++)
@@ -110,14 +111,11 @@ public class ClientManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        Debug.Log("OnApplicationQuit");
+
         manager.Socket.Emit("unityCloseRoom", passcode);
         manager?.Close();
         manager?.Socket?.Disconnect();
-    }
-
-    void SendHeartbeat()
-    {
-        manager.Socket.Emit("heartbeatToServer");
     }
 
     public void OnMinigameStart(string game)

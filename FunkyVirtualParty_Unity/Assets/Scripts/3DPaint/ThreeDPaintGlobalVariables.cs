@@ -18,4 +18,7 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
 
     //Every player the successfully chose the chosen player's answer
     public const int POINTS_CLIENT_OTHER_CORRECT_GUESSES = 50;
+
+    //The amount of time the VR player gets to draw
+    public const int DRAW_TIME_AMOUNT = 120;
 }

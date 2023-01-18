@@ -182,7 +182,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.7767742, y: 1}
+    m_SensorSize: {x: 1.3333334, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -221,6 +221,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -355,6 +371,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -594,6 +626,36 @@ Transform:
   m_Father: {fileID: 2138632562}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &541776213
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 541776214}
+  m_Layer: 0
+  m_Name: FireballAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &541776214
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541776213}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.16, y: 0.0135, z: 0}
+  m_LocalScale: {x: -1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1681611884}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1001 &597854562
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -756,6 +818,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1206,6 +1284,36 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 934389415}
   m_Mesh: {fileID: -3167472616253303294, guid: 626fb58d0cb97d0468f391228d13aa1e, type: 3}
+--- !u!1 &962467045
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 962467046}
+  m_Layer: 0
+  m_Name: FireballAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &962467046
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962467045}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.16, y: 0.0135, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1681611885}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1 &968089516
 GameObject:
   m_ObjectHideFlags: 0
@@ -1600,6 +1708,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -1894,6 +2018,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -2216,6 +2356,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -2619,6 +2775,16 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 7233920282596647805, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
   m_PrefabInstance: {fileID: 1681611882}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1681611884 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7233920284374092104, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
+  m_PrefabInstance: {fileID: 1681611882}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1681611885 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7233920283111157019, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
+  m_PrefabInstance: {fileID: 1681611882}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1759541645
 GameObject:
   m_ObjectHideFlags: 0
@@ -2965,6 +3131,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -3230,6 +3412,22 @@ PrefabInstance:
       propertyPath: objectID
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: handAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorLeft
+      value: 
+      objectReference: {fileID: 962467045}
+    - target: {fileID: 1512483270483760650, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
+      propertyPath: fireballHandAnchorRight
+      value: 
+      objectReference: {fileID: 541776213}
     - target: {fileID: 2752464409011767149, guid: 7779b0d1775e8254c9c2927a4e5c697c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

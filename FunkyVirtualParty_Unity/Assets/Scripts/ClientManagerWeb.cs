@@ -33,12 +33,11 @@ public class ClientManagerWeb : MonoBehaviour
     [SerializeField] RectTransform fadeRect;
     private float fadeIncrementDistance;
 
-    private float lastHeartbeatReceived;
-    private float hostTimeoutTime = 7.0f;
+    //id of vr headset
+    string hostID;
 
     [DllImport("__Internal")]
     private static extern void ReloadPage();
-    private bool reloadingPage = false;
 
     //Check to make sure we do not load main menu consecutively
     private bool isInMainMenu = true;
@@ -50,12 +49,11 @@ public class ClientManagerWeb : MonoBehaviour
         {
             manager = new SocketManager(new Uri(socketUrl));
             manager.Socket.On<bool>("joinedRoom", JoinRoomCheck);
-            manager.Socket.On("heartbeatToClients", OnHeartBeat);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
             manager.Socket.On<string>("action", OnAction);
-            manager.Socket.On<string[]>("playerInfoToClient", playerInfoReceived);
+            manager.Socket.On<string, string[]>("playerInfoToClient", playerInfoReceived);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
             manager.Socket.On<string, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
             manager.Socket.On("roomClosed", ReloadPage);
@@ -80,15 +78,6 @@ public class ClientManagerWeb : MonoBehaviour
         fadeIncrementDistance = Screen.width / 8;
     }
 
-    private void CheckHeartbeat()
-    {
-        if(joinedRoom && !reloadingPage && (Time.time - lastHeartbeatReceived) > hostTimeoutTime)
-        {
-            ReloadPage();
-            reloadingPage = true;
-        }
-    }
-
     public void AttemptJoinRoom(string code, string name)
     {
         Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
@@ -97,8 +86,10 @@ public class ClientManagerWeb : MonoBehaviour
         //manager.Socket.Once("connect", () => Debug.Log("connected!"));
     }
 
-    public void playerInfoReceived(string[] players)
+    public void playerInfoReceived(string host, string[] players)
     {
+        hostID = host;
+
         if (players.Length == 0)
         {
             return;
@@ -161,10 +152,7 @@ public class ClientManagerWeb : MonoBehaviour
     {
         if(joined) //If we successfuly joined a room
         {
-            lastHeartbeatReceived = Time.time;
             joinedRoom = true;
-
-            InvokeRepeating("CheckHeartbeat", 0, 1);
         }
         else //If room was invalid
         {
@@ -203,6 +191,11 @@ public class ClientManagerWeb : MonoBehaviour
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
 
+        if(id.Equals(hostID))
+        {
+            ReloadPage();
+        }
+
         if (GetPlayerByID(id))
         {
             Destroy(GetPlayerByID(id).gameObject);
@@ -213,11 +206,6 @@ public class ClientManagerWeb : MonoBehaviour
         {
             onClientDisonnect(id);
         }
-    }
-
-    private void OnHeartBeat()
-    {
-        lastHeartbeatReceived = Time.time;
     }
 
     private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)

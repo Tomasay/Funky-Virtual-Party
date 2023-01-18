@@ -4,20 +4,24 @@ using UnityEngine;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using UnityEngine.Animations;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
 
-public class FireballObjectSyncer : ObjectSyncer
+public class FireballObjectSyncer : GrabbableObjectSyncer
 {
 #if UNITY_WEBGL
         [DllImport("__Internal")]
         private static extern void TriggerHaptic(int hapticTime);
 #endif
 
+    private bool isActive, isBoosted, isMini;
+    private float currentScale;
+    
     [SerializeField] GameObject fireballMesh, fireballTrail;
     [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
-    [SerializeField] float minSize, maxSize;
+    [SerializeField] float minSize, maxSize, fireballGrowSpeed;
     [SerializeField] Color minColor, maxColor;
     [SerializeField] Color emberColor, emberColorBoosted;
     [SerializeField] Color boostedMainColor, boostedSecondaryColor;
@@ -28,39 +32,27 @@ public class FireballObjectSyncer : ObjectSyncer
 
     private bool lastActiveSent; //Value of isActive last sent to clients
 
-    [Serializable]
-    public class FireballObjectData : ObjectData
-    {
-        public float currentScale; //Value between 0 and 1
-        public bool isActive;
-        public bool boosted;
-    }
-
-    FireballObjectData currentFireballData;
-
-    public FireballObjectData CurrentFireballData { get => currentFireballData;}
-
     protected override void Awake()
     {
-        currentFireballData = new FireballObjectData();
-        currentData.Init(objectID);
-
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-
-        //indicator.transform.parent = null;
+#if UNITY_ANDROID
+        grabbable.onRelease.AddListener(OnDrop);
+        grabbable.onGrab.AddListener(OnGrab);
 #endif
 
-#if !UNITY_WEBGL
-        InvokeRepeating("SendData", 0, 1/UpdatesPerSecond);
+#if UNITY_WEBGL
+        if (ClientManagerWeb.instance)
+        {
+            ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
+            ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
+            ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
+        }
 #endif
     }
 
     void Update()
     {
 #if UNITY_WEBGL
-        if (currentFireballData.isActive)
+        if (isActive)
         {
             //Check to see if above terrain
             if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, maxIndicatorDistance))
@@ -74,9 +66,8 @@ public class FireballObjectSyncer : ObjectSyncer
 
                     //Color and size
                     float t = hit.distance / maxIndicatorDistance;
-                    transform.localScale = Vector3.one * Mathf.Lerp(0.05f, 0.5f, t);
+                    indicator.transform.localScale = Vector3.one * Mathf.Lerp(0.25f, 2.5f, t);
                     indicator.color = Color.Lerp(Color.red, Color.yellow, t);
-
                 }
                 else
                 {
@@ -87,6 +78,23 @@ public class FireballObjectSyncer : ObjectSyncer
             {
                 indicator.enabled = false;
             }
+
+            if (!isDropped && !isMini)
+            {
+                currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
+            }
+
+            //Scale
+            float s = Mathf.Lerp(minSize, maxSize, currentScale);
+            Vector3 scale = new Vector3(s, s, s);
+            fireballMesh.transform.localScale = scale;
+            explosion.transform.localScale = scale;
+            smokePuff.transform.localScale = scale;
+
+            //Colors
+            mainFireball.startColor = isBoosted ? boostedMainColor : Color.Lerp(minColor, maxColor, currentScale);
+            fireTrail.startColor = isBoosted ? boostedSecondaryColor : emberColor;
+            ember.startColor = isBoosted ? emberColorBoosted : emberColor;
         }
         else
         {
@@ -96,104 +104,78 @@ public class FireballObjectSyncer : ObjectSyncer
     }
 
 #if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
+    protected override void MethodCalledFromServer(string methodName, byte data)
     {
-        if (int.TryParse(data, out int id) && id == currentFireballData.objectID)
+        base.MethodCalledFromServer(methodName, data);
+
+        if (data == objectID)
         {
             if (methodName.Equals("SmokePuffEvent"))
             {
                 smokePuff.Play();
+
+                Reset();
             }
             else if (methodName.Equals("FireballExplosionEvent"))
             {
                 explosion.Play();
 
-
                 ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.LocalPlayer;
-                sp.CheckCollisionWithFireball(currentFireballData.Position, Mathf.Max(2, currentFireballData.currentScale * fireballExplosionRange) ); 
+                sp.CheckCollisionWithFireball(transform.position, Mathf.Max(2, currentScale * fireballExplosionRange) );
+
+                Reset();
 
                 TriggerHaptic(200);
             }
-        }
-    }
-#endif
-
-#if !UNITY_WEBGL
-    protected override void SendData()
-    {
-        Fireball f = GetComponent<Fireball>();
-        if (f.fireball.activeSelf || lastActiveSent == true) //Only send data if fireball is active, make sure it is marked inactive on client first
-        {
-            //Position
-            currentFireballData.Position = transform.position;
-
-            //Rotation
-            currentFireballData.Rotation = transform.rotation;
-
-            //Fireball variables
-            currentFireballData.isActive = lastActiveSent = f.fireball.activeSelf;
-            currentFireballData.currentScale = f.currentScale;
-            currentFireballData.boosted = f.boosted;
-
-            //Send Data
-            //string json = JsonUtility.ToJson(currentFireballData);
-            byte[] bytes = ByteArrayConverter.ObjectToByteArray<FireballObjectData>(currentFireballData);
-
-            if (ClientManager.instance)
+            else if (methodName.Equals("OnGrabLeft"))
             {
-                ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", bytes);
+                Activate();
+            }
+            else if (methodName.Equals("OnGrabRight"))
+            {
+                Activate();
+            }
+            else if (methodName.Equals("FireballActivateMini"))
+            {
+                isMini = true;
+                Activate();
+                currentScale = 0.5f;
+            }
+            else if (methodName.Equals("FireballBoost"))
+            {
+                isBoosted = true;
             }
         }
     }
-#endif
 
-    public override void ReceiveData(string json)
+    private void Activate()
     {
-        ApplyNewFireballData(JsonUtility.FromJson<FireballObjectData>(json));
-    }
-
-    public void ReceiveData(byte[] arrBytes)
-    {
-        ApplyNewFireballData(ByteArrayConverter.ByteArrayToObject<FireballObjectData>(arrBytes));
-    }
-
-    protected void ApplyNewFireballData(FireballObjectData data)
-    {
-        if (data.objectID != currentFireballData.objectID)
-        {
-            return;
-        }
-
-        //Position
-        currentFireballData.Position = transform.position = data.Position;
-
-        //Rotation
-        currentFireballData.Rotation = transform.rotation = data.Rotation;
-
-        //Fireball
-        currentFireballData.isActive = data.isActive;
-        fireballMesh.SetActive(data.isActive);
-        if(data.isActive && !fireballTrail.activeSelf)
+        isActive = true;
+        fireballMesh.SetActive(true);
+        if (!fireballTrail.activeSelf)
         {
             StartCoroutine("ActivateTrailDelayed", 0.5f);
         }
-        else
-        {
-            fireballTrail.SetActive(data.isActive);
-        }
-
-        currentFireballData.currentScale = data.currentScale;
-
-        float s = Mathf.Lerp(minSize, maxSize, data.currentScale);
-        Vector3 scale = new Vector3(s, s, s);
-        fireballMesh.transform.localScale = scale;
-        explosion.transform.localScale = scale;
-        smokePuff.transform.localScale = scale;
-
-        mainFireball.startColor = data.boosted ? boostedMainColor : Color.Lerp(minColor, maxColor, data.currentScale);
-        fireTrail.startColor = data.boosted ? boostedSecondaryColor : emberColor;
-        ember.startColor = data.boosted ? emberColorBoosted : emberColor;
     }
+
+    
+
+    private void Reset()
+    {
+        currentScale = 0;
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        isActive = false;
+        fireballMesh.SetActive(false);
+        isBoosted = false;
+        fireballMesh.transform.localScale = new Vector3(minSize, minSize, minSize);
+        mainFireball.startColor = minColor;
+        ember.startColor = emberColor;
+        fireTrail.startColor = emberColor;
+        isDropped = false;
+        isMini = false;
+    }
+#endif
 
     IEnumerator ActivateTrailDelayed(float delay)
     {

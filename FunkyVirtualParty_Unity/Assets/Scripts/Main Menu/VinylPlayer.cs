@@ -14,7 +14,6 @@ using UnityEngine.InputSystem;
 public class VinylPlayer : MonoBehaviour
 {
     [SerializeField] Transform vinylParent;
-    [SerializeField] float vinylSpinSpeed = 0.2f;
 
     [SerializeField] TMP_Text titleText, descriptionText;
     [SerializeField] VideoPlayer videoPlayer;
@@ -48,13 +47,10 @@ public class VinylPlayer : MonoBehaviour
             if (!g.IsHeld()) //If vinyl is released from hands
             {
                 currentVinyl = other.gameObject;
+                VinylDiscSyncer currentVinylSyncer = other.gameObject.GetComponent<VinylDiscSyncer>();
 
                 //Set vinyl pos/rot
-                Rigidbody rb = currentVinyl.GetComponent<Rigidbody>();
-                rb.useGravity = false;
-                rb.isKinematic = true;
-                currentVinyl.transform.position = vinylParent.position;
-                currentVinyl.transform.rotation = Quaternion.Euler(Vector3.zero);
+                currentVinylSyncer.SetDiscOnPlayer();
 
                 anim.SetTrigger("Play");
 
@@ -67,7 +63,10 @@ public class VinylPlayer : MonoBehaviour
                 videoPlayer.clip = info.videoPreview;
                 videoTexture.enabled = true;
 
+                //Load game scene in 3 seconds
                 StartCoroutine(LoadSceneDelayed(info.SceneToLoad, 3));
+
+                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "DiscOnPlayer", currentVinylSyncer.objectID);
             }
         }
     }
@@ -91,12 +90,6 @@ public class VinylPlayer : MonoBehaviour
 
     private void Update()
     {
-        //Spin current vinyl
-        if(currentVinyl)
-        {
-            currentVinyl.transform.Rotate(0, vinylSpinSpeed, 0);
-        }
-
 #if UNITY_EDITOR
         if (!isSceneLoading)
         {

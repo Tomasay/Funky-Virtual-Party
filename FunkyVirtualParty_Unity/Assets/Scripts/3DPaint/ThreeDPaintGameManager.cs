@@ -65,6 +65,9 @@ public class ThreeDPaintGameManager : GameManager
     [SerializeField]
     AutoHandPlayer ahp;
 
+    [SerializeField]
+    Button finishedPaintingEarlyButton;
+
     Dictionary<string, string> answers;
 
     private string chosenAnswer, chosenAnswerOwner;
@@ -72,7 +75,6 @@ public class ThreeDPaintGameManager : GameManager
     private int playersGuessed = 0;
 
     float drawTimeRemaining;
-    const int DRAW_TIME_AMOUNT = 120;
 
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
@@ -97,7 +99,9 @@ public class ThreeDPaintGameManager : GameManager
         timerText.text = "";
         headerText.enabled = false;
 
-        drawTimeRemaining = DRAW_TIME_AMOUNT;
+        finishedPaintingEarlyButton.gameObject.SetActive(false);
+
+        drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
 
         if (ClientManager.instance)
         {
@@ -163,23 +167,29 @@ public class ThreeDPaintGameManager : GameManager
         headerText.enabled = true;
     }
 
+    public void FinishedPaintingEarly()
+    {
+        State = ThreeDPaintGameState.ClientsGuessing;
+    }
+
     void OnStateChange()
     {
         switch (state)
         {
             case ThreeDPaintGameState.ClientsAnswering:
+                //Enable VR tools
+                pen.CanPaint = true;
+                sprayGun.CanPaint = true;
+
                 //Display text that players are answering
-                headerText.text = "Players are typing their answers \nUse this time to practice painting! \nTurn around for controls";
+                headerText.text = "Players are typing their answers \nUse this time to practice painting!";
 
                 //Animate client players to look like they are on their phones
 
                 break;
             case ThreeDPaintGameState.VRPainting:
                 timerText.enabled = true;
-
-                //Enable VR tools
-                pen.canPaint = true;
-                sprayGun.canPaint = true;
+                finishedPaintingEarlyButton.gameObject.SetActive(true);
 
                 //Display answer
                 headerText.text = "Paint: " + chosenAnswer;
@@ -199,13 +209,15 @@ public class ThreeDPaintGameManager : GameManager
                 ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "DoneDrawing", "");
 
                 //Disable VR tools
-                pen.canPaint = false;
-                sprayGun.canPaint = false;
+                pen.CanPaint = false;
+                sprayGun.CanPaint = false;
 
                 //Display all answers
                 headerText.text = "Clients are guessing what your art is";
                 timerText.enabled = false;
                 playerNamesIconParent.SetActive(true);
+
+                finishedPaintingEarlyButton.gameObject.SetActive(false);
                 break;
             case ThreeDPaintGameState.VRGuessing:
                 headerText.text = "The prompt was: " + currentPrompt + "\nWhich player do you think wrote the given answer?";
@@ -310,7 +322,7 @@ public class ThreeDPaintGameManager : GameManager
         {
             ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "SetNewPrompt", GetPrompt());
             State = ThreeDPaintGameState.ClientsAnswering;
-            drawTimeRemaining = DRAW_TIME_AMOUNT;
+            drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
             answers = new Dictionary<string, string>();
 
             currentRound++;
@@ -328,6 +340,7 @@ public class ThreeDPaintGameManager : GameManager
                 string randomPlayer = ClientManager.instance.Players[Random.Range(0, ClientManager.instance.Players.Count)].PlayerID;
                 chosenAnswer = answers[randomPlayer];
                 chosenAnswerOwner = randomPlayer;
+                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChosenAnswerOwner", chosenAnswerOwner);
 
                 if (vrTutorialCompleted)
                 {
@@ -337,10 +350,11 @@ public class ThreeDPaintGameManager : GameManager
         }
         else if (State == ThreeDPaintGameState.ClientsGuessing)
         {
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PlayerGuessed", playerID + ":" + info);
+
             //If player guessed right
             if (answers[info].Equals(answers[chosenAnswerOwner]))
             {
-                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedRight", playerID);
                 AddPlayerToResults(playerID, true);
 
                 vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
@@ -348,7 +362,6 @@ public class ThreeDPaintGameManager : GameManager
             }
             else
             {
-                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GuessedWrong", playerID);
                 AddPlayerToResults(playerID, false);
             }
 
@@ -374,7 +387,8 @@ public class ThreeDPaintGameManager : GameManager
         pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerByID(playerID).PlayerName;
         pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
-        pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+        //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
+        pi.GetComponent<Image>().color = ClientManager.instance.GetPlayerByID(playerID).PlayerColor;
 
         playerNameIcons.Add(pi);
     }

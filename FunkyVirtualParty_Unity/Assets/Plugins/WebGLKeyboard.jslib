@@ -54,7 +54,8 @@ mergeInto(LibraryManager.library, {
 	},
 	ReloadPage: function ()
 	{
-		window.location.reload();
+		//window.location.reload();
+		window.location = "https://www.partycrashers.app"
 	},
 	CheckURLPartyCode: function ()
 	{

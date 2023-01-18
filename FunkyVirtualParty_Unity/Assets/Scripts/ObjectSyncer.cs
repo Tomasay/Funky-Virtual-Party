@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.IO;
+
 
 public class ObjectSyncer : MonoBehaviour
 {
     [Tooltip("ID of object to track in scene. Must be the same ID on mobile vs VR scenes")]
-    public int objectID;
+    public byte objectID;
 
-    [Tooltip("How often data is sent to be synced")]
+    [Tooltip("How often data is sent to be synced. Set to 0 for non dynamic syncing (improves performance)")]
     public float UpdatesPerSecond = 10;
 
     [Serializable]
@@ -16,15 +18,45 @@ public class ObjectSyncer : MonoBehaviour
     {
         public SerializedVector3 Position;
         public SerializedQuaternion Rotation;
-        public int objectID;
+        public byte objectID;
 
-        public void Init(int ID)
+        public void Init(byte ID)
         {
             objectID = ID;
         }
     }
 
     protected ObjectData currentData;
+
+    public byte[] Serialize()
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(currentData.Position);
+                writer.Write(currentData.Rotation);
+                writer.Write(currentData.objectID);
+
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static ObjectData Deserialize(byte[] data)
+    {
+        ObjectData result = new ObjectData();
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                result.Position = reader.ReadVector3();
+                result.Rotation = reader.ReadQuaternion();
+                result.objectID = reader.ReadByte();
+            }
+        }
+        return result;
+    }
 
 
     protected virtual void Awake()
@@ -33,11 +65,14 @@ public class ObjectSyncer : MonoBehaviour
         currentData.Init(objectID);
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
+        if(ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<byte[]>("ObjectDataToClient", ReceiveData);
 #endif
 
 #if !UNITY_WEBGL
-        InvokeRepeating("SendData", 0, 1/ UpdatesPerSecond);
+        if (UpdatesPerSecond > 0)
+        {
+            InvokeRepeating("SendData", 0, 1 / UpdatesPerSecond);
+        }
 #endif
 
     }
@@ -58,25 +93,16 @@ public class ObjectSyncer : MonoBehaviour
         //Rotation
         currentData.Rotation = transform.rotation;
 
-        //string json = JsonUtility.ToJson(currentData);
-        byte[] bytes = ByteArrayConverter.ObjectToByteArray<ObjectData>(currentData);
-
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", bytes);
+            ClientManager.instance.Manager.Socket.Emit("ObjectDataToServer", Serialize());
         }
     }
 #endif
 
-
-    public virtual void ReceiveData(string json)
+    public virtual void ReceiveData(byte[] arrBytes)
     {
-        ApplyNewData(JsonUtility.FromJson<ObjectData>(json));
-    }
-
-    public void ReceiveData(byte[] arrBytes)
-    {
-        ApplyNewData(ByteArrayConverter.ByteArrayToObject<ObjectData>(arrBytes));
+        ApplyNewData(Deserialize(arrBytes));
     }
 
     protected virtual void ApplyNewData<T>(T data) where T : ObjectData

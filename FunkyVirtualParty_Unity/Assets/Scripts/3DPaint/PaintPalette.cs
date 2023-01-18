@@ -89,7 +89,7 @@ public class PaintPalette : MonoBehaviour
         }
 
 #if UNITY_ANDROID
-        ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MirrorPalette", "");
+        if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MirrorPalette", "");
 #endif
     }
 

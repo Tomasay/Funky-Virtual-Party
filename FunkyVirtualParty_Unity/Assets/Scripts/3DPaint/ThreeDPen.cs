@@ -29,6 +29,9 @@ public class ThreeDPen : MonoBehaviour
 
     [SerializeField]
     ThreeDPaintGameManager gm;
+
+    [SerializeField]
+    AutoHandPlayer ahp;
 #endif
 
     bool isPainting;
@@ -40,7 +43,7 @@ public class ThreeDPen : MonoBehaviour
     //The amount of time that has to pass before another point can be created
     const float pointSecondDelay = 0.01f;
     //Skips this many points beforing sending a new one. Higher = better performance. Lower = more accurate results for clients
-    const int networkedPointsOffset = 7;
+    const int networkedPointsOffset = 10;
     int pointSkipCounter = 0;
 
     float lastPointTime;
@@ -48,9 +51,10 @@ public class ThreeDPen : MonoBehaviour
     const int maxPointCount = 100000;
     int currentPointCount;
 
-    public bool canPaint = true;
+    private bool canPaint = true;
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
+    public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } }
 
     public UnityEvent OnDraw;
 
@@ -66,7 +70,7 @@ public class ThreeDPen : MonoBehaviour
 #if UNITY_ANDROID
     void Update()
     {
-        if(isPainting && rb.velocity.magnitude > 0.1f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
+        if(isPainting && (rb.velocity.magnitude > 0.1f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             if(pointSkipCounter == 0 && ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");

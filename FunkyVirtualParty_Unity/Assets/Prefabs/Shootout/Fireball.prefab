@@ -63,7 +63,7 @@ Rigidbody:
   m_GameObject: {fileID: 566606611587223288}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 2
+  m_Drag: 3
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
@@ -221,7 +221,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f9d75771baefb7409dee2c11a897e06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  objectID: 0
   UpdatesPerSecond: 15
+  grabbable: {fileID: 3466704360205798773}
+  constraint: {fileID: 3865167073801075657}
+  rb: {fileID: 566606611587223269}
+  onTrajectory: 0
+  fireballHandAnchorLeft: {fileID: 0}
+  fireballHandAnchorRight: {fileID: 0}
   fireballMesh: {fileID: 4423289069885267050}
   fireballTrail: {fileID: 0}
   mainFireball: {fileID: 0}
@@ -231,6 +238,7 @@ MonoBehaviour:
   fireTrail: {fileID: 5562646482745574621}
   minSize: 0.5
   maxSize: 3
+  fireballGrowSpeed: 0.25
   minColor: {r: 1, g: 0.14509805, b: 0, a: 0.5019608}
   maxColor: {r: 1, g: 0.8392157, b: 0.31764707, a: 1}
   emberColor: {r: 0.8235294, g: 0.47058824, b: 0.23137255, a: 1}
