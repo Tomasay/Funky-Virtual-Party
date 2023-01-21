@@ -215,7 +215,7 @@ public class KaijuGameManager : GameManager
     private void UpdateDebugPlayerWaypoint(ClientPlayer cp, int index)
     {
         //If player does not have a waypoint, or has made it to their waypoint
-        if (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f)
+        /*if (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f)
         {
             //Get new waypoint
             currentWaypoints[index] = debugWaypoints[Random.Range(0, debugWaypoints.Length)].position;
@@ -231,7 +231,7 @@ public class KaijuGameManager : GameManager
             dir *= Mathf.Clamp(1 / (dist / currentWaypointDistances[index]), 0.1f, 1f);
 
             ClientManager.instance.Manager.Socket.Emit("inputDebug", dir.x, dir.z, cp.PlayerID);
-        }
+        }*/
     }
 #endif
 }
