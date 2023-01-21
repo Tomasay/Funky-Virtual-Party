@@ -59,9 +59,11 @@ public class VRTutorial : MonoBehaviour
 
     bool hasMoved, hasRotated;
 
-    // Start is called before the first frame update
     void Start()
     {
+        BButtonEvent.enabled = false;
+        YButtonEvent.enabled = false;
+
         sprayGun.OnSpray.AddListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
         pen.OnDraw.AddListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
         palette.OnColorChanged.AddListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
@@ -89,16 +91,22 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "Use the trigger button to spray paint";
                 break;
             case TutorialStage.SwapTools:
+                BButtonEvent.enabled = true;
+
                 sprayInstructions.SetActive(false);
                 swapToolsInstructions.SetActive(true);
                 headerText.text = "Press the primary button to swap between your spray gun and 3D pen";
                 break;
             case TutorialStage.Draw:
+                BButtonEvent.enabled = false;
+
                 swapToolsInstructions.SetActive(false);
                 drawInstructions.SetActive(true);
                 headerText.text = "Use the trigger button to draw in 3D space";
                 break;
             case TutorialStage.SwapColors:
+                BButtonEvent.enabled = true;
+
                 drawInstructions.SetActive(false);
                 headerText.text = "Tap your tool on the color palette to change colors";
                 break;
@@ -107,11 +115,15 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "To switch handedness, press the primary button in the hand holding your color palette";
                 break;
             case TutorialStage.Movement:
+                ahp.maxMoveSpeed = 3;
+
                 swapHandsInstructions.SetActive(false);
                 movementInstructions.SetActive(true);
                 headerText.text = "Use the left joystick to move around, and the right joystick to rotate";
                 break;
             case TutorialStage.Done:
+                YButtonEvent.enabled = true;
+
                 headerText.text = "You're ready to show off your skills!";
 
                 controllerImagesParent.SetActive(false);
