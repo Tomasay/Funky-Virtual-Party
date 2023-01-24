@@ -103,7 +103,7 @@ public class ChaseGameManager : GameManager
 
     public override void OnAction(string id)
     {
-        ClientManager.instance.GetPlayerByID(id).GetComponent<ChaseGameClientPlayer>().Action();
+        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<ChaseGameClientPlayer>().Action();
     }
 
     private void SetVRPlayerHandMovement(bool enabled)

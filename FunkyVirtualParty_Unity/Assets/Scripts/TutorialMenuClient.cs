@@ -44,7 +44,7 @@ public class TutorialMenuClient : MonoBehaviour
             txt.color = cm.Players[i].PlayerColor;
             txt.text = cm.Players[i].PlayerName;
 
-            clientPlayerIcons.Add(cm.Players[i].PlayerID, newPlayerIcon);
+            clientPlayerIcons.Add(cm.Players[i].PlayerSocketID, newPlayerIcon);
         }
     }
 
@@ -57,13 +57,13 @@ public class TutorialMenuClient : MonoBehaviour
     public void ReadyUpButtonPressed()
     {
         ReadyUp(ClientManagerWeb.instance.LocalPlayer);
-        ClientManagerWeb.instance.Manager.Socket.Emit("ReadyUp");
+        ClientManagerWeb.instance.Manager.Socket.Emit("ReadyUp", ClientManagerWeb.instance.LocalPlayer.PlayerByteID);
     }
     private void ReadyUp(ClientPlayer p)
     {
-        clientPlayerIcons[p.PlayerID].GetComponentInChildren<TMP_Text>().text = "READY";
-        clientPlayerIcons[p.PlayerID].GetComponent<Animator>().SetTrigger("Ready");
-        clientPlayerIcons.Remove(p.PlayerID);
+        clientPlayerIcons[p.PlayerSocketID].GetComponentInChildren<TMP_Text>().text = "READY";
+        clientPlayerIcons[p.PlayerSocketID].GetComponent<Animator>().SetTrigger("Ready");
+        clientPlayerIcons.Remove(p.PlayerSocketID);
 
         //Check if every player is ready
         if (clientPlayerIcons.Count > 0)

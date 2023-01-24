@@ -52,7 +52,7 @@ public class TutorialMenu : MonoBehaviour
         {
             if (cp.isDebugPlayer)
             {
-                ClientManager.instance.Manager.Socket.Emit("ReadyUpDebug", cp.PlayerID);
+                ClientManager.instance.Manager.Socket.Emit("ReadyUpDebug", cp.PlayerSocketID);
             }
         }
     }
@@ -88,7 +88,7 @@ public class TutorialMenu : MonoBehaviour
                 txt.color = ClientManager.instance.Players[i].PlayerColor;
                 txt.text = ClientManager.instance.Players[i].PlayerName;
 
-                vrPlayerIcons.Add(ClientManager.instance.Players[i].PlayerID, newPlayerIcon);
+                vrPlayerIcons.Add(ClientManager.instance.Players[i].PlayerSocketID, newPlayerIcon);
             }
         }
     }
@@ -101,9 +101,9 @@ public class TutorialMenu : MonoBehaviour
 
     private void ReadyUp(ClientPlayer p)
     {
-        vrPlayerIcons[p.PlayerID].GetComponentInChildren<TMP_Text>().text = "READY";
-        vrPlayerIcons[p.PlayerID].GetComponent<Animator>().SetTrigger("Ready");
-        vrPlayerIcons.Remove(p.PlayerID);
+        vrPlayerIcons[p.PlayerSocketID].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons[p.PlayerSocketID].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove(p.PlayerSocketID);
 
         //Check if every player is ready
         if (vrPlayerIcons.Count > 0)

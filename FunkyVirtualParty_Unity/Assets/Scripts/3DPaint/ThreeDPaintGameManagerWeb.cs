@@ -100,7 +100,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
             foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
             {
-                playerPoints.Add(cp.PlayerID, 0);
+                playerPoints.Add(cp.PlayerSocketID, 0);
             }
         }
 
@@ -321,7 +321,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             if (aob.playerID.Equals(answerPlayerID))
             {
                 ClientManagerWeb inst = ClientManagerWeb.instance;
-                aob.AddPlayerIcon(inst.GetPlayerByID(playerID).PlayerName, inst.GetPlayerByID(playerID).PlayerColor);
+                aob.AddPlayerIcon(inst.GetPlayerBySocketID(playerID).PlayerName, inst.GetPlayerBySocketID(playerID).PlayerColor);
                 return;
             }
         }
@@ -371,7 +371,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerByID(entry.Key).PlayerName;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerBySocketID(entry.Key).PlayerName;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 

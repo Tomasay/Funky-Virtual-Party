@@ -89,7 +89,7 @@ public class MazeGameClientPlayer : ClientPlayer
         if (methodName.Equals("MarbleCollision"))
         {
             //Player falls over
-            ClientPlayer player = ClientManagerWeb.instance.GetPlayerByID(data);
+            ClientPlayer player = ClientManagerWeb.instance.GetPlayerBySocketID(data);
             player.Anim.SetTrigger("Fall");
             TriggerBlinkingAnimation(3);
 

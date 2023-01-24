@@ -8,6 +8,7 @@ using BestHTTP.SocketIO3;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Events;
+using System.IO;
 
 public class ClientManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class ClientManager : MonoBehaviour
     [SerializeField]
     private GameObject playerPrefab;
     private static List<ClientPlayer> players = new List<ClientPlayer>();
+    private byte playerCounter; //Incremented and used to assign single digit IDs to players
 
     public List<ClientPlayer> Players { get => players; }
 
@@ -79,13 +81,13 @@ public class ClientManager : MonoBehaviour
 
             manager.Socket.Once("connect", () => Debug.Log("connected!"));
 
-            manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
+            manager.Socket.On<float, float, byte>("toUnity", OnInputReceived);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-            manager.Socket.On<string>("readyUp", OnReadyUp);
-            manager.Socket.On<string>("action", OnAction);
+            manager.Socket.On<byte>("readyUp", OnReadyUp);
+            manager.Socket.On<byte>("action", OnAction);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
-            manager.Socket.On<string>("requestPlayerPosToHost", SyncPlayerPos);
+            manager.Socket.On<byte>("requestPlayerPosToHost", SyncPlayerPos);
 
             DontDestroyOnLoad(gameObject);
         }
@@ -169,31 +171,18 @@ public class ClientManager : MonoBehaviour
     {
         Debug.Log("Client connected with ID: " + id + " at IP address: " + ip);
 
-        /* This was implemented because Unity was triggering as the first client connect. Seems to be unnecessary with the implementation of rooms
-        if (unityClientID == "")
-        {
-            unityClientID = id;
-            return;
-        }
-        */
-
-        string[] playersToSend = new string[players.Count];
-        for (int i = 0; i < players.Count; i++)
-        {
-            playersToSend[i] = players[i].ToString();
-        }
-        manager.Socket.Emit("playerInfoFromHost", id, playersToSend);
-        Debug.Log("Sent players: " + playersToSend.Length);
+        manager.Socket.Emit("playerInfoFromHost", id, SerializePlayersInfo());
 
         ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
 
         players.Add(newPlayer);
-        newPlayer.PlayerID = id;
+        newPlayer.PlayerSocketID = id;
+        newPlayer.PlayerByteID = playerCounter;
+        manager.Socket.Emit("assignPlayerByteIDServer", id, playerCounter);
+        playerCounter++;
         newPlayer.PlayerIP = ip;
-        //players[id].GetComponent<ClientPlayer>().SetPlayerName("Player " + players.Count);
         newPlayer.PlayerName = name;
 
-        
 
         if (onClientConnect != null)
         {
@@ -209,8 +198,10 @@ public class ClientManager : MonoBehaviour
         StartCoroutine("AddDebugDelayed", id);
 
         players.Add(newPlayer);
-        newPlayer.PlayerID = id;
-        
+        newPlayer.PlayerSocketID = id;
+        newPlayer.PlayerByteID = playerCounter;
+        playerCounter++;
+
         newPlayer.PlayerName = name;
 
         if (onClientConnect != null)
@@ -223,9 +214,9 @@ public class ClientManager : MonoBehaviour
     IEnumerator AddDebugDelayed(string id)
     {
         yield return new WaitForSeconds(1);
-        GetPlayerByID(id).PlayerIP = "test";
-        GetPlayerByID(id).isDebugPlayer = true;
-        GetPlayerByID(id).gameObject.AddComponent<ClientPlayerDebug>();
+        GetPlayerBySocketID(id).PlayerIP = "test";
+        GetPlayerBySocketID(id).isDebugPlayer = true;
+        GetPlayerBySocketID(id).gameObject.AddComponent<ClientPlayerDebug>();
     }
 #endif
 
@@ -234,10 +225,10 @@ public class ClientManager : MonoBehaviour
     {
         Debug.Log("Client disconnected with ID: " + id + " at IP address: " + ip);
 
-        if (GetPlayerByID(id))
+        if (GetPlayerBySocketID(id))
         {
-            Destroy(GetPlayerByID(id).gameObject);
-            players.Remove(GetPlayerByID(id));
+            Destroy(GetPlayerBySocketID(id).gameObject);
+            players.Remove(GetPlayerBySocketID(id));
         }
 
         if (onClientDisonnect != null)
@@ -246,30 +237,27 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    private void OnInputReceived(float x, float y, string id)
+    private void OnInputReceived(float x, float y, byte id)
     {
-        if (GetPlayerByID(id))
-        {
-            GetPlayerByID(id).Move(x, y);
-        }
+        GetPlayerByByteID(id)?.Move(x, y);
     }
 
     private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
     {
-        GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
+        GetPlayerBySocketID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
-    public void SyncPlayerPos(string id)
+    public void SyncPlayerPos(byte id)
     {
-        ClientPlayer cp = GetPlayerByID(id);
-        manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
+        ClientPlayer cp = GetPlayerByByteID(id);
+        manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerByteID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
     }
 
     public void SyncAllPlayerPos()
     {
         foreach (ClientPlayer cp in players)
         {
-            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
+            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerByteID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, false);
         }
     }
 
@@ -277,24 +265,24 @@ public class ClientManager : MonoBehaviour
     {
         foreach (ClientPlayer cp in players)
         {
-            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, true);
+            manager.Socket.Emit("syncPlayerPosFromHost", cp.PlayerByteID, cp.transform.position.x, cp.transform.position.y, cp.transform.position.z, true);
         }
     }
 
     public event Action<ClientPlayer> onReadyUp;
-    private void OnReadyUp(string id)
+    private void OnReadyUp(byte id)
     {
         if (onReadyUp != null)
         {
-            onReadyUp(GetPlayerByID(id));
+            onReadyUp(GetPlayerByByteID(id));
         }
     }
 
-    private void OnAction(string id)
+    private void OnAction(byte id)
     {
-        if (GetPlayerByID(id))
+        if (GetPlayerByByteID(id))
         {
-            GetPlayerByID(id).Action();
+            GetPlayerByByteID(id).Action();
         }
     }
 
@@ -302,7 +290,8 @@ public class ClientManager : MonoBehaviour
     {
         for (int i = 0; i < players.Count; i++)
         {
-            string ID = players[i].PlayerID;
+            string socketID = players[i].PlayerSocketID;
+            byte byteID = players[i].PlayerByteID;
             string playerName = players[i].PlayerName;
             Color playerColor = players[i].PlayerColor;
             int playerHeadType = players[i].PlayerHeadType;
@@ -313,10 +302,10 @@ public class ClientManager : MonoBehaviour
             bool isDebug = players[i].isDebugPlayer;
 #endif
 
-
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
-            players[i].PlayerID = ID;
+            players[i].PlayerSocketID = socketID;
+            players[i].PlayerByteID = byteID;
             players[i].PlayerName = playerName;
             players[i].PlayerColor = playerColor;
             players[i].PlayerHeadType = playerHeadType;
@@ -341,7 +330,7 @@ public class ClientManager : MonoBehaviour
 #if UNITY_EDITOR
             if(isDebug)
             {
-                StartCoroutine("AddDebugDelayed", ID);
+                StartCoroutine("AddDebugDelayed", byteID);
             }
 #endif
         }
@@ -370,14 +359,48 @@ public class ClientManager : MonoBehaviour
         return (char)UnityEngine.Random.Range(65, 91);
     }
 
-    public ClientPlayer GetPlayerByID(string id)
+    public ClientPlayer GetPlayerBySocketID(string id)
     {
         foreach (ClientPlayer p in players)
         {
-            if (p.PlayerID.Equals(id))
+            if (p.PlayerSocketID.Equals(id))
                 return p;
         }
 
         return null;
+    }
+
+    public ClientPlayer GetPlayerByByteID(byte id)
+    {
+        foreach (ClientPlayer p in players)
+        {
+            if (p.PlayerByteID == id)
+                return p;
+        }
+
+        return null;
+    }
+
+    public byte[] SerializePlayersInfo()
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write((byte)players.Count);
+                foreach (ClientPlayer cp in players)
+                {
+                    writer.Write(cp.PlayerSocketID);
+                    writer.Write(cp.PlayerByteID);
+                    writer.Write(cp.PlayerIP);
+                    writer.Write(cp.PlayerName);
+                    writer.Write("#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor));
+                    writer.Write((sbyte)cp.PlayerHeadType);
+                    writer.Write(cp.PlayerHeight);
+                    writer.Write((sbyte)cp.PlayerHatIndex);
+                }
+            }
+            return m.ToArray();
+        }
     }
 }

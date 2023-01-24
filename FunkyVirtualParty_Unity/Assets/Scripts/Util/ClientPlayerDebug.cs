@@ -17,7 +17,7 @@ public class ClientPlayerDebug : MonoBehaviour
 
     void NewPlayerJoined(GameObject newPlayer)
     {
-        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), cp.PlayerHeadType, cp.PlayerHeight, -1);
+        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), cp.PlayerHeadType, cp.PlayerHeight, -1);
     }
 
     void Customize()
@@ -36,6 +36,6 @@ public class ClientPlayerDebug : MonoBehaviour
         //Height
         cp.PlayerHeight = Random.Range(-0.2f, 0.75f);
 
-        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), headType, cp.PlayerHeight, -1);
+        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), headType, cp.PlayerHeight, -1);
     }
 }

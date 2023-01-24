@@ -141,7 +141,7 @@ public class ShootoutGameManager : GameManager
 
     public override void OnAction(string id)
     {
-        ClientManager.instance.GetPlayerByID(id).GetComponent<ShootoutGameClientPlayer>().Action();
+        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<ShootoutGameClientPlayer>().Action();
     }
 
     private void SetVRPlayerCanThrowFireballs(bool canThrow)
@@ -179,7 +179,7 @@ public class ShootoutGameManager : GameManager
             float dist = Vector3.Distance(currentWaypoints[index], cp.transform.position);
             dir *= Mathf.Clamp(1/(dist / currentWaypointDistances[index]), 0.1f, 1f);
 
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", dir.x, dir.z, cp.PlayerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", dir.x, dir.z, cp.PlayerSocketID);
         }
     }
 #endif

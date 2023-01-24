@@ -107,7 +107,7 @@ public class ThreeDPaintGameManager : GameManager
         {
             foreach (ClientPlayer cp in ClientManager.instance.Players)
             {
-                playerPoints.Add(cp.PlayerID, 0);
+                playerPoints.Add(cp.PlayerSocketID, 0);
             }
 
             ClientManager.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
@@ -288,7 +288,7 @@ public class ThreeDPaintGameManager : GameManager
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManager.instance.GetPlayerByID(entry.Key).PlayerName;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManager.instance.GetPlayerBySocketID(entry.Key).PlayerName;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 
@@ -337,7 +337,7 @@ public class ThreeDPaintGameManager : GameManager
 
             if (answers.Count >= ClientManager.instance.Players.Count)
             {
-                string randomPlayer = ClientManager.instance.Players[Random.Range(0, ClientManager.instance.Players.Count)].PlayerID;
+                string randomPlayer = ClientManager.instance.Players[Random.Range(0, ClientManager.instance.Players.Count)].PlayerSocketID;
                 chosenAnswer = answers[randomPlayer];
                 chosenAnswerOwner = randomPlayer;
                 if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChosenAnswerOwner", chosenAnswerOwner);
@@ -384,11 +384,11 @@ public class ThreeDPaintGameManager : GameManager
     void AddPlayerToResults(string playerID, bool correct)
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
-        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerByID(playerID).PlayerName;
+        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerBySocketID(playerID).PlayerName;
         pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
         //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
-        pi.GetComponent<Image>().color = ClientManager.instance.GetPlayerByID(playerID).PlayerColor;
+        pi.GetComponent<Image>().color = ClientManager.instance.GetPlayerBySocketID(playerID).PlayerColor;
 
         playerNameIcons.Add(pi);
     }
@@ -405,7 +405,7 @@ public class ThreeDPaintGameManager : GameManager
         }
         else
         {
-            headerText.text = "Wrong! " + ClientManager.instance.GetPlayerByID(chosenAnswerOwner).PlayerName + " wrote the answer";
+            headerText.text = "Wrong! " + ClientManager.instance.GetPlayerBySocketID(chosenAnswerOwner).PlayerName + " wrote the answer";
         }
 
         State = ThreeDPaintGameState.ShowingLeaderboard;

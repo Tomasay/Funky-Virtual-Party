@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
 
     public virtual void OnAction(string id)
     {
-        ClientManager.instance.GetPlayerByID(id).GetComponent<ClientPlayer>().Action();
+        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<ClientPlayer>().Action();
     }
 
     public IEnumerator DisableMirroring()

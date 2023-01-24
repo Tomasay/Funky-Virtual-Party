@@ -62,7 +62,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             WaterSplashData data = new WaterSplashData();
             data.splashPos = pos;
-            data.playerID = playerID;
+            data.playerID = PlayerSocketID;
             if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "WaterSplashEvent", JsonUtility.ToJson(data));
         }
     }
@@ -87,7 +87,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if(isDebugPlayer && isColliding)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, playerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, PlayerSocketID);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -110,7 +110,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("input", target.x, target.y);
+                ClientManagerWeb.instance.Manager.Socket.Emit("input", target.x, target.y, PlayerByteID);
             }
 
             Move(target.x, target.y);
@@ -123,7 +123,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if (IsLocal && isColliding)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f);
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, PlayerByteID);
             Move(collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, false);
 
             Vector3 positionDifference = posFromHost - transform.position;   
@@ -146,7 +146,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, playerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, PlayerSocketID);
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -161,7 +161,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2 );
+            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, PlayerByteID);
             Move(collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, false);
 
             Vector3 positionDifference = posFromHost - transform.position;
@@ -235,7 +235,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             SpawnSplashEffect(newData.splashPos);
 
             //Kill corresponding player
-            ShootoutGameClientPlayer player = ClientManagerWeb.instance.GetPlayerByID(newData.playerID) as ShootoutGameClientPlayer;
+            ShootoutGameClientPlayer player = ClientManagerWeb.instance.GetPlayerBySocketID(newData.playerID) as ShootoutGameClientPlayer;
             player.SetPlayerActive(false);
             player.isAlive = false;
 

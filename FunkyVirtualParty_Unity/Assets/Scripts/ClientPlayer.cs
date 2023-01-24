@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
-  
+
 public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] public Texture2D colorPalette;
@@ -21,7 +21,10 @@ public class ClientPlayer : MonoBehaviour
     protected GameObject currentHat;
     protected int currentHatIndex = -1;
 
-    protected string playerID, playerIP, playerName;
+    protected string playerSocketID;
+    protected byte playerByteID;
+
+    protected string playerIP, playerName;
     protected bool isLocal = false; //Is this the player being controlled by device?
     protected Color playerColor = Color.white;
     protected int headType;
@@ -37,7 +40,8 @@ public class ClientPlayer : MonoBehaviour
 
     protected PlayerInput playerInput;
 
-    public string PlayerID { get => playerID; set => playerID = value; }
+    public string PlayerSocketID { get => playerSocketID; set => playerSocketID = value; }
+    public byte PlayerByteID { get => playerByteID; set => playerByteID = value; }
     public string PlayerIP { get => playerIP; set => playerIP = value; }
     public string PlayerName { get => playerName; set { playerNameText.text = playerName = value; } }
     public Color PlayerColor { get => playerColor; set{ playerColor = value; ChangeColor(value); } }
@@ -91,10 +95,14 @@ public class ClientPlayer : MonoBehaviour
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-            
+
+            //Round to 2 decimal points
+            //input.x = Mathf.Round(input.x * 100) / 100;
+            //input.y = Mathf.Round(input.y * 100) / 100;
+
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y);
+                ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y, PlayerByteID);
             }
 
             Move(input.x, input.y);
@@ -317,19 +325,5 @@ public class ClientPlayer : MonoBehaviour
     protected virtual void OnCollisionEnter(Collision collision)
     {
         //Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
-    }
-
-    public override string ToString()
-    {
-        string s = "";
-        s += playerID + "\n";
-        s += PlayerIP + "\n";
-        s += playerName + "\n";
-        s += "#" + ColorUtility.ToHtmlStringRGB(playerColor) + "\n";
-        s += headType + "\n";
-        s += height + "\n";
-        s += currentHatIndex;
-
-        return s;
     }
 }

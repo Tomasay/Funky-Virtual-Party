@@ -136,7 +136,7 @@ public class MainMenuWeb : MonoBehaviour
     {
         ClientPlayer cp = player.GetComponent<ClientPlayer>();
         GameObject newIcon = Instantiate(playerIconPrefab, playerNamesList.transform);
-        newIcon.name = cp.PlayerID;
+        newIcon.name = cp.PlayerSocketID;
         newIcon.GetComponent<Animator>().cullingMode = AnimatorCullingMode.CullUpdateTransforms; //Weird workaround with Unity's animator
         newIcon.GetComponent<Image>().color = cp.PlayerColor;
         newIcon.GetComponentInChildren<TMP_Text>().text = cp.PlayerName;
