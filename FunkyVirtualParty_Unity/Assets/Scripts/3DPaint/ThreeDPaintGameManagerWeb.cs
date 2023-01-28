@@ -28,9 +28,11 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     TMP_Text headerText;
 
     [SerializeField]
-    TMP_Text timerText;
+    TMP_Text timerText, inputTimerText;
     float drawTimeRemaining;
-    bool timerCountingDown;
+    bool drawTimerCountingDown;
+    float answerTimeRemaining;
+    bool answerTimerCountingDown;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -68,6 +70,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     [SerializeField]
     GameObject leaderboardPlayerCardPrefab, leaderboardParent;
     List<GameObject> currentLeaderboardCards;
+
+    private ThreeDPaintGameState state;
+    public ThreeDPaintGameState State { get => state; set => state = value; }
 
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
@@ -123,10 +128,16 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
         }
 
-        if(timerCountingDown && drawTimeRemaining >= 0)
+        if(drawTimerCountingDown && drawTimeRemaining >= 0)
         {
             drawTimeRemaining -= Time.deltaTime;
             timerText.text = FormatTime(drawTimeRemaining);
+        }
+
+        if (answerTimerCountingDown && answerTimeRemaining >= 0)
+        {
+            answerTimeRemaining -= Time.deltaTime;
+            inputTimerText.text = FormatTime(answerTimeRemaining);
         }
     }
 
@@ -176,7 +187,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
             drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
             timerText.text = FormatTime(drawTimeRemaining);
-            timerCountingDown = true;
+            drawTimerCountingDown = true;
 
             drawingPhaseCamera.gameObject.SetActive(true);
             guessingPhaseCamera.gameObject.SetActive(false);
@@ -192,7 +203,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
             guessingCanvas.enabled = true;
 
-            timerCountingDown = false;
+            drawTimerCountingDown = false;
 
             drawingPhaseCamera.gameObject.SetActive(false);
             guessingPhaseCamera.gameObject.SetActive(true);
@@ -254,6 +265,35 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         else if (methodName.Equals("VRDoneWithTutorial"))
         {
             vrTutorialCompleted = true;
+        }
+    }
+
+    protected override void OnStateChange(string s)
+    {
+        if (System.Enum.TryParse(s, out ThreeDPaintGameState newGameState))
+        {
+            State = newGameState;
+
+            switch (State)
+            {
+                case ThreeDPaintGameState.ClientsAnswering:
+                    answerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
+                    answerTimerCountingDown = true;
+                    break;
+                case ThreeDPaintGameState.VRPainting:
+                    break;
+                case ThreeDPaintGameState.ClientsGuessing:
+                    break;
+                case ThreeDPaintGameState.VRGuessing:
+                    answerTimerCountingDown = false;
+                    break;
+                case ThreeDPaintGameState.ShowingLeaderboard:
+                    break;
+                case ThreeDPaintGameState.GameOver:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

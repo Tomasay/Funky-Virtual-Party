@@ -47,7 +47,7 @@ public class GameManagerWeb : MonoBehaviour
         return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    protected void OnStateChange(string s)
+    protected virtual void OnStateChange(string s)
     {
         if(System.Enum.TryParse(s, out GameState newGameState))
         {
