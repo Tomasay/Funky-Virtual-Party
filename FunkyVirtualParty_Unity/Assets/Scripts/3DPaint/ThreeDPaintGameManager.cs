@@ -12,6 +12,7 @@ using UnityEngine.Animations;
 public enum ThreeDPaintGameState
 {
     ClientsAnswering,
+    VRPosing,
     VRPainting,
     ClientsGuessing,
     VRGuessing,
@@ -60,13 +61,16 @@ public class ThreeDPaintGameManager : GameManager
     List<GameObject> playerNameIcons;
 
     [SerializeField]
-    XRControllerEvent YButtonEvent, BButtonEvent;
+    XRControllerEvent YButtonEvent, BButtonEvent, AButtonEvent, XButtonEvent, RightTriggerEvent, LeftTriggerEvent, RightGripEvent, LeftGripEvent;
 
     [SerializeField]
     AutoHandPlayer ahp;
 
     [SerializeField]
     Button finishedPaintingEarlyButton;
+
+    [SerializeField]
+    MannequinSolver solver;
 
     Dictionary<string, string> answers;
 
@@ -135,7 +139,7 @@ public class ThreeDPaintGameManager : GameManager
 
                 if (clientAnswerTimeRemaining <= 0)
                 {
-                    State = ThreeDPaintGameState.VRPainting;
+                    State = ThreeDPaintGameState.VRPosing;
                 }
                 break;
             case ThreeDPaintGameState.VRPainting:
@@ -165,7 +169,7 @@ public class ThreeDPaintGameManager : GameManager
         {
             if (answers.Count >= ClientManager.instance.Players.Count)
             {
-                State = ThreeDPaintGameState.VRPainting;
+                State = ThreeDPaintGameState.VRPosing;
             }
 
             ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "VRDoneWithTutorial", "");
@@ -177,6 +181,13 @@ public class ThreeDPaintGameManager : GameManager
     public void FinishedPaintingEarly()
     {
         State = ThreeDPaintGameState.ClientsGuessing;
+    }
+
+    void SetPose()
+    {
+        solver.SetPose();
+        GrabToolsStart();
+        State = ThreeDPaintGameState.VRPainting;
     }
 
     void OnStateChange()
@@ -196,7 +207,15 @@ public class ThreeDPaintGameManager : GameManager
                 //Animate client players to look like they are on their phones
 
                 break;
-            case ThreeDPaintGameState.VRPainting:
+            case ThreeDPaintGameState.VRPosing:
+                solver.EnablePosing();
+
+                //Disable VR tools
+                pen.CanPaint = false;
+                sprayGun.CanPaint = false;
+                DropTool();
+                DropPalette();
+
                 //Get random answer
                 string randomPlayer = answers.ElementAt(Random.Range(0, answers.Count)).Key;
                 chosenAnswer = answers[randomPlayer];
@@ -204,17 +223,50 @@ public class ThreeDPaintGameManager : GameManager
                 if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChosenAnswerOwner", chosenAnswerOwner);
 
                 //UI
-                timerText.enabled = true;
-                finishedPaintingEarlyButton.gameObject.SetActive(true);
-                headerText.text = "Paint: " + chosenAnswer;
-
-                //Show blurred view to clients
-                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowBlurredView", "");
+                headerText.text = "<u>Paint: " + chosenAnswer + "</u>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 //Clear practice painting
                 pen.EraseAllLines();
                 paintTexture.Clear();
 
+                //Inputs for setting pose
+                YButtonEvent.Pressed.RemoveAllListeners();
+                BButtonEvent.Pressed.RemoveAllListeners();
+
+                YButtonEvent.Pressed.AddListener(SetPose);
+                BButtonEvent.Pressed.AddListener(SetPose);
+                AButtonEvent.Pressed.AddListener(SetPose);
+                XButtonEvent.Pressed.AddListener(SetPose);
+                RightTriggerEvent.Pressed.AddListener(SetPose);
+                LeftTriggerEvent.Pressed.AddListener(SetPose);
+                RightGripEvent.Pressed.AddListener(SetPose);
+                LeftGripEvent.Pressed.AddListener(SetPose);
+
+                break;
+            case ThreeDPaintGameState.VRPainting:
+
+                //Inputs
+                YButtonEvent.Pressed.RemoveListener(SetPose);
+                BButtonEvent.Pressed.RemoveListener(SetPose);
+                AButtonEvent.Pressed.RemoveListener(SetPose);
+                XButtonEvent.Pressed.RemoveListener(SetPose);
+                RightTriggerEvent.Pressed.RemoveListener(SetPose);
+                LeftTriggerEvent.Pressed.RemoveListener(SetPose);
+                RightGripEvent.Pressed.RemoveListener(SetPose);
+                LeftGripEvent.Pressed.RemoveListener(SetPose);
+
+                //Enable VR tools
+                pen.CanPaint = true;
+                sprayGun.CanPaint = true;
+
+                //UI
+                headerText.text = "Paint: " + chosenAnswer;
+                timerText.enabled = true;
+                finishedPaintingEarlyButton.gameObject.SetActive(true);
+                
+
+                //Show blurred view to clients
+                ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowBlurredView", "");
                 break;
             case ThreeDPaintGameState.ClientsGuessing:
                 playersGuessed = 0;
@@ -351,7 +403,7 @@ public class ThreeDPaintGameManager : GameManager
 
             if (answers.Count >= ClientManager.instance.Players.Count && vrTutorialCompleted)
             {
-                State = ThreeDPaintGameState.VRPainting;
+                State = ThreeDPaintGameState.VRPosing;
             }
         }
         else if (State == ThreeDPaintGameState.ClientsGuessing)
@@ -464,6 +516,24 @@ public class ThreeDPaintGameManager : GameManager
         {
             rightHand.Grab(GrabType.InstantGrab);
         }
+    }
+
+    void DropTool()
+    {
+        bool isToolHandLeft = (toolHand == HandType.left);
+
+        //Drop current tool
+        if (isToolHandLeft)
+        {
+            leftHand.ForceReleaseGrab();
+        }
+        else
+        {
+            rightHand.ForceReleaseGrab();
+        }
+
+        sprayGun.SetActive(false);
+        pen.SetActive(false);
     }
 
     IEnumerator GrabDelayed(bool isToolHandLeft, float delay)
@@ -646,6 +716,27 @@ public class ThreeDPaintGameManager : GameManager
         paintPalette.GetComponent<ParentConstraint>().constraintActive = false;
 
         needToGrabPalette = false;
+    }
+
+    void DropPalette()
+    {
+        bool isPaletteHandLeft = !(toolHand == HandType.left);
+
+        if (isPaletteHandLeft)
+        {
+            leftHand.ForceReleaseGrab();
+        }
+        else
+        {
+            rightHand.ForceReleaseGrab();
+        }
+
+        foreach (MeshRenderer mr in paintPalette.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.enabled = false;
+        }
+
+        paintPalette.GetComponent<MeshCollider>().enabled = false;
     }
 
     //Enable/Disable colliders that could get in the way of grabbing

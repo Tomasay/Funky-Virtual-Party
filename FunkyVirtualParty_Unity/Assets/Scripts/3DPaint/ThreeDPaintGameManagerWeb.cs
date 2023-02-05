@@ -280,6 +280,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
                     answerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
                     answerTimerCountingDown = true;
                     break;
+                case ThreeDPaintGameState.VRPosing:
+                    headerText.text = "Waiting for VR player to set a pose...";
+                    break;
                 case ThreeDPaintGameState.VRPainting:
                     break;
                 case ThreeDPaintGameState.ClientsGuessing:

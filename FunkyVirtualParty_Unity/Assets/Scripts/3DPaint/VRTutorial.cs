@@ -78,6 +78,17 @@ public class VRTutorial : MonoBehaviour
         CurrentStage = TutorialStage.Spray;
     }
 
+    public void SkipButtonPressed()
+    {
+        ahp.maxMoveSpeed = 3;
+        BButtonEvent.enabled = true;
+        YButtonEvent.enabled = true;
+
+        RemoveListeners();
+
+        gameObject.SetActive(false);
+    }
+
     void OnStateChange()
     {
         switch (currentStage)
@@ -129,19 +140,24 @@ public class VRTutorial : MonoBehaviour
                 controllerImagesParent.SetActive(false);
                 movementInstructions.SetActive(false);
 
-                sprayGun.OnSpray.RemoveListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
-                pen.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
-                palette.OnColorChanged.RemoveListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
-                BButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
-                //YButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
-                ahp.OnMove.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
-                ahp.OnRotate.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
+                RemoveListeners();
 
                 StartCoroutine("CloseTutorial");
                 break;
             default:
                 break;
         }
+    }
+
+    void RemoveListeners()
+    {
+        sprayGun.OnSpray.RemoveListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
+        pen.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
+        palette.OnColorChanged.RemoveListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
+        BButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
+        //YButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
+        ahp.OnMove.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
+        ahp.OnRotate.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
     }
 
     IEnumerator CloseTutorial()
