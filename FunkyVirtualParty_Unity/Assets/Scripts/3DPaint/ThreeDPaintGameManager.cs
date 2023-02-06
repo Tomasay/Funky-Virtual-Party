@@ -434,8 +434,16 @@ public class ThreeDPaintGameManager : GameManager
 
     string GetPrompt()
     {
+        //Split prompt text file into individual lines
         string[] prompts = promptList.ToString().Split('\n');
-        currentPrompt = prompts[Random.Range(0, prompts.Length)];
+
+        //Get prompt at random, excluding comments
+        do
+        {
+            currentPrompt = prompts[Random.Range(0, prompts.Length)];
+        }
+        while (currentPrompt.StartsWith("//"));
+
         return currentPrompt;
     }
 
