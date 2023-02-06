@@ -41,6 +41,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     ThreeDPen pen;
 
     [SerializeField]
+    PaintSprayGun sprayGun;
+
+    [SerializeField]
     Canvas inputCanvas, guessingCanvas, resultsCanvas, leaderboardCanvas;
 
     [SerializeField]
@@ -286,6 +289,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
                 case ThreeDPaintGameState.VRPainting:
                     break;
                 case ThreeDPaintGameState.ClientsGuessing:
+                    //Make sure there's no lingering drawings
+                    pen.CanPaint = false;
+                    sprayGun.CanPaint = false;
                     break;
                 case ThreeDPaintGameState.VRGuessing:
                     answerTimerCountingDown = false;

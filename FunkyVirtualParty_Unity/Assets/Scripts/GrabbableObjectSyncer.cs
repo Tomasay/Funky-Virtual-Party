@@ -18,6 +18,9 @@ public class GrabbableObjectSyncer : ObjectSyncer
 {
 #if UNITY_ANDROID
     [SerializeField] protected Grabbable grabbable;
+
+    //If true, will send over physics info to clients when dropped. If false, object will detach from hand on drop but remain kinematic
+    public bool simulatePhysicsOnDrop = true;
 #endif
 
 #if UNITY_WEBGL
@@ -41,7 +44,6 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #if UNITY_WEBGL
         if (ClientManagerWeb.instance)
         {
-            ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
             ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
             ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
         }
@@ -94,7 +96,14 @@ public class GrabbableObjectSyncer : ObjectSyncer
     /// <param name="g">Grabbbable that was dropped</param>
     protected void OnDrop(Hand h, Grabbable g)
     {
-        StartCoroutine("SendTrajectoryAsync");
+        if (simulatePhysicsOnDrop)
+        {
+            StartCoroutine("SendTrajectoryAsync");
+        }
+        else if(ClientManager.instance)
+        {
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "OnDrop", objectID);
+        }
     }
 
     /// <summary>
@@ -117,10 +126,6 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #endif
 
 #if UNITY_WEBGL
-    protected virtual void MethodCalledFromServer(string methodName, string data)
-    {
-    }
-
     protected virtual void MethodCalledFromServer(string methodName, byte[] data)
     {
         if (methodName.Equals("Trajectory"))
@@ -141,6 +146,10 @@ public class GrabbableObjectSyncer : ObjectSyncer
             {
                 EnableConstraint(false);
             }
+            else if (methodName.Equals("OnDrop"))
+            {
+                DisableConstraint();
+            }
         }
     }
 
@@ -156,10 +165,7 @@ public class GrabbableObjectSyncer : ObjectSyncer
             {
                 if (!reader.ReadByte().Equals(objectID)) return;
 
-                //Disable constraint to hand
-                constraint.constraintActive = false;
-                constraint.enabled = false;
-                isDropped = true;
+                DisableConstraint();
 
                 //Physics
                 rb.isKinematic = false;
@@ -191,6 +197,13 @@ public class GrabbableObjectSyncer : ObjectSyncer
         }
         constraint.constraintActive = true;
         constraint.enabled = true;
+    }
+
+    protected void DisableConstraint()
+    {
+        constraint.constraintActive = false;
+        constraint.enabled = false;
+        isDropped = true;
     }
 #endif
 }

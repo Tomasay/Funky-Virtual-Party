@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 2548461492699794798}
   - component: {fileID: 6624454180844753420}
   - component: {fileID: 5798207331972594948}
-  - component: {fileID: 4180298833258971404}
+  - component: {fileID: 5436951583958924804}
   m_Layer: 29
   m_Name: PaintPalette
   m_TagString: Untagged
@@ -411,7 +411,7 @@ MonoBehaviour:
       m_Calls: []
   sprayGun: {fileID: 0}
   pen: {fileID: 0}
---- !u!114 &4180298833258971404
+--- !u!114 &5436951583958924804
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -420,11 +420,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 594011468458317952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fd35b5818f80534b918bc892d617062, type: 3}
+  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objectID: 3
-  UpdatesPerSecond: 10
+  UpdatesPerSecond: 0
+  grabbable: {fileID: 5559262786836256587}
+  simulatePhysicsOnDrop: 1
+  rb: {fileID: 3585005752254527412}
 --- !u!1 &799079142282651424
 GameObject:
   m_ObjectHideFlags: 0

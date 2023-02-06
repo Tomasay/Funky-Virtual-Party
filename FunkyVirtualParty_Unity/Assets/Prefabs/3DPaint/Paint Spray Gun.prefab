@@ -5071,7 +5071,7 @@ GameObject:
   - component: {fileID: 4590413094623354107}
   - component: {fileID: 4590413094623354109}
   - component: {fileID: 1320623855}
-  - component: {fileID: 2533470627107766442}
+  - component: {fileID: 6800828338441696193}
   - component: {fileID: 5967974369228407090}
   - component: {fileID: 707748359044679317}
   - component: {fileID: 6361721950504437107}
@@ -5463,7 +5463,7 @@ MonoBehaviour:
   minRange: 0
   testAngle: 0
   testRange: 0
---- !u!114 &2533470627107766442
+--- !u!114 &6800828338441696193
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5472,11 +5472,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 4590413094623354086}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fd35b5818f80534b918bc892d617062, type: 3}
+  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objectID: 1
-  UpdatesPerSecond: 10
+  UpdatesPerSecond: 0
+  grabbable: {fileID: 4590413094623354107}
+  simulatePhysicsOnDrop: 1
+  rb: {fileID: 4590413094623354109}
 --- !u!114 &5967974369228407090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5504,7 +5507,6 @@ MonoBehaviour:
   paintSphere: {fileID: 4590413093452200516}
   baseMesh: {fileID: 4590413094623354104}
   col: {fileID: 4590413094623354108}
-  canPaint: 1
   active: 0
   OnSpray:
     m_PersistentCalls:

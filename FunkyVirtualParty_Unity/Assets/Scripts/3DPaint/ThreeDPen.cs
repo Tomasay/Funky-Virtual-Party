@@ -42,19 +42,18 @@ public class ThreeDPen : MonoBehaviour
 
     //The amount of time that has to pass before another point can be created
     const float pointSecondDelay = 0.01f;
-    //Skips this many points beforing sending a new one. Higher = better performance. Lower = more accurate results for clients
-    const int networkedPointsOffset = 10;
-    int pointSkipCounter = 0;
 
     float lastPointTime;
 
     const int maxPointCount = 100000;
     int currentPointCount;
 
+    Vector3 lastPenPos;
+
     private bool canPaint = true;
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
-    public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } }
+    public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; if (HapticsManager.instance) { HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } } }
 
     public UnityEvent OnDraw;
 
@@ -67,24 +66,26 @@ public class ThreeDPen : MonoBehaviour
         tipMesh.material.color = currentColor;
     }
 
-#if UNITY_ANDROID
     void Update()
     {
-        if(isPainting && (rb.velocity.magnitude > 0.1f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
+#if UNITY_ANDROID
+        if (isPainting && (rb.velocity.magnitude > 0.1f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
-            if(pointSkipCounter == 0 && ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenAddLinePoint", "");
-
-            pointSkipCounter++;
-            if(pointSkipCounter >= networkedPointsOffset)
-            {
-                pointSkipCounter = 0;
-            }
-
             OnDraw.Invoke();
         }
+#endif
+#if UNITY_WEBGL
+        if (isPainting && (transform.position - lastPenPos).magnitude > 0.01f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
+        {
+            AddNewLinePoint();
+            OnDraw.Invoke();
+            lastPenPos = transform.position;
+        }
+#endif
     }
 
+#if UNITY_ANDROID
     public void OnTriggerPressed(Hand h, Grabbable g)
     {
         if (canPaint)
@@ -92,7 +93,7 @@ public class ThreeDPen : MonoBehaviour
             isPainting = true;
 
             CreateNewLine();
-            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenCreateNewLine", "");
+            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenTriggerPressed", "");
 
             HapticsManager.instance.TriggerHaptic(h.left, 999, 0.1f);
         }
@@ -104,6 +105,8 @@ public class ThreeDPen : MonoBehaviour
         {
             isPainting = false;
             HapticsManager.instance.StopHaptics(h.left);
+
+            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenTriggerReleased", "");
         }
     }
 #endif
@@ -111,13 +114,14 @@ public class ThreeDPen : MonoBehaviour
 #if UNITY_WEBGL
     void MethodCalledFromServer(string methodName, string data)
     {
-        if (methodName.Equals("PenCreateNewLine"))
+        if (methodName.Equals("PenTriggerPressed"))
         {
+            isPainting = true;
             CreateNewLine();
         }
-        else if(methodName.Equals("PenAddLinePoint"))
+        else if(methodName.Equals("PenTriggerReleased"))
         {
-            AddNewLinePoint();
+            isPainting = false;
         }
         else if(methodName.Equals("ChangeColorPen"))
         {
@@ -153,6 +157,8 @@ public class ThreeDPen : MonoBehaviour
         pl.SetPoints(new List<PolylinePoint>());
 
         currentLine = pl;
+
+        lastPenPos = transform.position;
     }
 
     private void AddNewLinePoint()
