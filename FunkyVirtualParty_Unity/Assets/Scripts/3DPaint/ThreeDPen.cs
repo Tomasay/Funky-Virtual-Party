@@ -20,6 +20,9 @@ public class ThreeDPen : MonoBehaviour
     [SerializeField]
     MeshRenderer tipMesh, baseMesh;
 
+    [SerializeField]
+    PaintPalette palette;
+
 #if UNITY_ANDROID
     [SerializeField]
     Collider col, tipCol;
@@ -61,6 +64,7 @@ public class ThreeDPen : MonoBehaviour
     {
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
 #endif
 
         tipMesh.material.color = currentColor;
@@ -123,13 +127,6 @@ public class ThreeDPen : MonoBehaviour
         {
             isPainting = false;
         }
-        else if(methodName.Equals("ChangeColorPen"))
-        {
-            if (ColorUtility.TryParseHtmlString(data, out Color col))
-            {
-                ChangeColor(col);
-            }
-        }
         else if (methodName.Equals("PenDisable"))
         {
             SetActive(false);
@@ -137,6 +134,14 @@ public class ThreeDPen : MonoBehaviour
         else if (methodName.Equals("PenEnable"))
         {
             SetActive(true);
+        }
+    }
+
+    void MethodCalledFromServer(string methodName, byte data)
+    {
+        if(methodName.Equals("ChangeColorPen"))
+        {
+            ChangeColor(data);
         }
     }
 #endif
@@ -180,20 +185,20 @@ public class ThreeDPen : MonoBehaviour
         }
     }
 
-    public void ChangeColor(Color c)
+    public void ChangeColor(int c)
     {
 #if UNITY_ANDROID
         if (IsInHand)
         {
-            currentColor = c;
-            tipMesh.material.color = c;
+            currentColor = palette.colors[c];
+            tipMesh.material.color = palette.colors[c];
 
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorPen", "#" + ColorUtility.ToHtmlStringRGB(c));
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "ChangeColorPen", (byte)c);
         }
 #endif
 #if UNITY_WEBGL
-            currentColor = c;
-            tipMesh.material.color = c;
+            currentColor = palette.colors[c];
+            tipMesh.material.color = palette.colors[c];
 #endif
     }
 

@@ -1159,6 +1159,7 @@ MonoBehaviour:
   inputTimerText: {fileID: 2098095986}
   paintTexture: {fileID: 688776770}
   pen: {fileID: 785370523}
+  sprayGun: {fileID: 0}
   inputCanvas: {fileID: 1672220640}
   guessingCanvas: {fileID: 813496879}
   resultsCanvas: {fileID: 840057276}
@@ -2104,6 +2105,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 520085263151131527, guid: 5bb7b86762309b74db8f8ebb87312b82, type: 3}
+      propertyPath: palette
+      value: 
+      objectReference: {fileID: 1383644111}
     - target: {fileID: 520085263151131527, guid: 5bb7b86762309b74db8f8ebb87312b82, type: 3}
       propertyPath: linesParent
       value: 
@@ -4467,6 +4472,17 @@ PrefabInstance:
       objectReference: {fileID: 336327243}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc473dc34e1e81e4fb9437d721766f24, type: 3}
+--- !u!114 &1383644111 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7917851678495994891, guid: dc473dc34e1e81e4fb9437d721766f24, type: 3}
+  m_PrefabInstance: {fileID: 1383644110}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33e0b7c1495db1743b6169cd1760b184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1418639913
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5099,6 +5115,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1300721514481495184, guid: eda20cd5bd4e7e940a43dafdbf2f905e, type: 3}
+      propertyPath: palette
+      value: 
+      objectReference: {fileID: 1383644111}
     - target: {fileID: 2215475341305339491, guid: eda20cd5bd4e7e940a43dafdbf2f905e, type: 3}
       propertyPath: handAnchorLeft
       value: 

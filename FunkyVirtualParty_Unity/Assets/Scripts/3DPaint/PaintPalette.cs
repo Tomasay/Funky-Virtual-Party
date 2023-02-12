@@ -5,8 +5,7 @@ using UnityEngine.Events;
 
 public class PaintPalette : MonoBehaviour
 {
-    [SerializeField]
-    Color[] colors;
+    public Color[] colors;
 
     [SerializeField]
     MeshRenderer[] colorMeshes;
@@ -27,7 +26,7 @@ public class PaintPalette : MonoBehaviour
     [SerializeField]
     ThreeDPen pen;
 
-    Color colorToSet;
+    int colorToSet;
 #endif
 
     void Start()
@@ -37,7 +36,7 @@ public class PaintPalette : MonoBehaviour
             colorMeshes[i].material.color = colors[i];
 #if UNITY_ANDROID
             var i2 = i;
-            colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(colors[i2]); });
+            colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(i2); });
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(ColorPressed);
 #endif
         }
@@ -51,9 +50,9 @@ public class PaintPalette : MonoBehaviour
     }
 
 #if UNITY_ANDROID
-    void SetColor(Color c)
+    void SetColor(int colorIndex)
     {
-        colorToSet = c;
+        colorToSet = colorIndex;
     }
 
     void ColorPressed(Collider other)
