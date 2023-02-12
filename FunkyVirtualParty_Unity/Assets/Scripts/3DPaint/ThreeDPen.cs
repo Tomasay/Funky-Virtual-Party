@@ -69,7 +69,7 @@ public class ThreeDPen : MonoBehaviour
     void Update()
     {
 #if UNITY_ANDROID
-        if (isPainting && (rb.velocity.magnitude > 0.1f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
+        if (isPainting && (rb.velocity.magnitude > 0.025f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             OnDraw.Invoke();
@@ -164,9 +164,12 @@ public class ThreeDPen : MonoBehaviour
     private void AddNewLinePoint()
     {
         Vector3 pos = currentLine.transform.InverseTransformPoint(tip.position);
-        currentLine.AddPoint(pos);
-        currentPointCount++;
-        lastPointTime = Time.time;
+        if (currentLine.Count == 0 || Vector3.Distance(currentLine.points[currentLine.points.Count-1].point, pos) > 0.01f)
+        {
+            currentLine.AddPoint(pos);
+            currentPointCount++;
+            lastPointTime = Time.time;
+        }
     }
 
     public void EraseAllLines()
