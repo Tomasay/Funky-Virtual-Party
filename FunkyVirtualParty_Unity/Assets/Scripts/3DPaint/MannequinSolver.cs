@@ -4,9 +4,15 @@ using UnityEngine;
 using System;
 using System.IO;
 using RootMotion.FinalIK;
+using Autohand;
 
 public class MannequinSolver : MonoBehaviour
 {
+    //From testing, this was the center eye height and rig scale that felt accurate
+    //Using this to determing rig scale for people of other heights
+    private const float REFERENCE_HEIGHT = 1.7f;
+    private const float REFERENCE_SCALE = 0.425f;
+
     [SerializeField]
     VRIK followIK, mannequinIK;
 
@@ -100,5 +106,14 @@ public class MannequinSolver : MonoBehaviour
             mannequinIK.transform.position += new Vector3(0, posingHeightOffset, 0);
             poseHeightAdjusted = true;
         }
+
+        UpdateHeight();
+    }
+
+    void UpdateHeight()
+    {
+        float newScale = (AutoHandPlayer.Instance.playerHeight * REFERENCE_SCALE) / REFERENCE_HEIGHT;
+        character.localScale = new Vector3(newScale, newScale, newScale);
+        followIK.solver.scale = newScale;
     }
 }
