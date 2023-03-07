@@ -330,7 +330,7 @@ public class ClientManager : MonoBehaviour
 #if UNITY_EDITOR
             if(isDebug)
             {
-                StartCoroutine("AddDebugDelayed", byteID);
+                StartCoroutine("AddDebugDelayed", socketID);
             }
 #endif
         }

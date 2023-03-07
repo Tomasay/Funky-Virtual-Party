@@ -52,7 +52,7 @@ public class TutorialMenu : MonoBehaviour
         {
             if (cp.isDebugPlayer)
             {
-                ClientManager.instance.Manager.Socket.Emit("ReadyUpDebug", cp.PlayerSocketID);
+                ClientManager.instance.Manager.Socket.Emit("ReadyUpDebug", cp.PlayerByteID);
             }
         }
     }
