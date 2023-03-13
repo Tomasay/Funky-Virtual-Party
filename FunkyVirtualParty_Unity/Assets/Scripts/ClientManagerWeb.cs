@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using BestHTTP;
 using BestHTTP.SocketIO3;
+using BestHTTP.SocketIO3.Parsers;
 using TMPro;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
@@ -49,6 +50,8 @@ public class ClientManagerWeb : MonoBehaviour
         if (!instance)
         {
             manager = new SocketManager(new Uri(socketUrl));
+            manager.Parser = new MsgPackParser();
+
             manager.Socket.On<bool>("joinedRoom", JoinRoomCheck);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, byte>("assignPlayerByteIDClient", AssignPlayerByteID);

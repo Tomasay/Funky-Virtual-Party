@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System;
 using BestHTTP;
 using BestHTTP.SocketIO3;
+using BestHTTP.SocketIO3.Parsers;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Events;
@@ -74,6 +75,7 @@ public class ClientManager : MonoBehaviour
             Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
 
             manager = new SocketManager(new Uri(socketUrl));
+            manager.Parser = new MsgPackParser();
             passcode = GenerateCode();
             Debug.Log("PASSCODE: " + passcode);
             manager.Socket.Emit("unityJoinRoom", passcode);
