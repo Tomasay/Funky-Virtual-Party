@@ -79,7 +79,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("input", target.x, target.y, PlayerByteID);
+                ClientManagerWeb.instance.Manager.Socket.Emit("IS", target.x, target.y, PlayerByteID);
             }
 
             Move(target.x, target.y);

@@ -176,11 +176,6 @@ public class XRSyncer : MonoBehaviour
 
         byte[] bytes = Serialize();
 
-        //string json = JsonUtility.ToJson(currentData);
-        //Debug.Log("Size of json: " + json.Length * sizeof(char) + "   size of byte array: " + bytes.Length);
-        //Debug.Log("size of byte array: " + bytes.Length);
-        //Debug.Log("size of custom byte array: " + Serialize().Length);
-
         if (ClientManager.instance)
         {
             ClientManager.instance.Manager.Socket.Emit("XS", bytes);

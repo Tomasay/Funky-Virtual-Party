@@ -20,11 +20,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
     [SerializeField] CinemachineVirtualCamera cinemachineCam;
     [SerializeField] Camera cam;
 
-    private void Awake()
-    {
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-    }
-
     protected override void Start()
     {
         base.Start();
@@ -108,22 +103,5 @@ public class ShootoutGameManagerWeb : GameManagerWeb
         yield return new WaitForSeconds(3);
 
         ClientManagerWeb.instance.LoadMainMenu();
-    }
-
-    void MethodCalledFromServer(string methodName, string data)
-    {
-        if (methodName.Equals("GenerateVoxels"))
-        {
-            StartCoroutine("GenerateVoxelsCorouting", data);
-        }
-    }
-
-    IEnumerator GenerateVoxelsCorouting(string data)
-    {
-        Debug.Log("Coroutine starting");
-        yield return new WaitForSeconds(0);
-
-        UpdateVoxelsData newData = JsonUtility.FromJson<UpdateVoxelsData>(data);
-        VoxelChunk.GenerateVoxels(digger, newData.heightarray, newData.chunkAltitude, ref newData.voxelArray);
     }
 }
