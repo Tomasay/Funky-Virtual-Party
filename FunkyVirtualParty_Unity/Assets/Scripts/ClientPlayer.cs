@@ -102,7 +102,7 @@ public class ClientPlayer : MonoBehaviour
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("input", input.x, input.y, PlayerByteID);
+                ClientManagerWeb.instance.Manager.Socket.Emit("IS", input.x, input.y, PlayerByteID);
             }
 
             Move(input.x, input.y);

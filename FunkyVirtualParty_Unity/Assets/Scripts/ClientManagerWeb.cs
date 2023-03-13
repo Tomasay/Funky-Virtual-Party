@@ -56,7 +56,7 @@ public class ClientManagerWeb : MonoBehaviour
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, byte>("assignPlayerByteIDClient", AssignPlayerByteID);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-            manager.Socket.On<float, float, byte>("toUnity", OnInputReceived);
+            manager.Socket.On<float, float, byte>("IC", OnInputReceived);
             manager.Socket.On<byte>("action", OnAction);
             manager.Socket.On<string, byte[]>("playerInfoToClient", playerInfoReceived);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);

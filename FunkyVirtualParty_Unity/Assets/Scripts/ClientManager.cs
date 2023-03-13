@@ -83,7 +83,7 @@ public class ClientManager : MonoBehaviour
 
             manager.Socket.Once("connect", () => Debug.Log("connected!"));
 
-            manager.Socket.On<float, float, byte>("toUnity", OnInputReceived);
+            manager.Socket.On<float, float, byte>("IC", OnInputReceived);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<byte>("readyUp", OnReadyUp);
