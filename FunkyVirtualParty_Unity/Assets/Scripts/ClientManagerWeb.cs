@@ -4,9 +4,11 @@ using UnityEngine;
 using System;
 using BestHTTP;
 using BestHTTP.SocketIO3;
+using BestHTTP.SocketIO3.Parsers;
 using TMPro;
 using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class ClientManagerWeb : MonoBehaviour
 {
@@ -48,18 +50,21 @@ public class ClientManagerWeb : MonoBehaviour
         if (!instance)
         {
             manager = new SocketManager(new Uri(socketUrl));
+            manager.Parser = new MsgPackParser();
+
             manager.Socket.On<bool>("joinedRoom", JoinRoomCheck);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
+            manager.Socket.On<string, byte>("assignPlayerByteIDClient", AssignPlayerByteID);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-            manager.Socket.On<float, float, string>("toUnity", OnInputReceived);
-            manager.Socket.On<string>("action", OnAction);
-            manager.Socket.On<string, string[]>("playerInfoToClient", playerInfoReceived);
+            manager.Socket.On<float, float, byte>("IC", OnInputReceived);
+            manager.Socket.On<byte>("action", OnAction);
+            manager.Socket.On<string, byte[]>("playerInfoToClient", playerInfoReceived);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
-            manager.Socket.On<string, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
+            manager.Socket.On<byte, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
             manager.Socket.On("roomClosed", ReloadPage);
             manager.Socket.On<string>("minigameStart", LoadGame);
             manager.Socket.On("readyUpVR", OnVRReadyUp);
-            manager.Socket.On<string>("readyUp", OnReadyUp);
+            manager.Socket.On<byte>("readyUp", OnReadyUp);
 
             DontDestroyOnLoad(gameObject);
 
@@ -86,7 +91,12 @@ public class ClientManagerWeb : MonoBehaviour
         //manager.Socket.Once("connect", () => Debug.Log("connected!"));
     }
 
-    public void playerInfoReceived(string host, string[] players)
+    public void AssignPlayerByteID(string socketId, byte byteId)
+    {
+        GetPlayerBySocketID(socketId).PlayerByteID = byteId;
+    }
+
+    public void playerInfoReceived(string host, byte[] players)
     {
         hostID = host;
 
@@ -95,24 +105,12 @@ public class ClientManagerWeb : MonoBehaviour
             return;
         }
 
-        //Parse players string
-        char[] delims = new[] { '\n' };
-        foreach (string s in players)
-        {
-            string[] attributes = s.Split(delims, StringSplitOptions.RemoveEmptyEntries);
-
-            OnClientConnect(attributes[0], attributes[1], attributes[2]);
-
-            if (int.TryParse(attributes[4], out int parsedHead) && float.TryParse(attributes[5], out float parsedHeight) && int.TryParse(attributes[6], out int parsedHatIndex))
-            {
-                SyncCustomizations(attributes[0], attributes[3], parsedHead, parsedHeight, parsedHatIndex);
-            }
-        }
+        DeserializePlayersInfo(players);
     }
 
-    public void SyncPlayerPos(string id, float x, float y, float z, bool lerp)
+    public void SyncPlayerPos(byte id, float x, float y, float z, bool lerp)
     {
-        ClientPlayer cp = GetPlayerByID(id);
+        ClientPlayer cp = GetPlayerByByteID(id);
 
         //If player is too far away from real position, override lerp
         /*
@@ -128,7 +126,7 @@ public class ClientManagerWeb : MonoBehaviour
         }
         else
         {
-            //GetPlayerByID(id).transform.position = Vector3.Lerp(GetPlayerByID(id).transform.position, new Vector3(x, y, z), Time.deltaTime);
+            //cp.transform.position = Vector3.Lerp(GetPlayerByID(id).transform.position, new Vector3(x, y, z), Time.deltaTime);
             cp.posFromHost = new Vector3(x, y, z);
         }
     }
@@ -136,14 +134,14 @@ public class ClientManagerWeb : MonoBehaviour
     public void ActionButtonPressed()
     {
         localPlayer.Action();
-        manager.Socket.Emit("Action");
+        manager.Socket.Emit("Action", LocalPlayer.PlayerByteID);
     }
 
-    private void OnAction(string id)
+    private void OnAction(byte id)
     {
-        if (GetPlayerByID(id))
+        if (GetPlayerByByteID(id))
         {
-            GetPlayerByID(id).Action();
+            GetPlayerByByteID(id).Action();
         }
     }
 
@@ -168,7 +166,7 @@ public class ClientManagerWeb : MonoBehaviour
         ClientPlayer newPlayer = Instantiate(playerPrefab).GetComponent<ClientPlayer>();
 
         players.Add(newPlayer);
-        newPlayer.PlayerID = id;
+        newPlayer.PlayerSocketID = id;
         newPlayer.PlayerName = name;
 
         if(players.Count == 1) //If this is the first player added, it is local
@@ -185,6 +183,11 @@ public class ClientManagerWeb : MonoBehaviour
             onClientConnect(newPlayer.gameObject);
         }
     }
+    private void OnClientConnect(string id, byte byteId, string ip, string name)
+    {
+        OnClientConnect(id, ip, name);
+        GetPlayerBySocketID(id).PlayerByteID = byteId;
+    }
 
     public event Action<string> onClientDisonnect;
     private void OnClientDisconnect(string id, string ip)
@@ -196,10 +199,10 @@ public class ClientManagerWeb : MonoBehaviour
             ReloadPage();
         }
 
-        if (GetPlayerByID(id))
+        if (GetPlayerBySocketID(id))
         {
-            Destroy(GetPlayerByID(id).gameObject);
-            players.Remove(GetPlayerByID(id));
+            Destroy(GetPlayerBySocketID(id).gameObject);
+            players.Remove(GetPlayerBySocketID(id));
         }
 
         if (onClientDisonnect != null)
@@ -210,26 +213,34 @@ public class ClientManagerWeb : MonoBehaviour
 
     private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
     {
-        GetPlayerByID(id).SetCustomizations(color, headShape, height, hatIndex);
+        GetPlayerBySocketID(id).SetCustomizations(color, headShape, height, hatIndex);
     }
 
-    public ClientPlayer GetPlayerByID(string id)
+    public ClientPlayer GetPlayerBySocketID(string id)
     {
         foreach (ClientPlayer p in players)
         {
-            if (p.PlayerID.Equals(id))
+            if (p.PlayerSocketID.Equals(id))
                 return p;
         }
 
         return null;
     }
 
-    private void OnInputReceived(float x, float y, string id)
+    public ClientPlayer GetPlayerByByteID(byte id)
     {
-        if (GetPlayerByID(id))
+        foreach (ClientPlayer p in players)
         {
-            GetPlayerByID(id).Move(x, y);
+            if (p.PlayerByteID == id)
+                return p;
         }
+
+        return null;
+    }
+
+    private void OnInputReceived(float x, float y, byte id)
+    {
+        GetPlayerByByteID(id)?.Move(x, y);
     }
 
     public event Action onVRReadyUp;
@@ -242,11 +253,11 @@ public class ClientManagerWeb : MonoBehaviour
     }
 
     public event Action<ClientPlayer> onReadyUp;
-    private void OnReadyUp(string id)
+    private void OnReadyUp(byte id)
     {
         if (onReadyUp != null)
         {
-            onReadyUp(GetPlayerByID(id));
+            onReadyUp(GetPlayerByByteID(id));
         }
     }
 
@@ -304,7 +315,8 @@ public class ClientManagerWeb : MonoBehaviour
     {
         for (int i = 0; i < players.Count; i++)
         {
-            string ID = players[i].PlayerID;
+            string socketID = players[i].PlayerSocketID;
+            byte byteID = players[i].PlayerByteID;
             string playerName = players[i].PlayerName;
             Color playerColor = players[i].PlayerColor;
             int playerHeadType = players[i].PlayerHeadType;
@@ -314,7 +326,8 @@ public class ClientManagerWeb : MonoBehaviour
 
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
-            players[i].PlayerID = ID;
+            players[i].PlayerSocketID = socketID;
+            players[i].PlayerByteID = byteID;
             players[i].PlayerName = playerName;
             players[i].PlayerColor = playerColor;
             players[i].PlayerHeadType = playerHeadType;
@@ -333,7 +346,24 @@ public class ClientManagerWeb : MonoBehaviour
                 players[i].transform.localPosition = Vector3.zero;
             }
 
-            manager.Socket.Emit("requestPlayerPosFromClient", ID);
+            manager.Socket.Emit("requestPlayerPosFromClient", byteID);
+        }
+    }
+
+    public void DeserializePlayersInfo(byte[] data)
+    {
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                byte count = reader.ReadByte();
+                for (int i = 0; i < count; i++)
+                {
+                    string playerSocketID = reader.ReadString();
+                    OnClientConnect(playerSocketID, reader.ReadByte(), reader.ReadString(), reader.ReadString());
+                    GetPlayerBySocketID(playerSocketID).SetCustomizations(reader.ReadString(), reader.ReadSByte(), reader.ReadSingle(), reader.ReadSByte());
+                }
+            }
         }
     }
 }

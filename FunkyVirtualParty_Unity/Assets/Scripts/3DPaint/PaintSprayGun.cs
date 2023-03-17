@@ -25,6 +25,9 @@ public class PaintSprayGun : MonoBehaviour
     [SerializeField]
     MeshRenderer baseMesh;
 
+    [SerializeField]
+    PaintPalette palette;
+
 #if UNITY_ANDROID
     [SerializeField]
     Collider col;
@@ -45,6 +48,7 @@ public class PaintSprayGun : MonoBehaviour
     {
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
 #endif
 
         paintColorMat.color = colors[colorIndex];
@@ -89,13 +93,6 @@ public class PaintSprayGun : MonoBehaviour
         {
             ps.Stop();
         }
-        else if(methodName.Equals("ChangeColorSprayGun"))
-        {
-            if (ColorUtility.TryParseHtmlString(data, out Color col))
-            {
-                ChangeColor(col);
-            }
-        }
         else if (methodName.Equals("SprayGunDisable"))
         {
             SetActive(false);
@@ -105,24 +102,32 @@ public class PaintSprayGun : MonoBehaviour
             SetActive(true);
         }
     }
+
+    void MethodCalledFromServer(string methodName, byte data)
+    {
+        if(methodName.Equals("ChangeColorSprayGun"))
+        {
+            ChangeColor(data);
+        }
+    }
 #endif
 
-    public void ChangeColor(Color c)
+    public void ChangeColor(int c)
     {
 #if UNITY_ANDROID
         if (IsInHand)
         {
-            paintColorMat.color = c;
-            ps.startColor = c;
-            paintSphere.Color = c;
+            paintColorMat.color = palette.colors[c];
+            ps.startColor = palette.colors[c];
+            paintSphere.Color = palette.colors[c];
 
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ChangeColorSprayGun", "#" + ColorUtility.ToHtmlStringRGB(c));
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "ChangeColorSprayGun", (byte)c);
         }
 #endif
 #if UNITY_WEBGL
-            paintColorMat.color = c;
-            ps.startColor = c;
-            paintSphere.Color = c;
+            paintColorMat.color = palette.colors[c];
+            ps.startColor = palette.colors[c];
+            paintSphere.Color = palette.colors[c];
 #endif
     }
 

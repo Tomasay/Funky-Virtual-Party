@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Cinemachine;
+using System;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
+
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
@@ -13,18 +17,13 @@ public class ShootoutGameClientPlayer : ClientPlayer
         [DllImport("__Internal")]
         private static extern void TriggerHaptic(int hapticTime);
 #endif
-
-    class WaterSplashData
-    {
-        public Vector3 splashPos; //Where the splash should display
-        public string playerID; //Player who died
-    }
-
     public UnityEvent OnDeath;
     public bool isColliding = false;
     float collisionTimer = 0.5f;
     const float collisionTimerDefault = 1;
     Vector2 collisionVector;
+
+    private SerializedVector3 splashPos;
 
     const float frictionCoefficient = 0.015f;
 
@@ -37,6 +36,46 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     public bool isAlive = true;
 
+#if !UNITY_WEBGL
+    public byte[] SerializeSplashData()
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(PlayerByteID);
+                writer.Write(splashPos);
+            }
+            return m.ToArray();
+        }
+    }
+#endif
+
+#if UNITY_WEBGL
+    public void DeserializeSplashData(byte[] data)
+    {
+        ShootoutGameClientPlayer player;
+        Vector3 playerSplashPos;
+
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                player = ClientManagerWeb.instance.GetPlayerByByteID(reader.ReadByte()) as ShootoutGameClientPlayer;
+                playerSplashPos = reader.ReadVector3();
+            }
+        }
+
+        //Kill corresponding player
+        player.SetPlayerActive(false);
+        player.isAlive = false;
+        player.TriggerIceCubeAnimation();
+        SpawnSplashEffect(playerSplashPos);
+
+        TriggerHaptic(500);
+    }
+#endif
+
     protected override void Awake()
     {
         startingSpeed = 1.5f;
@@ -44,7 +83,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         base.Awake();
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
+        ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
 #endif
     }
 
@@ -53,17 +92,14 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         if (other.tag.Equals("Water"))
         {
-            Vector3 pos = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
-            SpawnSplashEffect(pos);
+            splashPos = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
+            SpawnSplashEffect(splashPos);
             SetPlayerActive(false);
             TriggerIceCubeAnimation();
             isAlive = false;
             OnDeath.Invoke();
 
-            WaterSplashData data = new WaterSplashData();
-            data.splashPos = pos;
-            data.playerID = playerID;
-            if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "WaterSplashEvent", JsonUtility.ToJson(data));
+            if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData());
         }
     }
 #endif
@@ -87,7 +123,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if(isDebugPlayer && isColliding)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, playerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, PlayerByteID);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -110,7 +146,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("input", target.x, target.y);
+                ClientManagerWeb.instance.Manager.Socket.Emit("IS", target.x, target.y, PlayerByteID);
             }
 
             Move(target.x, target.y);
@@ -123,7 +159,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if (IsLocal && isColliding)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f);
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, PlayerByteID);
             Move(collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, false);
 
             Vector3 positionDifference = posFromHost - transform.position;   
@@ -146,7 +182,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, playerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, PlayerByteID);
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -161,7 +197,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("input", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2 );
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, PlayerByteID);
             Move(collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, false);
 
             Vector3 positionDifference = posFromHost - transform.position;
@@ -226,22 +262,11 @@ public class ShootoutGameClientPlayer : ClientPlayer
     }
 
 #if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
+    void MethodCalledFromServer(string methodName, byte[] data)
     {
         if (methodName.Equals("WaterSplashEvent"))
         {
-            //Trigger splash visual
-            WaterSplashData newData = JsonUtility.FromJson<WaterSplashData>(data);
-            SpawnSplashEffect(newData.splashPos);
-
-            //Kill corresponding player
-            ShootoutGameClientPlayer player = ClientManagerWeb.instance.GetPlayerByID(newData.playerID) as ShootoutGameClientPlayer;
-            player.SetPlayerActive(false);
-            player.isAlive = false;
-
-            player.TriggerIceCubeAnimation();
-
-            TriggerHaptic(500);
+            DeserializeSplashData(data);
         }
     }
 #endif

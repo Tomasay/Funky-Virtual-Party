@@ -192,7 +192,7 @@ public class KaijuGameManager : GameManager
 
     public override void OnAction(string id)
     {
-        ClientManager.instance.GetPlayerByID(id).GetComponent<KaijuGameClientPlayer>().Action();
+        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<KaijuGameClientPlayer>().Action();
     }
 
     private void SetVRPlayerCanThrowFireballs(bool canThrow)

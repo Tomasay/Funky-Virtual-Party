@@ -21,4 +21,7 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
 
     //The amount of time the VR player gets to draw
     public const int DRAW_TIME_AMOUNT = 120;
+
+    //The amount of time clients get to answer the prompt
+    public const int CLIENT_ANSWER_TIME_AMOUNT = 30;
 }

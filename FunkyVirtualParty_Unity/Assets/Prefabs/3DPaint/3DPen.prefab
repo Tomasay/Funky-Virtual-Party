@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 7458268346312224144}
   - component: {fileID: 7458268346312224140}
   - component: {fileID: 1114771459}
-  - component: {fileID: 5638921700144599754}
+  - component: {fileID: 6838958927684297173}
   - component: {fileID: 2750476897794741687}
   - component: {fileID: 4189939568797337253}
   m_Layer: 29
@@ -305,8 +305,8 @@ MonoBehaviour:
   tipCol: {fileID: 7957478968766357229}
   rb: {fileID: 7458268346312224145}
   gm: {fileID: 0}
+  ahp: {fileID: 0}
   active: 0
-  canPaint: 1
   OnDraw:
     m_PersistentCalls:
       m_Calls: []
@@ -428,7 +428,7 @@ MonoBehaviour:
     - {x: 0.03956462, y: -0.362823, z: -0.00011716784, w: 0.9310178}
     - {x: -0.000008029863, y: 0.0000010747461, z: -0.0000007860363, w: 1}
   leftPoseSet: 1
---- !u!114 &5638921700144599754
+--- !u!114 &6838958927684297173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -437,11 +437,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7728315887617822915}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fd35b5818f80534b918bc892d617062, type: 3}
+  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   objectID: 2
-  UpdatesPerSecond: 10
+  UpdatesPerSecond: 0
+  grabbable: {fileID: 7458268346312224144}
+  simulatePhysicsOnDrop: 1
+  rb: {fileID: 7458268346312224145}
 --- !u!114 &2750476897794741687
 MonoBehaviour:
   m_ObjectHideFlags: 0

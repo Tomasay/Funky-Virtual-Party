@@ -19,7 +19,7 @@ MonoBehaviour:
     Data3: -242444367
     Data4: -1868836969
   Banks:
-  - {fileID: 8547906298644744342}
+  - {fileID: 1786547578719203088}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -42,10 +42,30 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638023877161694896
+  lastModified: 638120151082894596
   FileSizes:
   - Name: Desktop
-    Value: 812
+    Value: 1192
+  Exists: 1
+--- !u!114 &-1060322754376276002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Music.bank
+  m_EditorClassIdentifier: 
+  Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Music.bank
+  Name: Music
+  StudioPath: bank:/Music
+  lastModified: 638120151083084583
+  FileSizes:
+  - Name: Desktop
+    Value: 1416128
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -62,16 +82,48 @@ MonoBehaviour:
   EditorBanks:
   - {fileID: -1657200388165055800}
   - {fileID: 8547906298644744342}
+  - {fileID: -1060322754376276002}
+  - {fileID: 1786547578719203088}
   EditorEvents:
   - {fileID: 596740172380866313}
   - {fileID: -3489532395887286795}
+  - {fileID: 8064383923443113136}
+  - {fileID: 397026873310947440}
+  - {fileID: 3828734369981536026}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8547906298644744342}
   StringsBanks:
   - {fileID: -1657200388165055800}
-  cacheTime: 638023877161694896
+  cacheTime: 638120151083264579
   cacheVersion: 131591
+--- !u!114 &397026873310947440
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Drop
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Drop
+  Guid:
+    Data1: -1170112543
+    Data2: 1211202973
+    Data3: -5967942
+    Data4: 199298461
+  Banks:
+  - {fileID: 1786547578719203088}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &596740172380866313
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -91,14 +143,88 @@ MonoBehaviour:
     Data3: -824086365
     Data4: -1260558855
   Banks:
-  - {fileID: 8547906298644744342}
+  - {fileID: -1060322754376276002}
   IsStream: 1
-  Is3D: 1
+  Is3D: 0
   IsOneShot: 0
   Parameters: []
   MinDistance: 1
   MaxDistance: 20
-  Length: 109766
+  Length: 60000
+--- !u!114 &1786547578719203088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/SFX.bank
+  m_EditorClassIdentifier: 
+  Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/SFX.bank
+  Name: SFX
+  StudioPath: bank:/SFX
+  lastModified: 638120151083264579
+  FileSizes:
+  - Name: Desktop
+    Value: 7488
+  Exists: 1
+--- !u!114 &3828734369981536026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Click
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Click
+  Guid:
+    Data1: 1082199966
+    Data2: 1334357978
+    Data3: -1714055296
+    Data4: -279343191
+  Banks:
+  - {fileID: 1786547578719203088}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &8064383923443113136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Music/Lobby
+  m_EditorClassIdentifier: 
+  Path: event:/Music/Lobby
+  Guid:
+    Data1: 543308897
+    Data2: 1142858616
+    Data3: -424045141
+    Data4: 1591998684
+  Banks:
+  - {fileID: -1060322754376276002}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 45375
 --- !u!114 &8547906298644744342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,8 +240,8 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638023877161684886
+  lastModified: 638120151082879578
   FileSizes:
   - Name: Desktop
-    Value: 1524352
+    Value: 1588
   Exists: 1

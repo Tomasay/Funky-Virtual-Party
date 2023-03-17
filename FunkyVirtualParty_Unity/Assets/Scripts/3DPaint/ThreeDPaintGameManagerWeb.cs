@@ -28,15 +28,20 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     TMP_Text headerText;
 
     [SerializeField]
-    TMP_Text timerText;
+    TMP_Text timerText, inputTimerText;
     float drawTimeRemaining;
-    bool timerCountingDown;
+    bool drawTimerCountingDown;
+    float answerTimeRemaining;
+    bool answerTimerCountingDown;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
     ThreeDPen pen;
+
+    [SerializeField]
+    PaintSprayGun sprayGun;
 
     [SerializeField]
     Canvas inputCanvas, guessingCanvas, resultsCanvas, leaderboardCanvas;
@@ -69,6 +74,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     GameObject leaderboardPlayerCardPrefab, leaderboardParent;
     List<GameObject> currentLeaderboardCards;
 
+    private ThreeDPaintGameState state;
+    public ThreeDPaintGameState State { get => state; set => state = value; }
+
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
     bool guessing = false; //Are players guessing?
@@ -100,7 +108,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
             foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
             {
-                playerPoints.Add(cp.PlayerID, 0);
+                playerPoints.Add(cp.PlayerSocketID, 0);
             }
         }
 
@@ -123,10 +131,16 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
         }
 
-        if(timerCountingDown && drawTimeRemaining >= 0)
+        if(drawTimerCountingDown && drawTimeRemaining >= 0)
         {
             drawTimeRemaining -= Time.deltaTime;
             timerText.text = FormatTime(drawTimeRemaining);
+        }
+
+        if (answerTimerCountingDown && answerTimeRemaining >= 0)
+        {
+            answerTimeRemaining -= Time.deltaTime;
+            inputTimerText.text = FormatTime(answerTimeRemaining);
         }
     }
 
@@ -176,7 +190,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
             drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
             timerText.text = FormatTime(drawTimeRemaining);
-            timerCountingDown = true;
+            drawTimerCountingDown = true;
 
             drawingPhaseCamera.gameObject.SetActive(true);
             guessingPhaseCamera.gameObject.SetActive(false);
@@ -192,7 +206,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
             guessingCanvas.enabled = true;
 
-            timerCountingDown = false;
+            drawTimerCountingDown = false;
 
             drawingPhaseCamera.gameObject.SetActive(false);
             guessingPhaseCamera.gameObject.SetActive(true);
@@ -254,6 +268,41 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         else if (methodName.Equals("VRDoneWithTutorial"))
         {
             vrTutorialCompleted = true;
+        }
+    }
+
+    protected override void OnStateChange(string s)
+    {
+        if (System.Enum.TryParse(s, out ThreeDPaintGameState newGameState))
+        {
+            State = newGameState;
+
+            switch (State)
+            {
+                case ThreeDPaintGameState.ClientsAnswering:
+                    answerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
+                    answerTimerCountingDown = true;
+                    break;
+                case ThreeDPaintGameState.VRPosing:
+                    headerText.text = "Waiting for VR player to set a pose...";
+                    break;
+                case ThreeDPaintGameState.VRPainting:
+                    break;
+                case ThreeDPaintGameState.ClientsGuessing:
+                    //Make sure there's no lingering drawings
+                    pen.CanPaint = false;
+                    sprayGun.CanPaint = false;
+                    break;
+                case ThreeDPaintGameState.VRGuessing:
+                    answerTimerCountingDown = false;
+                    break;
+                case ThreeDPaintGameState.ShowingLeaderboard:
+                    break;
+                case ThreeDPaintGameState.GameOver:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -321,7 +370,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             if (aob.playerID.Equals(answerPlayerID))
             {
                 ClientManagerWeb inst = ClientManagerWeb.instance;
-                aob.AddPlayerIcon(inst.GetPlayerByID(playerID).PlayerName, inst.GetPlayerByID(playerID).PlayerColor);
+                aob.AddPlayerIcon(inst.GetPlayerBySocketID(playerID).PlayerName, inst.GetPlayerBySocketID(playerID).PlayerColor);
                 return;
             }
         }
@@ -371,7 +420,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerByID(entry.Key).PlayerName;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerBySocketID(entry.Key).PlayerName;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 

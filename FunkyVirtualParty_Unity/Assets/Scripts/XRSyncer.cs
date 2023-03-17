@@ -100,7 +100,7 @@ public class XRSyncer : MonoBehaviour
         currentData = new XRData();
 
 #if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("XRDataToClient", ReceiveData);
+        ClientManagerWeb.instance.Manager.Socket.On<byte[]>("XC", ReceiveData);
 #endif
 
 #if !UNITY_WEBGL
@@ -176,14 +176,9 @@ public class XRSyncer : MonoBehaviour
 
         byte[] bytes = Serialize();
 
-        //string json = JsonUtility.ToJson(currentData);
-        //Debug.Log("Size of json: " + json.Length * sizeof(char) + "   size of byte array: " + bytes.Length);
-        //Debug.Log("size of byte array: " + bytes.Length);
-        //Debug.Log("size of custom byte array: " + Serialize().Length);
-
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("XRDataToServer", bytes);
+            ClientManager.instance.Manager.Socket.Emit("XS", bytes);
         }
     }
 #endif

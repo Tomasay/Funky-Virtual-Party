@@ -43,7 +43,7 @@ public class Marble : MonoBehaviour
 #if UNITY_ANDROID
         if (collision.gameObject.TryGetComponent<MazeGameClientPlayer>(out MazeGameClientPlayer player))
         {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MarbleCollision", player.PlayerID);
+            ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MarbleCollision", player.PlayerSocketID);
 
             player.Anim.SetTrigger("Fall");
             player.TriggerBlinkingAnimation(3);
