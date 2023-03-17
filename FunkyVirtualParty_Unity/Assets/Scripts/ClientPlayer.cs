@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
+using DG.Tweening;
 
 public class ClientPlayer : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class ClientPlayer : MonoBehaviour
 
     protected Vector3 movement;
     protected Quaternion lookRotation;
-    protected float startingSpeed = 5, speed;
+    protected float startingSpeed = 20, speed;
     protected bool canMove = true;
 
     public Vector3 posFromHost; //Current position from host, we need to sync to this if different
@@ -56,6 +57,8 @@ public class ClientPlayer : MonoBehaviour
     public Animator Anim { get => anim;}
     public Collider Col { get => col; }
     public SkinnedMeshRenderer Smr { get => smr; }
+
+    protected float inputPollRate = 0.05f;
 
 #if UNITY_EDITOR
     public bool isDebugPlayer;
@@ -88,31 +91,31 @@ public class ClientPlayer : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
 
         spinePos = spineBone.transform.localPosition;
+
+        InvokeRepeating("CheckInput", 0, inputPollRate);
     }
-    
-    protected virtual void Update()
+
+    private void OnDestroy()
+    {
+        CancelInvoke("CheckInput");
+    }
+
+    protected virtual void CheckInput()
     {
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            //Round to 2 decimal points
-            //input.x = Mathf.Round(input.x * 100) / 100;
-            //input.y = Mathf.Round(input.y * 100) / 100;
-
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
                 ClientManagerWeb.instance.Manager.Socket.Emit("IS", input.x, input.y, PlayerByteID);
+                Move(input.x, input.y);
             }
 
-            Move(input.x, input.y);
-
+            /*
             Vector3 positionDifference = posFromHost - transform.position;
-            transform.Translate((movement + positionDifference/4) * Time.deltaTime);
-        }
-        else
-        {
-            transform.Translate(movement * Time.deltaTime);
+            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+            */
         }
 
         // check if we are below the floor
@@ -122,8 +125,11 @@ public class ClientPlayer : MonoBehaviour
             GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
 
-        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+    }    
 
+    protected virtual void Update()
+    {
         if (Camera.main)
         {
             playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
@@ -271,7 +277,9 @@ public class ClientPlayer : MonoBehaviour
     {
         if (canMove)
         {
-            movement = new Vector3(x * speed, 0, y * speed);
+            movement = new Vector3(x * speed, 0, y * speed) * .01f;
+
+            transform.DOBlendableMoveBy(movement, inputPollRate);
 
             //Magnitude of movement for animations
             float val = Mathf.Abs(new Vector2(x, y).magnitude);
@@ -290,6 +298,7 @@ public class ClientPlayer : MonoBehaviour
                 if (lookDirection != Vector3.zero)
                 {
                     lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                    anim.transform.DORotateQuaternion(lookRotation, inputPollRate);
                 }
             }
         }

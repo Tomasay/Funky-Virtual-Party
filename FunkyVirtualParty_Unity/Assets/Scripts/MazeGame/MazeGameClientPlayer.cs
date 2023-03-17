@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
@@ -37,7 +38,9 @@ public class MazeGameClientPlayer : ClientPlayer
 
         if (canMove)
         {
-            movement = new Vector3(newInput.x, 0, newInput.z) * speed;
+            movement = new Vector3(x * speed, 0, y * speed) * .01f;
+
+            transform.DOBlendableMoveBy(movement * 0.01f, inputPollRate);
 
             //Magnitude of movement for animations
             float val = Mathf.Abs(newInput.magnitude);
@@ -62,7 +65,7 @@ public class MazeGameClientPlayer : ClientPlayer
         }
     }
 
-    protected override void Update()
+    protected override void CheckInput()
     {
         //Constantly update player rotation to be in line with maze board
         if(lastInput == Vector3.zero && maze)
@@ -72,7 +75,7 @@ public class MazeGameClientPlayer : ClientPlayer
         }
         lookRotation = Quaternion.LookRotation(lastInput, maze.transform.up);
 
-        base.Update();
+        base.CheckInput();
 
         //Keep player centered vertically in maze
         Vector3 localPos = transform.localPosition;

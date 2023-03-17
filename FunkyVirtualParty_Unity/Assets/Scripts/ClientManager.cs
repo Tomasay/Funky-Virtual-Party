@@ -94,7 +94,7 @@ public class ClientManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
         }
 
-        InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
+        //InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
 
 #if UNITY_EDITOR
         for (int i = 0; i < debugPlayersToAdd.Length; i++)

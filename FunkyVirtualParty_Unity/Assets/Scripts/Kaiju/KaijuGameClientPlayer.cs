@@ -24,7 +24,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 1;
+        startingSpeed = 2;
 
         base.Awake();
 
@@ -44,7 +44,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 #endif
 
     public Vector2 prevVector = Vector2.zero;
-    protected override void Update()
+    protected override void CheckInput()
     {
 #if UNITY_EDITOR
         if (isDebugPlayer && !isThrown)
@@ -80,21 +80,14 @@ public class KaijuGameClientPlayer : ClientPlayer
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
                 ClientManagerWeb.instance.Manager.Socket.Emit("IS", target.x, target.y, PlayerByteID);
+                Move(target.x, target.y);
             }
 
-            Move(target.x, target.y);
-
-            Vector3 positionDifference = posFromHost - transform.position;
-            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
             collisionTimer = collisionTimerDefault;
         }
         else if (IsLocal && isThrown)
         {
             // do not send input if held by VR player
-        }
-        else
-        { 
-            transform.Translate(movement * Time.deltaTime);
         }
 
         // check if we are below the floor
@@ -103,8 +96,11 @@ public class KaijuGameClientPlayer : ClientPlayer
             transform.position = posFromHost;
             GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
-        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+    }
 
+    protected override void Update()
+    {
         // Make the player name track to the camera
 #if UNITY_WEBGL
         playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);

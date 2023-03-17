@@ -25,7 +25,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     private SerializedVector3 splashPos;
 
-    const float frictionCoefficient = 0.015f;
+    const float frictionCoefficient = 0.075f;
 
     public Camera cam;
 
@@ -78,7 +78,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 1.5f;
+        startingSpeed = 15;
 
         base.Awake();
 
@@ -105,7 +105,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
 
     public Vector2 prevVector = Vector2.zero;
-    protected override void Update()
+    protected override void CheckInput()
     {
 #if UNITY_EDITOR
         if (isDebugPlayer && !isColliding)
@@ -123,7 +123,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if(isDebugPlayer && isColliding)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, PlayerByteID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -0.5f, collisionVector.normalized.y * -0.5f, PlayerByteID);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -147,23 +147,17 @@ public class ShootoutGameClientPlayer : ClientPlayer
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
                 ClientManagerWeb.instance.Manager.Socket.Emit("IS", target.x, target.y, PlayerByteID);
+                Move(target.x, target.y);
             }
 
-            Move(target.x, target.y);
-
-            Vector3 positionDifference = posFromHost - transform.position;
-            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
             collisionTimer = collisionTimerDefault;
 
             CheckIceTrailVisibility();
         }
         else if (IsLocal && isColliding)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, PlayerByteID);
-            Move(collisionVector.normalized.x * -1.25f, collisionVector.normalized.y * -1.25f, false);
-
-            Vector3 positionDifference = posFromHost - transform.position;   
-            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, PlayerByteID);
+            Move(collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, false);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -172,9 +166,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             }
         }
         else
-        { 
-            transform.Translate(movement * Time.deltaTime);
-
+        {
             CheckIceTrailVisibility();
         }
 
@@ -182,7 +174,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, PlayerByteID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, PlayerByteID);
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -197,11 +189,13 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, PlayerByteID);
-            Move(collisionVector.normalized.x * -2, collisionVector.normalized.y * -2, false);
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, PlayerByteID);
+            Move(collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, false);
 
+            /*
             Vector3 positionDifference = posFromHost - transform.position;
-            transform.Translate((movement + positionDifference / 4) * Time.deltaTime); 
+            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
+            */
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -219,7 +213,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             transform.position = posFromHost;
             GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
-        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
 
 #if UNITY_WEBGL
         playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);

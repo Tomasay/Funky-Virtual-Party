@@ -35,7 +35,7 @@ public class ChaseGameClientPlayer : ClientPlayer
         }
     }
 
-    protected override void Update()
+    protected override void CheckInput()
     {
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
@@ -54,16 +54,8 @@ public class ChaseGameClientPlayer : ClientPlayer
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
                 ClientManagerWeb.instance.Manager.Socket.Emit("IS", input.x, input.y, PlayerByteID);
+                Move(input.x, input.y);
             }
-
-            Move(input.x, input.y);
-
-            Vector3 positionDifference = posFromHost - transform.position;
-            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
-        }
-        else
-        {
-            transform.Translate(movement * Time.deltaTime);
         }
 
         // check if we are below the floor
@@ -73,8 +65,11 @@ public class ChaseGameClientPlayer : ClientPlayer
             GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
 
-        anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
+    }
 
+    protected override void Update()
+    {
 #if UNITY_WEBGL
         playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
 #else

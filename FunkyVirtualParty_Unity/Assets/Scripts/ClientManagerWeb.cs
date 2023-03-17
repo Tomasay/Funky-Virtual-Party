@@ -240,7 +240,10 @@ public class ClientManagerWeb : MonoBehaviour
 
     private void OnInputReceived(float x, float y, byte id)
     {
-        GetPlayerByByteID(id)?.Move(x, y);
+        if (LocalPlayer.PlayerByteID != id)
+        {
+            GetPlayerByByteID(id)?.Move(x, y);
+        }
     }
 
     public event Action onVRReadyUp;
