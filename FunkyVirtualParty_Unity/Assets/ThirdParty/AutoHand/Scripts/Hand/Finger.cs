@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 namespace Autohand{
     [HelpURL("https://earnestrobot.notion.site/Fingers-63ae83cda0b14a35b5ae15beeb51dc03")]
@@ -144,9 +145,22 @@ namespace Autohand{
                 fingerJoints[i].localRotation = Quaternion.Lerp(minGripRotPose[i], maxGripRotPose[i], bend);
             }
         }
-        
+
+        /// <summary>Forces the finger to a bend ignoring physics and offset. Uses DOTween to move smoothly</summary>
+        /// <param name="bend">0 is no bend / 1 is full bend</param>
+        /// <param name="duration">How long it takes to tween to the angle</param>
+        public void SetFingerBendTween(float bend, float duration)
+        {
+            this.bend = bend;
+            for (int i = 0; i < fingerJoints.Length; i++)
+            {
+                fingerJoints[i].DOLocalMove(Vector3.Lerp(minGripPosPose[i], maxGripPosPose[i], bend), duration);
+                fingerJoints[i].DOLocalRotateQuaternion(Quaternion.Lerp(minGripRotPose[i], maxGripRotPose[i], bend), duration);
+            }
+        }
+
         /// <summary>Sets the current finger to a bend without interfering with the target</summary>
-         /// <param name="bend">0 is no bend / 1 is full bend</param>
+        /// <param name="bend">0 is no bend / 1 is full bend</param>
         public void SetCurrentFingerBend(float bend) {
             currBendOffset = bend;
             for(int i = 0; i < fingerJoints.Length; i++) {
