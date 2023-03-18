@@ -27,6 +27,8 @@ public class KaijuGameManager : GameManager
     [SerializeField] private Transform[] debugWaypoints;
     private Vector3[] currentWaypoints;
     private float[] currentWaypointDistances;
+
+
 #endif
 
     protected override void Start()
@@ -34,16 +36,16 @@ public class KaijuGameManager : GameManager
         base.Start();
 
         timeRemaining = GAME_TIME_AMOUNT;
-        vrGameTimeText.text = FormatTime(timeRemaining);
+        //vrGameTimeText.text = FormatTime(timeRemaining);
 
-        /*if (ClientManager.instance)
+        if (ClientManager.instance)
         {
 
             foreach (ClientPlayer p in ClientManager.instance.Players)
             {
                 KaijuGameClientPlayer sp = (KaijuGameClientPlayer)p;
             }
-        }*/
+        }
 
         SetPlayerMovement(false);
         SetVRPlayerMovementDelayed(false, 1);
@@ -203,6 +205,7 @@ public class KaijuGameManager : GameManager
 #if UNITY_EDITOR
     private void UpdateDebugPlayers()
     {
+        if(ClientManager.instance)
         for (int i = 0; i < ClientManager.instance.Players.Count; i++)
         {
             if (ClientManager.instance.Players[i].isDebugPlayer)

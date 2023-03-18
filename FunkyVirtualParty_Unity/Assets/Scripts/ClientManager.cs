@@ -53,7 +53,7 @@ public class ClientManager : MonoBehaviour
 
 #if UNITY_EDITOR
     [SerializeField]
-    private string[] debugPlayersToAdd;
+    protected string[] debugPlayersToAdd;
 #endif
 
     void Awake()
@@ -97,6 +97,8 @@ public class ClientManager : MonoBehaviour
         //InvokeRepeating("SyncAllPlayerPosWithLerp", 1, 0.5f);
 
 #if UNITY_EDITOR
+        // test
+        debugPlayersToAdd[0] = "Gamer";
         for (int i = 0; i < debugPlayersToAdd.Length; i++)
         {
             SpawnDebugPlayer("test" + (i + 1), debugPlayersToAdd[i]);
