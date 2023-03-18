@@ -115,7 +115,6 @@ public class MainMenuWeb : MonoBehaviour
     private void OnDisable()
     {
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayer;
-        ClientManagerWeb.instance.onClientConnect -= SwitchToController;
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
         //ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;
 
@@ -160,5 +159,7 @@ public class MainMenuWeb : MonoBehaviour
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
+
+        ClientManagerWeb.instance.onClientConnect -= SwitchToController;
     }
 }
