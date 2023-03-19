@@ -4934,8 +4934,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nameField: {fileID: 593043969}
   codeField: {fileID: 2027479461}
-  nameFieldActivator: {fileID: 0}
-  codeFieldActivator: {fileID: 0}
   nameFieldButton: {fileID: 154338197}
   codeFieldButton: {fileID: 1955653876}
   manager: {fileID: 1909306993}
@@ -7086,6 +7084,7 @@ MonoBehaviour:
   nameWebGLButton: {fileID: 154338197}
   codeWebGLButton: {fileID: 1955653876}
   submitButton: {fileID: 323813367}
+  partyCodeInputField: {fileID: 2027479461}
   enableCustomizationsButton: {fileID: 1788419342}
   titleBG: {fileID: 332872348}
   dotsMat: {fileID: 2100000, guid: 0841fd27dfe80d14a885a0626b5ebfd1, type: 2}
@@ -7472,6 +7471,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1917974693}
         m_TargetAssemblyTypeName: MainMenuWeb, Assembly-CSharp
         m_MethodName: CheckValidPartyCode
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1917974693}
+        m_TargetAssemblyTypeName: MainMenuWeb, Assembly-CSharp
+        m_MethodName: PartyCodeInputToUpper
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

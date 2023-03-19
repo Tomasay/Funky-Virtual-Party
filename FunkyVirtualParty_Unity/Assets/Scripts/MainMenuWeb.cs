@@ -20,6 +20,8 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] Button nameWebGLButton, codeWebGLButton; //Buttons used to access keyboard on WebGL
     [SerializeField] Button submitButton;
 
+    [SerializeField] TMP_InputField partyCodeInputField;
+
     [SerializeField] Button enableCustomizationsButton;
 
     [SerializeField] Image titleBG;
@@ -100,6 +102,11 @@ public class MainMenuWeb : MonoBehaviour
     public void CheckValidPartyCode(string val)
     {
         submitButton.interactable = (val.Length == 4);
+    }
+
+    public void PartyCodeInputToUpper(string val)
+    {
+        partyCodeInputField.text = val.ToUpper();
     }
 
     private void GetNewBackgroundColors()
