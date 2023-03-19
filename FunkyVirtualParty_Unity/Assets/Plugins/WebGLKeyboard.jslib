@@ -15,13 +15,6 @@ mergeInto(LibraryManager.library, {
         divElement.appendChild(inputElement);
 		inputElement.oninput = function() {console.log("ON INPUT"); window.unityInstance.SendMessage('KeyboardController', 'UpdateText', document.getElementById("dummyInput").value.toString());}
 	},
-	OpenInputKeyboard: function () 
-	{
-		//document.getElementById("dummyInput").focus();
-		//fakeInputFocus();
-		//document.getElementById("fakeInputButton").click();
-		console.log("OpenInputKeyboard");
-	},
 	CloseInputKeyboard: function ()
 	{
 		document.getElementById("dummyInput").blur();
