@@ -70,6 +70,14 @@ public class ThreeDPen : MonoBehaviour
         tipMesh.material.color = currentColor;
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
+#endif
+    }
+
     void Update()
     {
 #if UNITY_ANDROID

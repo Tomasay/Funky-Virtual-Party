@@ -32,6 +32,13 @@ public class GameManagerWeb : MonoBehaviour
         }
     }
 
+    protected virtual void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("gameStateToClient");
+#endif
+    }
+
     protected void SetPlayerMovement(bool canPlayerMove)
     {
         foreach (ClientPlayer p in ClientManagerWeb.instance.Players)

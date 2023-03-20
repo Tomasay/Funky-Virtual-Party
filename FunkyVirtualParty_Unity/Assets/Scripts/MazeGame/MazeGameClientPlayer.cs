@@ -31,6 +31,13 @@ public class MazeGameClientPlayer : ClientPlayer
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+#endif
+    }
+
     public override void Move(float x, float y, bool changeDirection = true, bool animate = true)
     {
         //Reorient x and y for maze local space

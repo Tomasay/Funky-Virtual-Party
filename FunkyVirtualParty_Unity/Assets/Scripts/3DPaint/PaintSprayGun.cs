@@ -56,6 +56,14 @@ public class PaintSprayGun : MonoBehaviour
         paintSphere.Color = colors[colorIndex];
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
+#endif
+    }
+
 #if UNITY_ANDROID
     public void OnSqueeze()
     {

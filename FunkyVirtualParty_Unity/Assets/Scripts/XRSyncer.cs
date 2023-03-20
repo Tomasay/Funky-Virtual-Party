@@ -115,7 +115,7 @@ public class XRSyncer : MonoBehaviour
 #if UNITY_WEBGL
         //Unbind current XR player from callbacks, since this instance of XR player will not exist in the next scene, but the same socket will
         //Without this, null reference errors will be thrown in WebGL
-        ClientManagerWeb.instance.Manager.Socket.Off("XRDataToClient");
+        ClientManagerWeb.instance.Manager.Socket.Off("XC");
 #endif
     }
 

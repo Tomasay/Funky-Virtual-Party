@@ -87,6 +87,13 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
+#endif
+    }
+
 #if !UNITY_WEBGL
     private void OnTriggerEnter(Collider other)
     {

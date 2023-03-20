@@ -49,6 +49,15 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("ObjectDataToClient");
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
+#endif
+    }
+
     void Update()
     {
 #if UNITY_WEBGL

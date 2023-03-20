@@ -20,6 +20,13 @@ public class MannequinHeightSlider : MonoBehaviour
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
+#endif
+    }
+
     public void OnValueChange(float val)
     {
         currentVal = val;

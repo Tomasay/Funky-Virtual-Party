@@ -121,6 +121,13 @@ public class ThreeDPaintGameManager : GameManager
         }
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("InfoToXR");
+#endif
+    }
+
     public void GrabToolsStart()
     {
         GrabTool(true);

@@ -25,6 +25,13 @@ public class MannequinSolverClient : MonoBehaviour
         }
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
+#endif
+    }
+
     protected virtual void MethodCalledFromServer(string methodName, byte[] data)
     {
         if (methodName.Equals("IKData"))
