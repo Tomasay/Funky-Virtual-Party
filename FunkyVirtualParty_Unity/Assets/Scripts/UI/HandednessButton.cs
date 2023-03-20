@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem.OnScreen;
 
 public class HandednessButton : MonoBehaviour
 {
@@ -21,6 +22,11 @@ public class HandednessButton : MonoBehaviour
         foreach (RectTransform rt in transformsToFlip)
         {
             FlipXAxis(rt);
+
+            if(rt.TryGetComponent<ClientJoystick>(out ClientJoystick joy))
+            {
+                joy.UpdateAnchor();
+            }
         }
         FlipXScale(GetComponent<RectTransform>());
     }

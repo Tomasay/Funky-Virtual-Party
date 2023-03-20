@@ -2,6 +2,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.UI;
+using DG.Tweening;
 
 namespace UnityEngine.InputSystem.OnScreen
 {
@@ -54,15 +55,20 @@ namespace UnityEngine.InputSystem.OnScreen
             {
                 Color col = img.color;
                 col.a = alpha;
-                img.color = col;
+                img.DOColor(col, 0.5f);
             }
 
             foreach (Image i in alphaLinkedImages)
             {
                 Color col = i.color;
                 col.a = alpha;
-                i.color = col;
+                i.DOColor(col, 0.5f);
             }
+        }
+
+        public void UpdateAnchor()
+        {
+            m_StartPos = ((RectTransform)transform).anchoredPosition;
         }
 
         public float movementRange

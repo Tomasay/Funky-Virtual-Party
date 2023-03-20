@@ -50,6 +50,13 @@ public class PaintPalette : MonoBehaviour
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+#endif
+    }
+
 #if UNITY_ANDROID
     void SetColor(int colorIndex)
     {

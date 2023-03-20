@@ -842,43 +842,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 154338198}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1408861836}
-        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
-        m_MethodName: OpenKeyboard
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 593043971}
-        m_TargetAssemblyTypeName: KeyboardActivator, Assembly-CSharp
-        m_MethodName: ActivateKeyboard
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1408861836}
-        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
-        m_MethodName: SetField
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 593043969}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onPointerDown:
     m_PersistentCalls:
       m_Calls: []
@@ -5648,18 +5612,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1408861836}
-        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
-        m_MethodName: OpenKeyboard
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 2027479464}
         m_TargetAssemblyTypeName: KeyboardActivator, Assembly-CSharp
         m_MethodName: ActivateKeyboard
@@ -7132,6 +7084,7 @@ MonoBehaviour:
   nameWebGLButton: {fileID: 154338197}
   codeWebGLButton: {fileID: 1955653876}
   submitButton: {fileID: 323813367}
+  partyCodeInputField: {fileID: 2027479461}
   enableCustomizationsButton: {fileID: 1788419342}
   titleBG: {fileID: 332872348}
   dotsMat: {fileID: 2100000, guid: 0841fd27dfe80d14a885a0626b5ebfd1, type: 2}
@@ -7233,43 +7186,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1955653877}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1408861836}
-        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
-        m_MethodName: OpenKeyboard
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2027479464}
-        m_TargetAssemblyTypeName: KeyboardActivator, Assembly-CSharp
-        m_MethodName: ActivateKeyboard
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1408861836}
-        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
-        m_MethodName: SetField
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 2027479461}
-          m_ObjectArgumentAssemblyTypeName: TMPro.TMP_InputField, Unity.TextMeshPro
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onPointerDown:
     m_PersistentCalls:
       m_Calls: []
@@ -7554,6 +7471,18 @@ MonoBehaviour:
       - m_Target: {fileID: 1917974693}
         m_TargetAssemblyTypeName: MainMenuWeb, Assembly-CSharp
         m_MethodName: CheckValidPartyCode
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1917974693}
+        m_TargetAssemblyTypeName: MainMenuWeb, Assembly-CSharp
+        m_MethodName: PartyCodeInputToUpper
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

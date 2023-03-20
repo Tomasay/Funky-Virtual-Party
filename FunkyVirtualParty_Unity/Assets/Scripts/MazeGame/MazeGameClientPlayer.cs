@@ -31,7 +31,14 @@ public class MazeGameClientPlayer : ClientPlayer
 #endif
     }
 
-    public override void Move(float x, float y, bool changeDirection = true)
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+#endif
+    }
+
+    public override void Move(float x, float y, bool changeDirection = true, bool animate = true)
     {
         //Reorient x and y for maze local space
         Vector3 newInput = maze.transform.rotation * new Vector3(x, 0, y);
@@ -43,10 +50,17 @@ public class MazeGameClientPlayer : ClientPlayer
             transform.DOBlendableMoveBy(movement * 0.01f, inputPollRate);
 
             //Magnitude of movement for animations
-            float val = Mathf.Abs(newInput.magnitude);
-            if ((val > 0.05) || (val < -0.05))
+            if (animate)
             {
-                anim.SetFloat("Speed", val);
+                float val = Mathf.Abs(new Vector2(x, y).magnitude);
+                if ((val > 0.05) || (val < -0.05))
+                {
+                    anim.SetFloat("Speed", val);
+                }
+                else
+                {
+                    anim.SetFloat("Speed", 0);
+                }
             }
             else
             {

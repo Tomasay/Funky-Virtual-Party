@@ -20,6 +20,8 @@ public class MainMenuWeb : MonoBehaviour
     [SerializeField] Button nameWebGLButton, codeWebGLButton; //Buttons used to access keyboard on WebGL
     [SerializeField] Button submitButton;
 
+    [SerializeField] TMP_InputField partyCodeInputField;
+
     [SerializeField] Button enableCustomizationsButton;
 
     [SerializeField] Image titleBG;
@@ -102,6 +104,11 @@ public class MainMenuWeb : MonoBehaviour
         submitButton.interactable = (val.Length == 4);
     }
 
+    public void PartyCodeInputToUpper(string val)
+    {
+        partyCodeInputField.text = val.ToUpper();
+    }
+
     private void GetNewBackgroundColors()
     {
         int colorIndex = Random.Range(0, backgroundColors.Length);
@@ -115,7 +122,6 @@ public class MainMenuWeb : MonoBehaviour
     private void OnDisable()
     {
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayer;
-        ClientManagerWeb.instance.onClientConnect -= SwitchToController;
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
         //ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;
 
@@ -160,5 +166,7 @@ public class MainMenuWeb : MonoBehaviour
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
+
+        ClientManagerWeb.instance.onClientConnect -= SwitchToController;
     }
 }

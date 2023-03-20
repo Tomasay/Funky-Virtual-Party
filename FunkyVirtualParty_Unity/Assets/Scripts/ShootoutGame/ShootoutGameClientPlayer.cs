@@ -20,12 +20,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
     public UnityEvent OnDeath;
     public bool isColliding = false;
     float collisionTimer = 0.5f;
-    const float collisionTimerDefault = 1;
+    const float collisionTimerDefault = 0.5f;
     Vector2 collisionVector;
 
     private SerializedVector3 splashPos;
 
-    const float frictionCoefficient = 0.075f;
+    const float frictionCoefficient = 0.1f;
 
     public Camera cam;
 
@@ -78,12 +78,19 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 15;
+        startingSpeed = 10f;
 
         base.Awake();
 
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
+#endif
+    }
+
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
 #endif
     }
 
@@ -118,8 +125,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
             Vector2 delta = (input - prevVector) * frictionCoefficient;
             Vector2 target = prevVector + delta;
             prevVector = target;
-
-            collisionTimer = collisionTimerDefault;
         }
         else if(isDebugPlayer && isColliding)
         {
@@ -129,14 +134,15 @@ public class ShootoutGameClientPlayer : ClientPlayer
             if (collisionTimer <= 0)
             {
                 isColliding = false;
+                collisionTimer = collisionTimerDefault;
             }
         }
 #endif
         if (IsLocal && !isColliding) //Only read values from analog stick, and emit movement if being done from local device
         {
-            // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
+            //Friction
             if (prevVector == Vector2.zero)
                 prevVector = input;
 
@@ -147,10 +153,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
                 ClientManagerWeb.instance.Manager.Socket.Emit("IS", target.x, target.y, PlayerByteID);
-                Move(target.x, target.y);
-            }
 
-            collisionTimer = collisionTimerDefault;
+                bool isSliding = (input == Vector2.zero && target.magnitude > 0);
+                Move(target.x, target.y, !isSliding, !isSliding);
+            }
 
             CheckIceTrailVisibility();
         }
@@ -163,13 +169,13 @@ public class ShootoutGameClientPlayer : ClientPlayer
             if (collisionTimer <= 0)
             {
                 isColliding = false;
+                collisionTimer = collisionTimerDefault;
             }
         }
         else
         {
             CheckIceTrailVisibility();
         }
-
 
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)

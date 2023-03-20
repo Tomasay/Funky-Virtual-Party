@@ -11,9 +11,6 @@ public class KeyboardController : MonoBehaviour
     private static extern void CreateDummyInput();
 
     [DllImport("__Internal")]
-    private static extern void OpenInputKeyboard();
-
-    [DllImport("__Internal")]
     private static extern void CloseInputKeyboard();
 
     [DllImport("__Internal")]
@@ -49,8 +46,10 @@ public class KeyboardController : MonoBehaviour
 
         nameFieldButton.onPointerDown.AddListener(ButtonPointerDown);
         nameFieldButton.onPointerUp.AddListener(ButtonPointerUp);
+        nameFieldButton.onPointerUp.AddListener(delegate { SetField(nameField); });
         codeFieldButton.onPointerDown.AddListener(ButtonPointerDown);
         codeFieldButton.onPointerUp.AddListener(ButtonPointerUp);
+        codeFieldButton.onPointerUp.AddListener(delegate { SetField(codeField); });
 
         string storedName = GetNameData();
         if (storedName != null)
@@ -90,11 +89,6 @@ public class KeyboardController : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         SetPointerDownOnButton(false);
-    }
-
-    public void OpenKeyboard()
-    {
-        OpenInputKeyboard();
     }
 
     public void CloseKeyboard()

@@ -10,9 +10,6 @@ using System.Linq;
 public class ThreeDPaintGameManagerWeb : GameManagerWeb
 {
     [DllImport("__Internal")]
-    private static extern void OpenInputKeyboard();
-
-    [DllImport("__Internal")]
     private static extern void CloseInputKeyboard();
 
     [DllImport("__Internal")]
@@ -115,6 +112,16 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         inputCanvas.enabled = true;
         guessingCanvas.enabled = false;
         resultsCanvas.enabled = false;
+    }
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+        ClientManagerWeb.instance.Manager.Socket.Off("InfoToXR");
+#endif
     }
 
     void Update()
@@ -309,7 +316,6 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     public void OpenKeyboard()
     {
         typingAnswer = true;
-        OpenInputKeyboard();
     }
 
     public void UpdateText(string input)

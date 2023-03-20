@@ -50,6 +50,14 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
+#endif
+    }
+
 
 #if UNITY_ANDROID
     /// <summary>

@@ -56,6 +56,13 @@ public class Shootout_DestructibleTerrian : MonoBehaviour
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
+#endif
+    }
+
     void Start()
     {
         if(TryGetComponent<Terrain>(out Terrain t))

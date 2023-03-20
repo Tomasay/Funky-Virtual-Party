@@ -37,6 +37,13 @@ public class KaijuGameClientPlayer : ClientPlayer
 #endif
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+#endif
+    }
+
 #if !UNITY_WEBGL
     private void OnTriggerEnter(Collider other)
     {

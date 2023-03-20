@@ -21,6 +21,13 @@ public class KaijuGameManagerWeb : GameManagerWeb
         ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
     }
 
+    private void OnDisable()
+    {
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
+#endif
+    }
+
     void MethodCalledFromServer(string methodName, string data)
     {
 
