@@ -273,7 +273,7 @@ public class ClientPlayer : MonoBehaviour
         return -1;
     }
 
-    public virtual void Move(float x, float y, bool changeDirection = true)
+    public virtual void Move(float x, float y, bool changeDirection = true, bool animate = true)
     {
         if (canMove)
         {
@@ -282,15 +282,23 @@ public class ClientPlayer : MonoBehaviour
             transform.DOBlendableMoveBy(movement, inputPollRate);
 
             //Magnitude of movement for animations
-            float val = Mathf.Abs(new Vector2(x, y).magnitude);
-            if ((val > 0.05) || (val < -0.05))
+            if (animate)
             {
-                anim.SetFloat("Speed", val);
+                float val = Mathf.Abs(new Vector2(x, y).magnitude);
+                if ((val > 0.05) || (val < -0.05))
+                {
+                    anim.SetFloat("Speed", val);
+                }
+                else
+                {
+                    anim.SetFloat("Speed", 0);
+                }
             }
             else
             {
                 anim.SetFloat("Speed", 0);
             }
+
             //Update rotation
             if (changeDirection)
             {
