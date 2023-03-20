@@ -9,18 +9,22 @@ using System.Runtime.InteropServices;
 
 public class KaijuGameClientPlayer : ClientPlayer
 {
-    public bool isThrown = false;
-    float collisionTimer = 0.5f;
+    public enum KaijuClientState
+    {
+        OnGround,
+        Jump,
+        Grabbed,
+        Thrown
+    }
+    public KaijuClientState state = KaijuClientState.OnGround;
+    
     const float collisionTimerDefault = 1;
     Vector2 collisionVector;
 
-    const float frictionCoefficient = 0.025f;
 
     public Camera cam;
 
-    [SerializeField] ParticleSystem waterSplash, iceTrail;
-
-    [SerializeField] GameObject iceCube;
+    [SerializeField] ParticleSystem waterSplash;
 
     protected override void Awake()
     {
@@ -36,10 +40,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 #if !UNITY_WEBGL
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag.Equals("Powerup"))
-        {
-    
-        }
+
     }
 #endif
 
@@ -47,25 +48,25 @@ public class KaijuGameClientPlayer : ClientPlayer
     protected override void CheckInput()
     {
 #if UNITY_EDITOR
-        if (isDebugPlayer && !isThrown)
+        if (isDebugPlayer && state < KaijuClientState.Grabbed)
         {
             Vector2 input = new Vector2(movement.x, movement.z);
 
             if (prevVector == Vector2.zero)
                 prevVector = input;
 
-            Vector2 delta = (input - prevVector) * frictionCoefficient;
+            Vector2 delta = (input - prevVector);
             Vector2 target = prevVector + delta;
             prevVector = target;
 
-            collisionTimer = collisionTimerDefault;
+            
         }
-        else if(isDebugPlayer && isThrown)
+        else if(isDebugPlayer)
         {
             // do not send input if held by VR player
         }
 #endif
-        if (IsLocal && !isThrown) //Only read values from analog stick, and emit movement if being done from local device
+        if (IsLocal && state < KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
         {
             // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
@@ -73,7 +74,7 @@ public class KaijuGameClientPlayer : ClientPlayer
             if (prevVector == Vector2.zero)
                 prevVector = input;
 
-            Vector2 delta = (input - prevVector) * frictionCoefficient;
+            Vector2 delta = (input - prevVector);
             Vector2 target = prevVector + delta;
             prevVector = target;
 
@@ -83,9 +84,9 @@ public class KaijuGameClientPlayer : ClientPlayer
                 Move(target.x, target.y);
             }
 
-            collisionTimer = collisionTimerDefault;
+            
         }
-        else if (IsLocal && isThrown)
+        else if (IsLocal)
         {
             // do not send input if held by VR player
         }
@@ -95,6 +96,7 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             transform.position = posFromHost;
             GetComponent<Rigidbody>().velocity = Vector3.zero;
+            state = KaijuClientState.OnGround;
         }
         //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }

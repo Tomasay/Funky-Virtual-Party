@@ -52,8 +52,8 @@ public class KaijuGameManager : GameManager
         SetVRPlayerCanThrowFireballs(false);
 
 #if UNITY_EDITOR
-        currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
-        currentWaypointDistances = new float[ClientManager.instance.Players.Count];
+        //currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
+        //currentWaypointDistances = new float[ClientManager.instance.Players.Count];
 #endif
     }
 
