@@ -152,11 +152,14 @@ public class ShootoutGameManager : GameManager
 #if UNITY_EDITOR
     private void UpdateDebugPlayers()
     {
-        for (int i = 0; i < ClientManager.instance.Players.Count; i++)
+        if (ClientManager.instance)
         {
-            if(ClientManager.instance.Players[i].isDebugPlayer)
+            for (int i = 0; i < ClientManager.instance.Players.Count; i++)
             {
-                UpdateDebugPlayerWaypoint(ClientManager.instance.Players[i], i);
+                if (ClientManager.instance.Players[i].isDebugPlayer)
+                {
+                    UpdateDebugPlayerWaypoint(ClientManager.instance.Players[i], i);
+                }
             }
         }
     }

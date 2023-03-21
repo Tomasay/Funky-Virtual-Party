@@ -61,7 +61,7 @@ public class TutorialMenu : MonoBehaviour
     private void Update()
     {
 #if UNITY_EDITOR
-        if (Keyboard.current.rKey.wasPressedThisFrame)
+        if (Keyboard.current.rKey.wasPressedThisFrame && VrPlayerReady.interactable)
         {
             ReadyUpVR();
         }
@@ -139,6 +139,9 @@ public class TutorialMenu : MonoBehaviour
         vrPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
         vrPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
         vrPlayerIcons.Remove("VR");
+
+        VrPlayerReady.interactable = false;
+        VrPlayerReady.GetComponent<Animator>().SetTrigger("Stop");
 
         //Check if every player is ready
         if (vrPlayerIcons.Count > 0)
