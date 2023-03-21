@@ -1,9 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.IO;
 using TMPro;
 using UnityEngine.InputSystem;
 using DG.Tweening;
+
+[Serializable]
+public class ClientInputData
+{
+    public byte id;
+    public Vector2 input;
+}
 
 public class ClientPlayer : MonoBehaviour
 {
@@ -64,6 +73,34 @@ public class ClientPlayer : MonoBehaviour
     public bool isDebugPlayer;
 #endif
 
+
+    public byte[] SerializeInputData(Vector2 input)
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(PlayerByteID);
+                writer.Write(input);
+            }
+            return m.ToArray();
+        }
+    }
+
+    public static ClientInputData DeserializeInputData(byte[] data)
+    {
+        ClientInputData result = new ClientInputData();
+        using (MemoryStream m = new MemoryStream(data))
+        {
+            using (BinaryReader reader = new BinaryReader(m))
+            {
+                result.id = reader.ReadByte();
+                result.input = reader.ReadVector2();
+            }
+        }
+        return result;
+    }
+
     protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);
@@ -108,8 +145,8 @@ public class ClientPlayer : MonoBehaviour
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", input.x, input.y, PlayerByteID);
-                Move(input.x, input.y);
+                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
+                Move(input);
             }
 
             /*
@@ -141,12 +178,12 @@ public class ClientPlayer : MonoBehaviour
         //Color
         if (playerColor == Color.white)
         {
-            Color newCol = availableColors[Random.Range(0, availableColors.Count)];
+            Color newCol = availableColors[UnityEngine.Random.Range(0, availableColors.Count)];
             ChangeColor(newCol);
         }
 
         //Head shapes
-        headType = Random.Range(-1, smr.sharedMesh.blendShapeCount);
+        headType = UnityEngine.Random.Range(-1, smr.sharedMesh.blendShapeCount);
         if (headType > -1) //if -1, keep base head shape
         {
             smr.SetBlendShapeWeight(headType, 100);
@@ -154,7 +191,7 @@ public class ClientPlayer : MonoBehaviour
 
         //Height
         Vector3 pos = spineBone.transform.localPosition;
-        height = Random.Range(-0.2f, 0.75f);
+        height = UnityEngine.Random.Range(-0.2f, 0.75f);
         pos.y += height;
         spineBone.transform.localPosition = pos;
 
@@ -273,18 +310,18 @@ public class ClientPlayer : MonoBehaviour
         return -1;
     }
 
-    public virtual void Move(float x, float y, bool changeDirection = true, bool animate = true)
+    public virtual void Move(Vector2 input, bool changeDirection = true, bool animate = true)
     {
         if (canMove)
         {
-            movement = new Vector3(x * speed, 0, y * speed) * .01f;
+            movement = new Vector3(input.x * speed, 0, input.y * speed) * .01f;
 
             transform.DOBlendableMoveBy(movement, inputPollRate);
 
             //Magnitude of movement for animations
             if (animate)
             {
-                float val = Mathf.Abs(new Vector2(x, y).magnitude);
+                float val = Mathf.Abs(input.magnitude);
                 if ((val > 0.05) || (val < -0.05))
                 {
                     anim.SetFloat("Speed", val);
@@ -302,7 +339,7 @@ public class ClientPlayer : MonoBehaviour
             //Update rotation
             if (changeDirection)
             {
-                Vector3 lookDirection = new Vector3(x, 0, y);
+                Vector3 lookDirection = new Vector3(input.x, 0, input.y);
                 if (lookDirection != Vector3.zero)
                 {
                     lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
@@ -335,7 +372,7 @@ public class ClientPlayer : MonoBehaviour
     //Default action, dance of course
     public virtual void Action()
     {
-        int dance = Random.Range(1, 3);
+        int dance = UnityEngine.Random.Range(1, 3);
         anim.SetTrigger("Dance" + dance);
     }
 

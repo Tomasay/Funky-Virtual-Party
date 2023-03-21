@@ -233,7 +233,7 @@ public class KaijuGameManager : GameManager
             float dist = Vector3.Distance(currentWaypoints[index], cp.transform.position);
             dir *= Mathf.Clamp(1 / (dist / currentWaypointDistances[index]), 0.1f, 1f);
 
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", dir.x, dir.z, cp.PlayerID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", cp.SerializeInputData(dir));
         }*/
     }
 #endif

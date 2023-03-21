@@ -38,21 +38,21 @@ public class MazeGameClientPlayer : ClientPlayer
 #endif
     }
 
-    public override void Move(float x, float y, bool changeDirection = true, bool animate = true)
+    public override void Move(Vector2 input, bool changeDirection = true, bool animate = true)
     {
         //Reorient x and y for maze local space
-        Vector3 newInput = maze.transform.rotation * new Vector3(x, 0, y);
+        Vector3 newInput = maze.transform.rotation * new Vector3(input.x, 0, input.y);
 
         if (canMove)
         {
-            movement = new Vector3(x * speed, 0, y * speed) * .01f;
+            movement = new Vector3(input.x * speed, 0, input.y * speed) * .01f;
 
             transform.DOBlendableMoveBy(movement * 0.01f, inputPollRate);
 
             //Magnitude of movement for animations
             if (animate)
             {
-                float val = Mathf.Abs(new Vector2(x, y).magnitude);
+                float val = Mathf.Abs(input.magnitude);
                 if ((val > 0.05) || (val < -0.05))
                 {
                     anim.SetFloat("Speed", val);

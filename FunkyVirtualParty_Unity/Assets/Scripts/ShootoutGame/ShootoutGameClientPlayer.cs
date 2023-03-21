@@ -128,7 +128,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if(isDebugPlayer && isColliding)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -0.5f, collisionVector.normalized.y * -0.5f, PlayerByteID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -152,18 +152,18 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", target.x, target.y, PlayerByteID);
+                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(target));
 
                 bool isSliding = (input == Vector2.zero && target.magnitude > 0);
-                Move(target.x, target.y, !isSliding, !isSliding);
+                Move(target, !isSliding, !isSliding);
             }
 
             CheckIceTrailVisibility();
         }
         else if (IsLocal && isColliding)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, PlayerByteID);
-            Move(collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, false);
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.25f));
+            Move(collisionVector.normalized * -0.25f, false);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -180,7 +180,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, PlayerByteID);
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.25f));
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -195,8 +195,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, PlayerByteID);
-            Move(collisionVector.normalized.x * -0.25f, collisionVector.normalized.y * -0.25f, false);
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.25f));
+            Move(collisionVector.normalized * -0.25f, false, false);
 
             /*
             Vector3 positionDifference = posFromHost - transform.position;

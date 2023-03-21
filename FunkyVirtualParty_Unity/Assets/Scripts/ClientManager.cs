@@ -83,7 +83,7 @@ public class ClientManager : MonoBehaviour
 
             manager.Socket.Once("connect", () => Debug.Log("connected!"));
 
-            manager.Socket.On<float, float, byte>("IC", OnInputReceived);
+            manager.Socket.On<byte[]>("IC", OnInputReceived);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
             manager.Socket.On<byte>("readyUp", OnReadyUp);
@@ -241,9 +241,10 @@ public class ClientManager : MonoBehaviour
         }
     }
 
-    private void OnInputReceived(float x, float y, byte id)
+    private void OnInputReceived(byte[] data)
     {
-        GetPlayerByByteID(id)?.Move(x, y);
+        ClientInputData newData = ClientPlayer.DeserializeInputData(data);
+        GetPlayerByByteID(newData.id).Move(newData.input);
     }
 
     private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)

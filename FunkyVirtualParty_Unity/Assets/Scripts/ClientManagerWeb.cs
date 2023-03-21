@@ -56,7 +56,7 @@ public class ClientManagerWeb : MonoBehaviour
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, byte>("assignPlayerByteIDClient", AssignPlayerByteID);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
-            manager.Socket.On<float, float, byte>("IC", OnInputReceived);
+            manager.Socket.On<byte[]>("IC", OnInputReceived);
             manager.Socket.On<byte>("action", OnAction);
             manager.Socket.On<string, byte[]>("playerInfoToClient", playerInfoReceived);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
@@ -238,11 +238,12 @@ public class ClientManagerWeb : MonoBehaviour
         return null;
     }
 
-    private void OnInputReceived(float x, float y, byte id)
+    private void OnInputReceived(byte[] data)
     {
-        if (LocalPlayer.PlayerByteID != id)
+        ClientInputData newData = ClientPlayer.DeserializeInputData(data);
+        if (LocalPlayer.PlayerByteID != newData.id)
         {
-            GetPlayerByByteID(id)?.Move(x, y);
+            GetPlayerByByteID(newData.id).Move(newData.input);
         }
     }
 
