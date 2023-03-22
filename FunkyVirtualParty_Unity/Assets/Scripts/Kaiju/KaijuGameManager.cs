@@ -47,9 +47,8 @@ public class KaijuGameManager : GameManager
             }
         }
 
-        SetPlayerMovement(false);
-        SetVRPlayerMovementDelayed(false, 1);
-        SetVRPlayerCanThrowFireballs(false);
+        //SetPlayerMovement(false);
+        //SetVRPlayerMovementDelayed(false, 1);
 
 #if UNITY_EDITOR
         //currentWaypoints = new Vector3[ClientManager.instance.Players.Count];

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Cinemachine;
+using Autohand;
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
@@ -25,6 +26,8 @@ public class KaijuGameClientPlayer : ClientPlayer
     public Camera cam;
 
     [SerializeField] ParticleSystem waterSplash;
+
+    private RigidbodyConstraints currentConstraints;
 
     protected override void Awake()
     {
@@ -149,5 +152,22 @@ public class KaijuGameClientPlayer : ClientPlayer
             // Jump!
             GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
         }
+    }
+
+    public void OnGrabbed(Hand h, Grabbable g)
+    {
+        currentConstraints = rb.constraints;
+        rb.constraints = RigidbodyConstraints.None;
+
+        anim.SetBool("Grabbed", true);
+    }
+
+    public void OnDropped(Hand h, Grabbable g)
+    {
+        rb.constraints = currentConstraints;
+
+        anim.SetBool("Grabbed", false);
+
+        //Cool flying mechanics here
     }
 }

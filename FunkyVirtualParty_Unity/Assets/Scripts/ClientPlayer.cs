@@ -46,6 +46,8 @@ public class ClientPlayer : MonoBehaviour
     protected float startingSpeed = 20, speed;
     protected bool canMove = true;
 
+    protected Rigidbody rb;
+
     public Vector3 posFromHost; //Current position from host, we need to sync to this if different
 
     protected PlayerInput playerInput;
@@ -125,6 +127,8 @@ public class ClientPlayer : MonoBehaviour
 
         speed = startingSpeed;
 
+        rb = GetComponent<Rigidbody>();
+
         playerInput = GetComponent<PlayerInput>();
 
         spinePos = spineBone.transform.localPosition;
@@ -159,7 +163,7 @@ public class ClientPlayer : MonoBehaviour
         if (transform.position.y < -10 && transform.position.y != posFromHost.y)
         {
             transform.position = posFromHost;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            rb.velocity = Vector3.zero;
         }
 
         //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
