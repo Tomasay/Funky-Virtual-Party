@@ -310,7 +310,7 @@ public class ClientPlayer : MonoBehaviour
         return -1;
     }
 
-    public virtual void Move(Vector2 input, bool changeDirection = true, bool animate = true)
+    public virtual void Move(Vector2 input, bool changeDirection = true, bool animate = true, Vector2 overrideRotation = default)
     {
         if (canMove)
         {
@@ -339,7 +339,16 @@ public class ClientPlayer : MonoBehaviour
             //Update rotation
             if (changeDirection)
             {
-                Vector3 lookDirection = new Vector3(input.x, 0, input.y);
+                Vector3 lookDirection;
+                if (overrideRotation != Vector2.zero)
+                {
+                    lookDirection = new Vector3(overrideRotation.x, 0, overrideRotation.y);
+                }
+                else
+                {
+                    lookDirection = new Vector3(input.x, 0, input.y);
+                }
+
                 if (lookDirection != Vector3.zero)
                 {
                     lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
@@ -352,6 +361,18 @@ public class ClientPlayer : MonoBehaviour
             movement = Vector3.zero;
             anim.SetFloat("Speed", 0);
         }
+    }
+
+    public virtual void Move(byte[] inputData)
+    {
+        ClientInputData newData = DeserializeInputData(inputData);
+
+#if UNITY_WEBGL
+        ClientManagerWeb.instance.GetPlayerByByteID(newData.id).Move(newData.input);
+#elif UNITY_ANDROID
+        ClientManager.instance.GetPlayerByByteID(newData.id).Move(newData.input);
+#endif
+
     }
 
     //Sets player visuals and movement

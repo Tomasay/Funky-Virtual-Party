@@ -78,7 +78,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 10f;
+        startingSpeed = 7.5f;
 
         base.Awake();
 
@@ -155,15 +155,17 @@ public class ShootoutGameClientPlayer : ClientPlayer
                 ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(target));
 
                 bool isSliding = (input == Vector2.zero && target.magnitude > 0);
-                Move(target, !isSliding, !isSliding);
+                Move(target, !isSliding, !isSliding, input);
             }
 
             CheckIceTrailVisibility();
         }
         else if (IsLocal && isColliding)
         {
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+
             ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.25f));
-            Move(collisionVector.normalized * -0.25f, false);
+            Move(collisionVector.normalized * -0.25f, false, true, input);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -180,7 +182,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.25f));
+            ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -195,8 +197,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #endif
         if (isLocal && isExplosion)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.25f));
-            Move(collisionVector.normalized * -0.25f, false, false);
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.5f));
+            Move(collisionVector.normalized * -0.5f, false, false, input);
 
             /*
             Vector3 positionDifference = posFromHost - transform.position;

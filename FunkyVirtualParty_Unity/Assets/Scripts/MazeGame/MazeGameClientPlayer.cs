@@ -38,7 +38,7 @@ public class MazeGameClientPlayer : ClientPlayer
 #endif
     }
 
-    public override void Move(Vector2 input, bool changeDirection = true, bool animate = true)
+    public override void Move(Vector2 input, bool changeDirection = true, bool animate = true, Vector2 overrideRotation = default)
     {
         //Reorient x and y for maze local space
         Vector3 newInput = maze.transform.rotation * new Vector3(input.x, 0, input.y);
@@ -65,6 +65,26 @@ public class MazeGameClientPlayer : ClientPlayer
             else
             {
                 anim.SetFloat("Speed", 0);
+            }
+
+            //Update rotation
+            if (changeDirection)
+            {
+                Vector3 lookDirection;
+                if (overrideRotation != Vector2.zero)
+                {
+                    lookDirection = new Vector3(overrideRotation.x, 0, overrideRotation.y);
+                }
+                else
+                {
+                    lookDirection = new Vector3(input.x, 0, input.y);
+                }
+
+                if (lookDirection != Vector3.zero)
+                {
+                    lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                    anim.transform.DORotateQuaternion(lookRotation, inputPollRate);
+                }
             }
 
             if (newInput != Vector3.zero)
