@@ -10,6 +10,7 @@ public class TutorialMenuClient : MonoBehaviour
 
     [SerializeField] GameObject playerIconPrefab, clientPlayerIconsParent;
     [SerializeField] GameManagerWeb manager;
+    [SerializeField] Button readyUpButton;
 
     private Dictionary<string, GameObject> clientPlayerIcons;
 
@@ -64,6 +65,11 @@ public class TutorialMenuClient : MonoBehaviour
         clientPlayerIcons[p.PlayerSocketID].GetComponentInChildren<TMP_Text>().text = "READY";
         clientPlayerIcons[p.PlayerSocketID].GetComponent<Animator>().SetTrigger("Ready");
         clientPlayerIcons.Remove(p.PlayerSocketID);
+
+        if(readyUpButton)
+        {
+            readyUpButton.interactable = false;
+        }
 
         //Check if every player is ready
         if (clientPlayerIcons.Count > 0)
