@@ -66,7 +66,7 @@ public class TutorialMenuClient : MonoBehaviour
         clientPlayerIcons[p.PlayerSocketID].GetComponent<Animator>().SetTrigger("Ready");
         clientPlayerIcons.Remove(p.PlayerSocketID);
 
-        if(readyUpButton)
+        if(readyUpButton && p.IsLocal)
         {
             readyUpButton.interactable = false;
         }
