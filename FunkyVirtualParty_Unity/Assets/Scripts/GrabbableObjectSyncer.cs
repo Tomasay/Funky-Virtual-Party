@@ -50,8 +50,10 @@ public class GrabbableObjectSyncer : ObjectSyncer
 #endif
     }
 
-    private void OnDisable()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+
 #if UNITY_WEBGL
         ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
         ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
@@ -66,7 +68,7 @@ public class GrabbableObjectSyncer : ObjectSyncer
     /// <param name="pos">position of object</param>
     /// <param name="vel">velocity of object</param>
     /// <returns>byte array data of trajectory</returns>
-    public new byte[] SerializeTrajectory(Vector3 pos, Vector3 vel)
+    public byte[] SerializeTrajectory(Vector3 pos, Vector3 vel)
     {
         using (MemoryStream m = new MemoryStream())
         {
