@@ -94,6 +94,7 @@ public class KaijuGameManagerWeb : GameManagerWeb
                 }
                 break;
             case GameState.GameLoop:
+                SetPlayerMovement(true);
                 switch (KaijuGameState)
                 {
                     case KaijuGameLoopState.Not:

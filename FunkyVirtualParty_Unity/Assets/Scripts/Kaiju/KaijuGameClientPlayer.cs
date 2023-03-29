@@ -78,23 +78,25 @@ public class KaijuGameClientPlayer : ClientPlayer
 #endif
         if (IsLocal && state < KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
         {
-            // in this game we want the player to feel like they're on ice, so we calculate a low fricition 
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            if (prevVector == Vector2.zero)
-                prevVector = input;
-
-            Vector2 delta = (input - prevVector);
-            Vector2 target = prevVector + delta;
-            prevVector = target;
-
-            if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
+            //Input should be relative to camera, which is always facing forward from the player
+            if (input.magnitude > 0.1f)
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
-                Move(target);
+                float magnitude = input.magnitude;
+                input = input.normalized;
+                float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + cam.transform.eulerAngles.y; // + camera eulerAngles y
+                Vector3 newInput = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+                input = new Vector2(newInput.x, newInput.z) * magnitude;
             }
 
-            
+            if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
+            {
+                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
+                Move(input);
+            }
+
+
         }
         else if (IsLocal)
         {
