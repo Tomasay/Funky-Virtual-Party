@@ -182,7 +182,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -221,9 +220,7 @@ Shader "IcebergAmplify"
 				#define ENABLE_TERRAIN_PERPIXEL_NORMAL
 			#endif
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -305,6 +302,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
 				float2 uv_RenderTexture = v.texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 				o.ase_texcoord7.xy = v.texcoord.xy;
 				
@@ -317,7 +315,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
@@ -695,7 +693,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -709,9 +706,7 @@ Shader "IcebergAmplify"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -790,6 +785,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO( o );
 
 				float2 uv_RenderTexture = v.ase_texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
@@ -798,7 +794,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
 				#else
@@ -1008,7 +1004,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -1022,9 +1017,7 @@ Shader "IcebergAmplify"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -1098,6 +1091,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
 				float2 uv_RenderTexture = v.ase_texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
@@ -1106,7 +1100,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
@@ -1284,7 +1278,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -1299,9 +1292,7 @@ Shader "IcebergAmplify"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -1377,6 +1368,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
 				float2 uv_RenderTexture = v.ase_texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 				o.ase_texcoord2.xy = v.ase_texcoord.xy;
 				
@@ -1389,7 +1381,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
@@ -1564,7 +1556,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -1578,9 +1569,7 @@ Shader "IcebergAmplify"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -1654,6 +1643,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO( o );
 
 				float2 uv_RenderTexture = v.ase_texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 				o.ase_texcoord2.xy = v.ase_texcoord.xy;
 				
@@ -1666,7 +1656,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
@@ -1832,7 +1822,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -1846,9 +1835,7 @@ Shader "IcebergAmplify"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -1923,6 +1910,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
 				float2 uv_RenderTexture = v.ase_texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					float3 defaultVertexValue = v.vertex.xyz;
@@ -1930,7 +1918,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
@@ -2122,7 +2110,6 @@ Shader "IcebergAmplify"
 			#pragma multi_compile _ LOD_FADE_CROSSFADE
 			#pragma multi_compile_fog
 			#define ASE_FOG 1
-			#define ASE_ABSOLUTE_VERTEX_POS 1
 			#define ASE_SRP_VERSION 110000
 
 
@@ -2160,9 +2147,7 @@ Shader "IcebergAmplify"
 				#define ENABLE_TERRAIN_PERPIXEL_NORMAL
 			#endif
 
-			#define ASE_NEEDS_VERT_POSITION
-			#define ASE_NEEDS_VERT_NORMAL
-
+			
 
 			struct VertexInput
 			{
@@ -2246,6 +2231,7 @@ Shader "IcebergAmplify"
 				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
 				float2 uv_RenderTexture = v.texcoord.xy * _RenderTexture_ST.xy + _RenderTexture_ST.zw;
+				float4 color71 = IsGammaSpace() ? float4(0,1,0,0) : float4(0,1,0,0);
 				
 				o.ase_texcoord7.xy = v.texcoord.xy;
 				
@@ -2257,7 +2243,7 @@ Shader "IcebergAmplify"
 					float3 defaultVertexValue = float3(0, 0, 0);
 				#endif
 
-				float3 vertexValue = ( v.vertex.xyz - ( v.ase_normal * tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b ) );
+				float3 vertexValue = -( tex2Dlod( _RenderTexture, float4( uv_RenderTexture, 0, 0.0) ).b * color71 ).rgb;
 
 				#ifdef ASE_ABSOLUTE_VERTEX_POS
 					v.vertex.xyz = vertexValue;
@@ -2549,21 +2535,13 @@ Shader "IcebergAmplify"
 }
 /*ASEBEGIN
 Version=19105
-Node;AmplifyShaderEditor.PosVertexDataNode;10;-713,151;Inherit;False;0;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.NormalVertexDataNode;12;-699,299;Inherit;False;0;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;13;-405,315;Inherit;False;2;2;0;FLOAT3;0,0,0;False;1;FLOAT;0;False;1;FLOAT3;0
-Node;AmplifyShaderEditor.SimpleSubtractOpNode;11;-346,176;Inherit;False;2;0;FLOAT3;0,0,0;False;1;FLOAT3;0,0,0;False;1;FLOAT3;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;18;-304.3912,-385.3628;Inherit;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.ColorNode;19;-658.2833,-327.902;Inherit;False;Property;_FresnelColor;Fresnel Color;2;0;Create;True;0;0;0;False;0;False;1,1,1,1;0.6698113,0.6698113,0.6698113,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.SimpleAddOpNode;20;-254.1285,-124.2437;Inherit;True;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.SamplerNode;9;-699,457;Inherit;True;Property;_RenderTexture;Render Texture;0;0;Create;True;0;0;0;False;0;False;-1;f0ca894edbef3db4883ff4f773b6d029;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;8;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;6;FLOAT;0;False;7;SAMPLERSTATE;;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.RangedFloatNode;21;-874.848,-400.8943;Inherit;False;Property;_FresnelPower;Fresnel Power;4;0;Create;True;0;0;0;False;0;False;5;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;22;-878.0262,-482.4746;Inherit;False;Property;_FresnelScale;Fresnel Scale;6;0;Create;True;0;0;0;False;0;False;1;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;23;-868.49,-560.8771;Inherit;False;Property;_FresnelBias;Fresnel Bias;7;0;Create;True;0;0;0;False;0;False;0;0;0;0;0;1;FLOAT;0
 Node;AmplifyShaderEditor.ColorNode;43;-669.0468,-109.0113;Inherit;False;Property;_BaseColor;Base Color;1;0;Create;True;0;0;0;False;0;False;0.5647059,0.7450981,0.8862745,1;0.5647059,0.7450981,0.8862745,1;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.VertexColorNode;45;-232.7762,482.9178;Inherit;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.ColorNode;47;-173.5278,300.8863;Inherit;False;Property;_EdgeColor;Edge Color;8;0;Create;True;0;0;0;False;0;False;1,1,1,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;48;165.428,415.7482;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;55;185.9001,-15.6;Float;False;False;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;New Amplify Shader;94348b07e5e8bab40bd6c8a1e3df54cd;True;ExtraPrePass;0;0;ExtraPrePass;5;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;3;True;12;all;0;False;True;1;1;False;;0;False;;0;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;0;False;False;0;Hidden/InternalErrorShader;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;57;185.9001,-15.6;Float;False;False;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;New Amplify Shader;94348b07e5e8bab40bd6c8a1e3df54cd;True;ShadowCaster;0;2;ShadowCaster;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;3;True;12;all;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;False;False;True;False;False;False;False;0;False;;False;False;False;False;False;False;False;False;False;True;1;False;;True;3;False;;False;True;1;LightMode=ShadowCaster;False;False;0;Hidden/InternalErrorShader;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;58;185.9001,-15.6;Float;False;False;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;New Amplify Shader;94348b07e5e8bab40bd6c8a1e3df54cd;True;DepthOnly;0;3;DepthOnly;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;3;True;12;all;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;False;False;True;False;False;False;False;0;False;;False;False;False;False;False;False;False;False;False;True;1;False;;False;False;True;1;LightMode=DepthOnly;False;False;0;Hidden/InternalErrorShader;0;0;Standard;0;False;0
@@ -2572,7 +2550,6 @@ Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;60;185.9001,-15.6;Float;Fal
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;61;185.9001,-15.6;Float;False;False;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;New Amplify Shader;94348b07e5e8bab40bd6c8a1e3df54cd;True;DepthNormals;0;6;DepthNormals;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;3;True;12;all;0;False;True;1;1;False;;0;False;;0;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;False;;True;3;False;;False;True;1;LightMode=DepthNormals;False;False;0;Hidden/InternalErrorShader;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;62;185.9001,-15.6;Float;False;False;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;New Amplify Shader;94348b07e5e8bab40bd6c8a1e3df54cd;True;GBuffer;0;7;GBuffer;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;3;True;12;all;0;False;True;1;1;False;;0;False;;1;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;1;LightMode=UniversalGBuffer;False;False;0;Hidden/InternalErrorShader;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.SaturateNode;49;-19.7757,-52.62653;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0
-Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;56;189.8001,-15.6;Float;False;True;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;IcebergAmplify;94348b07e5e8bab40bd6c8a1e3df54cd;True;Forward;0;1;Forward;18;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;2;True;12;all;0;False;True;1;1;False;;0;False;;1;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;1;LightMode=UniversalForward;False;False;0;Hidden/InternalErrorShader;0;0;Standard;38;Workflow;1;0;Surface;0;0;  Refraction Model;0;0;  Blend;0;0;Two Sided;1;0;Fragment Normal Space,InvertActionOnDeselection;0;0;Transmission;0;0;  Transmission Shadow;0.5,False,;0;Translucency;0;0;  Translucency Strength;1,False,;0;  Normal Distortion;0.5,False,;0;  Scattering;2,False,;0;  Direct;0.9,False,;0;  Ambient;0.1,False,;0;  Shadow;0.5,False,;0;Cast Shadows;1;0;  Use Shadow Threshold;0;0;Receive Shadows;1;0;GPU Instancing;1;0;LOD CrossFade;1;0;Built-in Fog;1;0;_FinalColorxAlpha;0;0;Meta Pass;1;0;Override Baked GI;0;0;Extra Pre Pass;0;0;DOTS Instancing;0;0;Tessellation;0;0;  Phong;0;0;  Strength;0.5,False,;0;  Type;0;0;  Tess;16,False,;0;  Min;10,False,;0;  Max;25,False,;0;  Edge Length;16,False,;0;  Max Displacement;25,False,;0;Write Depth;0;0;  Early Z;0;0;Vertex Position,InvertActionOnDeselection;0;638158280046266120;0;8;False;True;True;True;True;True;True;True;False;;False;0
 Node;AmplifyShaderEditor.FresnelNode;16;-646.8235,-552.0422;Inherit;True;Standard;WorldNormal;ViewDir;False;False;5;0;FLOAT3;0,0,1;False;4;FLOAT3;0,0,0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;5;False;1;FLOAT;0
 Node;AmplifyShaderEditor.TextureCoordinatesNode;64;-952.7292,-939.8773;Inherit;False;0;-1;2;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT2;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.ScaleAndOffsetNode;65;-709.6093,-937.1581;Inherit;False;3;0;FLOAT2;0,0;False;1;FLOAT;1;False;2;FLOAT;-0.5;False;1;FLOAT2;0
@@ -2581,19 +2558,16 @@ Node;AmplifyShaderEditor.RangedFloatNode;67;-242.8781,-695.0891;Inherit;False;Pr
 Node;AmplifyShaderEditor.DistanceOpNode;68;-506.7183,-938.5276;Inherit;True;2;0;FLOAT2;0,0;False;1;FLOAT2;0,0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SmoothstepOpNode;69;-68.91007,-932.2551;Inherit;True;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0.22;False;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleSubtractOpNode;70;-288.6441,-934.9523;Inherit;True;2;0;FLOAT;0;False;1;FLOAT;0.3;False;1;FLOAT;0
-WireConnection;13;0;12;0
-WireConnection;13;1;9;3
-WireConnection;11;0;10;0
-WireConnection;11;1;13;0
+Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;56;189.8001,-15.6;Float;False;True;-1;2;UnityEditor.ShaderGraph.PBRMasterGUI;0;12;IcebergAmplify;94348b07e5e8bab40bd6c8a1e3df54cd;True;Forward;0;1;Forward;18;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;False;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;3;RenderPipeline=UniversalPipeline;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;True;2;True;12;all;0;False;True;1;1;False;;0;False;;1;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;1;LightMode=UniversalForward;False;False;0;Hidden/InternalErrorShader;0;0;Standard;38;Workflow;1;0;Surface;0;0;  Refraction Model;0;0;  Blend;0;0;Two Sided;1;0;Fragment Normal Space,InvertActionOnDeselection;0;0;Transmission;0;0;  Transmission Shadow;0.5,False,;0;Translucency;0;0;  Translucency Strength;1,False,;0;  Normal Distortion;0.5,False,;0;  Scattering;2,False,;0;  Direct;0.9,False,;0;  Ambient;0.1,False,;0;  Shadow;0.5,False,;0;Cast Shadows;1;0;  Use Shadow Threshold;0;0;Receive Shadows;1;0;GPU Instancing;1;0;LOD CrossFade;1;0;Built-in Fog;1;0;_FinalColorxAlpha;0;0;Meta Pass;1;0;Override Baked GI;0;0;Extra Pre Pass;0;0;DOTS Instancing;0;0;Tessellation;0;0;  Phong;0;0;  Strength;0.5,False,;0;  Type;0;0;  Tess;16,False,;0;  Min;10,False,;0;  Max;25,False,;0;  Edge Length;16,False,;0;  Max Displacement;25,False,;0;Write Depth;0;0;  Early Z;0;0;Vertex Position,InvertActionOnDeselection;1;638158790236110108;0;8;False;True;True;True;True;True;True;True;False;;False;0
+Node;AmplifyShaderEditor.SamplerNode;9;-675.0003,168.9999;Inherit;True;Property;_RenderTexture;Render Texture;0;0;Create;True;0;0;0;False;0;False;-1;f0ca894edbef3db4883ff4f773b6d029;f0ca894edbef3db4883ff4f773b6d029;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;8;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;6;FLOAT;0;False;7;SAMPLERSTATE;;False;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.ColorNode;71;-644.4613,405.1121;Inherit;False;Constant;_VertexDisplacementColor;Vertex Displacement Color;9;0;Create;True;0;0;0;False;0;False;0,1,0,0;0,0,0,0;True;0;5;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;72;-368.8606,305.0116;Inherit;False;2;2;0;FLOAT;0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
+Node;AmplifyShaderEditor.NegateNode;76;-132.2655,231.8008;Inherit;False;1;0;COLOR;0,0,0,0;False;1;COLOR;0
 WireConnection;18;0;69;0
 WireConnection;18;1;19;0
 WireConnection;20;0;18;0
 WireConnection;20;1;43;0
-WireConnection;48;0;47;0
-WireConnection;48;1;45;0
 WireConnection;49;0;20;0
-WireConnection;56;0;49;0
-WireConnection;56;8;11;0
 WireConnection;16;1;23;0
 WireConnection;16;2;22;0
 WireConnection;16;3;21;0
@@ -2603,5 +2577,10 @@ WireConnection;69;0;70;0
 WireConnection;69;2;67;0
 WireConnection;70;0;68;0
 WireConnection;70;1;66;0
+WireConnection;56;0;49;0
+WireConnection;56;8;76;0
+WireConnection;72;0;9;3
+WireConnection;72;1;71;0
+WireConnection;76;0;72;0
 ASEEND*/
-//CHKSM=3DDC96CF8D4CF5E6BCCCF4D785CEB4E59C46F9DC
+//CHKSM=88976F276C56EDDD25635CB0DCDAABE523D85022
