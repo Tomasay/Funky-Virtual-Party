@@ -4839,6 +4839,7 @@ MonoBehaviour:
   hatAttachPoint: {fileID: 334808032036139402}
   hatPoofParticles: {fileID: 2732590188110306956}
   posFromHost: {x: 0, y: 0, z: 0}
+  isDebugPlayer: 0
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
@@ -4847,6 +4848,7 @@ MonoBehaviour:
   waterSplash: {fileID: 5531231052371847848, guid: 60c88e966a0f8324da766221921ee65f, type: 3}
   iceTrail: {fileID: 2732590188110306956}
   iceCube: {fileID: 7032091265331159820}
+  snowDigParticles: {fileID: 0}
   isAlive: 1
   prevVector: {x: 0, y: 0}
   jumpForce: 250
@@ -4999,6 +5001,18 @@ PrefabInstance:
     - target: {fileID: 2109134583531204466, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 2.5274377
+      objectReference: {fileID: 0}
+    - target: {fileID: 2272252485581221372, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2272252485581221372, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2272252485581221372, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_ReflectionProbeUsage
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2272252485581221372, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_Materials.Array.data[0]

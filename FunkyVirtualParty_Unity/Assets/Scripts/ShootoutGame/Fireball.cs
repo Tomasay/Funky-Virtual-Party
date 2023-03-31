@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Animations;
@@ -18,7 +20,6 @@ public class Fireball : MonoBehaviour
     [SerializeField] Color emberColor, emberColorBoosted;
     [SerializeField] float fireballGrowSpeed = 0.25f;
     [SerializeField] public FireballObjectSyncer syncer;
-    [SerializeField] Shootout_DestructibleTerrian terrain;
 
     [SerializeField] Color boostedMainColor, boostedSecondaryColor;
     [SerializeField] ParticleSystem boostedParticleEffect;
@@ -33,6 +34,20 @@ public class Fireball : MonoBehaviour
 
     public bool hasExploded = false, isDropped = false;
     public float maxTimeAlive = 10, timeDropped;
+
+    public byte[] SerializeExplosionData(Vector3 pos)
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(syncer.objectID);
+                writer.Write(pos);
+                writer.Write(currentScale);
+            }
+            return m.ToArray();
+        }
+    }
 
     private void Awake()
     {
@@ -95,9 +110,11 @@ public class Fireball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.GetComponent<Terrain>() || collision.gameObject.name.Contains("ChunkObject"))
+        if(collision.gameObject.name.Equals("Iceberg_Collider"))
         {
-            terrain.Explosion(collision, this);
+            Vector3 point = collision.GetContact(0).point;
+
+            syncer.TriggerIcebergHole(point, currentScale);
             TriggerExplosion();
         }
         else if(collision.gameObject.name.Contains("IceTower"))
