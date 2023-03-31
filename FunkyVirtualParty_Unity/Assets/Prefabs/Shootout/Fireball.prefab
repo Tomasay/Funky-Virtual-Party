@@ -99,7 +99,6 @@ MonoBehaviour:
   emberColorBoosted: {r: 1, g: 0, b: 0.84019756, a: 1}
   fireballGrowSpeed: 0.25
   syncer: {fileID: 4879968599162948385}
-  terrain: {fileID: 0}
   boostedMainColor: {r: 0, g: 0.36078432, b: 1, a: 1}
   boostedSecondaryColor: {r: 0.69803923, g: 0.22352941, b: 0.19215687, a: 1}
   boostedParticleEffect: {fileID: 8006817646706589012}
@@ -224,11 +223,8 @@ MonoBehaviour:
   objectID: 0
   UpdatesPerSecond: 15
   grabbable: {fileID: 3466704360205798773}
-  constraint: {fileID: 3865167073801075657}
+  simulatePhysicsOnDrop: 1
   rb: {fileID: 566606611587223269}
-  onTrajectory: 0
-  fireballHandAnchorLeft: {fileID: 0}
-  fireballHandAnchorRight: {fileID: 0}
   fireballMesh: {fileID: 4423289069885267050}
   fireballTrail: {fileID: 0}
   mainFireball: {fileID: 0}
@@ -246,6 +242,9 @@ MonoBehaviour:
   boostedMainColor: {r: 0, g: 0.36078432, b: 1, a: 1}
   boostedSecondaryColor: {r: 0.69803923, g: 0.22352941, b: 0.19215687, a: 1}
   indicator: {fileID: 0}
+  icebergHolePrefab: {fileID: 4490812570648585615, guid: 106b4f7f8aaf55c409cbb8bb9cf3f889, type: 3}
+  minHoleScale: 0.05
+  maxHoleScale: 0.15
 --- !u!1 &719313112521586798
 GameObject:
   m_ObjectHideFlags: 0

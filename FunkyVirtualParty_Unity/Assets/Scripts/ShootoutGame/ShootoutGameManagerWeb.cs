@@ -6,7 +6,6 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 using Cinemachine;
-using Digger.Modules.Core.Sources;
 
 public class ShootoutGameManagerWeb : GameManagerWeb
 {
@@ -14,8 +13,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
-
-    [SerializeField] DiggerSystem digger;
 
     [SerializeField] CinemachineVirtualCamera cinemachineCam;
     [SerializeField] Camera cam;

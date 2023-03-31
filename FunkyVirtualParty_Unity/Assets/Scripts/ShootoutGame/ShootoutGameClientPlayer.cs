@@ -6,6 +6,7 @@ using Cinemachine;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using DG.Tweening;
 
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
@@ -45,6 +46,22 @@ public class ShootoutGameClientPlayer : ClientPlayer
             {
                 writer.Write(PlayerByteID);
                 writer.Write(splashPos);
+                writer.Write(false);
+            }
+            return m.ToArray();
+        }
+    }
+
+    public byte[] SerializeSplashData(Vector3 holePos)
+    {
+        using (MemoryStream m = new MemoryStream())
+        {
+            using (BinaryWriter writer = new BinaryWriter(m))
+            {
+                writer.Write(PlayerByteID);
+                writer.Write(splashPos);
+                writer.Write(true);
+                writer.Write(holePos);
             }
             return m.ToArray();
         }
@@ -63,16 +80,25 @@ public class ShootoutGameClientPlayer : ClientPlayer
             {
                 player = ClientManagerWeb.instance.GetPlayerByByteID(reader.ReadByte()) as ShootoutGameClientPlayer;
                 playerSplashPos = reader.ReadVector3();
+
+                //Kill corresponding player
+                if (reader.ReadBoolean())
+                {
+                    player.TriggerIceCubeAnimation(reader.ReadVector3());
+
+                    TriggerHaptic(500);
+                }
+                else
+                {
+                    player.SetPlayerActive(false);
+                    player.isAlive = false;
+                    player.TriggerIceCubeAnimation();
+                    SpawnSplashEffect(playerSplashPos);
+
+                    TriggerHaptic(500);
+                }
             }
         }
-
-        //Kill corresponding player
-        player.SetPlayerActive(false);
-        player.isAlive = false;
-        player.TriggerIceCubeAnimation();
-        SpawnSplashEffect(playerSplashPos);
-
-        TriggerHaptic(500);
     }
 #endif
 
@@ -83,6 +109,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         base.Awake();
 
 #if UNITY_WEBGL
+        snowDigParticles.Stop();
+
         ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
 #endif
     }
@@ -107,6 +135,14 @@ public class ShootoutGameClientPlayer : ClientPlayer
             OnDeath.Invoke();
 
             if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData());
+        }
+        else if(other.gameObject.name.Equals("HoleVolume"))
+        {
+            TriggerIceCubeAnimation(other.gameObject.transform.position);
+            isAlive = false;
+            OnDeath.Invoke();
+
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData(other.gameObject.transform.position));
         }
     }
 #endif
@@ -312,8 +348,53 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
     }
 
+    
+
     public void TriggerIceCubeAnimation()
     {
+        iceCube.SetActive(true);
+
+        playerNameText.enabled = false;
+
+        Col.enabled = false;
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+
+        smr.enabled = true;
+
+        CanMove = false;
+
+        anim.SetTrigger("StandingPose");
+
+        //Put player under water
+        transform.position = new Vector3(transform.position.x, 24.5f, transform.position.z);
+
+        StartCoroutine("BringToTop");
+    }
+
+    public void TriggerIceCubeAnimation(Vector3 holeCenterPos)
+    {
+        splashPos = new Vector3(holeCenterPos.x, 25, holeCenterPos.z);
+
+        CanMove = false;
+
+        anim.SetTrigger("FallIntoWater");
+
+        transform.DOMoveX(holeCenterPos.x, 0.25f);
+        transform.DOMoveZ(holeCenterPos.z, 0.25f);
+
+        StartCoroutine("IceCubeAnimation");
+    }
+
+    IEnumerator IceCubeAnimation()
+    {
+        yield return new WaitForSeconds(0.75f);
+
+        SpawnSplashEffect(splashPos);
+        SetPlayerActive(false);
+
+        yield return new WaitForSeconds(1);
+
         iceCube.SetActive(true);
 
         playerNameText.enabled = false;

@@ -30,6 +30,9 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
     private int maxIndicatorDistance = 4;
     private int fireballExplosionRange = 1;
 
+    [SerializeField] GameObject icebergHolePrefab;
+    [SerializeField] float minHoleScale, maxHoleScale;
+
     private bool lastActiveSent; //Value of isActive last sent to clients
 
     protected override void Awake()
@@ -63,10 +66,10 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
 #if UNITY_WEBGL
         if (isActive)
         {
-            //Check to see if above terrain
+            //Check to see if above iceberg
             if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, maxIndicatorDistance))
             {
-                if (hit.transform.TryGetComponent<Terrain>(out Terrain ter) || hit.transform.gameObject.name.Contains("Chunk"))
+                if (hit.transform.gameObject.name.Contains("Iceberg_Collider"))
                 {
                     //Enable indicator
                     indicator.enabled = true;
@@ -129,6 +132,8 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
             {
                 explosion.Play();
 
+                TriggerIcebergHole(transform.position);
+
                 ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)ClientManagerWeb.instance.LocalPlayer;
                 sp.CheckCollisionWithFireball(transform.position, Mathf.Max(2, currentScale * fireballExplosionRange) );
 
@@ -185,6 +190,19 @@ public class FireballObjectSyncer : GrabbableObjectSyncer
         isMini = false;
     }
 #endif
+
+    /// <summary>
+    /// Creates a prefab for a hole in the iceberg
+    /// </summary>
+    /// <param name="pos">Position of collision contact point</param>
+    /// <param name="scale">Scale of the current fireball. For WebGL, no need to input this parameter as it will use local scale. For VR, must override</param>
+    public void TriggerIcebergHole(Vector3 pos, float scale = -1)
+    {
+        GameObject newHole = Instantiate(icebergHolePrefab, pos, Quaternion.identity);
+
+        float holeSize = Mathf.Lerp(minHoleScale, maxHoleScale, (scale == -1) ? currentScale : scale);
+        newHole.transform.localScale = new Vector3(holeSize, holeSize, holeSize);
+    }
 
     IEnumerator ActivateTrailDelayed(float delay)
     {

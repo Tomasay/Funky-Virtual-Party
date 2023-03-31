@@ -5,7 +5,6 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
-using Digger.Modules.Core.Sources;
 
 public class ShootoutGameManager : GameManager
 {
@@ -29,8 +28,6 @@ public class ShootoutGameManager : GameManager
 
         if (ClientManager.instance)
         {
-            DiggerSocketManagerGetter.instance.manager = ClientManager.instance.Manager;
-
             foreach (ClientPlayer p in ClientManager.instance.Players)
             {
                 ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
@@ -40,7 +37,7 @@ public class ShootoutGameManager : GameManager
 
         SetPlayerMovement(false);
         SetVRPlayerMovementDelayed(false, 1);
-        SetVRPlayerCanThrowFireballs(false);
+        SetVRPlayerCanThrowFireballs(true);
 
 #if UNITY_EDITOR
         currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
