@@ -109,8 +109,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
         base.Awake();
 
 #if UNITY_WEBGL
-        snowDigParticles.Stop();
-
         ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
 #endif
     }
