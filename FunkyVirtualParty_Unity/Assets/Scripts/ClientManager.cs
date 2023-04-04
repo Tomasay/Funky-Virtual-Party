@@ -287,6 +287,7 @@ public class ClientManager : MonoBehaviour
         for (int i = 0; i < players.Count; i++)
         {
             string socketID = players[i].PlayerSocketID;
+            string playerIP = players[i].PlayerIP;
             byte byteID = players[i].PlayerByteID;
             string playerName = players[i].PlayerName;
             Color playerColor = players[i].PlayerColor;
@@ -301,6 +302,7 @@ public class ClientManager : MonoBehaviour
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
             players[i].PlayerSocketID = socketID;
+            players[i].PlayerIP = playerIP;
             players[i].PlayerByteID = byteID;
             players[i].PlayerName = playerName;
             players[i].PlayerColor = playerColor;
