@@ -397,7 +397,7 @@ public class ClientPlayer : MonoBehaviour
     //Default action, dance of course
     public virtual void Action()
     {
-        int dance = UnityEngine.Random.Range(1, 3);
+        int dance = UnityEngine.Random.Range(1, 4);
         anim.SetTrigger("Dance" + dance);
     }
 
