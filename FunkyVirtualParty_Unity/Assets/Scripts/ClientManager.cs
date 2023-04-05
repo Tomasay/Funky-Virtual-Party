@@ -238,9 +238,11 @@ public class ClientManager : MonoBehaviour
         GetPlayerByByteID(newData.id).Move(newData.input);
     }
 
+    public event Action<string, string, int, float, int> OnPlayerCustomized;
     private void SyncCustomizations(string id, string color, int headShape, float height, int hatIndex)
     {
         GetPlayerBySocketID(id).SetCustomizations(color, headShape, height, hatIndex);
+        OnPlayerCustomized(id, color, headShape, height, hatIndex);
     }
 
     public void SyncPlayerPos(byte id)
