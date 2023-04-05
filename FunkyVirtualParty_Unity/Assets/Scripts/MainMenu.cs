@@ -35,7 +35,6 @@ public class MainMenu : MonoBehaviour
     private bool isDiscoBallOn;
 
 
-
     // Start is called before the first frame update
     void Start()
     {
@@ -68,6 +67,8 @@ public class MainMenu : MonoBehaviour
         }
 
         ToggleBackgroundColor(0);
+
+        ClientManager.instance.OnPlayerCustomized += OnPlayerCustomized;
     }
 
     private void Update()
@@ -103,6 +104,15 @@ public class MainMenu : MonoBehaviour
         ClientManager.instance.onClientConnect -= SpawnPlayer;
         ClientManager.instance.onClientConnect -= SpawnPlayerIcon;
         ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
+        ClientManager.instance.OnPlayerCustomized -= OnPlayerCustomized;
+    }
+
+    void OnPlayerCustomized(string id, string color, int headShape, float height, int hatIndex)
+    {
+        if (ColorUtility.TryParseHtmlString(color, out Color newCol))
+        {
+            UpdatePlayerIconColor(id, newCol);
+        }
     }
 
     private void SpawnPlayer(GameObject player)
@@ -126,6 +136,17 @@ public class MainMenu : MonoBehaviour
         newIcon.GetComponent<Animator>().cullingMode = AnimatorCullingMode.CullUpdateTransforms; //Weird workaround with Unity's animator
         newIcon.GetComponent<Image>().color = cp.PlayerColor;
         newIcon.GetComponentInChildren<TMP_Text>().text = cp.PlayerName;
+    }
+
+    public void UpdatePlayerIconColor(string id, Color c)
+    {
+        foreach (Transform t in playerNamesList.GetComponentsInChildren<Transform>())
+        {
+            if (t.name.Equals(id))
+            {
+                t.GetComponent<Image>().color = c;
+            }
+        }
     }
 
     private void RemovePlayerIcon(string id)

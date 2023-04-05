@@ -38,20 +38,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
     public bool isAlive = true;
 
 #if !UNITY_WEBGL
-    public byte[] SerializeSplashData()
-    {
-        using (MemoryStream m = new MemoryStream())
-        {
-            using (BinaryWriter writer = new BinaryWriter(m))
-            {
-                writer.Write(PlayerByteID);
-                writer.Write(splashPos);
-                writer.Write(false);
-            }
-            return m.ToArray();
-        }
-    }
-
     public byte[] SerializeSplashData(Vector3 holePos)
     {
         using (MemoryStream m = new MemoryStream())
@@ -125,14 +111,11 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         if (other.tag.Equals("Water"))
         {
-            splashPos = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position);
-            SpawnSplashEffect(splashPos);
-            SetPlayerActive(false);
-            TriggerIceCubeAnimation();
+            TriggerIceCubeAnimation(transform.position);
             isAlive = false;
             OnDeath.Invoke();
 
-            if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData());
+            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData(transform.position));
         }
         else if(other.gameObject.name.Equals("HoleVolume"))
         {
