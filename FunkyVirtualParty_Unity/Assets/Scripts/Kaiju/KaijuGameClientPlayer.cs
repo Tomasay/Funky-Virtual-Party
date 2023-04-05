@@ -129,6 +129,11 @@ public class KaijuGameClientPlayer : ClientPlayer
     protected override void OnCollisionEnter(Collision collision)
     {
         // collide with objects
+        if (collision.collider.CompareTag("Untagged"))
+        {
+            state = KaijuClientState.OnGround;
+        }
+
     }
 
 #if UNITY_WEBGL
@@ -153,6 +158,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
             // Jump!
             GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
+            state = KaijuClientState.Jump;
         }
     }
 
@@ -162,6 +168,7 @@ public class KaijuGameClientPlayer : ClientPlayer
         rb.constraints = RigidbodyConstraints.None;
 
         anim.SetBool("Grabbed", true);
+        state = KaijuClientState.Grabbed;
     }
 
     public void OnDropped(Hand h, Grabbable g)
@@ -169,6 +176,7 @@ public class KaijuGameClientPlayer : ClientPlayer
         rb.constraints = currentConstraints;
 
         anim.SetBool("Grabbed", false);
+        state = KaijuClientState.Thrown;
 
         //Cool flying mechanics here
     }

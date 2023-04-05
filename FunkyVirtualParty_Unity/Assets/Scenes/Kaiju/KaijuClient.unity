@@ -378,7 +378,7 @@ GameObject:
   - component: {fileID: 193109269}
   m_Layer: 0
   m_Name: Kaiju
-  m_TagString: Untagged
+  m_TagString: Water
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1170,7 +1170,6 @@ MonoBehaviour:
   VRPlayer: {fileID: 1681611883}
   countdownText: {fileID: 740883006}
   gameTimeText: {fileID: 1759541647}
-  digger: {fileID: 0}
   cinemachineCam: {fileID: 22529009}
   cam: {fileID: 1161875111}
 --- !u!4 &968089518
@@ -2150,6 +2149,14 @@ PrefabInstance:
     - target: {fileID: 7233920282596647805, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
       propertyPath: m_Name
       value: XRPlayerClient1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7233920283111157093, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7233920284374092086, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
+      propertyPath: m_TagString
+      value: Player
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3abf909178130a845ac9529b3c0d0d4b, type: 3}
