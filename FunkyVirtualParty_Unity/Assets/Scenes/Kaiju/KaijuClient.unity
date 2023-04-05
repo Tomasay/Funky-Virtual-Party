@@ -148,7 +148,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 22529007}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1adce75ac332e4c4e9e7ac1b7b8ff9ad, type: 3}
   m_Name: 
@@ -182,7 +182,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.3333334, y: 1}
+    m_SensorSize: {x: 1.6863354, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -1443,6 +1443,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 802a16dbf333ff942adbc71c8cf941c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cam: {fileID: 22529009}
   player: {fileID: 0}
   XRplayer: {fileID: 1681611884}
   kaiju: {fileID: 193109273}
@@ -1823,19 +1824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 521f8e3d06ab44cadaed6ad179732778, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkSize: 17
-  sceneDataFolder: Shootout
-  screenRelativeTransitionHeightLod0: 0.1
-  screenRelativeTransitionHeightLod1: 0.05
-  colliderLodIndex: 0
-  createLODs: 0
-  showUnderlyingObjects: 0
-  resolutionMult: 1
-  voxelHeight: 1
-  autoVoxelHeight: 0
-  layer: 0
-  chunksTag: Untagged
-  enableOcclusionCulling: 0
 --- !u!4 &1371804622
 Transform:
   m_ObjectHideFlags: 0
@@ -2080,7 +2068,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2071d786339914393a9a433cd58890f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enablePersistence: 0
 --- !u!4 &1670597468
 Transform:
   m_ObjectHideFlags: 0

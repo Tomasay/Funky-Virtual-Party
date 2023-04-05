@@ -5,7 +5,8 @@ using Cinemachine;
 
 public class CameraKaijuState : MonoBehaviour
 {
-    CinemachineFreeLook cam;
+    //CinemachineFreeLook cam;
+    [SerializeField] CinemachineVirtualCamera cam;
     [SerializeField] Transform player;
     [SerializeField] Transform XRplayer;
     [SerializeField] Transform kaiju;
@@ -18,7 +19,9 @@ public class CameraKaijuState : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        cam = GetComponent<CinemachineFreeLook>();
+        if(!cam)
+            cam = GetComponent<CinemachineVirtualCamera>();
+
         if (!player)
         {
             player = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
@@ -55,29 +58,29 @@ public class CameraKaijuState : MonoBehaviour
             {
                 valueToLerpTo = -((rotation - 270) / 90) * maxRotation;
             }
-                cam.m_XAxis.Value = Mathf.Lerp(cam.m_XAxis.Value, valueToLerpTo, Time.deltaTime);
+                cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, Quaternion.Euler(valueToLerpTo, cam.transform.rotation.eulerAngles.y, cam.transform.rotation.eulerAngles.z), Time.deltaTime); //Mathf.Lerp(cam.transform.rotation.x, valueToLerpTo, Time.deltaTime);
                 break;
             case KaijuGameClientPlayer.KaijuClientState.Grabbed:
                 // look at vr player while keeping player in frame
                 Vector3 m = (XRplayer.position + player.position) / 2f;
                 mid.position = m;
-                //cam.LookAt = mid;
+                cam.LookAt = mid;
 
                 Vector3 dist = mid.position - player.position;
                 cam.transform.position = player.position - dist;
                 Vector3 direction = mid.position - cam.transform.position;
-                cam.transform.rotation = Quaternion.LookRotation(direction);
+                cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, Quaternion.LookRotation(direction), Time.deltaTime);
                 break;
             case KaijuGameClientPlayer.KaijuClientState.Thrown:
                 // look at Kaiju while keeping player in center
                 Vector3 ma = (kaiju.position + player.position) / 2f;
                 mid.position = ma;
-                //cam.LookAt = mid;
+                cam.LookAt = mid;
 
                 Vector3 dista = mid.position - player.position;
                 cam.transform.position = player.position - dista;
                 Vector3 directiona = mid.position - cam.transform.position;
-                cam.transform.rotation = Quaternion.LookRotation(directiona);
+                cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, Quaternion.LookRotation(directiona), Time.deltaTime);
                 break;
 
         }
