@@ -6,7 +6,7 @@ using Cinemachine;
 public class CameraKaijuState : MonoBehaviour
 {
     //CinemachineFreeLook cam;
-    [SerializeField] CinemachineVirtualCamera cam;
+    [SerializeField] CinemachineFreeLook cam;
     [SerializeField] Transform player;
     [SerializeField] Transform XRplayer;
     [SerializeField] Transform kaiju;
@@ -20,13 +20,15 @@ public class CameraKaijuState : MonoBehaviour
     void Start()
     {
         if(!cam)
-            cam = GetComponent<CinemachineVirtualCamera>();
+            cam = GetComponent<CinemachineFreeLook>();
 
         if (!player)
         {
             player = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
         }
-        if(!clientPlayer)
+        cam.LookAt = player;
+
+        if (!clientPlayer)
         {
             clientPlayer = ClientManagerWeb.instance.LocalPlayer as KaijuGameClientPlayer;
         }
@@ -49,7 +51,7 @@ public class CameraKaijuState : MonoBehaviour
             default:
             case KaijuGameClientPlayer.KaijuClientState.OnGround:
             case KaijuGameClientPlayer.KaijuClientState.Jump:
-            float rotation = player.rotation.eulerAngles.y;
+            /*float rotation = player.rotation.eulerAngles.y;
             if (rotation > 0 && rotation < 90)
             {
                 valueToLerpTo = (rotation / 90) * maxRotation;
@@ -58,7 +60,7 @@ public class CameraKaijuState : MonoBehaviour
             {
                 valueToLerpTo = -((rotation - 270) / 90) * maxRotation;
             }
-                cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, Quaternion.Euler(valueToLerpTo, cam.transform.rotation.eulerAngles.y, cam.transform.rotation.eulerAngles.z), Time.deltaTime); //Mathf.Lerp(cam.transform.rotation.x, valueToLerpTo, Time.deltaTime);
+                cam.transform.rotation = Quaternion.Lerp(cam.transform.rotation, Quaternion.Euler(valueToLerpTo, cam.transform.rotation.eulerAngles.y, cam.transform.rotation.eulerAngles.z), Time.deltaTime);*/
                 break;
             case KaijuGameClientPlayer.KaijuClientState.Grabbed:
                 // look at vr player while keeping player in frame

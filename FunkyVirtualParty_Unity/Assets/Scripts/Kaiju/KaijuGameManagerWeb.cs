@@ -12,7 +12,7 @@ public class KaijuGameManagerWeb : GameManagerWeb
     private bool countingDown = false;
     private float timeRemaining;
 
-    [SerializeField] CinemachineVirtualCamera cinemachineCam;
+    [SerializeField] CinemachineFreeLook cinemachineCam;
     [SerializeField] Camera cam;
 
 
@@ -59,8 +59,8 @@ public class KaijuGameManagerWeb : GameManagerWeb
         countdownText.enabled = false;
         SetPlayerMovement(true);
 
-        cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_YDamping = 1;
-        cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_ZDamping = 1;
+        //cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_YDamping = 1;
+        //cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_ZDamping = 1;
     }
     // Start is called before the first frame update
     protected override void Start()
@@ -71,12 +71,10 @@ public class KaijuGameManagerWeb : GameManagerWeb
 
         ClientManagerWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
 
-        foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
-        {
-            (cp as KaijuGameClientPlayer).cam = cam;
-        }
+        (ClientManagerWeb.instance.LocalPlayer as KaijuGameClientPlayer).cam = cam;
 
-        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
+        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+        cinemachineCam.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
     }
 
     // Update is called once per frame
