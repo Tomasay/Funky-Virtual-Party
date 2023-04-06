@@ -181,8 +181,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.25f));
-            Move(collisionVector.normalized * -0.25f, false, true, input);
+            //Collision force starts off strong and fades off, input influence starts low and comes back to normal
+            float t = (collisionTimer > 0) ? (collisionTimer / collisionTimerDefault) : 0;
+            Vector2 collisionInput = prevVector = (input * (1-t)) + (-0.75f * t * collisionVector.normalized);
+
+            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionInput));
+            Move(collisionInput, (input == Vector2.zero) ? false : true, true, input);
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -278,7 +282,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         if(ext)
         {
             isColliding = true;
-            collisionVector = Vector2.Reflect(prevVector, collision.contacts[0].normal );
+            collisionVector = Vector2.Reflect(prevVector - new Vector2(ext.movement.x, ext.movement.z), collision.contacts[0].normal );
         }
     }
 
