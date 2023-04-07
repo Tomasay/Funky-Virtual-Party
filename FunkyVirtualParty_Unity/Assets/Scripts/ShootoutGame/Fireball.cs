@@ -125,7 +125,7 @@ public class Fireball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.name.Contains("Water"))
+        if (other.name.Contains("Water") || other.name.Equals("HoleVolume"))
         {
             TriggerSmokePuff();
         }
