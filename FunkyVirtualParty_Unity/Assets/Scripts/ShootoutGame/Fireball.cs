@@ -59,7 +59,7 @@ public class Fireball : MonoBehaviour
         }
         pool.Add(this);
 
-        chargeCanvas.transform.parent = null;
+        chargeCanvas.transform.SetParent(null);
     }
 
     private void OnDisable()

@@ -68,10 +68,10 @@ public class ClientManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        SceneManager.sceneLoaded += FadeInScene;
-
         if (passcode == null)
         {
+            SceneManager.sceneLoaded += FadeInScene;
+
             Debug.Log("Attempting to connect to socket.io server: " + socketUrl);
 
             manager = new SocketManager(new Uri(socketUrl));
@@ -109,6 +109,8 @@ public class ClientManager : MonoBehaviour
     void OnApplicationQuit()
     {
         Debug.Log("OnApplicationQuit");
+
+        SceneManager.sceneLoaded -= FadeInScene;
 
         manager.Socket.Emit("unityCloseRoom", passcode);
         manager?.Close();
