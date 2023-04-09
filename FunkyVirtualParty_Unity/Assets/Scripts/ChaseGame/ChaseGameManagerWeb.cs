@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 using Cinemachine;
+using DG.Tweening;
 
 public class ChaseGameManagerWeb : GameManagerWeb
 {
@@ -14,6 +15,7 @@ public class ChaseGameManagerWeb : GameManagerWeb
 
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
+    [SerializeField] private ParticleSystem countdownParticles;
     private bool countingDown = false;
     private float timeRemaining;
 
@@ -78,10 +80,15 @@ public class ChaseGameManagerWeb : GameManagerWeb
         for (int i = countdown; i > 0; i--)
         {
             countdownText.text = "" + i;
+            countdownText.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+            countdownText.transform.DOScale(1, 0.25f);
             yield return new WaitForSeconds(1);
         }
 
+        countdownParticles.Play();
         countdownText.text = "GO!";
+        countdownText.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        countdownText.transform.DOScale(1, 0.25f);
 
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
