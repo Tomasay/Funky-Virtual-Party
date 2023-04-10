@@ -319,11 +319,11 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     // Jumping fields
     [SerializeField] private int jumpForce = 500;
-    [SerializeField] int jumpCooldown = 2;
+    [SerializeField] float jumpCooldown = 1;
     float timeJumped = 0;
     public override void Action()
     {
-        if (CanMove && timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown)
+        if (CanMove && (timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown))
         {
             timeJumped = Time.time;
             anim.SetTrigger("Jump");
