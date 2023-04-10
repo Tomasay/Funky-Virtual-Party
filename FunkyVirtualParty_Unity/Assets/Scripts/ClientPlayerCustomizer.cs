@@ -9,14 +9,15 @@ public class ClientPlayerCustomizer : MonoBehaviour
     [SerializeField] Button enableCustomizationButton, closeCustomizationButton;
     [SerializeField] Canvas controllerCanvas;
     [SerializeField] GameObject backgroundDots;
+    [SerializeField] Camera cam;
 
     private Vector3 initialCameraPos;
     private Quaternion initialCameraRot;
 
     void Start()
     {
-        initialCameraPos = Camera.main.transform.position;
-        initialCameraRot = Camera.main.transform.rotation;
+        initialCameraPos = cam.transform.position;
+        initialCameraRot = cam.transform.rotation;
 
         enableCustomizationButton.onClick.AddListener(EnableCustomization);
         closeCustomizationButton.onClick.AddListener(DisableCustomization);
@@ -26,12 +27,22 @@ public class ClientPlayerCustomizer : MonoBehaviour
         toggleColorRightButton.onClick.AddListener(NextColorCustomization);
     }
 
+    private void OnDestroy()
+    {
+        enableCustomizationButton.onClick.RemoveListener(EnableCustomization);
+        closeCustomizationButton.onClick.RemoveListener(DisableCustomization);
+        toggleHatLeftButton.onClick.RemoveListener(PreviousHatCustomization);
+        toggleHatRightButton.onClick.RemoveListener(NextHatCustomization);
+        toggleColorLeftButton.onClick.RemoveListener(PreviousColorCustomization);
+        toggleColorRightButton.onClick.RemoveListener(NextColorCustomization);
+    }
+
     private void EnableCustomization()
     {
         //Camera
-        Camera.main.transform.parent = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
-        Camera.main.transform.localPosition = new Vector3(0, 5, 10);
-        Camera.main.transform.localRotation = Quaternion.Euler(new Vector3(15, 180, 0));
+        cam.transform.parent = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+        cam.transform.localPosition = new Vector3(0, 5, 10);
+        cam.transform.localRotation = Quaternion.Euler(new Vector3(15, 180, 0));
 
         //Enable UI components
         controllerCanvas.enabled = false;
@@ -42,14 +53,16 @@ public class ClientPlayerCustomizer : MonoBehaviour
         closeCustomizationButton.gameObject.SetActive(true);
         enableCustomizationButton.gameObject.SetActive(false);
         backgroundDots.SetActive(false);
+
+        ClientManagerWeb.instance.LocalPlayer.SetPlayerNameVisibility(false);
     }
 
     private void DisableCustomization()
     {
         //Camera
-        Camera.main.transform.parent = null;
-        Camera.main.transform.position = initialCameraPos;
-        Camera.main.transform.rotation = initialCameraRot;
+        cam.transform.parent = null;
+        cam.transform.position = initialCameraPos;
+        cam.transform.rotation = initialCameraRot;
 
         //Disable UI components
         controllerCanvas.enabled = true;
@@ -60,6 +73,8 @@ public class ClientPlayerCustomizer : MonoBehaviour
         closeCustomizationButton.gameObject.SetActive(false);
         enableCustomizationButton.gameObject.SetActive(true);
         backgroundDots.SetActive(true);
+
+        ClientManagerWeb.instance.LocalPlayer.SetPlayerNameVisibility(true);
     }
 
     private void NextHatCustomization()

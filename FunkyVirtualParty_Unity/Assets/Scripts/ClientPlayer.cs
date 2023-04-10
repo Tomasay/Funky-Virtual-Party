@@ -388,6 +388,13 @@ public class ClientPlayer : MonoBehaviour
         CanMove = active;
     }
 
+    //Sets player name visibility
+    public void SetPlayerNameVisibility(bool active)
+    {
+        playerNameText.enabled = active;
+        Debug.Log("Set name visible: " + active);
+    }
+
     //Sets player indicator
     public void SetPlayerIndicatorVisibility(bool active)
     {
