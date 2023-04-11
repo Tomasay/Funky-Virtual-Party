@@ -144,6 +144,7 @@ public class ChaseGameClientPlayer : ClientPlayer
                 //Rotate to look at player, only on Y axis
                 Quaternion lookDir = Quaternion.LookRotation(dir);
                 lookRotation = Quaternion.Euler(new Vector3(0, lookDir.eulerAngles.y, 0));
+                anim.transform.rotation = lookRotation;
 
                 //Tackle!
                 GetComponent<Rigidbody>().AddForce(dir * tackleForce);
