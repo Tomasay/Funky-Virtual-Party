@@ -89,9 +89,10 @@ public class MainMenuWeb : MonoBehaviour
         */
     }
 
-    private void EnableFailedConnectDebug()
+    private void EnableFailedConnectDebug(string s)
     {
         partyCodeInvalidDebug.SetActive(true);
+        partyCodeInvalidDebug.GetComponentInChildren<TMP_Text>().text = s;
     }
 
     public void DisableFailedConnectDebug()
