@@ -38,6 +38,11 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if(ClientManager.instance.Manager != null)
+        {
+            ClientManager.instance.Manager.Socket.Emit("setIsGameInPlay", ClientManager.instance.Passcode, false);
+        }
+
         //Spawn all existing players
         ClientManager.instance.SpawnPlayers(playerPrefab, playerPositions);
         foreach (ClientPlayer cp in ClientManager.instance.Players)

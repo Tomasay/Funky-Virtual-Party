@@ -52,7 +52,7 @@ public class ClientManagerWeb : MonoBehaviour
             manager = new SocketManager(new Uri(socketUrl));
             manager.Parser = new MsgPackParser();
 
-            manager.Socket.On<bool>("joinedRoom", JoinRoomCheck);
+            manager.Socket.On<bool, string>("joinedRoom", JoinRoomCheck);
             manager.Socket.On<string, string, string>("connectToHost", OnClientConnect);
             manager.Socket.On<string, byte>("assignPlayerByteIDClient", AssignPlayerByteID);
             manager.Socket.On<string, string>("disconnectToUnity", OnClientDisconnect);
@@ -145,8 +145,8 @@ public class ClientManagerWeb : MonoBehaviour
         }
     }
 
-    public event Action onClientFailedConnect;
-    private void JoinRoomCheck(bool joined)
+    public event Action<string> onClientFailedConnect;
+    private void JoinRoomCheck(bool joined, string failCode)
     {
         if(joined) //If we successfuly joined a room
         {
@@ -154,7 +154,7 @@ public class ClientManagerWeb : MonoBehaviour
         }
         else //If room was invalid
         {
-            onClientFailedConnect.Invoke();
+            onClientFailedConnect.Invoke(failCode);
         }
     }
 
