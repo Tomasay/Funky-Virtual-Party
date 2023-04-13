@@ -31,7 +31,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 2;
+        startingSpeed = 10;
 
         base.Awake();
 
