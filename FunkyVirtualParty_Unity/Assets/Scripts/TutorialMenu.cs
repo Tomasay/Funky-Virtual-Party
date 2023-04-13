@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 #if UNITY_EDITOR
 using UnityEngine.InputSystem;
@@ -17,6 +18,9 @@ public class TutorialMenu : MonoBehaviour
     [SerializeField] Button VrPlayerReady;
 
     private Dictionary<string, GameObject> vrPlayerIcons;
+
+    private int canvasRotationIncrement = 45;
+    private float timeRotated, rotationTime = 1;
 
     void Start()
     {
@@ -66,6 +70,8 @@ public class TutorialMenu : MonoBehaviour
             ReadyUpVR();
         }
 #endif
+
+        UpdateCameraRotationOffset();
     }
 
     private void OnDestroy()
@@ -155,5 +161,28 @@ public class TutorialMenu : MonoBehaviour
         }
         manager.State = GameState.Countdown;
         this.gameObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// Rotates the tutorial screen incrementally to match the player's head rotation.
+    /// Make sure that the origin of this tutorial screen object is the same pos/rot as the player
+    /// </summary>
+    void UpdateCameraRotationOffset()
+    {
+        if (Time.time > timeRotated + rotationTime)
+        {
+            float rot = Mathf.DeltaAngle(transform.rotation.eulerAngles.y, Camera.main.transform.rotation.eulerAngles.y);
+
+            if (rot >= canvasRotationIncrement)
+            {
+                transform.DOBlendableRotateBy(new Vector3(0, canvasRotationIncrement, 0), rotationTime);
+                timeRotated = Time.time;
+            }
+            else if (rot <= -canvasRotationIncrement)
+            {
+                transform.DOBlendableRotateBy(new Vector3(0, -canvasRotationIncrement, 0), rotationTime);
+                timeRotated = Time.time;
+            }
+        }
     }
 }
