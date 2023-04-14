@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using FMODUnity;
 
 public class PaintPalette : MonoBehaviour
 {
@@ -68,12 +67,10 @@ public class PaintPalette : MonoBehaviour
         if (other.name.Equals("Tip"))
         {
             pen.ChangeColor(colorToSet);
-            RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
         }
         else if(other.name.Equals("Paint Spray Gun"))
         {
             sprayGun.ChangeColor(colorToSet);
-            RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
         }
 
         OnColorChanged.Invoke();

@@ -4,6 +4,10 @@ using UnityEngine;
 using PaintIn3D;
 using UnityEngine.Events;
 
+#if UNITY_ANDROID
+using FMODUnity;
+#endif
+
 public class PaintSprayGun : MonoBehaviour
 {
     [SerializeField]
@@ -125,6 +129,11 @@ public class PaintSprayGun : MonoBehaviour
 #if UNITY_ANDROID
         if (IsInHand)
         {
+            if (!paintColorMat.color.Equals(palette.colors[c]))
+            {
+                RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
+            }
+
             paintColorMat.color = palette.colors[c];
             ps.startColor = palette.colors[c];
             paintSphere.Color = palette.colors[c];

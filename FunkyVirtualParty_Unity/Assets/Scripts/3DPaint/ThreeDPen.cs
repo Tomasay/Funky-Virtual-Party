@@ -5,6 +5,10 @@ using Shapes;
 using Autohand;
 using UnityEngine.Events;
 
+#if UNITY_ANDROID
+using FMODUnity;
+#endif
+
 public class ThreeDPen : MonoBehaviour
 {
     Polyline currentLine;
@@ -198,6 +202,11 @@ public class ThreeDPen : MonoBehaviour
 #if UNITY_ANDROID
         if (IsInHand)
         {
+            if(!currentColor.Equals(palette.colors[c]))
+            {
+                RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
+            }
+
             currentColor = palette.colors[c];
             tipMesh.material.color = palette.colors[c];
 
