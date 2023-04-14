@@ -8,6 +8,8 @@ using Autohand;
 using Autohand.Demo;
 using System.Linq;
 using UnityEngine.Animations;
+using FMOD.Studio;
+using FMODUnity;
 
 public enum ThreeDPaintGameState
 {
@@ -72,6 +74,11 @@ public class ThreeDPaintGameManager : GameManager
     [SerializeField]
     MannequinSolver solver;
 
+    [SerializeField]
+    EventReference musicEvent;
+
+    EventInstance fmodInstance;
+
     Dictionary<string, string> answers;
 
     private string chosenAnswer, chosenAnswerOwner;
@@ -119,6 +126,9 @@ public class ThreeDPaintGameManager : GameManager
 
             StartCoroutine("StartGame");
         }
+
+        fmodInstance = RuntimeManager.CreateInstance(musicEvent);
+        fmodInstance.start();
     }
 
     private void OnDisable()
@@ -154,7 +164,16 @@ public class ThreeDPaintGameManager : GameManager
                 drawTimeRemaining -= Time.deltaTime;
                 timerText.text = FormatTime(drawTimeRemaining);
 
-                if(drawTimeRemaining <= 0)
+                if (drawTimeRemaining <= 15)
+                {
+                    fmodInstance.setParameterByName("VRtistryClock", 2);
+                }
+                else if (drawTimeRemaining <= ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT / 2)
+                {
+                    fmodInstance.setParameterByName("VRtistryClock", 1);
+                }
+
+                if (drawTimeRemaining <= 0)
                 {
                     State = ThreeDPaintGameState.ClientsGuessing;
                 }
@@ -215,6 +234,8 @@ public class ThreeDPaintGameManager : GameManager
 
                 break;
             case ThreeDPaintGameState.VRPosing:
+                fmodInstance.setParameterByName("VRtistryPhase", 1);
+
                 solver.EnablePosing();
 
                 //Disable VR tools
@@ -276,6 +297,9 @@ public class ThreeDPaintGameManager : GameManager
                 ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowBlurredView", "");
                 break;
             case ThreeDPaintGameState.ClientsGuessing:
+                fmodInstance.setParameterByName("VRtistryPhase", 0);
+                fmodInstance.setParameterByName("VRtistryClock", 0);
+
                 playersGuessed = 0;
 
                 //Communicate to clients
@@ -326,7 +350,13 @@ public class ThreeDPaintGameManager : GameManager
     {
         if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "GameOver", "");
 
-        yield return new WaitForSeconds(5);
+        fmodInstance.setParameterByName("VRtistryPhase", 2);
+
+        yield return new WaitForSeconds(4);
+
+        fmodInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+
+        yield return new WaitForSeconds(1);
 
         ClientManager.instance.LoadMainMenu();
     }

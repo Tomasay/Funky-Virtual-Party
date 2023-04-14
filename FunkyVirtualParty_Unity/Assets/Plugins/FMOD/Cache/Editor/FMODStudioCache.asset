@@ -42,10 +42,10 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638120151082894596
+  lastModified: 638170198748685495
   FileSizes:
   - Name: Desktop
-    Value: 1192
+    Value: 1334
   Exists: 1
 --- !u!114 &-1060322754376276002
 MonoBehaviour:
@@ -62,10 +62,10 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Music.bank
   Name: Music
   StudioPath: bank:/Music
-  lastModified: 638120151083084583
+  lastModified: 638170198767082019
   FileSizes:
   - Name: Desktop
-    Value: 1416128
+    Value: 3593024
   Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
@@ -90,12 +90,13 @@ MonoBehaviour:
   - {fileID: 8064383923443113136}
   - {fileID: 397026873310947440}
   - {fileID: 3828734369981536026}
+  - {fileID: 5266432385895195812}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8547906298644744342}
   StringsBanks:
   - {fileID: -1657200388165055800}
-  cacheTime: 638120151083264579
+  cacheTime: 638170198767360150
   cacheVersion: 131591
 --- !u!114 &397026873310947440
 MonoBehaviour:
@@ -166,7 +167,7 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/SFX.bank
   Name: SFX
   StudioPath: bank:/SFX
-  lastModified: 638120151083264579
+  lastModified: 638170198767360150
   FileSizes:
   - Name: Desktop
     Value: 7488
@@ -198,6 +199,83 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &5068687081363746621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/VRtistry/VRtistryPhase
+  m_EditorClassIdentifier: 
+  Name: VRtistryPhase
+  StudioPath: 
+  Min: 0
+  Max: 2
+  Default: 0
+  ID:
+    data1: 2159833158
+    data2: 4048619947
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &5266432385895195812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Music/VRtistry
+  m_EditorClassIdentifier: 
+  Path: event:/Music/VRtistry
+  Guid:
+    Data1: -1433382967
+    Data2: 1096983145
+    Data3: 1271356330
+    Data4: -25941865
+  Banks:
+  - {fileID: -1060322754376276002}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 0
+  Parameters:
+  - {fileID: 7170981953767192235}
+  - {fileID: 5068687081363746621}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 8000
+--- !u!114 &7170981953767192235
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/VRtistry/VRtistryClock
+  m_EditorClassIdentifier: 
+  Name: VRtistryClock
+  StudioPath: 
+  Min: 0
+  Max: 2
+  Default: 0
+  ID:
+    data1: 804725157
+    data2: 1215947821
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &8064383923443113136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,7 +318,7 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638120151082879578
+  lastModified: 638170198748670596
   FileSizes:
   - Name: Desktop
     Value: 1588
