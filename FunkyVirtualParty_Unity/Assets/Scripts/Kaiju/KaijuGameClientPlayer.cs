@@ -167,8 +167,12 @@ public class KaijuGameClientPlayer : ClientPlayer
         currentConstraints = rb.constraints;
         rb.constraints = RigidbodyConstraints.None;
 
+        anim.transform.localRotation = Quaternion.identity;
+
         anim.SetBool("Grabbed", true);
         state = KaijuClientState.Grabbed;
+
+        CanMove = false;
     }
 
     public void OnDropped(Hand h, Grabbable g)
@@ -177,6 +181,8 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
+
+        CanMove = true;
 
         //Cool flying mechanics here
     }
