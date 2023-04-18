@@ -25,7 +25,7 @@ public class GrabbableObjectSyncer : ObjectSyncer
 
 #if UNITY_WEBGL
     [SerializeField] protected ParentConstraint constraint;
-    [SerializeField] protected GameObject handAnchorLeft, handAnchorRight;
+    [SerializeField] public GameObject handAnchorLeft, handAnchorRight;
 #endif
 
     [SerializeField] protected Rigidbody rb;

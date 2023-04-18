@@ -15,6 +15,8 @@ public class KaijuGameManagerWeb : GameManagerWeb
     [SerializeField] CinemachineFreeLook cinemachineCam;
     [SerializeField] Camera cam;
 
+    [SerializeField] GameObject playerGrabAnchorLeft, playerGrabAnchorRight;
+
 
     private void Awake()
     {
@@ -79,7 +81,32 @@ public class KaijuGameManagerWeb : GameManagerWeb
         cinemachineCam.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
     }
 
-    // Update is called once per frame
+    protected override void OnStateChange(string s)
+    {
+        base.OnStateChange(s);
+
+        switch (State)
+        {
+            case GameState.Tutorial:
+                break;
+            case GameState.Countdown:
+#if UNITY_WEBGL
+                SetupPlayerParams(); // Set this on countdown because we know all players have spawned in
+#endif
+                break;
+            case GameState.GameLoop:
+                break;
+            case GameState.VRPlayerLoses:
+                break;
+            case GameState.VRPlayerWins:
+                break;
+            case GameState.TimeEnded:
+                break;
+            default:
+                break;
+        }
+    }
+
     void Update()
     {
         switch (State)
@@ -135,4 +162,17 @@ public class KaijuGameManagerWeb : GameManagerWeb
                 break;
         }
     }
+
+#if UNITY_WEBGL
+    void SetupPlayerParams()
+    {
+        for (int i = 0; i < ClientManagerWeb.instance.Players.Count; i++)
+        {
+            GrabbableObjectSyncer g = ClientManagerWeb.instance.Players[i].GetComponent<GrabbableObjectSyncer>();
+            g.objectID += (byte)i;
+            g.handAnchorLeft = playerGrabAnchorLeft;
+            g.handAnchorRight = playerGrabAnchorRight;
+        }
+    }
+#endif
 }

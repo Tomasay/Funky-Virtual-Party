@@ -1260,6 +1260,7 @@ GameObject:
   - component: {fileID: 7438992923791116873}
   - component: {fileID: 2390970669613709328}
   - component: {fileID: 4742599005701009078}
+  - component: {fileID: 8557081336447174041}
   m_Layer: 12
   m_Name: KaijuClientPlayer
   m_TagString: Untagged
@@ -1624,6 +1625,23 @@ MonoBehaviour:
     - {x: 0.03908651, y: -0.21121895, z: 0.0061333873, w: 0.9766377}
     - {x: -0.000008029863, y: 0.0000010747461, z: -0.0000007860363, w: 1}
   leftPoseSet: 1
+--- !u!114 &8557081336447174041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8143653906893471124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectID: 99
+  UpdatesPerSecond: 0
+  grabbable: {fileID: 7438992923791116873}
+  simulatePhysicsOnDrop: 1
+  rb: {fileID: 7095686512168902855}
 --- !u!1 &8335237129105250394
 GameObject:
   m_ObjectHideFlags: 0
