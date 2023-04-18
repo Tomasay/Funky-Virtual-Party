@@ -161,6 +161,8 @@ public class KaijuGameManager : GameManager
 
     IEnumerator StartCountdownTimer(int countdown)
     {
+        SetClientPlayerParams();
+
         countingDown = true;
         SetVRPlayerCanThrowFireballs(true);
 
@@ -199,6 +201,15 @@ public class KaijuGameManager : GameManager
     private void SetVRPlayerCanThrowFireballs(bool canThrow)
     {
         //VRPlayer.GetComponent<KaijuGameVRPlayerController>().canThrowFireballs = canThrow;
+    }
+
+    void SetClientPlayerParams()
+    {
+        for (int i = 0; i < ClientManager.instance.Players.Count; i++)
+        {
+            GrabbableObjectSyncer g = ClientManager.instance.Players[i].GetComponent<GrabbableObjectSyncer>();
+            g.objectID += (byte)i;
+        }
     }
 
 #if UNITY_EDITOR
