@@ -69,6 +69,7 @@ public class TutorialMenuClient : MonoBehaviour
         if(readyUpButton && p.IsLocal)
         {
             readyUpButton.interactable = false;
+            readyUpButton.GetComponent<Animator>().SetTrigger("Stop");
         }
 
         //Check if every player is ready
