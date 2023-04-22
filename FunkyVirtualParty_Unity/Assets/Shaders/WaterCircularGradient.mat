@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: WaterGradient
-  m_Shader: {fileID: 4800000, guid: adc9306dc0c73be4199339794065a7b1, type: 3}
+  m_Name: WaterCircularGradient
+  m_Shader: {fileID: 4800000, guid: 81e88bd1f2b99d1488e22939d487e519, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
@@ -22,10 +22,9 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaCutoff: 0.5
-    - _RadiusBottom: 1.62
-    - _RadiusTop: -7.5
-    - _Softness: 5.97
+    - _Radius: 0.25
+    - _Softness: 0.25
     m_Colors:
-    - _Color: {r: 0.36470592, g: 0.59346306, b: 1, a: 1}
+    - _Color: {r: 0.3647059, g: 0.5921569, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
