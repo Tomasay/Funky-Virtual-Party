@@ -11,7 +11,7 @@ public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Transform[] playerPositions;
 
-    [SerializeField] private TMP_Text partyCodeText, partyCodeTextStatic, inviteYourFriendsText, connectingText, connectionErrorText;
+    [SerializeField] private TMP_Text partyCodeText, partyCodeQRText, inviteYourFriendsText, connectingText, connectionErrorText;
 
     [SerializeField] private const float TIMEOUT_TIME = 5.0f;
 
@@ -170,7 +170,7 @@ public class MainMenu : MonoBehaviour
         if (partyCodeText)
         {
             partyCodeText.text = "Party Code: " + code;
-            partyCodeTextStatic.text = "Party Code: " + code;
+            partyCodeQRText.text = code;
         }
     }
 
