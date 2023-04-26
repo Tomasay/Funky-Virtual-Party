@@ -15,8 +15,7 @@ public class ChaseGameManagerWeb : GameManagerWeb
 
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
-    [SerializeField] private ParticleSystem countdownParticles;
-    private bool countingDown = false;
+    [SerializeField] private ParticleSystem countdownParticles, playerCapturedParticles;
     private float timeRemaining;
 
     protected override void Start()
@@ -31,40 +30,50 @@ public class ChaseGameManagerWeb : GameManagerWeb
         (ClientManagerWeb.instance.LocalPlayer as ChaseGameClientPlayer).cam = cam;
     }
 
-    void Update()
+    protected override void OnStateChange(string s)
     {
+        base.OnStateChange(s);
+
         switch (State)
         {
             case GameState.Tutorial:
                 SetPlayerMovement(false);
                 break;
             case GameState.Countdown:
-                if (!countingDown)
-                {
-                    StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
-                }
+                StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;
             case GameState.GameLoop:
                 SetPlayerMovement(true);
-                countingDown = false;
-                timeRemaining -= Time.deltaTime;
-                gameTimeText.text = FormatTime(timeRemaining);
-                /*
-                if (timeRemaining <= 0) //Game end, VR player wins
-                {
-                    State = GameState.TimeEnded;
-                }
-                */
                 break;
             case GameState.VRPlayerLoses:
+                playerCapturedParticles.Play();
                 StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
                 break;
+            case GameState.VRPlayerWins:
+                break;
             case GameState.TimeEnded:
-                if (!endingGame)
-                {
-                    StartCoroutine(GameOver(2, "TIMES UP!"));
-                    endingGame = true;
-                }
+                StartCoroutine(GameOver(2, "TIMES UP!"));
+                break;
+            default:
+                break;
+        }
+    }
+
+    void Update()
+    {
+        switch (State)
+        {
+            case GameState.Tutorial:
+                break;
+            case GameState.Countdown:
+                break;
+            case GameState.GameLoop:
+                timeRemaining -= Time.deltaTime;
+                gameTimeText.text = FormatTime(timeRemaining);
+                break;
+            case GameState.VRPlayerLoses:
+                break;
+            case GameState.TimeEnded:
                 break;
             default:
                 break;
@@ -73,8 +82,6 @@ public class ChaseGameManagerWeb : GameManagerWeb
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        countingDown = true;
-
         yield return new WaitForSeconds(1);
 
         for (int i = countdown; i > 0; i--)
