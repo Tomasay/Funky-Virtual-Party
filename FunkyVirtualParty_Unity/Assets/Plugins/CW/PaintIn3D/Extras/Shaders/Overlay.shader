@@ -1,11 +1,11 @@
-//<HASH>-2029883706</HASH>
+//<HASH>-1490749796</HASH>
 ////////////////////////////////////////
 // Generated with Better Shaders
 //
 // Auto-generated shader code, don't hand edit!
 //
 //   Unity Version: 2019.4.12f1
-//   Render Pipeline: URP2020
+//   Render Pipeline: URP2021
 //   Platform: WindowsEditor
 ////////////////////////////////////////
 
@@ -14,6 +14,8 @@ Shader "Paint in 3D/Overlay"
 {
    Properties
    {
+      [HideInInspector]_QueueOffset("_QueueOffset", Float) = 0
+      [HideInInspector]_QueueControl("_QueueControl", Float) = -1
       [HideInInspector][NoScaleOffset]unity_Lightmaps("unity_Lightmaps", 2DArray) = "" {}
       [HideInInspector][NoScaleOffset]unity_LightmapsInd("unity_LightmapsInd", 2DArray) = "" {}
       [HideInInspector][NoScaleOffset]unity_ShadowMasks("unity_ShadowMasks", 2DArray) = "" {}
@@ -77,25 +79,32 @@ ZWrite Off
             #pragma exclude_renderers d3d11_9x
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON
-        
+            #pragma instancing_options renderinglayer
+    
             // Keywords
-            #pragma multi_compile _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
             #pragma multi_compile _ LIGHTMAP_ON
+            #pragma multi_compile _ DYNAMICLIGHTMAP_ON
             #pragma multi_compile _ DIRLIGHTMAP_COMBINED
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS _ADDITIONAL_OFF
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BLENDING
+            #pragma multi_compile_fragment _ _REFLECTION_PROBE_BOX_PROJECTION
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
             #pragma multi_compile _ SHADOWS_SHADOWMASK
+            #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
+            #pragma multi_compile_fragment _ _LIGHT_LAYERS
+            #pragma multi_compile_fragment _ DEBUG_DISPLAY
+            #pragma multi_compile_fragment _ _LIGHT_COOKIES
+            #pragma multi_compile _ _CLUSTERED_RENDERING
             // GraphKeywords: <None>
 
             #define SHADER_PASS SHADERPASS_FORWARD
-            #define SHADERPASS_FORWARD
             #define VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
             #define _PASSFORWARD 1
+            #define _FOG_FRAGMENT 1
             
 
             
@@ -119,15 +128,16 @@ ZWrite Off
 
 
             // Includes
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Version.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Texture.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/TextureStack.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Shadows.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderGraphFunctions.hlsl"
-            #include "Packages/com.unity.shadergraph/ShaderGraphLibrary/ShaderVariablesFunctions.hlsl"
-
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DBuffer.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl"
+            
 
         
 
@@ -185,65 +195,70 @@ ZWrite Off
          // half4 vertexColor : COLOR;
          // #endif
 
-         // #if %EXTRAV2F0REQUIREKEY%
-         // float4 extraV2F0 : TEXCOORD12;
-         // #endif
-
-         // #if %EXTRAV2F1REQUIREKEY%
-         // float4 extraV2F1 : TEXCOORD13;
-         // #endif
-
-         // #if %EXTRAV2F2REQUIREKEY%
-         // float4 extraV2F2 : TEXCOORD14;
-         // #endif
-
-         // #if %EXTRAV2F3REQUIREKEY%
-         // float4 extraV2F3 : TEXCOORD15;
-         // #endif
-
-         // #if %EXTRAV2F4REQUIREKEY%
-         // float4 extraV2F4 : TEXCOORD16;
-         // #endif
-
-         // #if %EXTRAV2F5REQUIREKEY%
-         // float4 extraV2F5 : TEXCOORD17;
-         // #endif
-
-         // #if %EXTRAV2F6REQUIREKEY%
-         // float4 extraV2F6 : TEXCOORD18;
-         // #endif
-
-         // #if %EXTRAV2F7REQUIREKEY%
-         // float4 extraV2F7 : TEXCOORD19;
-         // #endif
-            
          #if defined(LIGHTMAP_ON)
             float2 lightmapUV : TEXCOORD8;
          #endif
+         #if defined(DYNAMICLIGHTMAP_ON)
+            float2 dynamicLightmapUV : TEXCOORD9;
+         #endif
          #if !defined(LIGHTMAP_ON)
-            float3 sh : TEXCOORD9;
+            float3 sh : TEXCOORD10;
          #endif
 
-         #ifdef VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
-            float4 fogFactorAndVertexLight : TEXCOORD10;
+         #if defined(VARYINGS_NEED_FOG_AND_VERTEX_LIGHT)
+            float4 fogFactorAndVertexLight : TEXCOORD11;
          #endif
 
          #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
-           float4 shadowCoord : TEXCOORD11;
+           float4 shadowCoord : TEXCOORD12;
          #endif
 
+         // #if %EXTRAV2F0REQUIREKEY%
+         // float4 extraV2F0 : TEXCOORD13;
+         // #endif
+
+         // #if %EXTRAV2F1REQUIREKEY%
+         // float4 extraV2F1 : TEXCOORD14;
+         // #endif
+
+         // #if %EXTRAV2F2REQUIREKEY%
+         // float4 extraV2F2 : TEXCOORD15;
+         // #endif
+
+         // #if %EXTRAV2F3REQUIREKEY%
+         // float4 extraV2F3 : TEXCOORD16;
+         // #endif
+
+         // #if %EXTRAV2F4REQUIREKEY%
+         // float4 extraV2F4 : TEXCOORD17;
+         // #endif
+
+         // #if %EXTRAV2F5REQUIREKEY%
+         // float4 extraV2F5 : TEXCOORD18;
+         // #endif
+
+         // #if %EXTRAV2F6REQUIREKEY%
+         // float4 extraV2F6 : TEXCOORD19;
+         // #endif
+
+         // #if %EXTRAV2F7REQUIREKEY%
+         // float4 extraV2F7 : TEXCOORD20;
+         // #endif
+
          #if UNITY_ANY_INSTANCING_ENABLED
-            uint instanceID : CUSTOM_INSTANCE_ID;
-         #endif
-         #if (defined(UNITY_STEREO_INSTANCING_ENABLED))
-            uint stereoTargetEyeIndexAsRTArrayIdx : SV_RenderTargetArrayIndex;
+         uint instanceID : CUSTOM_INSTANCE_ID;
          #endif
          #if (defined(UNITY_STEREO_MULTIVIEW_ENABLED)) || (defined(UNITY_STEREO_INSTANCING_ENABLED) && (defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)))
-            uint stereoTargetEyeIndexAsBlendIdx0 : BLENDINDICES0;
+         uint stereoTargetEyeIndexAsBlendIdx0 : BLENDINDICES0;
+         #endif
+         #if (defined(UNITY_STEREO_INSTANCING_ENABLED))
+         uint stereoTargetEyeIndexAsRTArrayIdx : SV_RenderTargetArrayIndex;
          #endif
          #if defined(SHADER_STAGE_FRAGMENT) && defined(VARYINGS_NEED_CULLFACE)
-            FRONT_FACE_TYPE cullFace : FRONT_FACE_SEMANTIC;
+         FRONT_FACE_TYPE cullFace : FRONT_FACE_SEMANTIC;
          #endif
+
+
       };
 
 
@@ -1080,8 +1095,9 @@ ZWrite Off
          
 
          
-         #if _PASSSHADOW
+         #if defined(_PASSSHADOW)
             float3 _LightDirection;
+            float3 _LightPosition;
          #endif
 
          // vertex shader
@@ -1116,10 +1132,15 @@ ZWrite Off
            o.worldNormal = TransformObjectToWorldNormal(v.normal);
            o.worldTangent = float4(TransformObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 
-
+          // For some very odd reason, in 2021.2, we can't use Unity's defines, but have to use our own..
           #if _PASSSHADOW
+              #if _CASTING_PUNCTUAL_LIGHT_SHADOW
+                 float3 lightDirectionWS = normalize(_LightPosition - o.worldPos);
+              #else
+                 float3 lightDirectionWS = _LightDirection;
+              #endif
               // Define shadow pass specific clip position for Universal
-              o.pos = TransformWorldToHClip(ApplyShadowBias(o.worldPos, o.worldNormal, _LightDirection));
+              o.pos = TransformWorldToHClip(ApplyShadowBias(o.worldPos, o.worldNormal, lightDirectionWS));
               #if UNITY_REVERSED_Z
                   o.pos.z = min(o.pos.z, o.pos.w * UNITY_NEAR_CLIP_VALUE);
               #else
@@ -1131,7 +1152,6 @@ ZWrite Off
               o.pos = TransformWorldToHClip(o.worldPos);
           #endif
 
-
           // #if %SCREENPOSREQUIREKEY%
           // o.screenPos = ComputeScreenPos(o.pos, _ProjectionParams.x);
           // #endif
@@ -1141,16 +1161,22 @@ ZWrite Off
               OUTPUT_LIGHTMAP_UV(uv1, unity_LightmapST, o.lightmapUV);
                o.texcoord1.xy = uv1;
               OUTPUT_SH(o.worldNormal, o.sh);
+              #if defined(DYNAMICLIGHTMAP_ON)
+                   o.dynamicLightmapUV.xy = v.texcoord2.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+              #endif
           #endif
 
           #ifdef VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
+              half fogFactor = 0;
+              #if defined(_FOG_FRAGMENT)
+                fogFactor = ComputeFogFactor(o.pos.z);
+              #endif
               #if _BAKEDLIT
-                 half3 vertexLight = 0;
+                 o.fogFactorAndVertexLight = half4(fogFactor, 0, 0, 0);
               #else
                  half3 vertexLight = VertexLighting(o.worldPos, o.worldNormal);
+                 o.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
               #endif
-              half fogFactor = ComputeFogFactor(o.pos.z);
-              o.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
           #endif
 
           #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
@@ -1162,6 +1188,10 @@ ZWrite Off
 
 
          
+
+#if _UNLIT
+   #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Unlit.hlsl"  
+#endif
 
          // fragment shader
          half4 Frag (VertexToPixel IN
@@ -1207,9 +1237,9 @@ ZWrite Off
            #endif
 
 
-         
+            
            
-            InputData inputData;
+            InputData inputData = (InputData)0;
 
             inputData.positionWS = IN.worldPos;
             #if _WORLDSPACENORMAL
@@ -1228,68 +1258,106 @@ ZWrite Off
             #else
                   inputData.shadowCoord = float4(0, 0, 0, 0);
             #endif
-
+            
+#if _BAKEDLIT
             inputData.fogCoord = IN.fogFactorAndVertexLight.x;
+            inputData.vertexLighting = 0;
+#else
+            inputData.fogCoord = InitializeInputDataFog(float4(IN.worldPos, 1.0), IN.fogFactorAndVertexLight.x);
             inputData.vertexLighting = IN.fogFactorAndVertexLight.yzw;
+#endif    
+
+
+
             #if defined(_OVERRIDE_BAKEDGI)
                inputData.bakedGI = l.DiffuseGI;
                l.Emission += l.SpecularGI;
-            #else
+            #elif _BAKEDLIT
                inputData.bakedGI = SAMPLE_GI(IN.lightmapUV, IN.sh, inputData.normalWS);
+            #else
+               #if defined(DYNAMICLIGHTMAP_ON)
+                  inputData.bakedGI = SAMPLE_GI(IN.lightmapUV, IN.dynamicLightmapUV.xy, IN.sh, inputData.normalWS);
+               #else
+                  inputData.bakedGI = SAMPLE_GI(IN.lightmapUV, IN.sh, inputData.normalWS);
+               #endif
             #endif
             inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(IN.pos);
             #if !_BAKEDLIT
                inputData.shadowMask = SAMPLE_SHADOWMASK(IN.lightmapUV);
-
+           
                #if defined(_OVERRIDE_SHADOWMASK)
                   float4 mulColor = saturate(dot(l.ShadowMask, _MainLightOcclusionProbes)); //unity_OcclusionMaskSelector));
                   inputData.shadowMask = mulColor;
                #endif
+            #else
+               inputData.shadowMask = float4(1,1,1,1);
+            #endif
+
+            #if defined(DEBUG_DISPLAY)
+                #if defined(DYNAMICLIGHTMAP_ON)
+                  inputData.dynamicLightmapUV = IN.dynamicLightmapUV.xy;
+                #endif
+                #if defined(LIGHTMAP_ON)
+                  inputData.staticLightmapUV = IN.lightmapUV;
+                #else
+                  inputData.vertexSH = IN.sh;
+                #endif
+            #endif
+
+            #if _WORLDSPACENORMAL
+              float3 normalTS = WorldToTangentSpace(d, l.Normal);
+            #else
+              float3 normalTS = l.Normal;
+            #endif
+
+            SurfaceData surface         = (SurfaceData)0;
+            surface.albedo              = l.Albedo;
+            surface.metallic            = saturate(metallic);
+            surface.specular            = specular;
+            surface.smoothness          = saturate(l.Smoothness),
+            surface.occlusion           = l.Occlusion,
+            surface.emission            = l.Emission,
+            surface.alpha               = saturate(l.Alpha);
+            surface.clearCoatMask       = 0;
+            surface.clearCoatSmoothness = 1;
+
+            #ifdef _CLEARCOAT
+                  surface.clearCoatMask       = saturate(l.CoatMask);
+                  surface.clearCoatSmoothness = saturate(l.CoatSmoothness);
             #endif
 
             #if !_UNLIT
-               #if _SIMPLELIT
-                  half4 color = UniversalFragmentBlinnPhong(
-                     inputData,
-                     l.Albedo,
-                     float4(specular * l.Smoothness, 0),
-                     l.SpecularPower * 128,
-                     l.Emission,
-                     l.Alpha);
-                  color.a = l.Alpha;
-               #elif _BAKEDLIT
-                  color = UniversalFragmentBakedLit(inputData, l.Albedo, l.Alpha, normalTS);
-               #else
-
-                  
-                  SurfaceData surface         = (SurfaceData)0;
-                  surface.albedo              = l.Albedo;
-                  surface.metallic            = saturate(metallic);
-                  surface.specular            = specular;
-                  surface.smoothness          = saturate(l.Smoothness),
-                  surface.occlusion           = l.Occlusion,
-                  surface.emission            = l.Emission,
-                  surface.alpha               = saturate(l.Alpha);
-                  surface.clearCoatMask       = 0;
-                  surface.clearCoatSmoothness = 1;
-
-                  #ifdef _CLEARCOAT
-                      surface.clearCoatMask       = saturate(l.CoatMask);
-                      surface.clearCoatSmoothness = saturate(l.CoatSmoothness);
-                  #endif
-
-                  half4 color = UniversalFragmentPBR(inputData, surface);
-
-               #endif
-
-            #else
                half4 color = half4(l.Albedo, l.Alpha);
-               
-            #endif
-
-            #if !DISABLEFOG
-                  color.rgb = MixFog(color.rgb, IN.fogFactorAndVertexLight.x);
+               #ifdef _DBUFFER
+                  #if _BAKEDLIT
+                     ApplyDecalToBaseColorAndNormal(IN.pos, color, inputData.normalWS);
+                  #else
+                     ApplyDecalToSurfaceData(IN.pos, surface, inputData);
+                  #endif
                #endif
+               #if _SIMPLELIT
+                  color = UniversalFragmentBlinnPhong(
+                     inputData,
+                     surface);
+               #elif _BAKEDLIT
+                  color = UniversalFragmentBakedLit(inputData, color.rgb, color.a, normalTS);
+               #else
+                  color = UniversalFragmentPBR(inputData, surface);
+               #endif
+
+               #if !DISABLEFOG
+                  color.rgb = MixFog(color.rgb, inputData.fogCoord);
+               #endif
+
+            #else // unlit
+               #ifdef _DBUFFER
+                  ApplyDecalToSurfaceData(IN.pos, surface, inputData);
+               #endif
+               half4 color = UniversalFragmentUnlit(inputData, l.Albedo, l.Alpha);
+               #if !DISABLEFOG
+                  color.rgb = MixFog(color.rgb, inputData.fogCoord);
+               #endif
+            #endif
             ChainFinalColorForward(l, d, color);
 
             return color;
@@ -1313,9 +1381,8 @@ ZWrite Off
                 "LightMode" = "Meta"
             }
 
-             // Render State
             Cull Off
-            // ColorMask: <None>
+            
 
             	ZWrite Off
 
@@ -1330,7 +1397,7 @@ ZWrite Off
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
         
-            #define SHADERPASS_META
+            #define SHADERPASS SHADERPASS_META
             #define _PASSMETA 1
 
 
@@ -1358,7 +1425,7 @@ ZWrite Off
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/TextureStack.hlsl"
             #include "Packages/com.unity.shadergraph/ShaderGraphLibrary/ShaderVariablesFunctions.hlsl"
-        
+            #include "Packages/com.unity.render-pipelines.universal/Editor/ShaderGraph/Includes/ShaderPass.hlsl"
 
                   #undef WorldNormalVector
       #define WorldNormalVector(data, normal) mul(normal, data.TBNMatrix)
@@ -1414,65 +1481,70 @@ ZWrite Off
          // half4 vertexColor : COLOR;
          // #endif
 
-         // #if %EXTRAV2F0REQUIREKEY%
-         // float4 extraV2F0 : TEXCOORD12;
-         // #endif
-
-         // #if %EXTRAV2F1REQUIREKEY%
-         // float4 extraV2F1 : TEXCOORD13;
-         // #endif
-
-         // #if %EXTRAV2F2REQUIREKEY%
-         // float4 extraV2F2 : TEXCOORD14;
-         // #endif
-
-         // #if %EXTRAV2F3REQUIREKEY%
-         // float4 extraV2F3 : TEXCOORD15;
-         // #endif
-
-         // #if %EXTRAV2F4REQUIREKEY%
-         // float4 extraV2F4 : TEXCOORD16;
-         // #endif
-
-         // #if %EXTRAV2F5REQUIREKEY%
-         // float4 extraV2F5 : TEXCOORD17;
-         // #endif
-
-         // #if %EXTRAV2F6REQUIREKEY%
-         // float4 extraV2F6 : TEXCOORD18;
-         // #endif
-
-         // #if %EXTRAV2F7REQUIREKEY%
-         // float4 extraV2F7 : TEXCOORD19;
-         // #endif
-            
          #if defined(LIGHTMAP_ON)
             float2 lightmapUV : TEXCOORD8;
          #endif
+         #if defined(DYNAMICLIGHTMAP_ON)
+            float2 dynamicLightmapUV : TEXCOORD9;
+         #endif
          #if !defined(LIGHTMAP_ON)
-            float3 sh : TEXCOORD9;
+            float3 sh : TEXCOORD10;
          #endif
 
-         #ifdef VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
-            float4 fogFactorAndVertexLight : TEXCOORD10;
+         #if defined(VARYINGS_NEED_FOG_AND_VERTEX_LIGHT)
+            float4 fogFactorAndVertexLight : TEXCOORD11;
          #endif
 
          #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
-           float4 shadowCoord : TEXCOORD11;
+           float4 shadowCoord : TEXCOORD12;
          #endif
 
+         // #if %EXTRAV2F0REQUIREKEY%
+         // float4 extraV2F0 : TEXCOORD13;
+         // #endif
+
+         // #if %EXTRAV2F1REQUIREKEY%
+         // float4 extraV2F1 : TEXCOORD14;
+         // #endif
+
+         // #if %EXTRAV2F2REQUIREKEY%
+         // float4 extraV2F2 : TEXCOORD15;
+         // #endif
+
+         // #if %EXTRAV2F3REQUIREKEY%
+         // float4 extraV2F3 : TEXCOORD16;
+         // #endif
+
+         // #if %EXTRAV2F4REQUIREKEY%
+         // float4 extraV2F4 : TEXCOORD17;
+         // #endif
+
+         // #if %EXTRAV2F5REQUIREKEY%
+         // float4 extraV2F5 : TEXCOORD18;
+         // #endif
+
+         // #if %EXTRAV2F6REQUIREKEY%
+         // float4 extraV2F6 : TEXCOORD19;
+         // #endif
+
+         // #if %EXTRAV2F7REQUIREKEY%
+         // float4 extraV2F7 : TEXCOORD20;
+         // #endif
+
          #if UNITY_ANY_INSTANCING_ENABLED
-            uint instanceID : CUSTOM_INSTANCE_ID;
-         #endif
-         #if (defined(UNITY_STEREO_INSTANCING_ENABLED))
-            uint stereoTargetEyeIndexAsRTArrayIdx : SV_RenderTargetArrayIndex;
+         uint instanceID : CUSTOM_INSTANCE_ID;
          #endif
          #if (defined(UNITY_STEREO_MULTIVIEW_ENABLED)) || (defined(UNITY_STEREO_INSTANCING_ENABLED) && (defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)))
-            uint stereoTargetEyeIndexAsBlendIdx0 : BLENDINDICES0;
+         uint stereoTargetEyeIndexAsBlendIdx0 : BLENDINDICES0;
+         #endif
+         #if (defined(UNITY_STEREO_INSTANCING_ENABLED))
+         uint stereoTargetEyeIndexAsRTArrayIdx : SV_RenderTargetArrayIndex;
          #endif
          #if defined(SHADER_STAGE_FRAGMENT) && defined(VARYINGS_NEED_CULLFACE)
-            FRONT_FACE_TYPE cullFace : FRONT_FACE_SEMANTIC;
+         FRONT_FACE_TYPE cullFace : FRONT_FACE_SEMANTIC;
          #endif
+
+
       };
 
 
@@ -2309,8 +2381,9 @@ ZWrite Off
          
 
             
-         #if _PASSSHADOW
+         #if defined(_PASSSHADOW)
             float3 _LightDirection;
+            float3 _LightPosition;
          #endif
 
          // vertex shader
@@ -2345,10 +2418,15 @@ ZWrite Off
            o.worldNormal = TransformObjectToWorldNormal(v.normal);
            o.worldTangent = float4(TransformObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 
-
+          // For some very odd reason, in 2021.2, we can't use Unity's defines, but have to use our own..
           #if _PASSSHADOW
+              #if _CASTING_PUNCTUAL_LIGHT_SHADOW
+                 float3 lightDirectionWS = normalize(_LightPosition - o.worldPos);
+              #else
+                 float3 lightDirectionWS = _LightDirection;
+              #endif
               // Define shadow pass specific clip position for Universal
-              o.pos = TransformWorldToHClip(ApplyShadowBias(o.worldPos, o.worldNormal, _LightDirection));
+              o.pos = TransformWorldToHClip(ApplyShadowBias(o.worldPos, o.worldNormal, lightDirectionWS));
               #if UNITY_REVERSED_Z
                   o.pos.z = min(o.pos.z, o.pos.w * UNITY_NEAR_CLIP_VALUE);
               #else
@@ -2360,7 +2438,6 @@ ZWrite Off
               o.pos = TransformWorldToHClip(o.worldPos);
           #endif
 
-
           // #if %SCREENPOSREQUIREKEY%
           // o.screenPos = ComputeScreenPos(o.pos, _ProjectionParams.x);
           // #endif
@@ -2370,16 +2447,22 @@ ZWrite Off
               OUTPUT_LIGHTMAP_UV(uv1, unity_LightmapST, o.lightmapUV);
                o.texcoord1.xy = uv1;
               OUTPUT_SH(o.worldNormal, o.sh);
+              #if defined(DYNAMICLIGHTMAP_ON)
+                   o.dynamicLightmapUV.xy = v.texcoord2.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+              #endif
           #endif
 
           #ifdef VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
+              half fogFactor = 0;
+              #if defined(_FOG_FRAGMENT)
+                fogFactor = ComputeFogFactor(o.pos.z);
+              #endif
               #if _BAKEDLIT
-                 half3 vertexLight = 0;
+                 o.fogFactorAndVertexLight = half4(fogFactor, 0, 0, 0);
               #else
                  half3 vertexLight = VertexLighting(o.worldPos, o.worldNormal);
+                 o.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
               #endif
-              half fogFactor = ComputeFogFactor(o.pos.z);
-              o.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
           #endif
 
           #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
@@ -2439,10 +2522,9 @@ ZWrite Off
             }
     
             // Render State
-            Cull Back
-            Blend One Zero
-            ZTest LEqual
-            ZWrite On
+             Cull Back
+                ZTest LEqual
+                ZWrite On
 
             	ZWrite Off
 
@@ -2459,7 +2541,8 @@ ZWrite Off
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
             #pragma multi_compile _ DOTS_INSTANCING_ON
-        
+
+
             #define SHADERPASS SHADERPASS_DEPTHNORMALSONLY
             #define _PASSDEPTH 1
             #define _PASSDEPTHNORMALS 1
@@ -2552,65 +2635,70 @@ ZWrite Off
          // half4 vertexColor : COLOR;
          // #endif
 
-         // #if %EXTRAV2F0REQUIREKEY%
-         // float4 extraV2F0 : TEXCOORD12;
-         // #endif
-
-         // #if %EXTRAV2F1REQUIREKEY%
-         // float4 extraV2F1 : TEXCOORD13;
-         // #endif
-
-         // #if %EXTRAV2F2REQUIREKEY%
-         // float4 extraV2F2 : TEXCOORD14;
-         // #endif
-
-         // #if %EXTRAV2F3REQUIREKEY%
-         // float4 extraV2F3 : TEXCOORD15;
-         // #endif
-
-         // #if %EXTRAV2F4REQUIREKEY%
-         // float4 extraV2F4 : TEXCOORD16;
-         // #endif
-
-         // #if %EXTRAV2F5REQUIREKEY%
-         // float4 extraV2F5 : TEXCOORD17;
-         // #endif
-
-         // #if %EXTRAV2F6REQUIREKEY%
-         // float4 extraV2F6 : TEXCOORD18;
-         // #endif
-
-         // #if %EXTRAV2F7REQUIREKEY%
-         // float4 extraV2F7 : TEXCOORD19;
-         // #endif
-            
          #if defined(LIGHTMAP_ON)
             float2 lightmapUV : TEXCOORD8;
          #endif
+         #if defined(DYNAMICLIGHTMAP_ON)
+            float2 dynamicLightmapUV : TEXCOORD9;
+         #endif
          #if !defined(LIGHTMAP_ON)
-            float3 sh : TEXCOORD9;
+            float3 sh : TEXCOORD10;
          #endif
 
-         #ifdef VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
-            float4 fogFactorAndVertexLight : TEXCOORD10;
+         #if defined(VARYINGS_NEED_FOG_AND_VERTEX_LIGHT)
+            float4 fogFactorAndVertexLight : TEXCOORD11;
          #endif
 
          #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
-           float4 shadowCoord : TEXCOORD11;
+           float4 shadowCoord : TEXCOORD12;
          #endif
 
+         // #if %EXTRAV2F0REQUIREKEY%
+         // float4 extraV2F0 : TEXCOORD13;
+         // #endif
+
+         // #if %EXTRAV2F1REQUIREKEY%
+         // float4 extraV2F1 : TEXCOORD14;
+         // #endif
+
+         // #if %EXTRAV2F2REQUIREKEY%
+         // float4 extraV2F2 : TEXCOORD15;
+         // #endif
+
+         // #if %EXTRAV2F3REQUIREKEY%
+         // float4 extraV2F3 : TEXCOORD16;
+         // #endif
+
+         // #if %EXTRAV2F4REQUIREKEY%
+         // float4 extraV2F4 : TEXCOORD17;
+         // #endif
+
+         // #if %EXTRAV2F5REQUIREKEY%
+         // float4 extraV2F5 : TEXCOORD18;
+         // #endif
+
+         // #if %EXTRAV2F6REQUIREKEY%
+         // float4 extraV2F6 : TEXCOORD19;
+         // #endif
+
+         // #if %EXTRAV2F7REQUIREKEY%
+         // float4 extraV2F7 : TEXCOORD20;
+         // #endif
+
          #if UNITY_ANY_INSTANCING_ENABLED
-            uint instanceID : CUSTOM_INSTANCE_ID;
-         #endif
-         #if (defined(UNITY_STEREO_INSTANCING_ENABLED))
-            uint stereoTargetEyeIndexAsRTArrayIdx : SV_RenderTargetArrayIndex;
+         uint instanceID : CUSTOM_INSTANCE_ID;
          #endif
          #if (defined(UNITY_STEREO_MULTIVIEW_ENABLED)) || (defined(UNITY_STEREO_INSTANCING_ENABLED) && (defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)))
-            uint stereoTargetEyeIndexAsBlendIdx0 : BLENDINDICES0;
+         uint stereoTargetEyeIndexAsBlendIdx0 : BLENDINDICES0;
+         #endif
+         #if (defined(UNITY_STEREO_INSTANCING_ENABLED))
+         uint stereoTargetEyeIndexAsRTArrayIdx : SV_RenderTargetArrayIndex;
          #endif
          #if defined(SHADER_STAGE_FRAGMENT) && defined(VARYINGS_NEED_CULLFACE)
-            FRONT_FACE_TYPE cullFace : FRONT_FACE_SEMANTIC;
+         FRONT_FACE_TYPE cullFace : FRONT_FACE_SEMANTIC;
          #endif
+
+
       };
 
 
@@ -3447,8 +3535,9 @@ ZWrite Off
          
 
          
-         #if _PASSSHADOW
+         #if defined(_PASSSHADOW)
             float3 _LightDirection;
+            float3 _LightPosition;
          #endif
 
          // vertex shader
@@ -3483,10 +3572,15 @@ ZWrite Off
            o.worldNormal = TransformObjectToWorldNormal(v.normal);
            o.worldTangent = float4(TransformObjectToWorldDir(v.tangent.xyz), v.tangent.w);
 
-
+          // For some very odd reason, in 2021.2, we can't use Unity's defines, but have to use our own..
           #if _PASSSHADOW
+              #if _CASTING_PUNCTUAL_LIGHT_SHADOW
+                 float3 lightDirectionWS = normalize(_LightPosition - o.worldPos);
+              #else
+                 float3 lightDirectionWS = _LightDirection;
+              #endif
               // Define shadow pass specific clip position for Universal
-              o.pos = TransformWorldToHClip(ApplyShadowBias(o.worldPos, o.worldNormal, _LightDirection));
+              o.pos = TransformWorldToHClip(ApplyShadowBias(o.worldPos, o.worldNormal, lightDirectionWS));
               #if UNITY_REVERSED_Z
                   o.pos.z = min(o.pos.z, o.pos.w * UNITY_NEAR_CLIP_VALUE);
               #else
@@ -3498,7 +3592,6 @@ ZWrite Off
               o.pos = TransformWorldToHClip(o.worldPos);
           #endif
 
-
           // #if %SCREENPOSREQUIREKEY%
           // o.screenPos = ComputeScreenPos(o.pos, _ProjectionParams.x);
           // #endif
@@ -3508,16 +3601,22 @@ ZWrite Off
               OUTPUT_LIGHTMAP_UV(uv1, unity_LightmapST, o.lightmapUV);
                o.texcoord1.xy = uv1;
               OUTPUT_SH(o.worldNormal, o.sh);
+              #if defined(DYNAMICLIGHTMAP_ON)
+                   o.dynamicLightmapUV.xy = v.texcoord2.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+              #endif
           #endif
 
           #ifdef VARYINGS_NEED_FOG_AND_VERTEX_LIGHT
+              half fogFactor = 0;
+              #if defined(_FOG_FRAGMENT)
+                fogFactor = ComputeFogFactor(o.pos.z);
+              #endif
               #if _BAKEDLIT
-                 half3 vertexLight = 0;
+                 o.fogFactorAndVertexLight = half4(fogFactor, 0, 0, 0);
               #else
                  half3 vertexLight = VertexLighting(o.worldPos, o.worldNormal);
+                 o.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
               #endif
-              half fogFactor = ComputeFogFactor(o.pos.z);
-              o.fogFactorAndVertexLight = half4(fogFactor, vertexLight);
           #endif
 
           #if defined(REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR)
@@ -3565,8 +3664,21 @@ ZWrite Off
               outputDepth = l.outputDepth;
            #endif
 
-           return float4(PackNormalOctRectEncode(TransformWorldToViewDir(d.worldSpaceNormal, true)), 0.0, 0.0);
+          #if defined(_GBUFFER_NORMALS_OCT)
+              float3 normalWS = d.worldSpaceNormal;
+              float2 octNormalWS = PackNormalOctQuadEncode(normalWS);           // values between [-1, +1], must use fp32 on some platforms
+              float2 remappedOctNormalWS = saturate(octNormalWS * 0.5 + 0.5);   // values between [ 0,  1]
+              half3 packedNormalWS = PackFloat2To888(remappedOctNormalWS);      // values between [ 0,  1]
+              return half4(packedNormalWS, 0.0);
+          #else
+              float3 wsn = l.Normal;
+              #if !_WORLDSPACENORMAL
+                wsn = TangentToWorldSpace(d, l.Normal);
+              #endif
+              return half4(NormalizeNormalPerPixel(wsn), 0.0);
+          #endif
 
+         
          }
 
          ENDHLSL

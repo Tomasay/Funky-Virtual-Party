@@ -2,16 +2,15 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 8
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: FlameMaterial
-  m_Shader: {fileID: 4800000, guid: a8be0d92e1959674882aae20d781c393, type: 3}
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 0
+  m_Shader: {fileID: 4800000, guid: 7c23a278a9320c04d960beb2bf8c8479, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -38,6 +37,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AlphaCutoff: 0.5
     - _Cutoff: 0.5
     - _DissolveAmount: 1
     - _DissolveScale: 3.71
@@ -48,14 +48,21 @@ Material:
     - _Float0: 0.153
     - _Float1: 1
     - _Float2: 0
-    - _FollowThrough: 0
+    - _FollowThrough: 0.037
     - _GasColorHeight: 0.215
     - _Power: 1
+    - _TessEdgeLength: 16
+    - _TessMax: 25
+    - _TessMaxDisp: 25
+    - _TessMin: 10
+    - _TessPhongStrength: 0.5
+    - _TessValue: 16
     - __dirty: 0
     m_Colors:
     - _Color: {r: 5.992157, g: 2.6980393, b: 0, a: 0}
     - _DissolveSpeed: {r: -0.25, g: -0.5, b: 0, a: 0}
     - _DistortionSpeed: {r: 0, g: -0.6, b: 0, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _FlameColor: {r: 47.937256, g: 19.442865, b: 0, a: 0}
     - _GasColor: {r: 0, g: 36.89412, b: 47.937256, a: 0}
     - _Scrolling: {r: 0, g: -0.2, b: 0, a: 0}
