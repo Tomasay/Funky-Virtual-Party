@@ -7520,7 +7520,7 @@ PrefabInstance:
     - target: {fileID: 114568985850100520, guid: fca9d4afb3743274e8f7da14019d7e0b, type: 3}
       propertyPath: _localAvatarPrefab
       value: 
-      objectReference: {fileID: 8143653906893471124, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 114568985850100520, guid: fca9d4afb3743274e8f7da14019d7e0b, type: 3}
       propertyPath: _localPlayer.leftHand
       value: 
@@ -7549,7 +7549,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   realtime: {fileID: 1193540045}
+  nameInput: {fileID: 593043969}
   roomCodeInput: {fileID: 2027479461}
+  joinRoomCanvas: {fileID: 1255815456}
+  controllerCanvas: {fileID: 1888857726}
 --- !u!1 &2027479459
 GameObject:
   m_ObjectHideFlags: 0

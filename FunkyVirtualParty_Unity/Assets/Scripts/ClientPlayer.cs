@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using TMPro;
 using UnityEngine.InputSystem;
-using DG.Tweening;
+using Normal.Realtime;
 
 [Serializable]
 public class ClientInputData
@@ -24,6 +24,9 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] protected Animator anim;
     [SerializeField] protected GameObject spineBone; //Used to change height of player
     [SerializeField] protected Collider col; //Used to change height of player
+
+    [SerializeField] RealtimeView realtimeView;
+    [SerializeField] RealtimeTransform realtimeTransform;
 
     [SerializeField] public GameObject[] hats;
     [SerializeField] GameObject hatAttachPoint;
@@ -106,6 +109,16 @@ public class ClientPlayer : MonoBehaviour
     protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);
+
+        if (realtimeView.isOwnedLocallyInHierarchy)
+            LocalStart();
+    }
+
+    private void LocalStart()
+    {
+        realtimeTransform.RequestOwnership();
+
+        InitialCustomize();
     }
 
     protected virtual void Awake()
@@ -132,8 +145,6 @@ public class ClientPlayer : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
 
         spinePos = spineBone.transform.localPosition;
-
-        InvokeRepeating("CheckInput", 0, inputPollRate);
     }
 
     private void OnDestroy()
@@ -149,7 +160,7 @@ public class ClientPlayer : MonoBehaviour
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
+                //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
                 Move(input);
             }
 
@@ -175,6 +186,8 @@ public class ClientPlayer : MonoBehaviour
         {
             playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
         }
+
+        CheckInput();
     }
 
     public void InitialCustomize()
@@ -204,7 +217,7 @@ public class ClientPlayer : MonoBehaviour
 
         if (isLocal)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+            //ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
         }
     }
 
@@ -224,7 +237,7 @@ public class ClientPlayer : MonoBehaviour
 
         if (isLocal)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+            //ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
         }
     }
 
@@ -292,7 +305,7 @@ public class ClientPlayer : MonoBehaviour
 
         if (isLocal)
         {
-            ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
+            //ClientManagerWeb.instance.Manager.Socket.Emit("syncCustomizationsFromClient", "#" + ColorUtility.ToHtmlStringRGB(playerColor), headType, height, currentHatIndex);
         }
     }
 
@@ -318,9 +331,8 @@ public class ClientPlayer : MonoBehaviour
     {
         if (canMove)
         {
-            movement = new Vector3(input.x * speed, 0, input.y * speed) * .01f;
-
-            transform.DOBlendableMoveBy(movement, inputPollRate);
+            movement = new Vector3(input.x * speed, 0, input.y * speed);
+            transform.Translate(movement * Time.deltaTime);
 
             //Magnitude of movement for animations
             if (animate)
@@ -356,7 +368,7 @@ public class ClientPlayer : MonoBehaviour
                 if (lookDirection != Vector3.zero)
                 {
                     lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-                    anim.transform.DORotateQuaternion(lookRotation, inputPollRate);
+                    anim.transform.rotation = lookRotation;
                 }
             }
         }
