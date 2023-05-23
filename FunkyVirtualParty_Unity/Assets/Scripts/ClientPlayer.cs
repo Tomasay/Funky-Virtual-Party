@@ -157,6 +157,7 @@ public class ClientPlayer : MonoBehaviour
             Vector3 positionDifference = posFromHost - transform.position;
             transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
             */
+          
         }
 
         // check if we are below the floor
@@ -174,6 +175,12 @@ public class ClientPlayer : MonoBehaviour
         if (Camera.main)
         {
             playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
+        }
+
+        // This needs to exist here and not in CheckInput becuase of the polling rate, if it's not here the game will drop the input
+        if (playerInput.actions["ActionButton"].triggered)
+        {
+            ClientManagerWeb.instance.ActionButtonPressed();
         }
     }
 

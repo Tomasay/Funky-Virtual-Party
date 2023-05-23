@@ -38,6 +38,8 @@ public class KeyboardController : MonoBehaviour
 
     public ClientManagerWeb manager;
 
+    protected UnityEngine.InputSystem.PlayerInput playerInput;
+
     [SerializeField] private TMP_Text debugText;
 
     private void Start()
@@ -62,6 +64,7 @@ public class KeyboardController : MonoBehaviour
         {
             codeField.text = URLCode;
         }
+        playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
     }
 
 
@@ -72,6 +75,11 @@ public class KeyboardController : MonoBehaviour
         {
             currentField.ActivateInputField();
             currentField.caretPosition = currentField.text.Length;
+        }
+
+        if( playerInput.actions["EnterKey"].triggered && currentField == codeField)
+        {
+            SubmitButtonPressed();
         }
     }
 
