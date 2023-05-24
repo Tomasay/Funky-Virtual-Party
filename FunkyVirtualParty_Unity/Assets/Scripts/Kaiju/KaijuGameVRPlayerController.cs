@@ -6,7 +6,7 @@ using Autohand;
 
 public class KaijuGameVRPlayerController : VRPlayerController
 {
-    [SerializeField] private float handMovementSpeed = 20, maxSprintSeconds = 2f, handMovementThreshold = 0;
+    [SerializeField] private float handMovementSpeed = 20;
     private float currentHandMovementSpeed;
 
     private Vector3 movement, newMovement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
@@ -20,7 +20,6 @@ public class KaijuGameVRPlayerController : VRPlayerController
     private void Start()
     {
         walkSpeed = ahp.maxMoveSpeed;
-        currentHandMovementSpeed = handMovementSpeed;
     }
 
     void Update()
