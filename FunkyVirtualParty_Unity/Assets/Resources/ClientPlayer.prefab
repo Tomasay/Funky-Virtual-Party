@@ -1229,6 +1229,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7212281436343659920}
   - component: {fileID: 1572502805415702960}
+  - component: {fileID: 2456765693809158700}
+  - component: {fileID: 3869224440595003892}
   m_Layer: 12
   m_Name: Character_Base_Animated
   m_TagString: Untagged
@@ -1274,6 +1276,47 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2456765693809158700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8024565084117808938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 3869224440595003892}
+  _childViews: []
+--- !u!114 &3869224440595003892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8024565084117808938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolate: 1
+  _syncPosition: 0
+  _syncRotation: 1
+  _syncScale: 0
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 0
 --- !u!1 &8143653906893471124
 GameObject:
   m_ObjectHideFlags: 0
@@ -1284,6 +1327,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8143653906893471120}
   - component: {fileID: 8143653906893471125}
+  - component: {fileID: 8907446340524657188}
   - component: {fileID: 4125091638740170634}
   - component: {fileID: 7095686512168902855}
   - component: {fileID: 9202506750431072903}
@@ -1327,6 +1371,21 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8907446340524657188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8143653906893471124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0d87ff3154cda45bf9509c9f561508, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cp: {fileID: 4125091638740170634}
+  anim: {fileID: 1572502805415702960}
+  nameText: {fileID: 8745307368580851738}
 --- !u!114 &4125091638740170634
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1339,6 +1398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06ff100349c854945bb760046041d380, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncer: {fileID: 8907446340524657188}
   colorPalette: {fileID: 2800000, guid: d5d5c7de2ae85aa41b13c39260d4a533, type: 3}
   playerNameText: {fileID: 8745307368580851738}
   playerIndicatorText: {fileID: 1269928041217091059}
@@ -1348,6 +1408,7 @@ MonoBehaviour:
   col: {fileID: 8143653906893471125}
   realtimeView: {fileID: 4245382886292637614}
   realtimeTransform: {fileID: 624035471942958305}
+  animRealtimeTransform: {fileID: 3869224440595003892}
   hats:
   - {fileID: 7885003046060197423, guid: 79a89ee6ebe00d04a91cc3ffb6b4c18a, type: 3}
   - {fileID: 6427412174012747889, guid: 40986a5ec695bec4f9b54f2048ef8121, type: 3}
@@ -1361,7 +1422,7 @@ MonoBehaviour:
   - {fileID: 5697767704901991110, guid: fc0a0648be4c39e45a32196ab7106cd9, type: 3}
   hatAttachPoint: {fileID: 3736771296390564255}
   hatPoofParticles: {fileID: 7934806903019245887}
-  posFromHost: {x: 0, y: 0, z: 0}
+  actionInput: {fileID: -7443144522060120542, guid: d9fed7ac202eda24fa9da806cb3f5d67, type: 3}
   isDebugPlayer: 0
 --- !u!54 &7095686512168902855
 Rigidbody:
@@ -1431,7 +1492,11 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 624035471942958305}
-  _childViews: []
+  - componentID: 2
+    component: {fileID: 8907446340524657188}
+  _childViews:
+  - componentID: 1
+    component: {fileID: 2456765693809158700}
 --- !u!114 &624035471942958305
 MonoBehaviour:
   m_ObjectHideFlags: 0

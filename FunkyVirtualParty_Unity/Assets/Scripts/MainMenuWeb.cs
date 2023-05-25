@@ -136,7 +136,7 @@ public class MainMenuWeb : MonoBehaviour
             player.GetComponent<ClientPlayer>().InitialCustomize();
         }
         player.transform.position = playerPositions[ClientManagerWeb.instance.Players.Count - 1].position;
-        player.GetComponent<ClientPlayer>().PlayerNameColor = Color.white;
+        player.GetComponent<ClientPlayer>().syncer.NameColor = Color.white;
     }
 
     private void SpawnPlayerIcon(GameObject player)
@@ -145,8 +145,8 @@ public class MainMenuWeb : MonoBehaviour
         GameObject newIcon = Instantiate(playerIconPrefab, playerNamesList.transform);
         newIcon.name = cp.PlayerSocketID;
         newIcon.GetComponent<Animator>().cullingMode = AnimatorCullingMode.CullUpdateTransforms; //Weird workaround with Unity's animator
-        newIcon.GetComponent<Image>().color = cp.PlayerColor;
-        newIcon.GetComponentInChildren<TMP_Text>().text = cp.PlayerName;
+        newIcon.GetComponent<Image>().color = cp.syncer.Color;
+        newIcon.GetComponentInChildren<TMP_Text>().text = cp.syncer.Name;
     }
 
     private void RemovePlayerIcon(string id)

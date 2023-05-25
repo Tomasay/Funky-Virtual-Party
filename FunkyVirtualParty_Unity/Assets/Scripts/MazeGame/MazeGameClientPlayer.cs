@@ -46,8 +46,7 @@ public class MazeGameClientPlayer : ClientPlayer
         if (canMove)
         {
             movement = new Vector3(input.x * speed, 0, input.y * speed) * .01f;
-
-            transform.DOBlendableMoveBy(movement * 0.01f, inputPollRate);
+            transform.Translate(movement * Time.deltaTime);
 
             //Magnitude of movement for animations
             if (animate)
@@ -82,8 +81,8 @@ public class MazeGameClientPlayer : ClientPlayer
 
                 if (lookDirection != Vector3.zero)
                 {
-                    lookRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-                    anim.transform.DORotateQuaternion(lookRotation, inputPollRate);
+                    anim.transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                    //anim.transform.DORotateQuaternion(syncer.LookRotation, inputPollRate);
                 }
             }
 
@@ -107,7 +106,7 @@ public class MazeGameClientPlayer : ClientPlayer
             //Players look north by default, before any input
             lastInput = maze.transform.rotation * new Vector3(0, 0, 1);
         }
-        lookRotation = Quaternion.LookRotation(lastInput, maze.transform.up);
+        anim.transform.rotation = Quaternion.LookRotation(lastInput, maze.transform.up);
 
         base.CheckInput();
 

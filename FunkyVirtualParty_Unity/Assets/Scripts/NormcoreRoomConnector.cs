@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Normal.Realtime;
+using UnityEngine.UI;
 
 public class NormcoreRoomConnector : MonoBehaviour
 {
-    GameObject localPlayer;
+    ClientPlayer localPlayer;
 
     [SerializeField]
     Realtime realtime;
@@ -14,8 +15,12 @@ public class NormcoreRoomConnector : MonoBehaviour
     [SerializeField]
     TMP_InputField nameInput, roomCodeInput;
 
+    [SerializeField] Button enableCustomizationsButton;
+
     [SerializeField]
     Canvas joinRoomCanvas, controllerCanvas;
+
+    public ClientPlayer LocalPlayer { get => localPlayer; }
 
     private void Awake()
     {
@@ -31,9 +36,11 @@ public class NormcoreRoomConnector : MonoBehaviour
     {
         joinRoomCanvas.enabled = false;
         controllerCanvas.enabled = true;
+        enableCustomizationsButton.gameObject.SetActive(true);
 
-        localPlayer = Realtime.Instantiate("ClientPlayer", Realtime.InstantiateOptions.defaults);
-        localPlayer.GetComponent<ClientPlayer>().PlayerName = nameInput.text;
-        localPlayer.GetComponent<ClientPlayer>().IsLocal = true;
+        GameObject newPlayer = Realtime.Instantiate("ClientPlayer", Realtime.InstantiateOptions.defaults);
+        localPlayer = newPlayer.GetComponent<ClientPlayer>();
+        localPlayer.syncer.Name = nameInput.text;
+        localPlayer.IsLocal = true;
     }
 }

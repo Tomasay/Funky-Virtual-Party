@@ -391,7 +391,7 @@ public class ThreeDPaintGameManager : GameManager
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManager.instance.GetPlayerBySocketID(entry.Key).PlayerName;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManager.instance.GetPlayerBySocketID(entry.Key).syncer.Name;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers.ContainsKey(entry.Key) ? answers[entry.Key] : ""; //Leave blank if player didn't provide answer
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 
@@ -487,11 +487,11 @@ public class ThreeDPaintGameManager : GameManager
     void AddPlayerToResults(string playerID, bool correct)
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
-        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerBySocketID(playerID).PlayerName;
+        pi.GetComponentInChildren<TMP_Text>(true).text = ClientManager.instance.GetPlayerBySocketID(playerID).syncer.Name;
         pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
         //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
-        pi.GetComponent<Image>().color = ClientManager.instance.GetPlayerBySocketID(playerID).PlayerColor;
+        pi.GetComponent<Image>().color = ClientManager.instance.GetPlayerBySocketID(playerID).syncer.Color;
 
         playerNameIcons.Add(pi);
     }
@@ -508,7 +508,7 @@ public class ThreeDPaintGameManager : GameManager
         }
         else
         {
-            headerText.text = "Wrong! " + ClientManager.instance.GetPlayerBySocketID(chosenAnswerOwner).PlayerName + " wrote the answer";
+            headerText.text = "Wrong! " + ClientManager.instance.GetPlayerBySocketID(chosenAnswerOwner).syncer.Name + " wrote the answer";
         }
 
         State = ThreeDPaintGameState.ShowingLeaderboard;

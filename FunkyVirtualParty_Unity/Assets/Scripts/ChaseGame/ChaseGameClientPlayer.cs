@@ -53,19 +53,9 @@ public class ChaseGameClientPlayer : ClientPlayer
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
                 Move(input);
             }
         }
-
-        // check if we are below the floor
-        if (transform.position.y < -10 && transform.position.y != posFromHost.y)
-        {
-            transform.position = posFromHost;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-        }
-
-        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
     protected override void Update()
@@ -99,7 +89,7 @@ public class ChaseGameClientPlayer : ClientPlayer
             if (gm && gm.State == GameState.GameLoop && collision.gameObject.transform.root.tag.Equals("Player"))
             {
                 gm.State = GameState.VRPlayerLoses;
-                gm.DisplayVRCapture(playerName);
+                gm.DisplayVRCapture(syncer.Name);
             }
         }
     }
@@ -143,8 +133,7 @@ public class ChaseGameClientPlayer : ClientPlayer
 
                 //Rotate to look at player, only on Y axis
                 Quaternion lookDir = Quaternion.LookRotation(dir);
-                lookRotation = Quaternion.Euler(new Vector3(0, lookDir.eulerAngles.y, 0));
-                anim.transform.rotation = lookRotation;
+                anim.transform.rotation = Quaternion.Euler(new Vector3(0, lookDir.eulerAngles.y, 0));
 
                 //Tackle!
                 GetComponent<Rigidbody>().AddForce(dir * tackleForce);

@@ -127,7 +127,7 @@ public class ClientManagerWeb : MonoBehaviour
         else
         {
             //cp.transform.position = Vector3.Lerp(GetPlayerByID(id).transform.position, new Vector3(x, y, z), Time.deltaTime);
-            cp.posFromHost = new Vector3(x, y, z);
+            //cp.posFromHost = new Vector3(x, y, z);
         }
     }
 
@@ -167,7 +167,7 @@ public class ClientManagerWeb : MonoBehaviour
 
         players.Add(newPlayer);
         newPlayer.PlayerSocketID = id;
-        newPlayer.PlayerName = name;
+        newPlayer.syncer.Name = name;
 
         if(players.Count == 1) //If this is the first player added, it is local
         {
@@ -240,11 +240,13 @@ public class ClientManagerWeb : MonoBehaviour
 
     private void OnInputReceived(byte[] data)
     {
+        /*
         ClientInputData newData = ClientPlayer.DeserializeInputData(data);
         if (LocalPlayer.PlayerByteID != newData.id)
         {
             GetPlayerByByteID(newData.id).Move(newData.input);
         }
+        */
     }
 
     public event Action onVRReadyUp;
@@ -321,22 +323,22 @@ public class ClientManagerWeb : MonoBehaviour
         {
             string socketID = players[i].PlayerSocketID;
             byte byteID = players[i].PlayerByteID;
-            string playerName = players[i].PlayerName;
-            Color playerColor = players[i].PlayerColor;
-            int playerHeadType = players[i].PlayerHeadType;
-            float playerHeight = players[i].PlayerHeight;
-            int hatIndex = players[i].PlayerHatIndex;
+            string playerName = players[i].syncer.Name;
+            Color playerColor = players[i].syncer.Color;
+            int playerHeadType = players[i].syncer.HeadType;
+            float playerHeight = players[i].syncer.Height;
+            int hatIndex = players[i].syncer.HatIndex;
             bool isLocal = players[i].IsLocal;
 
             Destroy(players[i].gameObject);
             players[i] = Instantiate(prefab).GetComponent<ClientPlayer>();
             players[i].PlayerSocketID = socketID;
             players[i].PlayerByteID = byteID;
-            players[i].PlayerName = playerName;
-            players[i].PlayerColor = playerColor;
-            players[i].PlayerHeadType = playerHeadType;
-            players[i].PlayerHeight = playerHeight;
-            players[i].PlayerHatIndex = hatIndex;
+            players[i].syncer.Name = playerName;
+            players[i].syncer.Color = playerColor;
+            players[i].syncer.HeadType = playerHeadType;
+            players[i].syncer.Height = playerHeight;
+            players[i].syncer.HatIndex = hatIndex;
             players[i].IsLocal = isLocal;
             if(isLocal)
             {

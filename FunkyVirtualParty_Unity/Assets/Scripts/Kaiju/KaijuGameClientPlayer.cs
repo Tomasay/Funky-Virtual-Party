@@ -92,7 +92,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
             if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
+                //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
                 Move(input);
             }
 
@@ -102,15 +102,6 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             // do not send input if held by VR player
         }
-
-        // check if we are below the floor
-        if(transform.position.y < -10 && transform.position.y != posFromHost.y)
-        {
-            transform.position = posFromHost;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-            state = KaijuClientState.OnGround;
-        }
-        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
     }
 
     protected override void Update()

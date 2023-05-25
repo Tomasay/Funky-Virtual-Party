@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class ClientPlayerCustomizer : MonoBehaviour
 {
+    [SerializeField] NormcoreRoomConnector norm;
+
     [SerializeField] Button toggleHatLeftButton, toggleHatRightButton, toggleColorLeftButton, toggleColorRightButton;
     [SerializeField] Button enableCustomizationButton, closeCustomizationButton;
     [SerializeField] Canvas controllerCanvas;
@@ -40,7 +42,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
     private void EnableCustomization()
     {
         //Camera
-        cam.transform.parent = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+        cam.transform.parent = norm.LocalPlayer.Anim.transform;
         cam.transform.localPosition = new Vector3(0, 5, 10);
         cam.transform.localRotation = Quaternion.Euler(new Vector3(15, 180, 0));
 
@@ -54,7 +56,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         enableCustomizationButton.gameObject.SetActive(false);
         backgroundDots.SetActive(false);
 
-        ClientManagerWeb.instance.LocalPlayer.SetPlayerNameVisibility(false);
+        norm.LocalPlayer.SetPlayerNameVisibility(false);
     }
 
     private void DisableCustomization()
@@ -74,37 +76,37 @@ public class ClientPlayerCustomizer : MonoBehaviour
         enableCustomizationButton.gameObject.SetActive(true);
         backgroundDots.SetActive(true);
 
-        ClientManagerWeb.instance.LocalPlayer.SetPlayerNameVisibility(true);
+        norm.LocalPlayer.SetPlayerNameVisibility(true);
     }
 
     private void NextHatCustomization()
     {
-        if (ClientManagerWeb.instance.LocalPlayer.PlayerHatIndex < ClientManagerWeb.instance.LocalPlayer.hats.Length)
+        if (norm.LocalPlayer.syncer.HatIndex < norm.LocalPlayer.hats.Length)
         {
-            ClientManagerWeb.instance.LocalPlayer.PlayerHatIndex++;
+            norm.LocalPlayer.syncer.HatIndex++;
         }
         else
         {
-            ClientManagerWeb.instance.LocalPlayer.PlayerHatIndex = 0;
+            norm.LocalPlayer.syncer.HatIndex = 0;
         }
     }
 
     private void PreviousHatCustomization()
     {
-        if (ClientManagerWeb.instance.LocalPlayer.PlayerHatIndex > 0)
+        if (norm.LocalPlayer.syncer.HatIndex > 0)
         {
-            ClientManagerWeb.instance.LocalPlayer.PlayerHatIndex--;
+            norm.LocalPlayer.syncer.HatIndex--;
         }
         else
         {
-            ClientManagerWeb.instance.LocalPlayer.PlayerHatIndex = ClientManagerWeb.instance.LocalPlayer.hats.Length;
+            norm.LocalPlayer.syncer.HatIndex = norm.LocalPlayer.hats.Length;
         }
     }
 
     private void NextColorCustomization()
     {
-        int colIndex = ClientManagerWeb.instance.LocalPlayer.GetColorIndex();
-        Texture2D pallete = ClientManagerWeb.instance.LocalPlayer.colorPalette;
+        int colIndex = norm.LocalPlayer.GetColorIndex();
+        Texture2D pallete = norm.LocalPlayer.colorPalette;
 
         if(colIndex < pallete.width)
         {
@@ -115,13 +117,13 @@ public class ClientPlayerCustomizer : MonoBehaviour
             colIndex = 0;
         }
 
-        ClientManagerWeb.instance.LocalPlayer.UpdateColor(pallete.GetPixel(colIndex, 0));
+        norm.LocalPlayer.syncer.Color = pallete.GetPixel(colIndex, 0);
     }
 
     private void PreviousColorCustomization()
     {
-        int colIndex = ClientManagerWeb.instance.LocalPlayer.GetColorIndex();
-        Texture2D pallete = ClientManagerWeb.instance.LocalPlayer.colorPalette;
+        int colIndex = norm.LocalPlayer.GetColorIndex();
+        Texture2D pallete = norm.LocalPlayer.colorPalette;
 
         if (colIndex > 0)
         {
@@ -132,6 +134,6 @@ public class ClientPlayerCustomizer : MonoBehaviour
             colIndex = pallete.width;
         }
 
-        ClientManagerWeb.instance.LocalPlayer.UpdateColor(pallete.GetPixel(colIndex, 0));
+        norm.LocalPlayer.syncer.Color = pallete.GetPixel(colIndex, 0);
     }
 }

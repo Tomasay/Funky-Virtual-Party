@@ -42,8 +42,8 @@ public class TutorialMenuClient : MonoBehaviour
         {
             GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
             TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
-            txt.color = cm.Players[i].PlayerColor;
-            txt.text = cm.Players[i].PlayerName;
+            txt.color = cm.Players[i].syncer.Color;
+            txt.text = cm.Players[i].syncer.Name;
 
             clientPlayerIcons.Add(cm.Players[i].PlayerSocketID, newPlayerIcon);
         }

@@ -376,7 +376,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             if (aob.playerID.Equals(answerPlayerID))
             {
                 ClientManagerWeb inst = ClientManagerWeb.instance;
-                aob.AddPlayerIcon(inst.GetPlayerBySocketID(playerID).PlayerName, inst.GetPlayerBySocketID(playerID).PlayerColor);
+                aob.AddPlayerIcon(inst.GetPlayerBySocketID(playerID).syncer.Name, inst.GetPlayerBySocketID(playerID).syncer.Color);
                 return;
             }
         }
@@ -426,7 +426,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerBySocketID(entry.Key).PlayerName;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerBySocketID(entry.Key).syncer.Name;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 

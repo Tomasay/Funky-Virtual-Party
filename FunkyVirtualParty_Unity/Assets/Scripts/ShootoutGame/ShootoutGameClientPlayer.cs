@@ -145,7 +145,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
         else if(isDebugPlayer && isColliding)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
+            //ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
 
             collisionTimer -= Time.deltaTime;
             if (collisionTimer <= 0)
@@ -169,7 +169,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(target));
+                //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(target));
 
                 bool isSliding = (input == Vector2.zero && target.magnitude > 0);
                 Move(target, !isSliding, !isSliding, input);
@@ -185,7 +185,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             float t = (collisionTimer > 0) ? (collisionTimer / collisionTimerDefault) : 0;
             Vector2 collisionInput = prevVector = (input * (1-t)) + (-0.75f * t * collisionVector.normalized);
 
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionInput));
+            //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionInput));
             Move(collisionInput, (input == Vector2.zero) ? false : true, true, input);
 
             collisionTimer -= Time.deltaTime;
@@ -203,7 +203,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 #if UNITY_EDITOR
         if (isDebugPlayer && isExplosion)
         {
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
+            //ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -220,7 +220,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.5f));
+            //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.5f));
             Move(collisionVector.normalized * -0.5f, false, false, input);
 
             /*
@@ -238,13 +238,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             explosionTimer = explosionTimerDefault;
         }
-        // check if we are below the floor
-        if(transform.position.y < -10 && transform.position.y != posFromHost.y)
-        {
-            transform.position = posFromHost;
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
-        }
-        //anim.transform.rotation = Quaternion.RotateTowards(lookRotation, transform.rotation, Time.deltaTime);
 
 #if UNITY_WEBGL
         playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);

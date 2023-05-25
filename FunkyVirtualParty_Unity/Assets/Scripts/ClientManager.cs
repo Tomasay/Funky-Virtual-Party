@@ -178,7 +178,7 @@ public class ClientManager : MonoBehaviour
         manager.Socket.Emit("assignPlayerByteIDServer", id, playerCounter);
         playerCounter++;
         newPlayer.PlayerIP = ip;
-        newPlayer.PlayerName = name;
+        newPlayer.syncer.Name = name;
 
 
         if (onClientConnect != null)
@@ -199,7 +199,7 @@ public class ClientManager : MonoBehaviour
         newPlayer.PlayerByteID = playerCounter;
         playerCounter++;
 
-        newPlayer.PlayerName = name;
+        newPlayer.syncer.Name = name;
 
         if (onClientConnect != null)
         {
@@ -236,8 +236,10 @@ public class ClientManager : MonoBehaviour
 
     private void OnInputReceived(byte[] data)
     {
+        /*
         ClientInputData newData = ClientPlayer.DeserializeInputData(data);
         GetPlayerByByteID(newData.id).Move(newData.input);
+        */
     }
 
     public event Action<string, string, int, float, int> OnPlayerCustomized;
@@ -293,11 +295,11 @@ public class ClientManager : MonoBehaviour
             string socketID = players[i].PlayerSocketID;
             string playerIP = players[i].PlayerIP;
             byte byteID = players[i].PlayerByteID;
-            string playerName = players[i].PlayerName;
-            Color playerColor = players[i].PlayerColor;
-            int playerHeadType = players[i].PlayerHeadType;
-            float playerHeight = players[i].PlayerHeight;
-            int hatIndex = players[i].PlayerHatIndex;
+            string playerName = players[i].syncer.Name;
+            Color playerColor = players[i].syncer.Color;
+            int playerHeadType = players[i].syncer.HeadType;
+            float playerHeight = players[i].syncer.Height;
+            int hatIndex = players[i].syncer.HatIndex;
 
 #if UNITY_EDITOR
             bool isDebug = players[i].isDebugPlayer;
@@ -308,11 +310,11 @@ public class ClientManager : MonoBehaviour
             players[i].PlayerSocketID = socketID;
             players[i].PlayerIP = playerIP;
             players[i].PlayerByteID = byteID;
-            players[i].PlayerName = playerName;
-            players[i].PlayerColor = playerColor;
-            players[i].PlayerHeadType = playerHeadType;
-            players[i].PlayerHeight = playerHeight;
-            players[i].PlayerHatIndex = hatIndex;
+            players[i].syncer.Name = playerName;
+            players[i].syncer.Color = playerColor;
+            players[i].syncer.HeadType = playerHeadType;
+            players[i].syncer.Height = playerHeight;
+            players[i].syncer.HatIndex = hatIndex;
 
             if (locations[i])
             {
@@ -395,11 +397,11 @@ public class ClientManager : MonoBehaviour
                     writer.Write(cp.PlayerSocketID);
                     writer.Write(cp.PlayerByteID);
                     writer.Write(cp.PlayerIP);
-                    writer.Write(cp.PlayerName);
-                    writer.Write("#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor));
-                    writer.Write((sbyte)cp.PlayerHeadType);
-                    writer.Write(cp.PlayerHeight);
-                    writer.Write((sbyte)cp.PlayerHatIndex);
+                    writer.Write(cp.syncer.Name);
+                    writer.Write("#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color));
+                    writer.Write((sbyte)cp.syncer.HeadType);
+                    writer.Write(cp.syncer.Height);
+                    writer.Write((sbyte)cp.syncer.HatIndex);
                 }
             }
             return m.ToArray();

@@ -17,14 +17,14 @@ public class ClientPlayerDebug : MonoBehaviour
 
     void NewPlayerJoined(GameObject newPlayer)
     {
-        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), cp.PlayerHeadType, cp.PlayerHeight, -1);
+        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color), cp.syncer.HeadType, cp.syncer.Height, -1);
     }
 
     void Customize()
     {
         //Color
         Color newCol = ClientPlayer.availableColors[Random.Range(0, ClientPlayer.availableColors.Count)];
-        cp.PlayerColor = newCol;
+        cp.syncer.Color = newCol;
 
         //Head shapes
         int headType = Random.Range(-1, cp.Smr.sharedMesh.blendShapeCount);
@@ -34,8 +34,8 @@ public class ClientPlayerDebug : MonoBehaviour
         }
 
         //Height
-        cp.PlayerHeight = Random.Range(-0.2f, 0.75f);
+        cp.syncer.Height = Random.Range(-0.2f, 0.75f);
 
-        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.PlayerColor), headType, cp.PlayerHeight, -1);
+        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color), headType, cp.syncer.Height, -1);
     }
 }

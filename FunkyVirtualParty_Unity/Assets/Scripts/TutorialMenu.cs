@@ -91,8 +91,8 @@ public class TutorialMenu : MonoBehaviour
             {
                 GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
                 TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
-                txt.color = ClientManager.instance.Players[i].PlayerColor;
-                txt.text = ClientManager.instance.Players[i].PlayerName;
+                txt.color = ClientManager.instance.Players[i].syncer.Color;
+                txt.text = ClientManager.instance.Players[i].syncer.Name;
 
                 vrPlayerIcons.Add(ClientManager.instance.Players[i].PlayerSocketID, newPlayerIcon);
             }
