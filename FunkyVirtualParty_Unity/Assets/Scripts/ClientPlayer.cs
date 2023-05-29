@@ -18,6 +18,8 @@ public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] public ClientSync syncer;
 
+    public static List<ClientPlayer> clients;
+
     [SerializeField] public Texture2D colorPalette;
     public static List<Color> availableColors; //Colors not used from the available palette
     [SerializeField] public TMP_Text playerNameText;
@@ -27,7 +29,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] protected GameObject spineBone; //Used to change height of player
     [SerializeField] protected Collider col; //Used to change height of player
 
-    [SerializeField] RealtimeView realtimeView;
+    [SerializeField] public RealtimeView realtimeView;
     [SerializeField] RealtimeTransform realtimeTransform, animRealtimeTransform;
 
     [SerializeField] public GameObject[] hats;
@@ -68,6 +70,11 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void Start()
     {
+        if (clients == null)
+            clients = new List<ClientPlayer>();
+
+        clients.Add(this);
+
         DontDestroyOnLoad(gameObject);
 
         if (realtimeView.isOwnedLocallyInHierarchy)
@@ -116,6 +123,8 @@ public class ClientPlayer : MonoBehaviour
     private void OnDestroy()
     {
         CancelInvoke("CheckInput");
+
+        clients.Remove(this);
     }
 
     protected virtual void CheckInput()
@@ -331,5 +340,18 @@ public class ClientPlayer : MonoBehaviour
     protected virtual void OnCollisionEnter(Collision collision)
     {
         //Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
+    }
+
+    public static ClientPlayer GetClientByViewID(string id)
+    {
+        foreach (ClientPlayer cp in clients)
+        {
+            if(cp.realtimeView.viewUUID.Equals(id))
+            {
+                return cp;
+            }
+        }
+
+        return null;
     }
 }

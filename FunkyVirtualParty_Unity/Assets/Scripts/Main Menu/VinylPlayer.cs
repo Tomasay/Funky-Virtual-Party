@@ -13,6 +13,8 @@ using UnityEngine.InputSystem;
 
 public class VinylPlayer : MonoBehaviour
 {
+    [SerializeField] SceneChangerSyncer sceneChanger;
+
     [SerializeField] Transform vinylParent;
 
     [SerializeField] TMP_Text titleText, descriptionText;
@@ -65,8 +67,6 @@ public class VinylPlayer : MonoBehaviour
 
                 //Load game scene in 3 seconds
                 StartCoroutine(LoadSceneDelayed(info.SceneToLoad, 3));
-
-                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "DiscOnPlayer", currentVinylSyncer.objectID);
             }
         }
     }
@@ -96,27 +96,28 @@ public class VinylPlayer : MonoBehaviour
             if (Keyboard.current.vKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                ClientManager.instance.OnMinigameStart("ChaseGame");
+                sceneChanger.CurrentScene = "ChaseGame";
+                Debug.Log("Bruh");
             }
             else if (Keyboard.current.iKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                ClientManager.instance.OnMinigameStart("Shootout");
+                sceneChanger.CurrentScene = "Shootout";
             }
             else if (Keyboard.current.mKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                ClientManager.instance.OnMinigameStart("MazeGame");
+                sceneChanger.CurrentScene = "MazeGame";
             }
             else if (Keyboard.current.kKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                ClientManager.instance.OnMinigameStart("Kaiju");
+                sceneChanger.CurrentScene = "Kaiju";
             }
             else if (Keyboard.current.pKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                ClientManager.instance.OnMinigameStart("3DPaintGame");
+                sceneChanger.CurrentScene = "3DPaintGame";
             }
         }
 #endif
@@ -127,6 +128,7 @@ public class VinylPlayer : MonoBehaviour
         yield return new WaitForSeconds(delay);
 
         isSceneLoading = true;
-        ClientManager.instance.OnMinigameStart(sceneName);
+
+        sceneChanger.CurrentScene = sceneName;
     }
 }

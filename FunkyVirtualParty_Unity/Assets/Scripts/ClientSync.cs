@@ -33,13 +33,13 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
         {
             // Unregister from events
             previousModel.nameDidChange -= OnNameChange;
-            currentModel.colorDidChange -= OnColorChange;
-            currentModel.animSpeedDidChange -= OnAnimSpeedChange;
-            currentModel.nameColorDidChange -= OnNameColorChange;
-            currentModel.hatIndexDidChange -= OnHatChanged;
-            currentModel.headTypeDidChange -= OnHeadTypeChanged;
-            currentModel.heightDidChange -= OnHeightChanged;
-            currentModel.danceIndexDidChange -= OnDanceIndexChanged;
+            previousModel.colorDidChange -= OnColorChange;
+            previousModel.animSpeedDidChange -= OnAnimSpeedChange;
+            previousModel.nameColorDidChange -= OnNameColorChange;
+            previousModel.hatIndexDidChange -= OnHatChanged;
+            previousModel.headTypeDidChange -= OnHeadTypeChanged;
+            previousModel.heightDidChange -= OnHeightChanged;
+            previousModel.danceIndexDidChange -= OnDanceIndexChanged;
         }
 
         if (currentModel != null)

@@ -4,9 +4,14 @@ using UnityEngine;
 using TMPro;
 using Normal.Realtime;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 public class NormcoreRoomConnector : MonoBehaviour
 {
+    private static NormcoreRoomConnector Instance = null;
+    public static NormcoreRoomConnector instance;
+
     ClientPlayer localPlayer;
 
     RealtimeAvatarManager avatarManager;
@@ -36,14 +41,38 @@ public class NormcoreRoomConnector : MonoBehaviour
 
     bool disconnectingDueToNoHost;
 
+
+    UnityEvent LocalPlayerSpawned;
+
+
     public ClientPlayer LocalPlayer { get => localPlayer; }
 
     private void Awake()
     {
+        //Singleton instantiation
+        if (!instance)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         avatarManager = GetComponent<RealtimeAvatarManager>();
 
         realtime.didConnectToRoom += ConnectedToRoom;
         realtime.didDisconnectFromRoom += CheckDisconnectedDueToNoHost;
+
+        DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        if(realtime.connected)
+        {
+            SpawnPlayer();
+        }
     }
 
     public void SubmitButtonPressed()
@@ -57,8 +86,6 @@ public class NormcoreRoomConnector : MonoBehaviour
 
     void ConnectedToRoom(Realtime realtime)
     {
-        Debug.Log("Avatars in room: " + avatarManager.avatars.Count);
-
         if (avatarManager.avatars.Count > 0)
         {
             loadingCircle.SetActive(false);
@@ -72,10 +99,7 @@ public class NormcoreRoomConnector : MonoBehaviour
             controllerCanvas.enabled = true;
             enableCustomizationsButton.gameObject.SetActive(true);
 
-            GameObject newPlayer = Realtime.Instantiate("ClientPlayer", Realtime.InstantiateOptions.defaults);
-            localPlayer = newPlayer.GetComponent<ClientPlayer>();
-            localPlayer.syncer.Name = nameInput.text;
-            localPlayer.IsLocal = true;
+            SpawnPlayer();
         }
         else
         {
@@ -95,6 +119,17 @@ public class NormcoreRoomConnector : MonoBehaviour
 
             disconnectingDueToNoHost = false;
         }
+    }
+
+    public void SpawnPlayer()
+    {
+        string currentScene = SceneManager.GetActiveScene().name;
+
+        GameObject newPlayer = Realtime.Instantiate(currentScene + "Player", Realtime.InstantiateOptions.defaults);
+        localPlayer = newPlayer.GetComponent<ClientPlayer>();
+        localPlayer.syncer.Name = nameInput.text;
+        localPlayer.IsLocal = true;
+        LocalPlayerSpawned.Invoke();
     }
 
     public void CheckValidPartyCode(string val)

@@ -9,43 +9,39 @@ public class TutorialMenuClient : MonoBehaviour
     [SerializeField] Canvas tutorialCanvas, controllerCanvas;
 
     [SerializeField] GameObject playerIconPrefab, clientPlayerIconsParent;
-    [SerializeField] GameManagerWeb manager;
     [SerializeField] Button readyUpButton;
 
     private Dictionary<string, GameObject> clientPlayerIcons;
-
-    private ClientManagerWeb cm;
 
     void Start()
     {
         tutorialCanvas.enabled = true;
 
         clientPlayerIcons = new Dictionary<string, GameObject>();
-        cm = ClientManagerWeb.instance;
         SpawnVRPlayerIcon();
         SpawnPlayerIcons();
 
-        cm.onVRReadyUp += ReadyUpVR;
-        cm.onReadyUp += ReadyUp;
-        cm.onClientDisonnect += RemovePlayerIcon;
+        //cm.onVRReadyUp += ReadyUpVR;
+        //cm.onReadyUp += ReadyUp;
+        //cm.onClientDisonnect += RemovePlayerIcon;
     }
 
     private void OnDestroy()
     {
-        cm.onVRReadyUp -= ReadyUpVR;
-        cm.onReadyUp -= ReadyUp;
+        //cm.onVRReadyUp -= ReadyUpVR;
+        //cm.onReadyUp -= ReadyUp;
     }
 
     private void SpawnPlayerIcons()
     {
-        for (int i = 0; i < cm.Players.Count; i++)
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
             GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
             TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
-            txt.color = cm.Players[i].syncer.Color;
-            txt.text = cm.Players[i].syncer.Name;
+            txt.color = ClientPlayer.clients[i].syncer.Color;
+            txt.text = ClientPlayer.clients[i].syncer.Name;
 
-            clientPlayerIcons.Add(cm.Players[i].PlayerSocketID, newPlayerIcon);
+            clientPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.viewUUID, newPlayerIcon);
         }
     }
 
@@ -62,9 +58,9 @@ public class TutorialMenuClient : MonoBehaviour
     }
     private void ReadyUp(ClientPlayer p)
     {
-        clientPlayerIcons[p.PlayerSocketID].GetComponentInChildren<TMP_Text>().text = "READY";
-        clientPlayerIcons[p.PlayerSocketID].GetComponent<Animator>().SetTrigger("Ready");
-        clientPlayerIcons.Remove(p.PlayerSocketID);
+        clientPlayerIcons[p.realtimeView.viewUUID].GetComponentInChildren<TMP_Text>().text = "READY";
+        clientPlayerIcons[p.realtimeView.viewUUID].GetComponent<Animator>().SetTrigger("Ready");
+        clientPlayerIcons.Remove(p.realtimeView.viewUUID);
 
         if(readyUpButton && p.IsLocal)
         {
