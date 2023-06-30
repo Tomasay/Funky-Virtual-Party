@@ -7,24 +7,33 @@ using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
-    [SerializeField] VRPlayerController vrPlayer;
     [SerializeField] float positionOffset = 3.0f;
 
+    private VRPlayerController vrPlayer;
     private PositionConstraint posContraint;
     private XRControllerEvent leftMenuEvent;
     private Canvas can;
 
     void Start()
     {
-        if (!vrPlayer)
-        {
-            Debug.LogError("No vrPlayer provided! Pause menu will not function");
-            Destroy(this);
-        }
-
         //Canvas
         can = GetComponent<Canvas>();
         can.enabled = false;
+
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
+
+        //TODO: Menu should always spawn in front of the player's face
+    }
+
+    private void OnDestroy()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        vrPlayer = avatar.GetComponent<VRPlayerController>();
 
         //Setup position constraint to follow player camera
         posContraint = GetComponent<PositionConstraint>();
@@ -41,8 +50,6 @@ public class PauseMenu : MonoBehaviour
         leftMenuEvent.button = CommonButton.menuButton;
         leftMenuEvent.Pressed = new UnityEngine.Events.UnityEvent();
         leftMenuEvent.Pressed.AddListener(this.ToggleMenu);
-
-        //TODO: Menu should always spawn in front of the player's face
     }
 
     public void ToggleMenu()

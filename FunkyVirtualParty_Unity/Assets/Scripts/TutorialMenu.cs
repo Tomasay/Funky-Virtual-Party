@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.Events;
 
 #if UNITY_EDITOR
 using UnityEngine.InputSystem;
@@ -11,10 +12,11 @@ using UnityEngine.InputSystem;
 
 public class TutorialMenu : MonoBehaviour
 {
+    public UnityEvent allPlayersReady;
+
     [SerializeField] Canvas vrCanvas;
 
     [SerializeField] GameObject playerIconPrefab, VRPlayerIconsParent;
-    [SerializeField] GameManager manager;
     [SerializeField] Button VrPlayerReady;
 
     private Dictionary<string, GameObject> vrPlayerIcons;
@@ -22,52 +24,36 @@ public class TutorialMenu : MonoBehaviour
     private int canvasRotationIncrement = 45;
     private float timeRotated, rotationTime = 1;
 
+    private void Awake()
+    {
+        if (allPlayersReady == null)
+            allPlayersReady = new UnityEvent();
+
+        vrPlayerIcons = new Dictionary<string, GameObject>();
+    }
+
     void Start()
     {
-        vrPlayerIcons = new Dictionary<string, GameObject>();
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();
         }
         SpawnPlayerIcons();
 
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.onReadyUp += ReadyUp;
-            ClientManager.instance.onClientDisonnect += RemovePlayerIcon;
-        }
-        
-        if(VrPlayerReady != null )
-        {
-            VrPlayerReady.onClick.AddListener(ReadyUpVR);
-        }
+        ClientPlayer.OnReadyUp.AddListener(ReadyUp);
 
-#if UNITY_EDITOR
-        StartCoroutine("ReadyUpDelayed");
-#endif
-    }
-
-#if UNITY_EDITOR
-    IEnumerator ReadyUpDelayed()
-    {
-        yield return new WaitForSeconds(2);
-
-        foreach (ClientPlayer cp in ClientManager.instance.Players)
+        foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            if (cp.isDebugPlayer)
-            {
-                ClientManager.instance.Manager.Socket.Emit("ReadyUpDebug", cp.PlayerByteID);
-            }
+            //ClientManager.instance.onClientDisonnect += RemovePlayerIcon;
         }
     }
-#endif
 
     private void Update()
     {
 #if UNITY_EDITOR
         if (Keyboard.current.rKey.wasPressedThisFrame && VrPlayerReady.interactable)
         {
-            ReadyUpVR();
+            VrPlayerReady.onClick.Invoke();
         }
 #endif
 
@@ -76,26 +62,24 @@ public class TutorialMenu : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (ClientManager.instance)
+        ClientPlayer.OnReadyUp.RemoveListener(ReadyUp);
+
+        foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            ClientManager.instance.onReadyUp -= ReadyUp;
-            ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
+            //ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
         }
     }
 
     private void SpawnPlayerIcons()
     {
-        if (ClientManager.instance)
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
-            for (int i = 0; i < ClientManager.instance.Players.Count; i++)
-            {
-                GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
-                TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
-                txt.color = ClientManager.instance.Players[i].syncer.Color;
-                txt.text = ClientManager.instance.Players[i].syncer.Name;
+            GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
+            TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+            txt.color = ClientPlayer.clients[i].syncer.Color;
+            txt.text = ClientPlayer.clients[i].syncer.Name;
 
-                vrPlayerIcons.Add(ClientManager.instance.Players[i].PlayerSocketID, newPlayerIcon);
-            }
+            vrPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.viewUUID, newPlayerIcon);
         }
     }
 
@@ -107,9 +91,9 @@ public class TutorialMenu : MonoBehaviour
 
     private void ReadyUp(ClientPlayer p)
     {
-        vrPlayerIcons[p.PlayerSocketID].GetComponentInChildren<TMP_Text>().text = "READY";
-        vrPlayerIcons[p.PlayerSocketID].GetComponent<Animator>().SetTrigger("Ready");
-        vrPlayerIcons.Remove(p.PlayerSocketID);
+        vrPlayerIcons[p.realtimeView.viewUUID].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons[p.realtimeView.viewUUID].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove(p.realtimeView.viewUUID);
 
         //Check if every player is ready
         if (vrPlayerIcons.Count > 0)
@@ -117,11 +101,7 @@ public class TutorialMenu : MonoBehaviour
             return;
         }
 
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.onReadyUp -= ReadyUp;
-        }
-        manager.State = GameState.Countdown;
+        allPlayersReady.Invoke();
         this.gameObject.SetActive(false);
     }
     private void SpawnVRPlayerIcon()
@@ -137,11 +117,6 @@ public class TutorialMenu : MonoBehaviour
 
     public void ReadyUpVR()
     {
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.Manager.Socket.Emit("ReadyUpVR");
-        }
-
         vrPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
         vrPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
         vrPlayerIcons.Remove("VR");
@@ -155,11 +130,7 @@ public class TutorialMenu : MonoBehaviour
             return;
         }
 
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.onReadyUp -= ReadyUp;
-        }
-        manager.State = GameState.Countdown;
+        allPlayersReady.Invoke();
         this.gameObject.SetActive(false);
     }
 
@@ -169,7 +140,7 @@ public class TutorialMenu : MonoBehaviour
     /// </summary>
     void UpdateCameraRotationOffset()
     {
-        if (Time.time > timeRotated + rotationTime)
+        if (Time.time > timeRotated + rotationTime && Camera.main)
         {
             float rot = Mathf.DeltaAngle(transform.rotation.eulerAngles.y, Camera.main.transform.rotation.eulerAngles.y);
 

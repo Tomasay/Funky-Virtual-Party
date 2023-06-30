@@ -1,57 +1,68 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
 using TMPro;
-using UnityEngine.SceneManagement;
-using Autohand;
 using Cinemachine;
 using DG.Tweening;
 
-public class ChaseGameManagerWeb : GameManagerWeb
+public class ChaseGameManagerWeb : MonoBehaviour
 {
     [SerializeField] CinemachineFreeLook playerCamera;
     [SerializeField] Camera cam;
 
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
-    [SerializeField] private ParticleSystem countdownParticles, playerCapturedParticles;
+    [SerializeField] private ParticleSystem countdownParticles;
     private float timeRemaining;
 
-    protected override void Start()
+    public void DebugLog(string log)
     {
-        base.Start();
+        Debug.Log((log));
+    }
+
+    private void Awake()
+    {
+        NormcoreRoomConnector.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+
+        ChaseGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
+    }
+
+    protected void Start()
+    {
+        NormcoreRoomConnector.instance.LocalPlayer.CanMove = false;
 
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
-        playerCamera.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
-        playerCamera.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
-
-        (ClientManagerWeb.instance.LocalPlayer as ChaseGameClientPlayer).cam = cam;
     }
 
-    protected override void OnStateChange(string s)
+    void OnLocalPlayerSpawned()
     {
-        base.OnStateChange(s);
+        playerCamera.Follow = NormcoreRoomConnector.instance.LocalPlayer.Anim.transform;
+        playerCamera.LookAt = NormcoreRoomConnector.instance.LocalPlayer.Anim.transform;
 
-        switch (State)
+        (NormcoreRoomConnector.instance.LocalPlayer as ChaseGameClientPlayer).cam = cam;
+    }
+
+    protected void OnStateChange(string s)
+    {
+        switch (ChaseGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
-                SetPlayerMovement(false);
+            case "tutorial":
+                
                 break;
-            case GameState.Countdown:
+            case "countdown":
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;
-            case GameState.GameLoop:
-                SetPlayerMovement(true);
+            case "game loop":
+                NormcoreRoomConnector.instance.LocalPlayer.CanMove = true;
                 break;
-            case GameState.VRPlayerLoses:
-                playerCapturedParticles.Play();
+            case "vr player loses":
+                NormcoreRoomConnector.instance.VRAvatar.GetComponent<ChaseGameVRPlayerController>().capturedParticles.Play();
                 StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
                 break;
-            case GameState.VRPlayerWins:
+            case "vr player wins":
                 break;
-            case GameState.TimeEnded:
+            case "time ended":
                 StartCoroutine(GameOver(2, "TIMES UP!"));
                 break;
             default:
@@ -61,19 +72,19 @@ public class ChaseGameManagerWeb : GameManagerWeb
 
     void Update()
     {
-        switch (State)
+        switch (ChaseGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
+            case "tutorial":
                 break;
-            case GameState.Countdown:
+            case "countdown":
                 break;
-            case GameState.GameLoop:
+            case "game loop":
                 timeRemaining -= Time.deltaTime;
                 gameTimeText.text = FormatTime(timeRemaining);
                 break;
-            case GameState.VRPlayerLoses:
+            case "vr player loses":
                 break;
-            case GameState.TimeEnded:
+            case "time ended":
                 break;
             default:
                 break;
@@ -111,5 +122,12 @@ public class ChaseGameManagerWeb : GameManagerWeb
         yield return new WaitForSeconds(3);
 
         ClientManagerWeb.instance.LoadMainMenu();
+    }
+
+    public string FormatTime(float time)
+    {
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }

@@ -6,39 +6,45 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 
-public class ChaseGameManager : GameManager
+public class ChaseGameManager : MonoBehaviour
 {
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
-    [SerializeField] private TMP_Text vrInfoText, vrGameTimeText;
+    private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
 
-    protected override void Start()
+    protected void Start()
     {
-        base.Start();
-
         timeRemaining = GAME_TIME_AMOUNT;
+        
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        vrInfoText = avatar.GetComponent<ChaseGameVRPlayerController>().vrInfoText;
+
+        vrGameTimeText = avatar.GetComponent<ChaseGameVRPlayerController>().vrGameTimeText;
         vrGameTimeText.text = FormatTime(timeRemaining);
 
-        SetPlayerMovement(false);
-        SetVRPlayerMovementDelayed(false, 1);
+        SetVRPlayerMovement(false);
         SetVRPlayerHandMovement(false);
     }
 
     void Update()
     {
-        switch (State)
+        switch (ChaseGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
+            case "tutorial":
                 
                 break;
-            case GameState.Countdown:
+            case "countdown":
                 if (!countingDown)
                 {
                     StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 }
                 break;
-            case GameState.GameLoop:
+            case "game loop":
                 timeRemaining -= Time.deltaTime;
                 vrGameTimeText.text = FormatTime(timeRemaining);
                 if (timeRemaining <= 10) //Display final 10 seconds for VR player
@@ -47,14 +53,14 @@ public class ChaseGameManager : GameManager
                 }
                 if (timeRemaining <= 0) //Game end, VR player wins
                 {
-                    State = GameState.TimeEnded;
+                    ChaseGameSyncer.instance.State = "time ended";
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
                 break;
-            case GameState.VRPlayerLoses:
+            case "vr player lost":
                 StartCoroutine(GameOver(2, "YOU'VE BEEN CAPTURED"));
                 break;
-            case GameState.TimeEnded:
+            case "time ended":
                 StartCoroutine(GameOver(2, "TIMES UP!\nYOU WIN"));
                 break;
             default:
@@ -79,8 +85,7 @@ public class ChaseGameManager : GameManager
         yield return new WaitForSeconds(1);
         vrInfoText.text = "";
 
-        State = GameState.GameLoop;
-        SetPlayerMovement(true);
+        ChaseGameSyncer.instance.State = "game loop";
 
         countingDown = false;
     }
@@ -92,7 +97,7 @@ public class ChaseGameManager : GameManager
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("MainMenuNormcore");
     }
     public void DisplayVRCapture(string playerName)
     {
@@ -101,13 +106,20 @@ public class ChaseGameManager : GameManager
         vrInfoText.text = playerName + " captured you!";
     }
 
-    public override void OnAction(string id)
-    {
-        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<ChaseGameClientPlayer>().Action();
-    }
-
     private void SetVRPlayerHandMovement(bool enabled)
     {
-        VRPlayer.GetComponent<ChaseGameVRPlayerController>().HandMovement = enabled;
+        RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<ChaseGameVRPlayerController>().HandMovement = enabled;
+    }
+
+    protected void SetVRPlayerMovement(bool canPlayerMove)
+    {
+        RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
+    }
+
+    public string FormatTime(float time)
+    {
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }

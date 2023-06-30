@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 #endif
 
+[RequireComponent(typeof(Animator))]
 public class VinylPlayer : MonoBehaviour
 {
     [SerializeField] SceneChangerSyncer sceneChanger;
@@ -30,10 +31,7 @@ public class VinylPlayer : MonoBehaviour
 
     private void Start()
     {
-        if(!TryGetComponent<Animator>(out anim))
-        {
-            Debug.LogWarning("No animator found on vinyl player!");
-        }
+        anim = GetComponent<Animator>();
 
         titleText.enabled = false;
         descriptionText.enabled = false;
@@ -49,15 +47,13 @@ public class VinylPlayer : MonoBehaviour
             if (!g.IsHeld()) //If vinyl is released from hands
             {
                 currentVinyl = other.gameObject;
-                VinylDiscSyncer currentVinylSyncer = other.gameObject.GetComponent<VinylDiscSyncer>();
+                VinylInfo info = other.gameObject.GetComponent<VinylInfo>();
 
                 //Set vinyl pos/rot
-                currentVinylSyncer.SetDiscOnPlayer();
-
+                info.SetDiscOnPlayer();
                 anim.SetTrigger("Play");
 
                 //Set UI info
-                VinylInfo info = other.gameObject.GetComponent<VinylInfo>();
                 titleText.enabled = true;
                 descriptionText.enabled = true;
                 titleText.text = info.Title;
@@ -97,7 +93,6 @@ public class VinylPlayer : MonoBehaviour
             {
                 isSceneLoading = true;
                 sceneChanger.CurrentScene = "ChaseGame";
-                Debug.Log("Bruh");
             }
             else if (Keyboard.current.iKey.wasPressedThisFrame)
             {

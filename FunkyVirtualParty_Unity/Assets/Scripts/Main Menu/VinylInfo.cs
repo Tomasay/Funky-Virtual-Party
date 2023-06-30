@@ -13,30 +13,55 @@ public class VinylInfo : MonoBehaviour
 
     [SerializeField] public GameObject highlightOutline;
 
-    [SerializeField] public AutoHandPlayer vrPlayer;
-
     [SerializeField] public Transform distanceChecker;
 
-    [SerializeField] public VinylDiscSyncer syncer;
+    [SerializeField] Transform vinylParent;
+
+    [SerializeField] GameObject poofEffect;
+
+    AutoHandPlayer vrPlayer;
 
     Grabbable grabbable;
     Collider col;
     Rigidbody rb;
 
-
-    [SerializeField] GameObject poofEffect;
     float distanceToRespawn = 10;
+
+    Vector3 startingPos;
+    Quaternion startingRot;
+
+    float vinylSpinSpeed = 0.2f;
+    bool isSpinning;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
-        Physics.IgnoreCollision(col, vrPlayer.headModel.GetComponent<Collider>());
-        Physics.IgnoreCollision(col, vrPlayer.capsuleColl);
+
+        startingPos = transform.position;
+        startingRot = transform.rotation;
 
         grabbable = GetComponent<Grabbable>();
         grabbable.onHighlight.AddListener(OnHighlight);
         grabbable.onUnhighlight.AddListener(OnUnhighlight);
+    }
+
+    private void Start()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+    }
+
+    private void OnDestroy()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        vrPlayer = avatar.GetComponentInChildren<AutoHandPlayer>();
+
+        Physics.IgnoreCollision(col, vrPlayer.headModel.GetComponent<Collider>());
+        Physics.IgnoreCollision(col, vrPlayer.capsuleColl);
     }
 
     private void Update()
@@ -48,9 +73,12 @@ public class VinylInfo : MonoBehaviour
             RuntimeManager.PlayOneShot("event:/SFX/Pop", transform.position);
             Instantiate(poofEffect, transform.position, transform.rotation);
 
-            syncer.RespawnDisc();
+            RespawnDisc();
+        }
 
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "RespawnDisc", syncer.objectID);
+        if (isSpinning)
+        {
+            transform.Rotate(0, vinylSpinSpeed, 0);
         }
     }
 
@@ -63,5 +91,23 @@ public class VinylInfo : MonoBehaviour
     public void OnUnhighlight(Hand hand, Grabbable g)
     {
         highlightOutline.SetActive(false);
+    }
+
+    public void RespawnDisc()
+    {
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        transform.position = startingPos;
+        transform.rotation = startingRot;
+    }
+
+    public void SetDiscOnPlayer()
+    {
+        rb.velocity = Vector3.zero;
+        rb.useGravity = false;
+        rb.isKinematic = true;
+        transform.position = vinylParent.position;
+        transform.rotation = Quaternion.Euler(Vector3.zero);
+        isSpinning = true;
     }
 }

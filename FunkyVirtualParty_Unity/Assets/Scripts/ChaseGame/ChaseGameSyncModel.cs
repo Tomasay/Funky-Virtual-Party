@@ -43,13 +43,27 @@ public partial class ChaseGameSyncModel : RealtimeModel {
         }
     }
     
+    public bool vrPlayerReady {
+        get {
+            return _vrPlayerReadyProperty.value;
+        }
+        set {
+            if (_vrPlayerReadyProperty.value == value) return;
+            _vrPlayerReadyProperty.value = value;
+            InvalidateReliableLength();
+            FireVrPlayerReadyDidChange(value);
+        }
+    }
+    
     public delegate void PropertyChangedHandler<in T>(ChaseGameSyncModel model, T value);
     public event PropertyChangedHandler<string> stateDidChange;
     public event PropertyChangedHandler<int> timerDidChange;
+    public event PropertyChangedHandler<bool> vrPlayerReadyDidChange;
     
     public enum PropertyID : uint {
         State = 1,
         Timer = 2,
+        VrPlayerReady = 3,
     }
     
     #region Properties
@@ -58,16 +72,20 @@ public partial class ChaseGameSyncModel : RealtimeModel {
     
     private ReliableProperty<int> _timerProperty;
     
+    private ReliableProperty<bool> _vrPlayerReadyProperty;
+    
     #endregion
     
     public ChaseGameSyncModel() : base(null) {
         _stateProperty = new ReliableProperty<string>(1, _state);
         _timerProperty = new ReliableProperty<int>(2, _timer);
+        _vrPlayerReadyProperty = new ReliableProperty<bool>(3, _vrPlayerReady);
     }
     
     protected override void OnParentReplaced(RealtimeModel previousParent, RealtimeModel currentParent) {
         _stateProperty.UnsubscribeCallback();
         _timerProperty.UnsubscribeCallback();
+        _vrPlayerReadyProperty.UnsubscribeCallback();
     }
     
     private void FireStateDidChange(string value) {
@@ -86,10 +104,19 @@ public partial class ChaseGameSyncModel : RealtimeModel {
         }
     }
     
+    private void FireVrPlayerReadyDidChange(bool value) {
+        try {
+            vrPlayerReadyDidChange?.Invoke(this, value);
+        } catch (System.Exception exception) {
+            UnityEngine.Debug.LogException(exception);
+        }
+    }
+    
     protected override int WriteLength(StreamContext context) {
         var length = 0;
         length += _stateProperty.WriteLength(context);
         length += _timerProperty.WriteLength(context);
+        length += _vrPlayerReadyProperty.WriteLength(context);
         return length;
     }
     
@@ -97,6 +124,7 @@ public partial class ChaseGameSyncModel : RealtimeModel {
         var writes = false;
         writes |= _stateProperty.Write(stream, context);
         writes |= _timerProperty.Write(stream, context);
+        writes |= _vrPlayerReadyProperty.Write(stream, context);
         if (writes) InvalidateContextLength(context);
     }
     
@@ -115,6 +143,11 @@ public partial class ChaseGameSyncModel : RealtimeModel {
                     if (changed) FireTimerDidChange(timer);
                     break;
                 }
+                case (uint) PropertyID.VrPlayerReady: {
+                    changed = _vrPlayerReadyProperty.Read(stream, context);
+                    if (changed) FireVrPlayerReadyDidChange(vrPlayerReady);
+                    break;
+                }
                 default: {
                     stream.SkipProperty();
                     break;
@@ -130,6 +163,7 @@ public partial class ChaseGameSyncModel : RealtimeModel {
     private void UpdateBackingFields() {
         _state = state;
         _timer = timer;
+        _vrPlayerReady = vrPlayerReady;
     }
     
 }

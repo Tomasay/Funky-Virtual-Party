@@ -2,11 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Normal.Realtime;
+using TMPro;
 
 public class ClientManagerNormcore : MonoBehaviour
 {
     [SerializeField]
     Realtime realtime;
+
+    [SerializeField]
+    TMP_Text partyCodeText;
 
     private const int PASSCODE_LENGTH = 4;
 
@@ -22,6 +26,9 @@ public class ClientManagerNormcore : MonoBehaviour
         {
             newCode += GetRandomLetter();
         }
+
+        partyCodeText.text = "Party Code: " + newCode;
+
         return newCode;
     }
 

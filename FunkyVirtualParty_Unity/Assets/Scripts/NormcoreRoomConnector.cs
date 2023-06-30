@@ -42,10 +42,13 @@ public class NormcoreRoomConnector : MonoBehaviour
     bool disconnectingDueToNoHost;
 
 
-    UnityEvent LocalPlayerSpawned;
+    public UnityEvent LocalPlayerSpawned;
 
 
     public ClientPlayer LocalPlayer { get => localPlayer; }
+
+    public RealtimeAvatar VRAvatar { get => avatarManager.avatars[0]; }
+    public bool isVRAvatarSpawned { get => avatarManager.avatars.Count > 0; }
 
     private void Awake()
     {
@@ -59,20 +62,33 @@ public class NormcoreRoomConnector : MonoBehaviour
             Destroy(gameObject);
         }
 
+        if (LocalPlayerSpawned == null)
+            LocalPlayerSpawned = new UnityEvent();
+
         avatarManager = GetComponent<RealtimeAvatarManager>();
 
         realtime.didConnectToRoom += ConnectedToRoom;
         realtime.didDisconnectFromRoom += CheckDisconnectedDueToNoHost;
 
+        SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
+    private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
-        if(realtime.connected)
+        if (realtime.connected)
         {
             SpawnPlayer();
         }
+    }
+
+    private void OnDestroy()
+    {
+        realtime.didConnectToRoom -= ConnectedToRoom;
+        realtime.didDisconnectFromRoom -= CheckDisconnectedDueToNoHost;
+
+        SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
     }
 
     public void SubmitButtonPressed()
@@ -126,9 +142,25 @@ public class NormcoreRoomConnector : MonoBehaviour
         string currentScene = SceneManager.GetActiveScene().name;
 
         GameObject newPlayer = Realtime.Instantiate(currentScene + "Player", Realtime.InstantiateOptions.defaults);
-        localPlayer = newPlayer.GetComponent<ClientPlayer>();
-        localPlayer.syncer.Name = nameInput.text;
+
+        if(localPlayer) //If player has already been spawned before
+        {
+            ClientPlayer oldPlayer = localPlayer;
+            localPlayer = newPlayer.GetComponent<ClientPlayer>();
+
+            localPlayer.syncer.Name = oldPlayer.syncer.Name;
+            localPlayer.SetCustomizations(oldPlayer.syncer.Color, oldPlayer.syncer.HeadType, oldPlayer.syncer.Height, oldPlayer.syncer.HatIndex);
+
+            Realtime.Destroy(oldPlayer.gameObject);
+        }
+        else
+        {
+            localPlayer = newPlayer.GetComponent<ClientPlayer>();
+            localPlayer.syncer.Name = nameInput.text;
+        }
+
         localPlayer.IsLocal = true;
+        Debug.Log("????");
         LocalPlayerSpawned.Invoke();
     }
 

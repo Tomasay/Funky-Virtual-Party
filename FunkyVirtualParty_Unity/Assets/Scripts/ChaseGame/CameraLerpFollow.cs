@@ -17,7 +17,7 @@ public class CameraLerpFollow : MonoBehaviour
         cam = GetComponent<CinemachineFreeLook>();
         if(!player)
         {
-            player = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+            player = NormcoreRoomConnector.instance.LocalPlayer.Anim.transform;
         }
     }
 
@@ -26,7 +26,7 @@ public class CameraLerpFollow : MonoBehaviour
     {
         if (!player)
         {
-            player = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+            player = NormcoreRoomConnector.instance.LocalPlayer.Anim.transform;
         }
 
 

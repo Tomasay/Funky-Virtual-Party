@@ -40,32 +40,14 @@ public class VRPlayerIndicator : MonoBehaviour
             return rectTransform;
         }
     }
-    
-    public GameManagerWeb Target { get; set; } = null;
-    private Transform player = null;
-
     private Quaternion tRot = Quaternion.identity;
-    private Vector3 tPos = Vector3.zero;
 
     [SerializeField]
     private Camera cam;
-    private void Start()
-    {
-            
-        Target = GameObject.Find("GameManager").GetComponent<GameManagerWeb>();
-        if(!Target)
-        {
-            Debug.Log("GameManager not Found in VRPLAYERINDICATOR");
-        }
-        else
-        {
-            Debug.Log(Target.VRPlayerHeadPos);
-        }
-        player = ClientManagerWeb.instance.LocalPlayer.transform;
-    }
+
     private void Update()
     {
-        if (!InSight())
+        if (NormcoreRoomConnector.instance.isVRAvatarSpawned && !InSight())
         {
             gameObject.SetActive(true);
             RotateToTarget();
@@ -78,17 +60,7 @@ public class VRPlayerIndicator : MonoBehaviour
 
     void RotateToTarget()
     {
-        if(Target)
-        {
-            tPos = Target.VRPlayerHeadPos;
-        }
-        Vector3 direction = player ? player.position - tPos : -tPos;
-        // check if we're null and set
-        if(!player)
-        {
-            player = ClientManagerWeb.instance.LocalPlayer.transform;
-            Debug.Log("Player set: " + player);
-        }
+        Vector3 direction = NormcoreRoomConnector.instance.VRAvatar.head.position;
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
@@ -102,7 +74,7 @@ public class VRPlayerIndicator : MonoBehaviour
 
     bool InSight()
     {
-        Vector3 ScreenPoint = cam.WorldToScreenPoint(Target.VRPlayerHeadPos);
+        Vector3 ScreenPoint = cam.WorldToScreenPoint(NormcoreRoomConnector.instance.VRAvatar.head.position);
         return ScreenPoint.z > 0 && ScreenPoint.x > 0 && ScreenPoint.x < 1 && ScreenPoint.y > 0 && ScreenPoint.y < 1;
     }
 }

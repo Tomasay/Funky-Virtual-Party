@@ -24,6 +24,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public int HatIndex { get => model.hatIndex; set => model.hatIndex = value; }
     public int HeadType { get => model.headType; set => model.headType = value; }
     public int DanceIndex { get => model.danceIndex; set => model.danceIndex = value; }
+    public bool IsReady { get => model.isReady; set => model.isReady = value; }
 
     #endregion
 
@@ -40,6 +41,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             previousModel.headTypeDidChange -= OnHeadTypeChanged;
             previousModel.heightDidChange -= OnHeightChanged;
             previousModel.danceIndexDidChange -= OnDanceIndexChanged;
+            previousModel.isReadyDidChange -= OnReadyUpChanged;
         }
 
         if (currentModel != null)
@@ -56,6 +58,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             cp.UpdateHeadType(model.headType);
             cp.UpdateHeight(model.height);
             if (model.danceIndex > 0) anim.SetTrigger("Dance" + model.danceIndex);
+            if (model.isReady) ClientPlayer.OnReadyUp.Invoke(cp);
 
             // Register for events
             currentModel.nameDidChange += OnNameChange;
@@ -66,6 +69,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             currentModel.headTypeDidChange += OnHeadTypeChanged;
             currentModel.heightDidChange += OnHeightChanged;
             currentModel.danceIndexDidChange += OnDanceIndexChanged;
+            currentModel.isReadyDidChange += OnReadyUpChanged;
         }
     }
 
@@ -110,6 +114,14 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
         if (val > 0)
         {
             anim.SetTrigger("Dance" + val);
+        }
+    }
+
+    void OnReadyUpChanged(ClientSyncModel previousModel, bool val)
+    {
+        if (val)
+        {
+            ClientPlayer.OnReadyUp.Invoke(cp);
         }
     }
     #endregion

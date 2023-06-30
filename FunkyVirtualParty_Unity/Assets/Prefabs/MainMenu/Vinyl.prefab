@@ -13,11 +13,12 @@ GameObject:
   - component: {fileID: 2177845158328170493}
   - component: {fileID: 7505318128133863892}
   - component: {fileID: 2506488580921175628}
-  - component: {fileID: 8965567671962159261}
   - component: {fileID: 6982595000861948571}
   - component: {fileID: 528049329206279739}
   - component: {fileID: 8076496022422041350}
-  - component: {fileID: 6193194855286646604}
+  - component: {fileID: 1976044667}
+  - component: {fileID: 1976044668}
+  - component: {fileID: 2291706367160797663}
   m_Layer: 29
   m_Name: Vinyl
   m_TagString: Untagged
@@ -32,7 +33,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 376541852131382824}
-  m_LocalRotation: {x: 0.000000021855694, y: 0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.81586, y: 0.81586, z: 0.81586}
   m_ConstrainProportionsScale: 0
@@ -109,7 +110,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 4
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 3222875399155513590, guid: bab7cbfc2004ccb4eb3c780d22a94ded, type: 3}
 --- !u!54 &2506488580921175628
@@ -128,27 +129,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 3
---- !u!114 &8965567671962159261
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 376541852131382824}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5f003ea24a20c1488c29543feb564cf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SceneToLoad: 
-  Title: 
-  Description: 
-  videoPreview: {fileID: 0}
-  highlightOutline: {fileID: 6337127811713015814}
-  vrPlayer: {fileID: 0}
-  distanceChecker: {fileID: 0}
-  syncer: {fileID: 6193194855286646604}
-  poofEffect: {fileID: 4568621449396615745, guid: 836f721988a69e64b8c023130a7268dc, type: 3}
 --- !u!114 &6982595000861948571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,7 +170,20 @@ MonoBehaviour:
   showEvents: 1
   onGrab:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1976044667}
+        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
+          Normcore
+        m_MethodName: RequestOwnership
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   onRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -239,25 +232,25 @@ MonoBehaviour:
   StartTargeting:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8965567671962159261}
-        m_TargetAssemblyTypeName: VinylInfo, Assembly-CSharp
-        m_MethodName: OnHighlight
-        m_Mode: 0
+      - m_Target: {fileID: 6337127811713015814}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
   StopTargeting:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8965567671962159261}
-        m_TargetAssemblyTypeName: VinylInfo, Assembly-CSharp
-        m_MethodName: OnUnhighlight
-        m_Mode: 0
+      - m_Target: {fileID: 6337127811713015814}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -399,7 +392,7 @@ MonoBehaviour:
   minRange: 0
   testAngle: 0
   testRange: 0
---- !u!114 &6193194855286646604
+--- !u!114 &1976044667
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -408,15 +401,59 @@ MonoBehaviour:
   m_GameObject: {fileID: 376541852131382824}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be1be7224854124fb2fb8d391f3d634, type: 3}
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectID: 0
-  UpdatesPerSecond: 0
-  grabbable: {fileID: 6982595000861948571}
-  simulatePhysicsOnDrop: 1
-  rb: {fileID: 2506488580921175628}
+  _interpolate: 1
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 0
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 1
+--- !u!114 &1976044668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376541852131382824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 1976044667}
+  _childViews: []
+--- !u!114 &2291706367160797663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376541852131382824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5f003ea24a20c1488c29543feb564cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SceneToLoad: 
+  Title: 
+  Description: 
+  videoPreview: {fileID: 0}
+  highlightOutline: {fileID: 6337127811713015814}
+  vrPlayer: {fileID: 0}
+  distanceChecker: {fileID: 0}
   vinylParent: {fileID: 0}
+  poofEffect: {fileID: 4568621449396615745, guid: 836f721988a69e64b8c023130a7268dc, type: 3}
 --- !u!1 &718560535834290466
 GameObject:
   m_ObjectHideFlags: 0
@@ -730,7 +767,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e0859904c9c6cf74d8e6143eff96211a, type: 2}
+  - {fileID: 2100000, guid: cbabea3663b7979418f746e4c96c2cd5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

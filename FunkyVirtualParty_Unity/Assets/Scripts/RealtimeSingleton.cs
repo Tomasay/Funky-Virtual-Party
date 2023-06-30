@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Normal.Realtime;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Realtime))]
 public class RealtimeSingleton : MonoBehaviour
@@ -28,7 +29,19 @@ public class RealtimeSingleton : MonoBehaviour
         }
 
         realtime = GetComponent<Realtime>();
+        realtimeAvatarManager = GetComponent<RealtimeAvatarManager>();
 
         DontDestroyOnLoad(gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (realtime.connected)
+        {
+            realtimeAvatarManager.localAvatarPrefab = Resources.Load("XRPlayer" + scene.name) as GameObject;
+            realtimeAvatarManager.CreateAvatarIfNeeded();
+        }
     }
 }

@@ -55,6 +55,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChaseGameClientPlayer
       objectReference: {fileID: 0}
+    - target: {fileID: 8907446340524657188, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: cp
+      value: 
+      objectReference: {fileID: 6358447245401685290}
     m_RemovedComponents:
     - {fileID: 4125091638740170634, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
@@ -127,6 +131,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 6925314124048163258, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
   m_PrefabInstance: {fileID: 759963019387956454}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8148829313993418434 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8907446340524657188, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+  m_PrefabInstance: {fileID: 759963019387956454}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8903612349321449842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d0d87ff3154cda45bf9509c9f561508, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &8346996266912400636 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8745307368580851738, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
@@ -155,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac02bb192004c84498723d660ac626f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncer: {fileID: 0}
+  syncer: {fileID: 8148829313993418434}
   colorPalette: {fileID: 2800000, guid: d5d5c7de2ae85aa41b13c39260d4a533, type: 3}
   playerNameText: {fileID: 8346996266912400636}
   playerIndicatorText: {fileID: 1951288467338037525}

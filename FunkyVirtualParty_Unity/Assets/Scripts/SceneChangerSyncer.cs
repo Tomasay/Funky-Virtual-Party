@@ -42,7 +42,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
         if (previousModel != null)
         {
             // Unregister from events
-            currentModel.currentSceneDidChange -= OnSceneChange;
+            previousModel.currentSceneDidChange -= OnSceneChange;
         }
 
         if (currentModel != null)
@@ -66,9 +66,17 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
 #if UNITY_WEBGL
         val += "Client";
+#elif UNITY_ANDROID
+        //Unregister current avatar as it will be destroyed on scene change
+        if (RealtimeSingleton.instance.Realtime.connected)
+        {
+            RealtimeSingleton.instance.RealtimeAvatarManager._UnregisterAvatar(RealtimeSingleton.instance.VRAvatar);
+        }
 #endif
-
-        SceneManager.LoadScene(val);
+        if (SceneUtility.GetBuildIndexByScenePath(val) != -1)
+        {
+            SceneManager.LoadScene(val);
+        }
     }
 #endregion
 

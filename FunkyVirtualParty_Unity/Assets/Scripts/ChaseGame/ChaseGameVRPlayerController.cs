@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using Autohand;
 using UnityEngine.UI;
+using TMPro;
 
 public class ChaseGameVRPlayerController : VRPlayerController
 {
     [SerializeField] private float handMovementSpeed = 20, maxSprintSeconds = 2f, handMovementThreshold = 0;
     private float currentHandMovementSpeed;
     [SerializeField] private Image sprintMeter;
+    [SerializeField] public ParticleSystem capturedParticles;
+
+    public TMP_Text vrInfoText, vrGameTimeText;
 
     private Vector3 movement, newMovement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;

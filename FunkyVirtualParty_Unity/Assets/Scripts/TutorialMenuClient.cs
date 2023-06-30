@@ -21,15 +21,18 @@ public class TutorialMenuClient : MonoBehaviour
         SpawnVRPlayerIcon();
         SpawnPlayerIcons();
 
+        ClientPlayer.OnReadyUp.AddListener(ReadyUp);
+
+
         //cm.onVRReadyUp += ReadyUpVR;
-        //cm.onReadyUp += ReadyUp;
         //cm.onClientDisonnect += RemovePlayerIcon;
     }
 
     private void OnDestroy()
     {
+        ClientPlayer.OnReadyUp.RemoveListener(ReadyUp);
+
         //cm.onVRReadyUp -= ReadyUpVR;
-        //cm.onReadyUp -= ReadyUp;
     }
 
     private void SpawnPlayerIcons()
@@ -42,7 +45,7 @@ public class TutorialMenuClient : MonoBehaviour
             txt.text = ClientPlayer.clients[i].syncer.Name;
 
             clientPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.viewUUID, newPlayerIcon);
-        }
+        } 
     }
 
     private void RemovePlayerIcon(string id)
@@ -53,8 +56,7 @@ public class TutorialMenuClient : MonoBehaviour
 
     public void ReadyUpButtonPressed()
     {
-        ReadyUp(ClientManagerWeb.instance.LocalPlayer);
-        ClientManagerWeb.instance.Manager.Socket.Emit("ReadyUp", ClientManagerWeb.instance.LocalPlayer.PlayerByteID);
+        NormcoreRoomConnector.instance.LocalPlayer.syncer.IsReady = true;
     }
     private void ReadyUp(ClientPlayer p)
     {

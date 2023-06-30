@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ChaseGameClientPlayer : ClientPlayer
 {
     [SerializeField] private int tackleForce, tackleCooldown = 2, tacklePlayerRange = 10;
 
-    private bool isWebGL = false;
     private bool tackling;
     private float timeTackled = 0;
 
@@ -14,15 +14,19 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     bool isInWater;
 
-    protected override void Start()
+    protected override void LocalStart()
     {
-        base.Start();
+        realtimeTransform.RequestOwnership();
+        animRealtimeTransform.RequestOwnership();
 
-#if UNITY_WEBGL
-        isWebGL = true;
-#endif
+        actionInput.action.started += DebugTest;
+        //actionInput.action.started += Action;
+        Debug.Log("Chase Game Local Start");
+    } 
 
-        cam = GameObject.Find("ThirdPersonCamera").GetComponent<Camera>();
+    void DebugTest(InputAction.CallbackContext obj)
+    {
+        Debug.Log("HUH");
     }
 
     protected override void CheckInput()
@@ -52,6 +56,8 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
 #if UNITY_WEBGL
         playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+
+        CheckInput();
 #else
         if (Camera.main)
         {
@@ -63,16 +69,18 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     protected override void OnCollisionEnter(Collision collision)
     {
+        Debug.Log("On collision");
+
         base.OnCollisionEnter(collision);
 
-        if (!isWebGL)
+#if UNITY_WEBGL
+        if (ChaseGameSyncer.instance.State.Equals("game loop") && collision.gameObject.transform.root.tag.Equals("Player"))
         {
-            if (ChaseGameSyncer.instance.State.Equals("GameLoop") && collision.gameObject.transform.root.tag.Equals("Player"))
-            {
-                ChaseGameSyncer.instance.State = "VRPlayerLoses";
-                //gm.DisplayVRCapture(syncer.Name);
-            }
+            Debug.Log("VR PLAYER LOST");
+            ChaseGameSyncer.instance.State = "vr player lost";
+            //gm.DisplayVRCapture(syncer.Name);
         }
+#endif
     }
 
     private void OnTriggerEnter(Collider other)
@@ -93,8 +101,10 @@ public class ChaseGameClientPlayer : ClientPlayer
         }
     }
 
-    public override void Action()
+    public override void Action(InputAction.CallbackContext obj)
     {
+        Debug.Log("Action");
+
         if (!canMove) return;
 
         if (timeTackled == 0 || (Time.time - timeTackled) > tackleCooldown)
@@ -105,7 +115,7 @@ public class ChaseGameClientPlayer : ClientPlayer
             StartCoroutine("TackleEnd", 2);
 
             //If VR player is within range, tackle towards them
-            //Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, isWebGL ? gmw.VRPlayerPos : gm.VRPlayerPos));
+            Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, RealtimeSingleton.instance.VRAvatar.head.position));
             if (Vector3.Distance(transform.position, RealtimeSingleton.instance.VRAvatar.head.position) < tacklePlayerRange)
             {
                 //Get direction towards VR player

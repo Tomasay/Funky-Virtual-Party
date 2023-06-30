@@ -6,12 +6,18 @@ using System.IO;
 using TMPro;
 using UnityEngine.InputSystem;
 using Normal.Realtime;
+using UnityEngine.Events;
 
 [Serializable]
 public class ClientInputData
 {
     public byte id;
     public Vector2 input;
+}
+
+[Serializable]
+public class MyCPEvent : UnityEvent<ClientPlayer>
+{
 }
 
 public class ClientPlayer : MonoBehaviour
@@ -30,7 +36,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] protected Collider col; //Used to change height of player
 
     [SerializeField] public RealtimeView realtimeView;
-    [SerializeField] RealtimeTransform realtimeTransform, animRealtimeTransform;
+    [SerializeField] protected RealtimeTransform realtimeTransform, animRealtimeTransform;
 
     [SerializeField] public GameObject[] hats;
     [SerializeField] GameObject hatAttachPoint;
@@ -64,6 +70,8 @@ public class ClientPlayer : MonoBehaviour
     public Collider Col { get => col; }
     public SkinnedMeshRenderer Smr { get => smr; }
 
+    public static MyCPEvent OnReadyUp;
+
 #if UNITY_EDITOR
     public bool isDebugPlayer;
 #endif
@@ -73,6 +81,9 @@ public class ClientPlayer : MonoBehaviour
         if (clients == null)
             clients = new List<ClientPlayer>();
 
+        if (OnReadyUp == null)
+            OnReadyUp = new MyCPEvent();
+
         clients.Add(this);
 
         DontDestroyOnLoad(gameObject);
@@ -81,7 +92,7 @@ public class ClientPlayer : MonoBehaviour
             LocalStart();
     }
 
-    private void LocalStart()
+    protected virtual void LocalStart()
     {
         realtimeTransform.RequestOwnership();
         animRealtimeTransform.RequestOwnership();
@@ -114,7 +125,6 @@ public class ClientPlayer : MonoBehaviour
         speed = startingSpeed;
 
         rb = GetComponent<Rigidbody>();
-
         playerInput = GetComponent<PlayerInput>();
 
         spinePos = spineBone.transform.localPosition;
@@ -122,7 +132,8 @@ public class ClientPlayer : MonoBehaviour
 
     private void OnDestroy()
     {
-        CancelInvoke("CheckInput");
+        //actionInput.action.started -= Action;
+        Debug.Log("Action removed");
 
         clients.Remove(this);
     }
@@ -163,6 +174,21 @@ public class ClientPlayer : MonoBehaviour
 
         //Hat, default none
         syncer.HatIndex = -1;
+    }
+
+    public void SetCustomizations(Color color, int headShape, float height, int hatIndex)
+    {
+        //Color
+        syncer.Color = color;
+
+        //Head shape
+        syncer.HeadType = headShape;
+
+        //Height
+        syncer.Height = height;
+
+        //Hat, default none
+        syncer.HatIndex = hatIndex;
     }
 
     public void UpdateHat(int newIndex, bool triggerParticles = true)
