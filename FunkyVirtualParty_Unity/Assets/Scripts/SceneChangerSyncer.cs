@@ -11,17 +11,31 @@ using UnityEngine.Rendering.Universal;
 
 public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 {
+    public static SceneChangerSyncer instance;
+
 #if UNITY_ANDROID
-        [SerializeField] private VolumeProfile postProcessingProfile;
+    [SerializeField] private VolumeProfile postProcessingProfile;
 #elif UNITY_WEBGL
-        [SerializeField] RectTransform fadeRect;
-        private float fadeIncrementDistance;
+    [SerializeField] RectTransform fadeRect;
+    private float fadeIncrementDistance;
 #endif
 
     public string CurrentScene { get => model.currentScene; set => model.currentScene = value; }
 
     private void Awake()
     {
+        //Singleton instantiation
+        if (!instance)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        DontDestroyOnLoad(gameObject);
+
         SceneManager.sceneLoaded += FadeInScene;
 
 #if UNITY_WEBGL
@@ -63,21 +77,33 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 #region Variable Callbacks
     void OnSceneChange(SceneChangerSyncModel previousModel, string val)
     {
-
 #if UNITY_WEBGL
         val += "Client";
+
+        if (SceneUtility.GetBuildIndexByScenePath(val) != -1)
+        {
+            SceneManager.LoadScene(val);
+        }
 #elif UNITY_ANDROID
         //Unregister current avatar as it will be destroyed on scene change
         if (RealtimeSingleton.instance.Realtime.connected)
         {
             RealtimeSingleton.instance.RealtimeAvatarManager._UnregisterAvatar(RealtimeSingleton.instance.VRAvatar);
         }
-#endif
+
         if (SceneUtility.GetBuildIndexByScenePath(val) != -1)
         {
-            SceneManager.LoadScene(val);
+            StartCoroutine(LoadSceneDelayed(val));
         }
+#endif
     }
+
+    IEnumerator LoadSceneDelayed(string scene)
+    {
+        yield return new WaitForSeconds(1);
+        SceneManager.LoadScene(scene);
+    }
+
 #endregion
 
     private void FadeInScene(Scene arg0, LoadSceneMode arg1)

@@ -10,7 +10,7 @@ public class RealtimeSingleton : MonoBehaviour
     public static RealtimeSingleton instance;
 
     Realtime realtime;
-    RealtimeAvatarManager realtimeAvatarManager;
+    public RealtimeAvatarManager realtimeAvatarManager;
 
     public Realtime Realtime { get => realtime; }
     public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager;}

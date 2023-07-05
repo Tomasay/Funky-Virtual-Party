@@ -19,15 +19,10 @@ public class ChaseGameClientPlayer : ClientPlayer
         realtimeTransform.RequestOwnership();
         animRealtimeTransform.RequestOwnership();
 
-        actionInput.action.started += DebugTest;
-        //actionInput.action.started += Action;
-        Debug.Log("Chase Game Local Start");
-    } 
+        SetSpawnPoint();
 
-    void DebugTest(InputAction.CallbackContext obj)
-    {
-        Debug.Log("HUH");
-    }
+        playerInput.actions["Action"].started += Action;
+    } 
 
     protected override void CheckInput()
     {
@@ -55,7 +50,10 @@ public class ChaseGameClientPlayer : ClientPlayer
     protected override void Update()
     {
 #if UNITY_WEBGL
-        playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+        if(cam)
+        {
+            playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+        }
 
         CheckInput();
 #else
@@ -63,6 +61,7 @@ public class ChaseGameClientPlayer : ClientPlayer
         {
             playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
         }
+
 #endif
     }
 
@@ -103,8 +102,6 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     public override void Action(InputAction.CallbackContext obj)
     {
-        Debug.Log("Action");
-
         if (!canMove) return;
 
         if (timeTackled == 0 || (Time.time - timeTackled) > tackleCooldown)
@@ -115,11 +112,10 @@ public class ChaseGameClientPlayer : ClientPlayer
             StartCoroutine("TackleEnd", 2);
 
             //If VR player is within range, tackle towards them
-            Debug.Log("DISTANCE FROM VR PLAYER: " + Vector3.Distance(transform.position, RealtimeSingleton.instance.VRAvatar.head.position));
-            if (Vector3.Distance(transform.position, RealtimeSingleton.instance.VRAvatar.head.position) < tacklePlayerRange)
+            if (Vector3.Distance(transform.position, NormcoreRoomConnector.instance.VRAvatar.head.position) < tacklePlayerRange)
             {
                 //Get direction towards VR player
-                Vector3 dir = (RealtimeSingleton.instance.VRAvatar.head.position - transform.position).normalized;
+                Vector3 dir = (NormcoreRoomConnector.instance.VRAvatar.head.position - transform.position).normalized;
                 //Debug.Log("DIRECTION TOWARDS VR PLAYER: " + dir);
 
                 //Rotate to look at player, only on Y axis

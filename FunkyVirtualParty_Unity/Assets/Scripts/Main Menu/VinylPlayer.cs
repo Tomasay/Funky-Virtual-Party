@@ -14,8 +14,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Animator))]
 public class VinylPlayer : MonoBehaviour
 {
-    [SerializeField] SceneChangerSyncer sceneChanger;
-
     [SerializeField] Transform vinylParent;
 
     [SerializeField] TMP_Text titleText, descriptionText;
@@ -92,27 +90,27 @@ public class VinylPlayer : MonoBehaviour
             if (Keyboard.current.vKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                sceneChanger.CurrentScene = "ChaseGame";
+                SceneChangerSyncer.instance.CurrentScene = "ChaseGame";
             }
             else if (Keyboard.current.iKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                sceneChanger.CurrentScene = "Shootout";
+                SceneChangerSyncer.instance.CurrentScene = "Shootout";
             }
             else if (Keyboard.current.mKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                sceneChanger.CurrentScene = "MazeGame";
+                SceneChangerSyncer.instance.CurrentScene = "MazeGame";
             }
             else if (Keyboard.current.kKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                sceneChanger.CurrentScene = "Kaiju";
+                SceneChangerSyncer.instance.CurrentScene = "Kaiju";
             }
             else if (Keyboard.current.pKey.wasPressedThisFrame)
             {
                 isSceneLoading = true;
-                sceneChanger.CurrentScene = "3DPaintGame";
+                SceneChangerSyncer.instance.CurrentScene = "3DPaintGame";
             }
         }
 #endif
@@ -124,6 +122,6 @@ public class VinylPlayer : MonoBehaviour
 
         isSceneLoading = true;
 
-        sceneChanger.CurrentScene = sceneName;
+        SceneChangerSyncer.instance.CurrentScene = sceneName;
     }
 }

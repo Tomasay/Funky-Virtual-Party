@@ -6,6 +6,7 @@ using Normal.Realtime;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
+using System.Runtime.InteropServices;
 
 public class NormcoreRoomConnector : MonoBehaviour
 {
@@ -50,6 +51,9 @@ public class NormcoreRoomConnector : MonoBehaviour
     public RealtimeAvatar VRAvatar { get => avatarManager.avatars[0]; }
     public bool isVRAvatarSpawned { get => avatarManager.avatars.Count > 0; }
 
+    [DllImport("__Internal")]
+    private static extern void ReloadPage();
+
     private void Awake()
     {
         //Singleton instantiation
@@ -59,6 +63,7 @@ public class NormcoreRoomConnector : MonoBehaviour
         }
         else
         {
+            SetJoinedUI();
             Destroy(gameObject);
         }
 
@@ -72,14 +77,24 @@ public class NormcoreRoomConnector : MonoBehaviour
 
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
+        avatarManager.avatarDestroyed += AvatarManager_avatarDestroyed;
+
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void AvatarManager_avatarDestroyed(RealtimeAvatarManager avatarManager, RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        if(!avatar.isOwnedRemotelyInHierarchy) //Check to make sure avatar isn't just being destroyed to switch scenes
+        {
+            ReloadPage();
+        }
     }
 
     private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
     {
         if (realtime.connected)
         {
-            SpawnPlayer();
+            StartCoroutine("SpawnPlayerDelayed");
         }
     }
 
@@ -104,16 +119,7 @@ public class NormcoreRoomConnector : MonoBehaviour
     {
         if (avatarManager.avatars.Count > 0)
         {
-            loadingCircle.SetActive(false);
-
-            foreach (GameObject g in objectsToEnableOnJoin)
-            {
-                g.SetActive(true);
-            }
-
-            logoCanvas.enabled = false;
-            controllerCanvas.enabled = true;
-            enableCustomizationsButton.gameObject.SetActive(true);
+            SetJoinedUI();
 
             SpawnPlayer();
         }
@@ -122,6 +128,21 @@ public class NormcoreRoomConnector : MonoBehaviour
             realtime.Disconnect();
             disconnectingDueToNoHost = true;
         }
+    }
+
+    void SetJoinedUI()
+    {
+        loadingCircle.SetActive(false);
+
+        foreach (GameObject g in objectsToEnableOnJoin)
+        {
+            g.SetActive(true);
+        }
+
+        joinRoomCanvas.enabled = false;
+        logoCanvas.enabled = false;
+        controllerCanvas.enabled = true;
+        enableCustomizationsButton.gameObject.SetActive(true);
     }
 
     void CheckDisconnectedDueToNoHost(Realtime realtime)
@@ -137,13 +158,20 @@ public class NormcoreRoomConnector : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnPlayerDelayed()
+    {
+        yield return new WaitForSeconds(1);
+
+        SpawnPlayer();
+    }
+
     public void SpawnPlayer()
     {
         string currentScene = SceneManager.GetActiveScene().name;
 
         GameObject newPlayer = Realtime.Instantiate(currentScene + "Player", Realtime.InstantiateOptions.defaults);
 
-        if(localPlayer) //If player has already been spawned before
+        if (localPlayer) //If player has already been spawned before
         {
             ClientPlayer oldPlayer = localPlayer;
             localPlayer = newPlayer.GetComponent<ClientPlayer>();
@@ -160,7 +188,6 @@ public class NormcoreRoomConnector : MonoBehaviour
         }
 
         localPlayer.IsLocal = true;
-        Debug.Log("????");
         LocalPlayerSpawned.Invoke();
     }
 

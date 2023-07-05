@@ -43,6 +43,8 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] ParticleSystem hatPoofParticles;
     protected GameObject currentHat;
 
+    [SerializeField] public Vector3[] spawnPoints;
+
     protected string playerSocketID;
     protected byte playerByteID;
 
@@ -57,7 +59,6 @@ public class ClientPlayer : MonoBehaviour
     protected Rigidbody rb;
 
     protected PlayerInput playerInput;
-    public InputActionReference actionInput;
 
     public string PlayerSocketID { get => playerSocketID; set => playerSocketID = value; }
     public byte PlayerByteID { get => playerByteID; set => playerByteID = value; }
@@ -97,7 +98,9 @@ public class ClientPlayer : MonoBehaviour
         realtimeTransform.RequestOwnership();
         animRealtimeTransform.RequestOwnership();
 
-        actionInput.action.started += Action;
+        SetSpawnPoint();
+
+        playerInput.actions["Action"].started += Action;
 
         InitialCustomize();
 
@@ -132,8 +135,7 @@ public class ClientPlayer : MonoBehaviour
 
     private void OnDestroy()
     {
-        //actionInput.action.started -= Action;
-        Debug.Log("Action removed");
+        playerInput.actions["Action"].started -= Action;
 
         clients.Remove(this);
     }
@@ -159,6 +161,16 @@ public class ClientPlayer : MonoBehaviour
         }
 
         CheckInput();
+    }
+
+    protected void SetSpawnPoint()
+    {
+        transform.position = spawnPoints[GetPlayerIndex()];
+    }
+
+    public int GetPlayerIndex()
+    {
+        return clients.IndexOf(this);
     }
 
     public void InitialCustomize()

@@ -5,9 +5,13 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
+using Normal.Realtime;
 
 public class ChaseGameManager : MonoBehaviour
 {
+    [SerializeField]
+    RealtimeView[] mapRealtimeViews;
+
     private const int COUNTDOWN_AMOUNT = 10, GAME_TIME_AMOUNT = 60;
     private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
@@ -18,6 +22,23 @@ public class ChaseGameManager : MonoBehaviour
         timeRemaining = GAME_TIME_AMOUNT;
         
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
+        StartCoroutine("RequestOwnershipDelayed");
+    }
+
+    private void OnDestroy()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+    }
+
+    IEnumerator RequestOwnershipDelayed()
+    {
+        yield return new WaitForSeconds(3);
+
+        foreach (RealtimeView rt in mapRealtimeViews)
+        {
+            rt.RequestOwnership();
+        }
     }
 
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -92,12 +113,10 @@ public class ChaseGameManager : MonoBehaviour
 
     IEnumerator GameOver(int countdown, string txt)
     {
-        //State = GameState.GameOver;
-
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
-        SceneManager.LoadScene("MainMenuNormcore");
+        SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }
     public void DisplayVRCapture(string playerName)
     {

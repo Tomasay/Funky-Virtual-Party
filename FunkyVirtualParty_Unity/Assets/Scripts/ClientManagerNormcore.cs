@@ -7,16 +7,20 @@ using TMPro;
 public class ClientManagerNormcore : MonoBehaviour
 {
     [SerializeField]
-    Realtime realtime;
-
-    [SerializeField]
     TMP_Text partyCodeText;
 
     private const int PASSCODE_LENGTH = 4;
 
     void Start()
     {
-        realtime.Connect(GenerateCode());
+        if (!RealtimeSingleton.instance.Realtime.connected)
+        {
+            RealtimeSingleton.instance.Realtime.Connect(GenerateCode());
+        }
+        else
+        {
+            partyCodeText.text = "Party Code: " + RealtimeSingleton.instance.Realtime.room.name;
+        }
     }
 
     private string GenerateCode()

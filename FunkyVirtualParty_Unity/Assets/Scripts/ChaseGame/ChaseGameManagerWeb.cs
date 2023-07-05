@@ -15,11 +15,6 @@ public class ChaseGameManagerWeb : MonoBehaviour
     [SerializeField] private ParticleSystem countdownParticles;
     private float timeRemaining;
 
-    public void DebugLog(string log)
-    {
-        Debug.Log((log));
-    }
-
     private void Awake()
     {
         NormcoreRoomConnector.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
@@ -33,6 +28,13 @@ public class ChaseGameManagerWeb : MonoBehaviour
 
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
+    }
+
+    private void OnDestroy()
+    {
+        NormcoreRoomConnector.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
+
+        ChaseGameSyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
     }
 
     void OnLocalPlayerSpawned()
@@ -51,19 +53,20 @@ public class ChaseGameManagerWeb : MonoBehaviour
                 
                 break;
             case "countdown":
+                NormcoreRoomConnector.instance.LocalPlayer.CanMove = false;
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;
             case "game loop":
                 NormcoreRoomConnector.instance.LocalPlayer.CanMove = true;
                 break;
-            case "vr player loses":
+            case "vr player lost":
                 NormcoreRoomConnector.instance.VRAvatar.GetComponent<ChaseGameVRPlayerController>().capturedParticles.Play();
-                StartCoroutine(GameOver(2, "PLAYER\nCAPTURED!"));
-                break;
-            case "vr player wins":
+                countdownText.enabled = true;
+                countdownText.text = "PLAYER\nCAPTURED!";
                 break;
             case "time ended":
-                StartCoroutine(GameOver(2, "TIMES UP!"));
+                countdownText.enabled = true;
+                countdownText.text = "TIME'S UP!\nVR PLAYER WINS";
                 break;
             default:
                 break;
@@ -82,7 +85,7 @@ public class ChaseGameManagerWeb : MonoBehaviour
                 timeRemaining -= Time.deltaTime;
                 gameTimeText.text = FormatTime(timeRemaining);
                 break;
-            case "vr player loses":
+            case "vr player lost":
                 break;
             case "time ended":
                 break;
@@ -110,18 +113,6 @@ public class ChaseGameManagerWeb : MonoBehaviour
 
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
-
-        //State = GameState.GameLoop;
-    }
-
-    IEnumerator GameOver(int countdown, string txt)
-    {
-        //State = GameState.GameOver;
-        countdownText.enabled = true;
-        countdownText.text = txt;
-        yield return new WaitForSeconds(3);
-
-        ClientManagerWeb.instance.LoadMainMenu();
     }
 
     public string FormatTime(float time)
