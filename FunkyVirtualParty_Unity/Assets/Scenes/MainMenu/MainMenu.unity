@@ -1954,6 +1954,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90c2437553de5f3459ebf35d76ea093d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  postProcessingProfile: {fileID: 11400000, guid: e41e313c66e80c54d96fa17e09eab886, type: 2}
   fadeRect: {fileID: 0}
 --- !u!114 &1093176595
 MonoBehaviour:
@@ -2591,6 +2592,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc9f122b21b2bf4fba754d3d786c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input_field: {fileID: 0}
+  raw_image_qr_code: {fileID: 0}
 --- !u!4 &1311646741
 Transform:
   m_ObjectHideFlags: 0
@@ -3330,7 +3333,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02137a08ff1ab1248ba1b31d72992197, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  realtimeAvatarManager: {fileID: 0}
+  realtimeAvatarManager: {fileID: 1588298405}
+--- !u!114 &1588298405 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114568985850100520, guid: fca9d4afb3743274e8f7da14019d7e0b, type: 3}
+  m_PrefabInstance: {fileID: 1588298401}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1588298403}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5b6ae53fe1e66d429cc41bbf5b29cb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1637549990 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7737079195972125517, guid: f36f9643bbc5e1849aed49cff1402b7d, type: 3}

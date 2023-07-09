@@ -3,22 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Normal.Realtime;
-
-#if UNITY_ANDROID
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-#endif
 
 public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 {
     public static SceneChangerSyncer instance;
 
-#if UNITY_ANDROID
+    [Tooltip("Only needed for Android")]
     [SerializeField] private VolumeProfile postProcessingProfile;
-#elif UNITY_WEBGL
+
+    [Tooltip("Only needed for WebGL")]
     [SerializeField] RectTransform fadeRect;
+
     private float fadeIncrementDistance;
-#endif
 
     public string CurrentScene { get => model.currentScene; set => model.currentScene = value; }
 

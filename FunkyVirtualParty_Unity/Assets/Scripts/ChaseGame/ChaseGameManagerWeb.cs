@@ -60,7 +60,7 @@ public class ChaseGameManagerWeb : MonoBehaviour
                 NormcoreRoomConnector.instance.LocalPlayer.CanMove = true;
                 break;
             case "vr player lost":
-                NormcoreRoomConnector.instance.VRAvatar.GetComponent<ChaseGameVRPlayerController>().capturedParticles.Play();
+                NormcoreRoomConnector.instance.VRAvatar.GetComponentInChildren<ParticleSystem>().Play();
                 countdownText.enabled = true;
                 countdownText.text = "PLAYER\nCAPTURED!";
                 break;

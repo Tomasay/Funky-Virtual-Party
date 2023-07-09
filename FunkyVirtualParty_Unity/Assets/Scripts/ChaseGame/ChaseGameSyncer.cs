@@ -20,11 +20,10 @@ public class ChaseGameSyncer : RealtimeComponent<ChaseGameSyncModel>
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
 
-#if UNITY_ANDROID
     [SerializeField] private TutorialMenu tutorial;
-#elif UNITY_WEBGL
-    [SerializeField] private TutorialMenuClient tutorial;
-#endif
+    [SerializeField] private TutorialMenuClient tutorialWeb;
+
+    private bool isWeb;
 
     private void Awake()
     {
@@ -40,6 +39,10 @@ public class ChaseGameSyncer : RealtimeComponent<ChaseGameSyncModel>
 
         if (OnStateChangeEvent == null)
             OnStateChangeEvent = new MyStringEvent();
+
+#if UNITY_WEBGL
+        isWeb = true;
+#endif
     }
 
 #if UNITY_ANDROID //Only host has to worry about triggering allPlayersReady event
@@ -72,7 +75,14 @@ public class ChaseGameSyncer : RealtimeComponent<ChaseGameSyncModel>
             }
 
             //Update to match new data
-            if (model.vrPlayerReady) tutorial.ReadyUpVR();
+            if (model.vrPlayerReady && !isWeb)
+            {
+                tutorial.ReadyUpVR();
+            }
+            else if(model.vrPlayerReady && isWeb)
+            {
+                tutorialWeb.ReadyUpVR();
+            }
 
             // Register for events
             currentModel.stateDidChange += OnStateChange;
@@ -90,9 +100,13 @@ public class ChaseGameSyncer : RealtimeComponent<ChaseGameSyncModel>
 
     void OnVRPlayerReadyUp(ChaseGameSyncModel previousModel, bool val)
     {
-        if(val)
+        if (val && !isWeb)
         {
             tutorial.ReadyUpVR();
+        }
+        else if (val && isWeb)
+        {
+            tutorialWeb.ReadyUpVR();
         }
     }
 #endregion
