@@ -44,6 +44,10 @@ public class KeyboardController : MonoBehaviour
     {
         //CreateDummyInput();
 
+#if UNITY_EDITOR
+        nameFieldButton.gameObject.SetActive(false);
+        codeFieldButton.gameObject.SetActive(false);
+#else
         nameFieldButton.onPointerDown.AddListener(ButtonPointerDown);
         nameFieldButton.onPointerUp.AddListener(ButtonPointerUp);
         nameFieldButton.onPointerUp.AddListener(delegate { SetField(nameField); });
@@ -62,11 +66,14 @@ public class KeyboardController : MonoBehaviour
         {
             codeField.text = URLCode;
         }
+#endif
+
     }
 
-
+#if !UNITY_EDITOR
     private void Update()
     {
+
         //If input field is active, update it accordingly
         if (currentField)
         {
@@ -123,4 +130,6 @@ public class KeyboardController : MonoBehaviour
         manager.AttemptJoinRoom(codeField.text.ToUpper(), nameField.text);
         StoreNameData(nameField.text);
     }
+#endif
+
 }
