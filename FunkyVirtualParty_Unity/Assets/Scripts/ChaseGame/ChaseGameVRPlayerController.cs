@@ -90,7 +90,7 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
         //Update movement from hands
         movement = Vector3.Lerp(movement, newMovement, 5 * Time.deltaTime);
-        ahp.transform.parent.Translate(movement);
+        ahp.transform.Translate(movement);
     }
 
     public void EnteredWater()
