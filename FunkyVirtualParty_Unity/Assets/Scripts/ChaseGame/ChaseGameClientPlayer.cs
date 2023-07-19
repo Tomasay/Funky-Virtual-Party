@@ -14,16 +14,6 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     bool isInWater;
 
-    protected override void LocalStart()
-    {
-        realtimeTransform.RequestOwnership();
-        animRealtimeTransform.RequestOwnership();
-
-        SetSpawnPoint();
-
-        playerInput.actions["Action"].started += Action;
-    } 
-
     protected override void CheckInput()
     {
         if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device

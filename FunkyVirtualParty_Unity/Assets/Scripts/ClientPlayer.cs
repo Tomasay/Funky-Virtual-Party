@@ -101,11 +101,6 @@ public class ClientPlayer : MonoBehaviour
         SetSpawnPoint();
 
         playerInput.actions["Action"].started += Action;
-
-        InitialCustomize();
-
-        Debug.Log("View ID for " + syncer.name + ": " + realtimeView.viewUUID);
-        Debug.Log("Owner ID for " + syncer.name + ": " + realtimeView.ownerIDSelf);
     }
 
     protected virtual void Awake()

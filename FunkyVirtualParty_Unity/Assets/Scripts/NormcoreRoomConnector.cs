@@ -185,6 +185,7 @@ public class NormcoreRoomConnector : MonoBehaviour
         {
             localPlayer = newPlayer.GetComponent<ClientPlayer>();
             localPlayer.syncer.Name = nameInput.text;
+            localPlayer.InitialCustomize();
         }
 
         localPlayer.IsLocal = true;
