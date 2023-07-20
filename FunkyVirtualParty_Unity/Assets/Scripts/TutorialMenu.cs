@@ -19,7 +19,7 @@ public class TutorialMenu : MonoBehaviour
     [SerializeField] GameObject playerIconPrefab, VRPlayerIconsParent;
     [SerializeField] Button VrPlayerReady;
 
-    private Dictionary<string, GameObject> vrPlayerIcons;
+    private Dictionary<int, GameObject> vrPlayerIcons;
 
     private int canvasRotationIncrement = 45;
     private float timeRotated, rotationTime = 1;
@@ -29,7 +29,7 @@ public class TutorialMenu : MonoBehaviour
         if (allPlayersReady == null)
             allPlayersReady = new UnityEvent();
 
-        vrPlayerIcons = new Dictionary<string, GameObject>();
+        vrPlayerIcons = new Dictionary<int, GameObject>();
     }
 
     void Start()
@@ -79,11 +79,11 @@ public class TutorialMenu : MonoBehaviour
             txt.color = ClientPlayer.clients[i].syncer.Color;
             txt.text = ClientPlayer.clients[i].syncer.Name;
 
-            vrPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.viewUUID, newPlayerIcon);
+            vrPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf, newPlayerIcon);
         }
     }
 
-    private void RemovePlayerIcon(string id)
+    private void RemovePlayerIcon(int id)
     {
         Destroy(vrPlayerIcons[id]);
         vrPlayerIcons.Remove(id);
@@ -91,9 +91,9 @@ public class TutorialMenu : MonoBehaviour
 
     private void ReadyUp(ClientPlayer p)
     {
-        vrPlayerIcons[p.realtimeView.viewUUID].GetComponentInChildren<TMP_Text>().text = "READY";
-        vrPlayerIcons[p.realtimeView.viewUUID].GetComponent<Animator>().SetTrigger("Ready");
-        vrPlayerIcons.Remove(p.realtimeView.viewUUID);
+        vrPlayerIcons[p.realtimeView.ownerIDSelf].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons[p.realtimeView.ownerIDSelf].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove(p.realtimeView.ownerIDSelf);
 
         //Check if every player is ready
         if (vrPlayerIcons.Count > 0)
@@ -112,14 +112,14 @@ public class TutorialMenu : MonoBehaviour
         txt.text = "";
         newPlayerIcon.GetComponentsInChildren<Image>(true)[2].gameObject.SetActive(true);
 
-        vrPlayerIcons.Add("VR", newPlayerIcon);
+        vrPlayerIcons.Add(-1, newPlayerIcon);
     }
 
     public void ReadyUpVR()
     {
-        vrPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
-        vrPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
-        vrPlayerIcons.Remove("VR");
+        vrPlayerIcons[-1].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons[-1].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove(-1);
 
         VrPlayerReady.interactable = false;
         VrPlayerReady.GetComponent<Animator>().SetTrigger("Stop");

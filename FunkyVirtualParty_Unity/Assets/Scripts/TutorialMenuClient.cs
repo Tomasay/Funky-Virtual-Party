@@ -11,13 +11,13 @@ public class TutorialMenuClient : MonoBehaviour
     [SerializeField] GameObject playerIconPrefab, clientPlayerIconsParent;
     [SerializeField] Button readyUpButton;
 
-    private Dictionary<string, GameObject> clientPlayerIcons;
+    private Dictionary<int, GameObject> clientPlayerIcons;
 
     void Start()
     {
         tutorialCanvas.enabled = true;
 
-        clientPlayerIcons = new Dictionary<string, GameObject>();
+        clientPlayerIcons = new Dictionary<int, GameObject>();
         SpawnVRPlayerIcon();
         SpawnPlayerIcons();
 
@@ -44,11 +44,11 @@ public class TutorialMenuClient : MonoBehaviour
             txt.color = ClientPlayer.clients[i].syncer.Color;
             txt.text = ClientPlayer.clients[i].syncer.Name;
 
-            clientPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.viewUUID, newPlayerIcon);
+            clientPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf, newPlayerIcon);
         } 
     }
 
-    private void RemovePlayerIcon(string id)
+    private void RemovePlayerIcon(int id)
     {
         Destroy(clientPlayerIcons[id]);
         clientPlayerIcons.Remove(id);
@@ -60,9 +60,9 @@ public class TutorialMenuClient : MonoBehaviour
     }
     private void ReadyUp(ClientPlayer p)
     {
-        clientPlayerIcons[p.realtimeView.viewUUID].GetComponentInChildren<TMP_Text>().text = "READY";
-        clientPlayerIcons[p.realtimeView.viewUUID].GetComponent<Animator>().SetTrigger("Ready");
-        clientPlayerIcons.Remove(p.realtimeView.viewUUID);
+        clientPlayerIcons[p.realtimeView.ownerIDSelf].GetComponentInChildren<TMP_Text>().text = "READY";
+        clientPlayerIcons[p.realtimeView.ownerIDSelf].GetComponent<Animator>().SetTrigger("Ready");
+        clientPlayerIcons.Remove(p.realtimeView.ownerIDSelf);
 
         if(readyUpButton && p.IsLocal)
         {
@@ -89,14 +89,14 @@ public class TutorialMenuClient : MonoBehaviour
         txt.text = "";
         newPlayerIcon.GetComponentsInChildren<Image>(true)[2].gameObject.SetActive(true);
 
-        clientPlayerIcons.Add("VR", newPlayerIcon);
+        clientPlayerIcons.Add(-1, newPlayerIcon);
     }
 
     public void ReadyUpVR()
     {
-        clientPlayerIcons["VR"].GetComponentInChildren<TMP_Text>().text = "READY";
-        clientPlayerIcons["VR"].GetComponent<Animator>().SetTrigger("Ready");
-        clientPlayerIcons.Remove("VR");
+        clientPlayerIcons[-1].GetComponentInChildren<TMP_Text>().text = "READY";
+        clientPlayerIcons[-1].GetComponent<Animator>().SetTrigger("Ready");
+        clientPlayerIcons.Remove(-1);
 
         //Check if every player is ready
         if (clientPlayerIcons.Count > 0)

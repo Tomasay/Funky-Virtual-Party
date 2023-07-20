@@ -160,9 +160,10 @@ public class ClientPlayer : MonoBehaviour
 
     protected void SetSpawnPoint()
     {
-        transform.position = spawnPoints[GetPlayerIndex()];
+        transform.position = spawnPoints[realtimeView.ownerIDSelf-1];
     }
 
+    //Doesn't seem to work currently
     public int GetPlayerIndex()
     {
         return clients.IndexOf(this);
