@@ -21,6 +21,9 @@ public class NormcoreRoomConnector : MonoBehaviour
     Realtime realtime;
 
     [SerializeField]
+    public KeyboardController keyboardController;
+
+    [SerializeField]
     GameObject[] objectsToEnableOnJoin;
 
     [SerializeField]
@@ -64,6 +67,7 @@ public class NormcoreRoomConnector : MonoBehaviour
         else
         {
             SetJoinedUI();
+            instance.keyboardController = keyboardController;
             Destroy(gameObject);
         }
 
@@ -120,6 +124,10 @@ public class NormcoreRoomConnector : MonoBehaviour
         if (avatarManager.avatars.Count > 0)
         {
             SetJoinedUI();
+
+#if !UNITY_EDITOR
+            if(keyboardController) keyboardController.CloseKeyboard();
+#endif
 
             SpawnPlayer();
         }

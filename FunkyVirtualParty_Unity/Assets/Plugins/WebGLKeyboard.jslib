@@ -21,7 +21,7 @@ mergeInto(LibraryManager.library, {
 	},
 	UpdateInputFieldText: function (txt)
 	{
-		document.getElementById("dummyInput").value = Pointer_stringify(txt);
+		document.getElementById("dummyInput").value = UTF8ToString(txt);
 	},
 	SetPointerDownOnButton: function (isDown)
 	{
@@ -30,7 +30,7 @@ mergeInto(LibraryManager.library, {
 	StoreNameData: function (name)
 	{
 		if (typeof(Storage) !== "undefined") {
-		  localStorage.setItem("playerName", Pointer_stringify(name));
+		  localStorage.setItem("playerName", UTF8ToString(name));
 		}
 	},
 	GetNameData: function ()
