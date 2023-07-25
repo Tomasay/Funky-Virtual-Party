@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ClientPlayerCustomizer : MonoBehaviour
 {
-    [SerializeField] NormcoreRoomConnector norm;
+    [SerializeField] RealtimeSingletonWeb norm;
 
     [SerializeField] Button toggleHatLeftButton, toggleHatRightButton, toggleColorLeftButton, toggleColorRightButton;
     [SerializeField] Button enableCustomizationButton, closeCustomizationButton;

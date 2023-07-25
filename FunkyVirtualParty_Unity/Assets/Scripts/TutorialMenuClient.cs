@@ -56,7 +56,7 @@ public class TutorialMenuClient : MonoBehaviour
 
     public void ReadyUpButtonPressed()
     {
-        NormcoreRoomConnector.instance.LocalPlayer.syncer.IsReady = true;
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.IsReady = true;
     }
     private void ReadyUp(ClientPlayer p)
     {

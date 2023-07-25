@@ -77,7 +77,7 @@ public class ChaseGameSyncerWeb : RealtimeComponent<ChaseGameSyncModel>
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;
             case "game loop":
-                NormcoreRoomConnector.instance.LocalPlayer.CanMove = true;
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = true;
                 break;
             default:
                 break;

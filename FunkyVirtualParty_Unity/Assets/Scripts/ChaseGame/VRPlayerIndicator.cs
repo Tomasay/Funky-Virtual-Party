@@ -47,7 +47,7 @@ public class VRPlayerIndicator : MonoBehaviour
 
     private void Update()
     {
-        if (NormcoreRoomConnector.instance.isVRAvatarSpawned && !InSight())
+        if (RealtimeSingletonWeb.instance.isVRAvatarSpawned && !InSight())
         {
             gameObject.SetActive(true);
             RotateToTarget();
@@ -60,7 +60,7 @@ public class VRPlayerIndicator : MonoBehaviour
 
     void RotateToTarget()
     {
-        Vector3 direction = NormcoreRoomConnector.instance.VRAvatar.head.position;
+        Vector3 direction = RealtimeSingletonWeb.instance.VRAvatar.head.position;
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
@@ -74,7 +74,7 @@ public class VRPlayerIndicator : MonoBehaviour
 
     bool InSight()
     {
-        Vector3 ScreenPoint = cam.WorldToScreenPoint(NormcoreRoomConnector.instance.VRAvatar.head.position);
+        Vector3 ScreenPoint = cam.WorldToScreenPoint(RealtimeSingletonWeb.instance.VRAvatar.head.position);
         return ScreenPoint.z > 0 && ScreenPoint.x > 0 && ScreenPoint.x < 1 && ScreenPoint.y > 0 && ScreenPoint.y < 1;
     }
 }

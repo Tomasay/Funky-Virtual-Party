@@ -8,10 +8,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Runtime.InteropServices;
 
-public class NormcoreRoomConnector : MonoBehaviour
+public class RealtimeSingletonWeb : MonoBehaviour
 {
-    private static NormcoreRoomConnector Instance = null;
-    public static NormcoreRoomConnector instance;
+    private static RealtimeSingletonWeb Instance = null;
+    public static RealtimeSingletonWeb instance;
 
     ClientPlayer localPlayer;
 

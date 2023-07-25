@@ -102,10 +102,10 @@ public class ChaseGameClientPlayer : ClientPlayer
             StartCoroutine("TackleEnd", 2);
 
             //If VR player is within range, tackle towards them
-            if (Vector3.Distance(transform.position, NormcoreRoomConnector.instance.VRAvatar.head.position) < tacklePlayerRange)
+            if (Vector3.Distance(transform.position, RealtimeSingletonWeb.instance.VRAvatar.head.position) < tacklePlayerRange)
             {
                 //Get direction towards VR player
-                Vector3 dir = (NormcoreRoomConnector.instance.VRAvatar.head.position - transform.position).normalized;
+                Vector3 dir = (RealtimeSingletonWeb.instance.VRAvatar.head.position - transform.position).normalized;
                 //Debug.Log("DIRECTION TOWARDS VR PLAYER: " + dir);
 
                 //Rotate to look at player, only on Y axis

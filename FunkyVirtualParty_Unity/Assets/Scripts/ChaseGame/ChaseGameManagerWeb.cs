@@ -17,14 +17,14 @@ public class ChaseGameManagerWeb : MonoBehaviour
 
     private void Awake()
     {
-        NormcoreRoomConnector.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
 
         ChaseGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
     }
 
     protected void Start()
     {
-        NormcoreRoomConnector.instance.LocalPlayer.CanMove = false;
+        RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
 
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
@@ -32,17 +32,17 @@ public class ChaseGameManagerWeb : MonoBehaviour
 
     private void OnDestroy()
     {
-        NormcoreRoomConnector.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
 
         ChaseGameSyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
     }
 
     void OnLocalPlayerSpawned()
     {
-        playerCamera.Follow = NormcoreRoomConnector.instance.LocalPlayer.Anim.transform;
-        playerCamera.LookAt = NormcoreRoomConnector.instance.LocalPlayer.Anim.transform;
+        playerCamera.Follow = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
+        playerCamera.LookAt = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
 
-        (NormcoreRoomConnector.instance.LocalPlayer as ChaseGameClientPlayer).cam = cam;
+        (RealtimeSingletonWeb.instance.LocalPlayer as ChaseGameClientPlayer).cam = cam;
     }
 
     protected void OnStateChange(string s)
@@ -53,14 +53,14 @@ public class ChaseGameManagerWeb : MonoBehaviour
                 
                 break;
             case "countdown":
-                NormcoreRoomConnector.instance.LocalPlayer.CanMove = false;
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;
             case "game loop":
-                NormcoreRoomConnector.instance.LocalPlayer.CanMove = true;
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = true;
                 break;
             case "vr player lost":
-                NormcoreRoomConnector.instance.VRAvatar.GetComponentInChildren<ParticleSystem>().Play();
+                RealtimeSingletonWeb.instance.VRAvatar.GetComponentInChildren<ParticleSystem>().Play();
                 countdownText.enabled = true;
                 countdownText.text = "PLAYER\nCAPTURED!";
                 break;
