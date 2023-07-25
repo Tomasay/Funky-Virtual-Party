@@ -1495,7 +1495,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2019387281}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: NormcoreRoomConnector, Assembly-CSharp
         m_MethodName: SubmitButtonPressed
         m_Mode: 1
@@ -5686,7 +5686,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e018c34371f05f4418fefb320817b716, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  norm: {fileID: 2019387281}
+  norm: {fileID: 0}
   toggleHatLeftButton: {fileID: 322269759}
   toggleHatRightButton: {fileID: 795524427}
   toggleColorLeftButton: {fileID: 574657961}
@@ -8074,41 +8074,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1572161834460568, guid: fca9d4afb3743274e8f7da14019d7e0b, type: 3}
   m_PrefabInstance: {fileID: 2019387279}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2019387281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2019387280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f351a46c0f4d96548bfa277df01a9067, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  localPlayer: {fileID: 0}
-  avatarManager: {fileID: 0}
-  realtime: {fileID: 1193540045}
-  keyboardController: {fileID: 1408861836}
-  objectsToEnableOnJoin:
-  - {fileID: 117491097}
-  - {fileID: 376541851295687614}
-  - {fileID: 376541852452959720}
-  - {fileID: 376541851915919373}
-  nameInput: {fileID: 593043969}
-  partyCodeInput: {fileID: 2027479461}
-  partyCodeInvalid: {fileID: 1198845095}
-  submitButton: {fileID: 323813367}
-  enableCustomizationsButton: {fileID: 1788419342}
-  joinRoomCanvas: {fileID: 1255815456}
-  controllerCanvas: {fileID: 1888857726}
-  logoCanvas: {fileID: 1025906521}
-  loadingCircle: {fileID: 1479516040}
-  disconnectingDueToNoHost: 0
-  LocalPlayerSpawned:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
 --- !u!114 &2019387282
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8274,7 +8239,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2019387281}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: NormcoreRoomConnector, Assembly-CSharp
         m_MethodName: CheckValidPartyCode
         m_Mode: 0
@@ -8286,7 +8251,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2019387281}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: NormcoreRoomConnector, Assembly-CSharp
         m_MethodName: PartyCodeInputToUpper
         m_Mode: 0
