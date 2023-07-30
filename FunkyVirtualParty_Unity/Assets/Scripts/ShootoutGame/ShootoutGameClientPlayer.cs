@@ -7,6 +7,7 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using DG.Tweening;
+using Normal.Realtime;
 
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
@@ -30,80 +31,18 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     public Camera cam;
 
-    [SerializeField] ParticleSystem waterSplash, iceTrail;
+    [SerializeField] ParticleSystem iceTrail;
 
     [SerializeField] GameObject iceCube;
 
 
     public bool isAlive = true;
 
-#if !UNITY_WEBGL
-    public byte[] SerializeSplashData(Vector3 holePos)
-    {
-        using (MemoryStream m = new MemoryStream())
-        {
-            using (BinaryWriter writer = new BinaryWriter(m))
-            {
-                writer.Write(PlayerByteID);
-                writer.Write(splashPos);
-                writer.Write(true);
-                writer.Write(holePos);
-            }
-            return m.ToArray();
-        }
-    }
-#endif
-
-#if UNITY_WEBGL
-    public void DeserializeSplashData(byte[] data)
-    {
-        ShootoutGameClientPlayer player;
-        Vector3 playerSplashPos;
-
-        using (MemoryStream m = new MemoryStream(data))
-        {
-            using (BinaryReader reader = new BinaryReader(m))
-            {
-                player = ClientManagerWeb.instance.GetPlayerByByteID(reader.ReadByte()) as ShootoutGameClientPlayer;
-                playerSplashPos = reader.ReadVector3();
-
-                //Kill corresponding player
-                if (reader.ReadBoolean())
-                {
-                    player.TriggerIceCubeAnimation(reader.ReadVector3());
-
-                    TriggerHaptic(500);
-                }
-                else
-                {
-                    player.SetPlayerActive(false);
-                    player.isAlive = false;
-                    player.TriggerIceCubeAnimation();
-                    SpawnSplashEffect(playerSplashPos);
-
-                    TriggerHaptic(500);
-                }
-            }
-        }
-    }
-#endif
-
     protected override void Awake()
     {
         startingSpeed = 7.5f;
 
         base.Awake();
-
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, byte[]>("MethodCallToClientByteArray", MethodCalledFromServer);
-#endif
-    }
-
-    private void OnDisable()
-    {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByteArray");
-#endif
     }
 
 #if !UNITY_WEBGL
@@ -114,16 +53,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
             TriggerIceCubeAnimation(transform.position);
             isAlive = false;
             OnDeath.Invoke();
-
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData(transform.position));
         }
         else if(other.gameObject.name.Equals("HoleVolume"))
         {
             TriggerIceCubeAnimation(other.gameObject.transform.position);
             isAlive = false;
             OnDeath.Invoke();
-
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "WaterSplashEvent", SerializeSplashData(other.gameObject.transform.position));
         }
     }
 #endif
@@ -279,21 +214,16 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
     }
 
-#if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, byte[] data)
-    {
-        if (methodName.Equals("WaterSplashEvent"))
-        {
-            DeserializeSplashData(data);
-        }
-    }
-#endif
-
     void SpawnSplashEffect(Vector3 collisionPoint)
     {
-        ParticleSystem ps = Instantiate(waterSplash, collisionPoint, Quaternion.identity);
-        ps.gameObject.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-        waterSplash.Play();
+        Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+        options.ownedByClient = true;
+        GameObject splash = Realtime.Instantiate("Water Splash", collisionPoint, Quaternion.identity, options);
+        splash.GetComponent<ParticleSystemStoppedEvent>().ParticleSystemStopped.AddListener(delegate { Realtime.Destroy(splash.gameObject); });
+
+#if UNITY_WEBGL
+        TriggerHaptic(500);
+#endif
     }
 
     bool isExplosion = false;

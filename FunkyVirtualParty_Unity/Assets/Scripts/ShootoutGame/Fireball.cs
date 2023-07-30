@@ -5,54 +5,31 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Animations;
+using Normal.Realtime;
 
 public class Fireball : MonoBehaviour
 {
     public static List<Fireball> pool;
 
-    [SerializeField] ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail;
-    [SerializeField] public GameObject fireball;
+    [SerializeField] public FireballSyncer syncer;
     [SerializeField] public Rigidbody rb;
     [SerializeField] public Canvas chargeCanvas;
     [SerializeField] public Image chargeIndicator;
     [SerializeField] public float minSize, maxSize;
-    [SerializeField] Color minColor, maxColor;
-    [SerializeField] Color emberColor, emberColorBoosted;
     [SerializeField] float fireballGrowSpeed = 0.25f;
-    [SerializeField] public FireballObjectSyncer syncer;
 
-    [SerializeField] Color boostedMainColor, boostedSecondaryColor;
-    [SerializeField] ParticleSystem boostedParticleEffect;
-    public bool boosted = false;
-    private float scaleForBoosted = 0.8f; //What level currentScale has to be for fireball to become boosted
+    [SerializeField] float minHoleScale, maxHoleScale;
 
     public Collider col;
     public ParentConstraint constraint;
-    public float currentScale = 0; //Between 0 and 1, indicates level between min and max size
     public bool readyToSpawn = false;
     public bool isInLeftHand, isInRightHand;
 
     public bool hasExploded = false, isDropped = false;
     public float maxTimeAlive = 10, timeDropped;
 
-    public byte[] SerializeExplosionData(Vector3 pos)
-    {
-        using (MemoryStream m = new MemoryStream())
-        {
-            using (BinaryWriter writer = new BinaryWriter(m))
-            {
-                writer.Write(syncer.objectID);
-                writer.Write(pos);
-                writer.Write(currentScale);
-            }
-            return m.ToArray();
-        }
-    }
-
     private void Awake()
     {
-        Reset();
-
         if(pool == null)
         {
             pool = new List<Fireball>();
@@ -60,6 +37,11 @@ public class Fireball : MonoBehaviour
         pool.Add(this);
 
         chargeCanvas.transform.SetParent(null);
+    }
+
+    private void Start()
+    {
+        Reset();
     }
 
     private void OnDisable()
@@ -71,39 +53,24 @@ public class Fireball : MonoBehaviour
     {
         chargeCanvas.transform.position = transform.position;
 
-        if ((hasExploded && explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
+        if ((hasExploded && syncer.explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
         {
             Reset();
         }
 
-        if(fireball.activeSelf && !isDropped)
+        if(syncer.IsActive && !isDropped)
         {
-            currentScale = Mathf.Lerp(currentScale, 1, fireballGrowSpeed * Time.deltaTime);
+            syncer.CurrentScale = Mathf.Lerp(syncer.CurrentScale, 1, fireballGrowSpeed * Time.deltaTime);
             SetScale();
 
-            chargeIndicator.color = Color.Lerp(minColor, maxColor, currentScale);
-            chargeIndicator.fillAmount = currentScale / scaleForBoosted;
+            chargeIndicator.color = Color.Lerp(syncer.minColor, syncer.maxColor, syncer.CurrentScale);
+            chargeIndicator.fillAmount = syncer.CurrentScale / syncer.scaleForBoosted;
 
-            if (!boosted && currentScale > scaleForBoosted)
+            if (!syncer.IsBoosted && syncer.CurrentScale > syncer.scaleForBoosted)
             {
-                //Level up fireball
-                boostedParticleEffect.Play();
-
-                mainFireball.startColor = boostedMainColor;
-
-                ember.startColor = emberColorBoosted;
-
-                fireTrail.startColor = boostedSecondaryColor;
-
-                boosted = true;
+                syncer.IsBoosted = true;
 
                 chargeIndicator.enabled = false;
-
-                if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballBoost", syncer.objectID);
-            }
-            else if(!boosted)
-            {
-                mainFireball.startColor = Color.Lerp(minColor, maxColor, currentScale);
             }
         }
     }
@@ -114,7 +81,7 @@ public class Fireball : MonoBehaviour
         {
             Vector3 point = collision.GetContact(0).point;
 
-            syncer.TriggerIcebergHole(point, currentScale);
+            TriggerIcebergHole(point);
             TriggerExplosion();
         }
         else if(collision.gameObject.name.Contains("IceTower"))
@@ -133,24 +100,19 @@ public class Fireball : MonoBehaviour
 
     private void TriggerSmokePuff()
     {
-        smokePuff.Play();
+        syncer.SmokePuffTrigger = true;
         Reset();
-
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "SmokePuffEvent", syncer.objectID);
-        }
     }
 
     private void TriggerExplosion()
     {
-        fireball.SetActive(false);
+        syncer.IsActive = false;
         col.enabled = false;
         rb.isKinematic = true;
-        explosion.Play();
+        syncer.ExplosionTrigger = true;
         hasExploded = true;
 
-        if(boosted)
+        if(syncer.IsBoosted)
         {
             //Get three available fireballs
             int spawnedCount = 0;
@@ -158,9 +120,9 @@ public class Fireball : MonoBehaviour
             {
                 if(f.readyToSpawn)
                 {
-                    if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateMini", f.syncer.objectID);
+                    //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateMini", f.objectSyncer.objectID);
 #if UNITY_ANDROID
-                    syncer.ManualSendTrajectory();
+                    //objectSyncer.ManualSendTrajectory();
 #endif
 
                     //Set pos to current explosion
@@ -171,7 +133,7 @@ public class Fireball : MonoBehaviour
                     f.Activate();
                     f.OnDrop();
                     
-                    f.currentScale = 0.5f;
+                    f.syncer.CurrentScale = 0.5f;
                     f.SetScale();
 
                     //Launch them outwards
@@ -201,9 +163,10 @@ public class Fireball : MonoBehaviour
             }
         }
 
+        /*
         if (ClientManager.instance)
         {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballExplosionEvent", syncer.objectID);
+            //ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballExplosionEvent", objectSyncer.objectID);
 
 #if UNITY_EDITOR
             foreach (ClientPlayer cp in ClientManager.instance.Players)
@@ -211,11 +174,22 @@ public class Fireball : MonoBehaviour
                 if (cp.isDebugPlayer)
                 {
                     ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)cp;
-                    sp.CheckCollisionWithFireball(transform.position, Mathf.Max(2, currentScale));
+                    sp.CheckCollisionWithFireball(transform.position, Mathf.Max(2, syncer.CurrentScale));
                 }
             }
 #endif
         }
+        */
+    }
+
+    void TriggerIcebergHole(Vector3 pos)
+    {
+        Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+        options.ownedByClient = true;
+        GameObject newHole = Realtime.Instantiate("IcebergHole", pos, Quaternion.identity, options);
+
+        float holeSize = Mathf.Lerp(minHoleScale, maxHoleScale, syncer.CurrentScale);
+        newHole.transform.localScale = new Vector3(holeSize, holeSize, holeSize);
     }
 
     IEnumerator SetColliderDelayed(Fireball f, bool enabled, float delay)
@@ -226,17 +200,17 @@ public class Fireball : MonoBehaviour
 
     public void SetScale()
     {
-        float s = Mathf.Lerp(minSize, maxSize, currentScale);
+        float s = Mathf.Lerp(minSize, maxSize, syncer.CurrentScale);
 
         Vector3 scale = new Vector3(s, s, s);
-        fireball.transform.localScale = scale;
-        explosion.transform.localScale = scale;
-        smokePuff.transform.localScale = scale;
+        syncer.fireball.transform.localScale = scale;
+        syncer.explosion.transform.localScale = scale;
+        syncer.smokePuff.transform.localScale = scale;
     }
 
     public void Activate()
     {
-        fireball.SetActive(true);
+        syncer.IsActive = true;
         rb.isKinematic = false;
         rb.useGravity = true;
         readyToSpawn = false;
@@ -253,17 +227,17 @@ public class Fireball : MonoBehaviour
 
     private void Reset()
     {
-        currentScale = 0;
-        fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
-        mainFireball.startColor = minColor;
-        ember.startColor = emberColor;
-        fireTrail.startColor = emberColor;
+        syncer.CurrentScale = 0;
+        syncer.fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
+        syncer.mainFireball.startColor = syncer.minColor;
+        syncer.ember.startColor = syncer.emberColor;
+        syncer.fireTrail.startColor = syncer.emberColor;
         rb.isKinematic = true;
         rb.useGravity = false;
-        fireball.SetActive(false);
+        syncer.IsActive = false;
         hasExploded = false;
         isDropped = false;
-        boosted = false;
+        syncer.IsBoosted = false;
         chargeIndicator.fillAmount = 0;
         chargeIndicator.enabled = true;
         readyToSpawn = true;

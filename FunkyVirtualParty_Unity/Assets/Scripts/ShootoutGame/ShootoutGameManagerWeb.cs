@@ -1,72 +1,91 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
 using TMPro;
-using UnityEngine.SceneManagement;
-using Autohand;
 using Cinemachine;
 using DG.Tweening;
 
-public class ShootoutGameManagerWeb : GameManagerWeb
+public class ShootoutGameManagerWeb : MonoBehaviour
 {
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     [SerializeField] private ParticleSystem countdownParticles;
-    private bool countingDown = false;
     private float timeRemaining;
 
     [SerializeField] CinemachineVirtualCamera cinemachineCam;
     [SerializeField] Camera cam;
 
-    protected override void Start()
+    private void Awake()
     {
-        base.Start();
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+
+        ShootoutGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
+    }
+
+    protected void Start()
+    {
+        RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
 
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
+    }
 
-        ClientManagerWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
+    private void OnDestroy()
+    {
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
 
-        foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
+        ShootoutGameSyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
+    }
+
+    void OnLocalPlayerSpawned()
+    {
+        RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
+        cinemachineCam.Follow = RealtimeSingletonWeb.instance.LocalPlayer.transform;
+        (RealtimeSingletonWeb.instance.LocalPlayer as ShootoutGameClientPlayer).cam = cam;
+    }
+
+    protected void OnStateChange(string s)
+    {
+        switch (ShootoutGameSyncer.instance.State)
         {
-            (cp as ShootoutGameClientPlayer).cam = cam;
-        }
+            case "tutorial":
 
-        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.transform;
+                break;
+            case "countdown":
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
+                StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
+                break;
+            case "game loop":
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = true;
+                break;
+            case "vr player won":
+                countdownText.enabled = true;
+                countdownText.text = "VR PLAYER WINS";
+                break;
+            case "time ended":
+                countdownText.enabled = true;
+                countdownText.text = "TIME'S UP!\nYOU WIN";
+                break;
+            default:
+                break;
+        }
     }
 
     void Update()
     {
-        switch (State)
+        switch (ShootoutGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
-                SetPlayerMovement(false);
+            case "tutorial":
                 break;
-            case GameState.Countdown:
-                if (!countingDown)
-                {
-                    StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
-                }
+            case "countdown":
                 break;
-            case GameState.GameLoop:
-                countingDown = false;
-                if (timeRemaining > 0) { timeRemaining -= Time.deltaTime; }
+            case "game loop":
+                timeRemaining -= Time.deltaTime;
                 gameTimeText.text = FormatTime(timeRemaining);
                 break;
-            case GameState.VRPlayerWins:
-                if (!endingGame)
-                {
-                    StartCoroutine(GameOver(2, "YOU LOSE!"));
-                    endingGame = true;
-                }
+            case "vr player won":
                 break;
-            case GameState.TimeEnded:
-                if (!endingGame)
-                {
-                    StartCoroutine(GameOver(2, "TIMES UP!"));
-                    endingGame = true;
-                }
+            case "time ended":
                 break;
             default:
                 break;
@@ -75,8 +94,6 @@ public class ShootoutGameManagerWeb : GameManagerWeb
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        countingDown = true;
-
         yield return new WaitForSeconds(1);
 
         for (int i = countdown; i > 0; i--)
@@ -94,18 +111,15 @@ public class ShootoutGameManagerWeb : GameManagerWeb
 
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
-        SetPlayerMovement(true);
 
         cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_YDamping = 1;
         cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_ZDamping = 1;
     }
 
-    IEnumerator GameOver(int countdown, string txt)
+    public string FormatTime(float time)
     {
-        countdownText.enabled = true;
-        countdownText.text = txt;
-        yield return new WaitForSeconds(3);
-
-        ClientManagerWeb.instance.LoadMainMenu();
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }

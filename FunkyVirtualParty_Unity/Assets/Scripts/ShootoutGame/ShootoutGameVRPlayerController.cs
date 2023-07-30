@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Autohand;
 using UnityEngine.UI;
+using TMPro;
 
 public class ShootoutGameVRPlayerController : VRPlayerController
 {
     [SerializeField] GameObject fireballPrefab, fireballHandAnchorLeft, fireballHandAnchorRight;
     [SerializeField] GameObject handFireEffectLeft, handFireEffectRight;
 
+    public TMP_Text vrInfoText, vrGameTimeText;
 
     public float fireballThrowPower = 1, handOffset = 0.05f;
 
@@ -192,7 +194,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         {
             while(isGrabbingLeft)
             {
-                HapticsManager.instance.TriggerHaptic(true, 0.1f, currentFireballLeft.GetComponent<Fireball>().currentScale);
+                HapticsManager.instance.TriggerHaptic(true, 0.1f, currentFireballLeft.GetComponent<Fireball>().syncer.CurrentScale);
                 yield return new WaitForSeconds(0.1f);
             }
         }
@@ -200,7 +202,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         {
             while (isGrabbingRight)
             {
-                HapticsManager.instance.TriggerHaptic(false, 0.1f, currentFireballRight.GetComponent<Fireball>().currentScale);
+                HapticsManager.instance.TriggerHaptic(false, 0.1f, currentFireballRight.GetComponent<Fireball>().syncer.CurrentScale);
                 yield return new WaitForSeconds(0.1f);
             }
         }

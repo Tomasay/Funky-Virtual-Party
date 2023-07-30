@@ -5,11 +5,12 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
+using Normal.Realtime;
 
-public class ShootoutGameManager : GameManager
+public class ShootoutGameManager : MonoBehaviour
 {
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
-    [SerializeField] private TMP_Text vrInfoText, vrGameTimeText;
+    private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
 
@@ -19,25 +20,16 @@ public class ShootoutGameManager : GameManager
     private float[] currentWaypointDistances;
 #endif
 
-    protected override void Start()
+    void Start()
     {
-        base.Start();
-
         timeRemaining = GAME_TIME_AMOUNT;
-        vrGameTimeText.text = FormatTime(timeRemaining);
 
-        if (ClientManager.instance)
+        foreach (ShootoutGameClientPlayer cp in ShootoutGameClientPlayer.clients)
         {
-            foreach (ClientPlayer p in ClientManager.instance.Players)
-            {
-                ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
-                sp.OnDeath.AddListener(CheckPlayersLeft);
-            }
+            cp.OnDeath.AddListener(CheckPlayersLeft);
         }
 
-        SetPlayerMovement(false);
-        SetVRPlayerMovementDelayed(false, 1);
-        SetVRPlayerCanThrowFireballs(true);
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 
 #if UNITY_EDITOR
         currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
@@ -45,19 +37,30 @@ public class ShootoutGameManager : GameManager
 #endif
     }
 
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        vrInfoText = avatar.GetComponent<ShootoutGameVRPlayerController>().vrInfoText;
+
+        vrGameTimeText = avatar.GetComponent<ShootoutGameVRPlayerController>().vrGameTimeText;
+        vrGameTimeText.text = FormatTime(timeRemaining);
+
+        SetVRPlayerMovement(false);
+        SetVRPlayerCanThrowFireballs(true);
+    }
+
     void Update()
     {
-        switch (State)
+        switch (ShootoutGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
+            case "tutorial":
                 break;
-            case GameState.Countdown:
+            case "countdown":
                 if (!countingDown)
                 {
                     StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 }
                 break;
-            case GameState.GameLoop:
+            case "gameLoop":
                 timeRemaining -= Time.deltaTime;
                 vrGameTimeText.text = FormatTime(timeRemaining);
 
@@ -67,14 +70,14 @@ public class ShootoutGameManager : GameManager
                 }
                 if (timeRemaining <= 0) //Game end, VR player wins
                 {
-                    State = GameState.TimeEnded;
+                    ShootoutGameSyncer.instance.State = "time ended";
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
                 break;
-            case GameState.VRPlayerWins:
+            case "vr player won":
                 StartCoroutine(GameOver(2, "YOU WIN!"));
                 break;
-            case GameState.TimeEnded:
+            case "time ended":
                 StartCoroutine(GameOver(2, "TIMES UP!\nYOU LOSE"));
                 break;
             default:
@@ -89,18 +92,17 @@ public class ShootoutGameManager : GameManager
     void CheckPlayersLeft()
     {
         int playersAlive = 0;
-        foreach (ClientPlayer p in ClientManager.instance.Players)
+        foreach (ShootoutGameClientPlayer cp in ShootoutGameClientPlayer.clients)
         {
-            ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)p;
-            if(sp.isAlive)
+            if (cp.isAlive)
             {
                 playersAlive++;
             }
         }
 
-        if(playersAlive == 0)
+        if (playersAlive == 0)
         {
-            State = GameState.VRPlayerWins;
+            ShootoutGameSyncer.instance.State = "vr player wins";
         }
     }
 
@@ -122,8 +124,7 @@ public class ShootoutGameManager : GameManager
         yield return new WaitForSeconds(1);
         vrInfoText.text = "";
 
-        State = GameState.GameLoop;
-        SetPlayerMovement(true);
+        ShootoutGameSyncer.instance.State = "game loop";
 
         countingDown = false;
     }
@@ -133,17 +134,17 @@ public class ShootoutGameManager : GameManager
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
-        SceneManager.LoadScene("MainMenu");
-    }
-
-    public override void OnAction(string id)
-    {
-        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<ShootoutGameClientPlayer>().Action();
+        SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }
 
     private void SetVRPlayerCanThrowFireballs(bool canThrow)
     {
-        VRPlayer.GetComponent<ShootoutGameVRPlayerController>().canThrowFireballs = canThrow;
+        RealtimeSingleton.instance.VRAvatar.GetComponent<ShootoutGameVRPlayerController>().canThrowFireballs = canThrow;
+    }
+
+    protected void SetVRPlayerMovement(bool canPlayerMove)
+    {
+        RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
     }
 
 #if UNITY_EDITOR
@@ -159,6 +160,7 @@ public class ShootoutGameManager : GameManager
                 }
             }
         }
+
     }
 
     private void UpdateDebugPlayerWaypoint(ClientPlayer cp, int index)
@@ -183,4 +185,11 @@ public class ShootoutGameManager : GameManager
         }
     }
 #endif
+
+    public string FormatTime(float time)
+    {
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
 }
