@@ -23,22 +23,12 @@ public class ChaseGameManager : MonoBehaviour
         
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 
-        StartCoroutine("RequestOwnershipDelayed");
+        ChaseGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
     }
 
     private void OnDestroy()
     {
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
-    }
-
-    IEnumerator RequestOwnershipDelayed()
-    {
-        yield return new WaitForSeconds(3);
-
-        foreach (RealtimeView rt in mapRealtimeViews)
-        {
-            rt.RequestOwnership();
-        }
     }
 
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -83,6 +73,30 @@ public class ChaseGameManager : MonoBehaviour
                 break;
             case "time ended":
                 StartCoroutine(GameOver(2, "TIMES UP!\nYOU WIN"));
+                break;
+            default:
+                break;
+        }
+    }
+
+    void OnStateChanged(string newState)
+    {
+        switch (newState)
+        {
+            case "tutorial":
+                break;
+            case "countdown":
+                //Get ownership of map buttons. Waiting till countdown to ensure we are properly connected
+                foreach (RealtimeView rt in mapRealtimeViews)
+                {
+                    rt.RequestOwnership();
+                }
+                break;
+            case "game loop":
+                break;
+            case "vr player lost":
+                break;
+            case "time ended":
                 break;
             default:
                 break;

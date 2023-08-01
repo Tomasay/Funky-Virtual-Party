@@ -24,16 +24,13 @@ public class ShootoutGameManager : MonoBehaviour
     {
         timeRemaining = GAME_TIME_AMOUNT;
 
-        foreach (ShootoutGameClientPlayer cp in ShootoutGameClientPlayer.clients)
-        {
-            cp.OnDeath.AddListener(CheckPlayersLeft);
-        }
+        ShootoutGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 
 #if UNITY_EDITOR
-        currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
-        currentWaypointDistances = new float[ClientManager.instance.Players.Count];
+        //currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
+        //currentWaypointDistances = new float[ClientManager.instance.Players.Count];
 #endif
     }
 
@@ -85,8 +82,32 @@ public class ShootoutGameManager : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        UpdateDebugPlayers();
+        //UpdateDebugPlayers();
 #endif
+    }
+
+    void OnStateChanged(string newState)
+    {
+        switch (newState)
+        {
+            case "tutorial":
+                break;
+            case "countdown":
+                //Setup client death events. Waiting till countdown to ensure all clients have been spawned in
+                foreach (ShootoutGameClientPlayer cp in ShootoutGameClientPlayer.clients)
+                {
+                    cp.OnDeath.AddListener(CheckPlayersLeft);
+                }
+                break;
+            case "gameLoop":
+                break;
+            case "vr player won":
+                break;
+            case "time ended":
+                break;
+            default:
+                break;
+        }
     }
 
     void CheckPlayersLeft()
@@ -148,6 +169,7 @@ public class ShootoutGameManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
+    /*
     private void UpdateDebugPlayers()
     {
         if (ClientManager.instance)
@@ -184,6 +206,7 @@ public class ShootoutGameManager : MonoBehaviour
             //ClientManager.instance.Manager.Socket.Emit("inputDebug", cp.SerializeInputData(dir));
         }
     }
+    */
 #endif
 
     public string FormatTime(float time)
