@@ -42,7 +42,7 @@ public class ShootoutGameManager : MonoBehaviour
         vrGameTimeText.text = FormatTime(timeRemaining);
 
         SetVRPlayerMovement(false);
-        SetVRPlayerCanThrowFireballs(true);
+        SetVRPlayerCanThrowFireballs(false);
     }
 
     void Update()
@@ -57,7 +57,7 @@ public class ShootoutGameManager : MonoBehaviour
                     StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 }
                 break;
-            case "gameLoop":
+            case "game loop":
                 timeRemaining -= Time.deltaTime;
                 vrGameTimeText.text = FormatTime(timeRemaining);
 
@@ -96,10 +96,11 @@ public class ShootoutGameManager : MonoBehaviour
                 //Setup client death events. Waiting till countdown to ensure all clients have been spawned in
                 foreach (ShootoutGameClientPlayer cp in ShootoutGameClientPlayer.clients)
                 {
-                    cp.OnDeath.AddListener(CheckPlayersLeft);
+                    cp.syncer.OnDeath.AddListener(CheckPlayersLeft);
                 }
                 break;
-            case "gameLoop":
+            case "game loop":
+                SetVRPlayerCanThrowFireballs(true);
                 break;
             case "vr player won":
                 break;

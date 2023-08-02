@@ -16,21 +16,11 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 
     public float scaleForBoosted = 0.8f; //What level currentScale has to be for fireball to become boosted
 
-    private bool isWeb;
-
     public float CurrentScale { get => model.currentScale; set => model.currentScale = value; }
     public bool IsBoosted { get => model.boosted; set => model.boosted = value; }
     public bool IsActive { get => model.active; set => model.active = value; }
     public bool SmokePuffTrigger { get => model.smokePuffTrigger; set => model.smokePuffTrigger = value; }
     public bool ExplosionTrigger { get => model.explosionTrigger; set => model.explosionTrigger = value; }
-
-    private void Awake()
-    {
-
-#if UNITY_WEBGL
-        isWeb = true;
-#endif
-    }
 
 
     protected override void OnRealtimeModelReplaced(FireballSyncModel previousModel, FireballSyncModel currentModel)
@@ -48,8 +38,12 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
         if (currentModel != null)
         {
             // If this is a model that has no data set on it
+            if (currentModel.isFreshModel)
+            {
+            }
 
             //Update to match new data
+            fireball.SetActive(model.active);
 
             // Register for events
             currentModel.currentScaleDidChange += OnScaleChange;
@@ -101,5 +95,4 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
         }
     }
     #endregion
-
 }

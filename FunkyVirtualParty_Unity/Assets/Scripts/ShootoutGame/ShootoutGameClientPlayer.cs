@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
 using Cinemachine;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -19,7 +18,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
         [DllImport("__Internal")]
         private static extern void TriggerHaptic(int hapticTime);
 #endif
-    public UnityEvent OnDeath;
     public bool isColliding = false;
     float collisionTimer = 0.5f;
     const float collisionTimerDefault = 0.5f;
@@ -40,25 +38,26 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 7.5f;
+        syncer.OnDeath.AddListener(OnPlayerDeath);
 
         base.Awake();
+
+        startingSpeed = 1;
     }
 
-#if !UNITY_WEBGL
+#if UNITY_WEBGL
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag.Equals("Water"))
+        if (isLocal)
         {
-            TriggerIceCubeAnimation(transform.position);
-            isAlive = false;
-            OnDeath.Invoke();
-        }
-        else if(other.gameObject.name.Equals("HoleVolume"))
-        {
-            TriggerIceCubeAnimation(other.gameObject.transform.position);
-            isAlive = false;
-            OnDeath.Invoke();
+            if (other.tag.Equals("Water"))
+            {
+                TriggerIceCubeAnimation(transform.position);
+            }
+            else if (other.gameObject.name.Equals("IcebergHole"))
+            {
+                TriggerIceCubeAnimation(other.gameObject.transform.position);
+            }
         }
     }
 #endif
@@ -256,42 +255,30 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
     }
 
-    
-
-    public void TriggerIceCubeAnimation()
+    void OnPlayerDeath()
     {
         iceCube.SetActive(true);
-
         playerNameText.enabled = false;
-
         Col.enabled = false;
-        GetComponent<Rigidbody>().useGravity = false;
-        GetComponent<Rigidbody>().isKinematic = true;
 
-        smr.enabled = true;
-
-        CanMove = false;
-
-        anim.SetTrigger("StandingPose");
-
-        //Put player under water
-        transform.position = new Vector3(transform.position.x, 24.5f, transform.position.z);
-
-        StartCoroutine("BringToTop");
+        anim.SetTrigger("FallIntoWater");
+        StartCoroutine("SetStandingPose");
     }
 
     public void TriggerIceCubeAnimation(Vector3 holeCenterPos)
     {
+        syncer.OnDeathTrigger = true;
+
         splashPos = new Vector3(holeCenterPos.x, 25, holeCenterPos.z);
 
         CanMove = false;
-
-        anim.SetTrigger("FallIntoWater");
 
         transform.DOMoveX(holeCenterPos.x, 0.25f);
         transform.DOMoveZ(holeCenterPos.z, 0.25f);
 
         StartCoroutine("IceCubeAnimation");
+
+        isAlive = false;
     }
 
     IEnumerator IceCubeAnimation()
@@ -311,16 +298,20 @@ public class ShootoutGameClientPlayer : ClientPlayer
         GetComponent<Rigidbody>().useGravity = false;
         GetComponent<Rigidbody>().isKinematic = true;
 
-        smr.enabled = true;
-
         CanMove = false;
-
-        anim.SetTrigger("StandingPose");
 
         //Put player under water
         transform.position = new Vector3(transform.position.x, 24.5f, transform.position.z);
 
         StartCoroutine("BringToTop");
+    }
+
+    IEnumerator SetStandingPose()
+    {
+        yield return new WaitForSeconds(1.75f);
+
+        smr.enabled = true;
+        anim.SetTrigger("StandingPose");
     }
 
     IEnumerator BringToTop()

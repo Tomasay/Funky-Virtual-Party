@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Normal.Realtime;
 using TMPro;
+using UnityEngine.Events;
 
 public class ClientSync : RealtimeComponent<ClientSyncModel>
 {
@@ -15,6 +16,8 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     [SerializeField]
     TMP_Text nameText;
 
+    public UnityEvent OnDeath;
+
     #region Properties
     public Color Color { get => model.color; set => model.color = value; }
     public string Name { get => model.name; set => model.name = value; }
@@ -25,8 +28,14 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public int HeadType { get => model.headType; set => model.headType = value; }
     public int DanceIndex { get => model.danceIndex; set => model.danceIndex = value; }
     public bool IsReady { get => model.isReady; set => model.isReady = value; }
+    public bool OnDeathTrigger { get => model.onDeathTrigger; set => model.onDeathTrigger = value; }
 
     #endregion
+
+    private void Awake()
+    {
+        OnDeath = new UnityEvent();
+    }
 
     protected override void OnRealtimeModelReplaced(ClientSyncModel previousModel, ClientSyncModel currentModel)
     {
@@ -42,6 +51,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             previousModel.heightDidChange -= OnHeightChanged;
             previousModel.danceIndexDidChange -= OnDanceIndexChanged;
             previousModel.isReadyDidChange -= OnReadyUpChanged;
+            previousModel.onDeathTriggerDidChange -= OnDeathTriggerChanged;
         }
 
         if (currentModel != null)
@@ -70,6 +80,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             currentModel.heightDidChange += OnHeightChanged;
             currentModel.danceIndexDidChange += OnDanceIndexChanged;
             currentModel.isReadyDidChange += OnReadyUpChanged;
+            currentModel.onDeathTriggerDidChange += OnDeathTriggerChanged;
         }
     }
 
@@ -122,6 +133,15 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
         if (val)
         {
             ClientPlayer.OnReadyUp.Invoke(cp);
+        }
+    }
+
+    void OnDeathTriggerChanged(ClientSyncModel previousModel, bool val)
+    {
+        if (val)
+        {
+            OnDeath.Invoke();
+            model.onDeathTrigger = false;
         }
     }
     #endregion

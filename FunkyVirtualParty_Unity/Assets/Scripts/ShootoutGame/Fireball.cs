@@ -17,7 +17,6 @@ public class Fireball : MonoBehaviour
     [SerializeField] public Image chargeIndicator;
     [SerializeField] public float minSize, maxSize;
     [SerializeField] float fireballGrowSpeed = 0.25f;
-
     [SerializeField] float minHoleScale, maxHoleScale;
 
     public Collider col;
