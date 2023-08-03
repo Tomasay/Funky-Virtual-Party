@@ -159,7 +159,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1856241660037757809}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
           Normcore
         m_MethodName: RequestOwnership
@@ -267,6 +267,14 @@ MonoBehaviour:
     component: {fileID: 8814657671409834338}
   - componentID: 2
     component: {fileID: 2216166930363824039}
+  - componentID: 3
+    component: {fileID: 0}
+  - componentID: 4
+    component: {fileID: 0}
+  - componentID: 5
+    component: {fileID: 7161987539948429102}
+  - componentID: 6
+    component: {fileID: 929057842675014986}
 --- !u!114 &1517035223848305831
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,12 +306,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fireball: {fileID: 4423289069885267050}
-  mainFireball: {fileID: 4423289069885267047}
-  explosion: {fileID: 8065244542973703527}
-  smokePuff: {fileID: 3435044216057484644}
-  ember: {fileID: 4423289069244120277}
-  fireTrail: {fileID: 5562646482745574621}
-  boostedParticleEffect: {fileID: 8006817646706589012}
+  rb: {fileID: 566606611587223269}
+  mainFireball: {fileID: 748022708764259300}
+  explosion: {fileID: 2880498983704401967}
+  smokePuff: {fileID: 8618383419126000046}
+  ember: {fileID: 6426614674339485571}
+  fireTrail: {fileID: 5027753823039684387}
+  boostedParticleEffect: {fileID: 8869947564070634049}
   minColor: {r: 1, g: 0.14509805, b: 0, a: 0.5019608}
   maxColor: {r: 1, g: 0.92941177, b: 0.7019608, a: 1}
   emberColor: {r: 0.8235294, g: 0.47058824, b: 0.23137255, a: 1}
@@ -440,7 +449,8 @@ GameObject:
   - component: {fileID: 8065244542973703527}
   - component: {fileID: 8146278247063727888}
   - component: {fileID: 8814657671409834338}
-  - component: {fileID: 1856241660037757809}
+  - component: {fileID: 2880498983704401967}
+  - component: {fileID: 23696351633496867}
   m_Layer: 0
   m_Name: Explosion
   m_TagString: Untagged
@@ -5324,9 +5334,25 @@ MonoBehaviour:
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
-    component: {fileID: 1856241660037757809}
+    component: {fileID: 0}
+  - componentID: 2
+    component: {fileID: 2880498983704401967}
+  - componentID: 3
+    component: {fileID: 23696351633496867}
   _childViews: []
---- !u!114 &1856241660037757809
+--- !u!114 &2880498983704401967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1589349854153909103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &23696351633496867
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -15263,11 +15289,46 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 8163684771574148751, guid: 6dc4191059d6c3a4a820270672bbf567, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 6dc4191059d6c3a4a820270672bbf567, type: 3}
---- !u!198 &8006817646706589012 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 8163684771574148737, guid: 6dc4191059d6c3a4a820270672bbf567, type: 3}
+--- !u!1 &8006817646706589014 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8163684771574148739, guid: 6dc4191059d6c3a4a820270672bbf567, type: 3}
   m_PrefabInstance: {fileID: 2186165780229854165}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7161987539948429102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8006817646706589014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 8869947564070634049}
+  _childViews: []
+--- !u!114 &8869947564070634049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8006817646706589014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8006817646706589019 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8163684771574148750, guid: 6dc4191059d6c3a4a820270672bbf567, type: 3}
@@ -15378,6 +15439,8 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 6596913273203820248}
+  - componentID: 2
+    component: {fileID: 8618383419126000046}
   _childViews: []
 --- !u!114 &6596913273203820248
 MonoBehaviour:
@@ -15397,14 +15460,21 @@ MonoBehaviour:
   _syncScale: 1
   _syncVelocity: 1
   _maintainOwnershipWhileSleeping: 0
+--- !u!114 &8618383419126000046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3435044216042048516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &3435044216042278948 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: a381ded06c204a54e909a18e574f7436, type: 3}
-  m_PrefabInstance: {fileID: 3435044216042146468}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &3435044216057484644 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 19800000, guid: a381ded06c204a54e909a18e574f7436, type: 3}
   m_PrefabInstance: {fileID: 3435044216042146468}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8148790419516744452
@@ -15532,11 +15602,46 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
---- !u!198 &4423289069244120277 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 5509305662281031633, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
+--- !u!1 &4423289069244120280 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5509305662281031644, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
   m_PrefabInstance: {fileID: 8148790419516744452}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4850438077008316256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4423289069244120280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 6426614674339485571}
+  _childViews: []
+--- !u!114 &6426614674339485571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4423289069244120280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4423289069587752931 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5509305661550462183, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
@@ -15567,18 +15672,87 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5509305661840162658, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
   m_PrefabInstance: {fileID: 8148790419516744452}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &4423289069885267047 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 5509305661840162659, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
-  m_PrefabInstance: {fileID: 8148790419516744452}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4423289069885267050 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5509305661840162670, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
   m_PrefabInstance: {fileID: 8148790419516744452}
   m_PrefabAsset: {fileID: 0}
---- !u!198 &5562646482745574621 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 4333637354549323737, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
+--- !u!114 &748022708764259300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4423289069885267050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &929057842675014986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4423289069885267050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 748022708764259300}
+  _childViews:
+  - componentID: 1
+    component: {fileID: 4850438077008316256}
+  - componentID: 2
+    component: {fileID: 8085814872398159930}
+--- !u!1 &5562646482745574611 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4333637354549323735, guid: 93493751bafa07b4ebec5bc245d5d2b4, type: 3}
   m_PrefabInstance: {fileID: 8148790419516744452}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5027753823039684387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5562646482745574611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &8085814872398159930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5562646482745574611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 5027753823039684387}
+  _childViews: []

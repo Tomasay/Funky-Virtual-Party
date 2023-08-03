@@ -5321,6 +5321,17 @@ SkinnedMeshRenderer:
   m_CorrespondingSourceObject: {fileID: 2272252485581221372, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
   m_PrefabInstance: {fileID: 3998870548620408853}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3594415489991098686 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 477164182028859691, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+  m_PrefabInstance: {fileID: 3998870548620408853}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d96f3e4206daf2b4195e94925ae0177b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4600377984273958132 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 624035471942958305, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
@@ -5355,6 +5366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncer: {fileID: 5540356437858398769}
+  animSyncer: {fileID: 3594415489991098686}
   colorPalette: {fileID: 2800000, guid: d5d5c7de2ae85aa41b13c39260d4a533, type: 3}
   playerNameText: {fileID: 5630419980778754063}
   playerIndicatorText: {fileID: 2801633969962425830}
@@ -5388,9 +5400,6 @@ MonoBehaviour:
   - {x: -56.5, y: 26, z: 57}
   - {x: -56.5, y: 26, z: 60}
   isDebugPlayer: 0
-  OnDeath:
-    m_PersistentCalls:
-      m_Calls: []
   isColliding: 0
   cam: {fileID: 0}
   iceTrail: {fileID: 2732590188110306956}

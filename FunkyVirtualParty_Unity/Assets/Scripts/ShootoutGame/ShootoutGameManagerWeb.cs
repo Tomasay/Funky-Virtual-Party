@@ -15,15 +15,11 @@ public class ShootoutGameManagerWeb : MonoBehaviour
     [SerializeField] CinemachineVirtualCamera cinemachineCam;
     [SerializeField] Camera cam;
 
-    private void Awake()
-    {
-        RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
-
-        ShootoutGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
-    }
-
     protected void Start()
     {
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+        ShootoutGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
+
         RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
 
         timeRemaining = GAME_TIME_AMOUNT;
@@ -33,7 +29,6 @@ public class ShootoutGameManagerWeb : MonoBehaviour
     private void OnDestroy()
     {
         RealtimeSingletonWeb.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
-
         ShootoutGameSyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
     }
 

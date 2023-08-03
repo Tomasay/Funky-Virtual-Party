@@ -97,7 +97,7 @@ public class ChaseGameClientPlayer : ClientPlayer
         if (timeTackled == 0 || (Time.time - timeTackled) > tackleCooldown)
         {
             timeTackled = Time.time;
-            anim.SetTrigger("Tackle");
+            animSyncer.Trigger = "Tackle";
             canMove = false;
             StartCoroutine("TackleEnd", 2);
 

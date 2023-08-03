@@ -29,12 +29,9 @@ public partial class ClientSyncModel
     private float _animSpeed;
 
     [RealtimeProperty(8, true, true)]
-    private int _danceIndex;
-
-    [RealtimeProperty(9, true, true)]
     private bool _isReady;
 
-    [RealtimeProperty(10, true, true)]
+    [RealtimeProperty(9, true, true)]
     private bool _onDeathTrigger; //Used for when player gets killed/knocked out in game. Triggers a callback and immediately gets set back to false
 }
 
@@ -124,18 +121,6 @@ public partial class ClientSyncModel : RealtimeModel {
         }
     }
     
-    public int danceIndex {
-        get {
-            return _danceIndexProperty.value;
-        }
-        set {
-            if (_danceIndexProperty.value == value) return;
-            _danceIndexProperty.value = value;
-            InvalidateReliableLength();
-            FireDanceIndexDidChange(value);
-        }
-    }
-    
     public bool isReady {
         get {
             return _isReadyProperty.value;
@@ -168,7 +153,6 @@ public partial class ClientSyncModel : RealtimeModel {
     public event PropertyChangedHandler<float> heightDidChange;
     public event PropertyChangedHandler<int> hatIndexDidChange;
     public event PropertyChangedHandler<float> animSpeedDidChange;
-    public event PropertyChangedHandler<int> danceIndexDidChange;
     public event PropertyChangedHandler<bool> isReadyDidChange;
     public event PropertyChangedHandler<bool> onDeathTriggerDidChange;
     
@@ -180,9 +164,8 @@ public partial class ClientSyncModel : RealtimeModel {
         Height = 5,
         HatIndex = 6,
         AnimSpeed = 7,
-        DanceIndex = 8,
-        IsReady = 9,
-        OnDeathTrigger = 10,
+        IsReady = 8,
+        OnDeathTrigger = 9,
     }
     
     #region Properties
@@ -201,8 +184,6 @@ public partial class ClientSyncModel : RealtimeModel {
     
     private UnreliableProperty<float> _animSpeedProperty;
     
-    private ReliableProperty<int> _danceIndexProperty;
-    
     private ReliableProperty<bool> _isReadyProperty;
     
     private ReliableProperty<bool> _onDeathTriggerProperty;
@@ -217,9 +198,8 @@ public partial class ClientSyncModel : RealtimeModel {
         _heightProperty = new ReliableProperty<float>(5, _height);
         _hatIndexProperty = new ReliableProperty<int>(6, _hatIndex);
         _animSpeedProperty = new UnreliableProperty<float>(7, _animSpeed);
-        _danceIndexProperty = new ReliableProperty<int>(8, _danceIndex);
-        _isReadyProperty = new ReliableProperty<bool>(9, _isReady);
-        _onDeathTriggerProperty = new ReliableProperty<bool>(10, _onDeathTrigger);
+        _isReadyProperty = new ReliableProperty<bool>(8, _isReady);
+        _onDeathTriggerProperty = new ReliableProperty<bool>(9, _onDeathTrigger);
     }
     
     protected override void OnParentReplaced(RealtimeModel previousParent, RealtimeModel currentParent) {
@@ -229,7 +209,6 @@ public partial class ClientSyncModel : RealtimeModel {
         _headTypeProperty.UnsubscribeCallback();
         _heightProperty.UnsubscribeCallback();
         _hatIndexProperty.UnsubscribeCallback();
-        _danceIndexProperty.UnsubscribeCallback();
         _isReadyProperty.UnsubscribeCallback();
         _onDeathTriggerProperty.UnsubscribeCallback();
     }
@@ -290,14 +269,6 @@ public partial class ClientSyncModel : RealtimeModel {
         }
     }
     
-    private void FireDanceIndexDidChange(int value) {
-        try {
-            danceIndexDidChange?.Invoke(this, value);
-        } catch (System.Exception exception) {
-            UnityEngine.Debug.LogException(exception);
-        }
-    }
-    
     private void FireIsReadyDidChange(bool value) {
         try {
             isReadyDidChange?.Invoke(this, value);
@@ -323,7 +294,6 @@ public partial class ClientSyncModel : RealtimeModel {
         length += _heightProperty.WriteLength(context);
         length += _hatIndexProperty.WriteLength(context);
         length += _animSpeedProperty.WriteLength(context);
-        length += _danceIndexProperty.WriteLength(context);
         length += _isReadyProperty.WriteLength(context);
         length += _onDeathTriggerProperty.WriteLength(context);
         return length;
@@ -338,7 +308,6 @@ public partial class ClientSyncModel : RealtimeModel {
         writes |= _heightProperty.Write(stream, context);
         writes |= _hatIndexProperty.Write(stream, context);
         writes |= _animSpeedProperty.Write(stream, context);
-        writes |= _danceIndexProperty.Write(stream, context);
         writes |= _isReadyProperty.Write(stream, context);
         writes |= _onDeathTriggerProperty.Write(stream, context);
         if (writes) InvalidateContextLength(context);
@@ -384,11 +353,6 @@ public partial class ClientSyncModel : RealtimeModel {
                     if (changed) FireAnimSpeedDidChange(animSpeed);
                     break;
                 }
-                case (uint) PropertyID.DanceIndex: {
-                    changed = _danceIndexProperty.Read(stream, context);
-                    if (changed) FireDanceIndexDidChange(danceIndex);
-                    break;
-                }
                 case (uint) PropertyID.IsReady: {
                     changed = _isReadyProperty.Read(stream, context);
                     if (changed) FireIsReadyDidChange(isReady);
@@ -419,7 +383,6 @@ public partial class ClientSyncModel : RealtimeModel {
         _height = height;
         _hatIndex = hatIndex;
         _animSpeed = animSpeed;
-        _danceIndex = danceIndex;
         _isReady = isReady;
         _onDeathTrigger = onDeathTrigger;
     }

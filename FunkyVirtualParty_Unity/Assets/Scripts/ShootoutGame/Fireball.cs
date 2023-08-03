@@ -52,7 +52,7 @@ public class Fireball : MonoBehaviour
     {
         chargeCanvas.transform.position = transform.position;
 
-        if ((hasExploded && syncer.explosion.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
+        if ((hasExploded && syncer.explosion.PSystem.isStopped) || (isDropped && timeDropped != 0 && Time.time - timeDropped > maxTimeAlive))
         {
             Reset();
         }
@@ -68,6 +68,7 @@ public class Fireball : MonoBehaviour
             if (!syncer.IsBoosted && syncer.CurrentScale > syncer.scaleForBoosted)
             {
                 syncer.IsBoosted = true;
+                syncer.boostedParticleEffect.Play();
 
                 chargeIndicator.enabled = false;
             }
@@ -99,16 +100,16 @@ public class Fireball : MonoBehaviour
 
     private void TriggerSmokePuff()
     {
-        syncer.SmokePuffTrigger = true;
+        syncer.smokePuff.Play();
         Reset();
     }
 
     private void TriggerExplosion()
     {
-        syncer.IsActive = false;
+        //syncer.IsActive = false;
         col.enabled = false;
-        rb.isKinematic = true;
         syncer.ExplosionTrigger = true;
+        syncer.explosion.Play();
         hasExploded = true;
 
         if(syncer.IsBoosted)
@@ -210,8 +211,6 @@ public class Fireball : MonoBehaviour
     public void Activate()
     {
         syncer.IsActive = true;
-        rb.isKinematic = false;
-        rb.useGravity = true;
         readyToSpawn = false;
     }
 
@@ -228,11 +227,9 @@ public class Fireball : MonoBehaviour
     {
         syncer.CurrentScale = 0;
         syncer.fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
-        syncer.mainFireball.startColor = syncer.minColor;
-        syncer.ember.startColor = syncer.emberColor;
-        syncer.fireTrail.startColor = syncer.emberColor;
-        rb.isKinematic = true;
-        rb.useGravity = false;
+        syncer.mainFireball.StartColor = syncer.minColor;
+        syncer.ember.StartColor = syncer.emberColor;
+        syncer.fireTrail.StartColor = syncer.emberColor;
         syncer.IsActive = false;
         hasExploded = false;
         isDropped = false;

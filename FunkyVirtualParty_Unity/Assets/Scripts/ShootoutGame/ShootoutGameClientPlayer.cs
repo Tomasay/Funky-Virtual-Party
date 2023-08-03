@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using DG.Tweening;
 using Normal.Realtime;
+using UnityEngine.InputSystem;
 
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
@@ -25,7 +26,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     private SerializedVector3 splashPos;
 
-    const float frictionCoefficient = 0.1f;
+    const float frictionCoefficient = 0.005f;
 
     public Camera cam;
 
@@ -40,9 +41,9 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         syncer.OnDeath.AddListener(OnPlayerDeath);
 
-        base.Awake();
+        startingSpeed = 1.25f;
 
-        startingSpeed = 1;
+        base.Awake();
     }
 
 #if UNITY_WEBGL
@@ -54,7 +55,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
             {
                 TriggerIceCubeAnimation(transform.position);
             }
-            else if (other.gameObject.name.Equals("IcebergHole"))
+            else if (other.gameObject.name.Equals("HoleVolume"))
             {
                 TriggerIceCubeAnimation(other.gameObject.transform.position);
             }
@@ -174,7 +175,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
 
 #if UNITY_WEBGL
-        playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+        if (cam)
+        {
+            playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+        }
 #else
         if (Camera.main)
         {
@@ -243,12 +247,12 @@ public class ShootoutGameClientPlayer : ClientPlayer
     [SerializeField] private int jumpForce = 500;
     [SerializeField] float jumpCooldown = 1;
     float timeJumped = 0;
-    public override void Action()
+    public override void Action(InputAction.CallbackContext obj)
     {
         if (CanMove && (timeJumped == 0 || (Time.time - timeJumped) > jumpCooldown))
         {
             timeJumped = Time.time;
-            anim.SetTrigger("Jump");
+            animSyncer.Trigger = "Jump";
 
             // Jump!
             GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);

@@ -23,6 +23,7 @@ public class MyCPEvent : UnityEvent<ClientPlayer>
 public class ClientPlayer : MonoBehaviour
 {
     [SerializeField] public ClientSync syncer;
+    [SerializeField] public AnimatorSyncer animSyncer;
 
     public static List<ClientPlayer> clients;
 
@@ -290,8 +291,6 @@ public class ClientPlayer : MonoBehaviour
     {
         if (canMove)
         {
-            syncer.DanceIndex = -1;
-
             movement = new Vector3(input.x * speed, 0, input.y * speed);
             transform.Translate(movement * Time.deltaTime);
 
@@ -363,12 +362,12 @@ public class ClientPlayer : MonoBehaviour
     //Default action, dance of course
     public virtual void Action()
     {
-        syncer.DanceIndex = UnityEngine.Random.Range(1, 4);
+        animSyncer.Trigger = "Dance" + UnityEngine.Random.Range(1, 4);
     }
 
     public virtual void Action(InputAction.CallbackContext obj)
     {
-        syncer.DanceIndex = UnityEngine.Random.Range(1, 4);
+        animSyncer.Trigger = "Dance" + UnityEngine.Random.Range(1, 4);
     }
 
     protected virtual void OnCollisionEnter(Collision collision)

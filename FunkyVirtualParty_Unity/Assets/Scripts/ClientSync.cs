@@ -26,7 +26,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public float Height { get => model.height; set => model.height = value; } //Between -0.2 and 2.0
     public int HatIndex { get => model.hatIndex; set => model.hatIndex = value; }
     public int HeadType { get => model.headType; set => model.headType = value; }
-    public int DanceIndex { get => model.danceIndex; set => model.danceIndex = value; }
     public bool IsReady { get => model.isReady; set => model.isReady = value; }
     public bool OnDeathTrigger { get => model.onDeathTrigger; set => model.onDeathTrigger = value; }
 
@@ -49,7 +48,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             previousModel.hatIndexDidChange -= OnHatChanged;
             previousModel.headTypeDidChange -= OnHeadTypeChanged;
             previousModel.heightDidChange -= OnHeightChanged;
-            previousModel.danceIndexDidChange -= OnDanceIndexChanged;
             previousModel.isReadyDidChange -= OnReadyUpChanged;
             previousModel.onDeathTriggerDidChange -= OnDeathTriggerChanged;
         }
@@ -67,7 +65,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             cp.UpdateHat(model.hatIndex, false);
             cp.UpdateHeadType(model.headType);
             cp.UpdateHeight(model.height);
-            if (model.danceIndex > 0) anim.SetTrigger("Dance" + model.danceIndex);
             if (model.isReady) ClientPlayer.OnReadyUp.Invoke(cp);
 
             // Register for events
@@ -78,7 +75,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             currentModel.hatIndexDidChange += OnHatChanged;
             currentModel.headTypeDidChange += OnHeadTypeChanged;
             currentModel.heightDidChange += OnHeightChanged;
-            currentModel.danceIndexDidChange += OnDanceIndexChanged;
             currentModel.isReadyDidChange += OnReadyUpChanged;
             currentModel.onDeathTriggerDidChange += OnDeathTriggerChanged;
         }
@@ -118,14 +114,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     void OnHeightChanged(ClientSyncModel previousModel, float val)
     {
         cp.UpdateHeight(val);
-    }
-
-    void OnDanceIndexChanged(ClientSyncModel previousModel, int val)
-    {
-        if (val > 0)
-        {
-            anim.SetTrigger("Dance" + val);
-        }
     }
 
     void OnReadyUpChanged(ClientSyncModel previousModel, bool val)
