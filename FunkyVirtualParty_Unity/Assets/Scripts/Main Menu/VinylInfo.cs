@@ -13,11 +13,15 @@ public class VinylInfo : MonoBehaviour
 
     [SerializeField] public GameObject highlightOutline;
 
-    [SerializeField] public Transform distanceChecker;
+    [SerializeField] public MeshRenderer vinylPreview;
 
-    [SerializeField] Transform vinylParent;
+    [SerializeField] public Vector3 distanceCheckerPosition, vinylParentPosition;
 
     [SerializeField] GameObject poofEffect;
+
+#if UNITY_ANDROID
+    [SerializeField] Material previewMat;
+#endif
 
     AutoHandPlayer vrPlayer;
 
@@ -44,16 +48,26 @@ public class VinylInfo : MonoBehaviour
         grabbable = GetComponent<Grabbable>();
         grabbable.onHighlight.AddListener(OnHighlight);
         grabbable.onUnhighlight.AddListener(OnUnhighlight);
+
+#if UNITY_ANDROID
+        vinylPreview.material = previewMat;
+#endif
     }
 
     private void Start()
     {
-        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+        if (RealtimeSingleton.instance)
+        {
+            RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+        }
     }
 
     private void OnDestroy()
     {
-        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+        if (RealtimeSingleton.instance)
+        {
+            RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+        }
     }
 
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -68,7 +82,7 @@ public class VinylInfo : MonoBehaviour
     {
         Vector3 discPos = new Vector3(transform.position.x, 0, transform.position.z);
 
-        if (Vector3.Distance(discPos, distanceChecker.position) > distanceToRespawn)
+        if (Vector3.Distance(discPos, distanceCheckerPosition) > distanceToRespawn)
         {
             RuntimeManager.PlayOneShot("event:/SFX/Pop", transform.position);
             Instantiate(poofEffect, transform.position, transform.rotation);
@@ -106,7 +120,7 @@ public class VinylInfo : MonoBehaviour
         rb.velocity = Vector3.zero;
         rb.useGravity = false;
         rb.isKinematic = true;
-        transform.position = vinylParent.position;
+        transform.position = vinylParentPosition;
         transform.rotation = Quaternion.Euler(Vector3.zero);
         isSpinning = true;
     }

@@ -26,7 +26,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     private SerializedVector3 splashPos;
 
-    const float frictionCoefficient = 0.005f;
+    const float frictionCoefficient = 0.0075f;
 
     public Camera cam;
 
@@ -208,12 +208,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     protected override void OnCollisionEnter(Collision collision)
     {
-        // expensive this should be optimized.
-        ShootoutGameClientPlayer ext = collision.gameObject.GetComponent<ShootoutGameClientPlayer>();
-        if(ext)
+        if(collision.gameObject.TryGetComponent<ShootoutGameClientPlayer>(out ShootoutGameClientPlayer ext))
         {
             isColliding = true;
-            collisionVector = Vector2.Reflect(prevVector - new Vector2(ext.movement.x, ext.movement.z), collision.contacts[0].normal );
+            collisionVector = Vector2.Reflect(prevVector - new Vector2(ext.movement.x, ext.movement.z), collision.contacts[0].normal);
         }
     }
 

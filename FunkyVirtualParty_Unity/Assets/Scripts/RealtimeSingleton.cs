@@ -12,6 +12,8 @@ public class RealtimeSingleton : MonoBehaviour
     Realtime realtime;
     public RealtimeAvatarManager realtimeAvatarManager;
 
+    public string[] vinylDiscNames;
+
     public Realtime Realtime { get => realtime; }
     public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager;}
     public RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
@@ -34,6 +36,7 @@ public class RealtimeSingleton : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         SceneManager.sceneLoaded += OnSceneLoaded;
+        realtime.didConnectToRoom += Realtime_didConnectToRoom;
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -42,6 +45,31 @@ public class RealtimeSingleton : MonoBehaviour
         {
             realtimeAvatarManager.localAvatarPrefab = Resources.Load("XRPlayer" + scene.name) as GameObject;
             realtimeAvatarManager.CreateAvatarIfNeeded();
+
+            if (scene.name.Equals("MainMenu"))
+            {
+                SpawnDiscs();
+            }
+        }
+    }
+
+    private void Realtime_didConnectToRoom(Realtime realtime)
+    {
+        SpawnDiscs();
+    }
+
+    /// <summary>
+    /// Instantiates the discs for each game. Needs to occur when joining a room, and whenever the main menu is re-entered
+    /// </summary>
+    void SpawnDiscs()
+    {
+        Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+        options.useInstance = realtime;
+        options.ownedByClient = true;
+
+        foreach (string s in vinylDiscNames)
+        {
+            Realtime.Instantiate("Vinyls/Vinyl_" + s, options);
         }
     }
 }

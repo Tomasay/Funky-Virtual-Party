@@ -106,7 +106,7 @@ public class Fireball : MonoBehaviour
 
     private void TriggerExplosion()
     {
-        //syncer.IsActive = false;
+        syncer.IsActive = false;
         col.enabled = false;
         syncer.ExplosionTrigger = true;
         syncer.explosion.Play();
