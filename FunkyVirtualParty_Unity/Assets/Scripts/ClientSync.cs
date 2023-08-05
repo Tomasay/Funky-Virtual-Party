@@ -126,11 +126,19 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     void OnDeathTriggerChanged(ClientSyncModel previousModel, bool val)
     {
+        Debug.Log("OnDeath: " + val);
         if (val)
         {
             OnDeath.Invoke();
-            model.onDeathTrigger = false;
+            Invoke("SetOnDeathFalse", 0.5f);
         }
     }
     #endregion
+
+    //Methods to reset play and stop triggers back to false
+    //NOTE these are set back to false with a small delay, as setting them back immediately would cause the initial trigger to not invoke
+    void SetOnDeathFalse()
+    {
+        model.onDeathTrigger = false;
+    }
 }

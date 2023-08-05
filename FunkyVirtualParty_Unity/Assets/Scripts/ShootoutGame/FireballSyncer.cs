@@ -15,7 +15,9 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
     [SerializeField] public Color minColor, maxColor;
     [SerializeField] public Color emberColor, emberColorBoosted;
     [SerializeField] public Color boostedMainColor, boostedSecondaryColor;
+    [SerializeField] SpriteRenderer indicator;
 
+    private int maxIndicatorDistance = 4;
     private int fireballExplosionRange = 1;
 
     public float scaleForBoosted = 0.8f; //What level currentScale has to be for fireball to become boosted
@@ -25,6 +27,42 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
     public bool IsActive { get => model.active; set => model.active = value; }
     public bool ExplosionTrigger { get => model.explosionTrigger; set => model.explosionTrigger = value; }
 
+    private void Update()
+    {
+#if UNITY_WEBGL
+        if(model.active)
+        {
+            //Check to see if above iceberg
+            if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, maxIndicatorDistance))
+            {
+                if (hit.transform.gameObject.name.Contains("Iceberg_Collider"))
+                {
+                    //Enable indicator
+                    indicator.enabled = true;
+                    indicator.transform.position = hit.point + new Vector3(0, 0.1f, 0);
+                    indicator.transform.rotation = Quaternion.Euler(Quaternion.identity.eulerAngles + new Vector3(-90, 0, 0));
+
+                    //Color and size
+                    float t = hit.distance / maxIndicatorDistance;
+                    indicator.transform.localScale = Vector3.one * Mathf.Lerp(0.25f, 2.5f, t);
+                    indicator.color = Color.Lerp(Color.red, Color.yellow, t);
+                }
+                else
+                {
+                    indicator.enabled = false;
+                }
+            }
+            else
+            {
+                indicator.enabled = false;
+            }
+        }
+        else
+        {
+            indicator.enabled = false;
+        }
+#endif
+    }
 
     protected override void OnRealtimeModelReplaced(FireballSyncModel previousModel, FireballSyncModel currentModel)
     {
@@ -55,7 +93,7 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
         }
     }
 
-    #region Variable Callbacks
+#region Variable Callbacks
     void OnScaleChange(FireballSyncModel previousModel, float val)
     {
         if (!IsBoosted)

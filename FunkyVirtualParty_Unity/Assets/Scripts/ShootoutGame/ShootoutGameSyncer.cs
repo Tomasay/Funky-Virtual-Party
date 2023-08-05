@@ -22,15 +22,8 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
 
     private void Awake()
     {
-        //Singleton instantiation
-        if (!instance)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        //Singleton
+        instance = this;
 
         if (OnStateChangeEvent == null)
             OnStateChangeEvent = new MyStringEvent();

@@ -253,18 +253,21 @@ public class ShootoutGameClientPlayer : ClientPlayer
             animSyncer.Trigger = "Jump";
 
             // Jump!
-            GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
+            rb.AddForce(Vector3.up * jumpForce);
         }
     }
 
     void OnPlayerDeath()
     {
-        iceCube.SetActive(true);
         playerNameText.enabled = false;
         Col.enabled = false;
+        rb.useGravity = false;
+        rb.isKinematic = true;
 
         anim.SetTrigger("FallIntoWater");
         StartCoroutine("SetStandingPose");
+
+        isAlive = false;
     }
 
     public void TriggerIceCubeAnimation(Vector3 holeCenterPos)
@@ -274,6 +277,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
         splashPos = new Vector3(holeCenterPos.x, 25, holeCenterPos.z);
 
         CanMove = false;
+
+        Col.enabled = false;
+        rb.useGravity = false;
+        rb.isKinematic = true;
 
         transform.DOMoveX(holeCenterPos.x, 0.25f);
         transform.DOMoveZ(holeCenterPos.z, 0.25f);
@@ -296,12 +303,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
         playerNameText.enabled = false;
 
-        Col.enabled = false;
-        GetComponent<Rigidbody>().useGravity = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-
-        CanMove = false;
-
         //Put player under water
         transform.position = new Vector3(transform.position.x, 24.5f, transform.position.z);
 
@@ -312,6 +313,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         yield return new WaitForSeconds(1.75f);
 
+        iceCube.SetActive(true);
         smr.enabled = true;
         anim.SetTrigger("StandingPose");
     }

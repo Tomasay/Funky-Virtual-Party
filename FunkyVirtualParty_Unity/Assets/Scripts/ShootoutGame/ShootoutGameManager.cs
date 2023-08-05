@@ -11,7 +11,6 @@ public class ShootoutGameManager : MonoBehaviour
 {
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private TMP_Text vrInfoText, vrGameTimeText;
-    private bool countingDown = false;
     private float timeRemaining;
 
 #if UNITY_EDITOR
@@ -59,10 +58,6 @@ public class ShootoutGameManager : MonoBehaviour
             case "tutorial":
                 break;
             case "countdown":
-                if (!countingDown)
-                {
-                    StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
-                }
                 break;
             case "game loop":
                 timeRemaining -= Time.deltaTime;
@@ -100,6 +95,8 @@ public class ShootoutGameManager : MonoBehaviour
             case "tutorial":
                 break;
             case "countdown":
+                StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
+
                 //Setup client death events. Waiting till countdown to ensure all clients have been spawned in
                 foreach (ShootoutGameClientPlayer cp in ShootoutGameClientPlayer.clients)
                 {
@@ -129,15 +126,16 @@ public class ShootoutGameManager : MonoBehaviour
             }
         }
 
+        Debug.Log("Players alive: " + playersAlive);
+
         if (playersAlive == 0)
         {
-            ShootoutGameSyncer.instance.State = "vr player wins";
+            ShootoutGameSyncer.instance.State = "vr player won";
         }
     }
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        countingDown = true;
         SetVRPlayerCanThrowFireballs(true);
 
         yield return new WaitForSeconds(1);
@@ -154,8 +152,6 @@ public class ShootoutGameManager : MonoBehaviour
         vrInfoText.text = "";
 
         ShootoutGameSyncer.instance.State = "game loop";
-
-        countingDown = false;
     }
 
     IEnumerator GameOver(int countdown, string txt)
