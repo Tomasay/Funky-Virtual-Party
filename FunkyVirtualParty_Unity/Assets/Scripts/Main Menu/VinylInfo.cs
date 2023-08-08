@@ -50,7 +50,10 @@ public class VinylInfo : MonoBehaviour
         grabbable.onUnhighlight.AddListener(OnUnhighlight);
 
 #if UNITY_ANDROID
-        vinylPreview.material = previewMat;
+        if (previewMat)
+        {
+            vinylPreview.material = previewMat;
+        }
 #endif
     }
 
