@@ -113,6 +113,7 @@ public class TutorialMenu : MonoBehaviour
         newPlayerIcon.GetComponentsInChildren<Image>(true)[2].gameObject.SetActive(true);
 
         vrPlayerIcons.Add(-1, newPlayerIcon);
+        Debug.Log("Vr Player Icon Added!");
     }
 
     public void ReadyUpVR()

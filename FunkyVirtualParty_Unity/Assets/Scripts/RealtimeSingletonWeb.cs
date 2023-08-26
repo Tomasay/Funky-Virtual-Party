@@ -54,8 +54,10 @@ public class RealtimeSingletonWeb : MonoBehaviour
     public RealtimeAvatar VRAvatar { get => avatarManager.avatars[0]; }
     public bool isVRAvatarSpawned { get => avatarManager.avatars.Count > 0; }
 
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void ReloadPage();
+#endif
 
     private void Awake()
     {
@@ -90,7 +92,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
     {
         if(!avatar.isOwnedRemotelyInHierarchy) //Check to make sure avatar isn't just being destroyed to switch scenes
         {
+#if UNITY_WEBGL
             ReloadPage();
+#endif
         }
     }
 
@@ -125,7 +129,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         {
             SetJoinedUI();
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && UNITY_WEBGL
             if(keyboardController) keyboardController.CloseKeyboard();
 #endif
 

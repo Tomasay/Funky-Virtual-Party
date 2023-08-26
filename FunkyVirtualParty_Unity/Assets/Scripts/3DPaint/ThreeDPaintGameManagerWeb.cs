@@ -9,6 +9,7 @@ using System.Linq;
 
 public class ThreeDPaintGameManagerWeb : GameManagerWeb
 {
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void CloseInputKeyboard();
 
@@ -20,6 +21,7 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
     [DllImport("__Internal")]
     private static extern void SetPointerDownOnButton(bool isDown);
+#endif
 
     [SerializeField]
     TMP_Text headerText;
@@ -325,7 +327,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
     public void ButtonPointerDown()
     {
+#if UNITY_WEBGL
         SetPointerDownOnButton(true);
+#endif
     }
 
     public void ButtonPointerUp()
@@ -336,7 +340,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     IEnumerator ButtonDown()
     {
         yield return new WaitForSeconds(1);
+#if UNITY_WEBGL
         SetPointerDownOnButton(false);
+#endif
     }
 
     public void CheckAnswerInput(string input)
@@ -346,7 +352,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
     public void SetField(TMP_InputField f)
     {
+#if UNITY_WEBGL
         UpdateInputFieldText(f.text);
+#endif
+        
     }
 
     public void SubmitAnswer()
@@ -354,7 +363,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.Emit("InfoFromPlayer", answerInputField.text);
 
         typingAnswer = false;
+#if UNITY_WEBGL
         CloseInputKeyboard();
+#endif
         answerInputField.DeactivateInputField();
 
         headerText.text = "Waiting for all players to submit their answer...";

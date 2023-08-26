@@ -29,7 +29,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
         }
         else
         {
-            Realtime.Destroy(gameObject);
+            Destroy(gameObject);
         }
 
         DontDestroyOnLoad(gameObject);

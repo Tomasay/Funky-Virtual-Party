@@ -91,8 +91,6 @@ MonoBehaviour:
   rb: {fileID: 566606611587223269}
   chargeCanvas: {fileID: 5515594925973633003}
   chargeIndicator: {fileID: 5745029252361561337}
-  minSize: 0.5
-  maxSize: 3
   fireballGrowSpeed: 0.25
   minHoleScale: 0.05
   maxHoleScale: 0.15
@@ -147,36 +145,9 @@ MonoBehaviour:
   onGrab:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1517035223848305831}
-        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
-          Normcore
-        m_MethodName: RequestOwnership
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
-          Normcore
-        m_MethodName: RequestOwnership
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6596913273203820248}
-        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
-          Normcore
-        m_MethodName: RequestOwnership
+      - m_Target: {fileID: 3294322318788967274}
+        m_TargetAssemblyTypeName: Fireball, Assembly-CSharp
+        m_MethodName: RequestRealtimes
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -314,6 +285,8 @@ MonoBehaviour:
   ember: {fileID: 6426614674339485571}
   fireTrail: {fileID: 5027753823039684387}
   boostedParticleEffect: {fileID: 8869947564070634049}
+  minSize: 0.5
+  maxSize: 3
   minColor: {r: 1, g: 0.14509805, b: 0, a: 0.5019608}
   maxColor: {r: 1, g: 0.92941177, b: 0.7019608, a: 1}
   emberColor: {r: 0.8235294, g: 0.47058824, b: 0.23137255, a: 1}

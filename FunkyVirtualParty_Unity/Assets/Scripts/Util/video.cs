@@ -9,12 +9,8 @@ public class video : MonoBehaviour
     public VideoPlayer videoPlayer;
     public UnityEngine.UI.RawImage image;
 
-    [DllImport("__Internal")]
-    private static extern void HTMLButtonPlugin();
-
     void Start(){
         playVideoWithoutSound();
-        //HTMLButtonPlugin();
     }
     public void playVideoWithoutSound()
     {

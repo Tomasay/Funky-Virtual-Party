@@ -15,7 +15,6 @@ public class Fireball : MonoBehaviour
     [SerializeField] public Rigidbody rb;
     [SerializeField] public Canvas chargeCanvas;
     [SerializeField] public Image chargeIndicator;
-    [SerializeField] public float minSize, maxSize;
     [SerializeField] float fireballGrowSpeed = 0.25f;
     [SerializeField] float minHoleScale, maxHoleScale;
 
@@ -60,7 +59,6 @@ public class Fireball : MonoBehaviour
         if(syncer.IsActive && !isDropped)
         {
             syncer.CurrentScale = Mathf.Lerp(syncer.CurrentScale, 1, fireballGrowSpeed * Time.deltaTime);
-            SetScale();
 
             chargeIndicator.color = Color.Lerp(syncer.minColor, syncer.maxColor, syncer.CurrentScale);
             chargeIndicator.fillAmount = syncer.CurrentScale / syncer.scaleForBoosted;
@@ -120,21 +118,16 @@ public class Fireball : MonoBehaviour
             {
                 if(f.readyToSpawn)
                 {
-                    //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballActivateMini", f.objectSyncer.objectID);
-#if UNITY_ANDROID
-                    //objectSyncer.ManualSendTrajectory();
-#endif
+                    f.RequestRealtimes();
 
                     //Set pos to current explosion
                     f.transform.position = transform.position + Vector3.up;
 
                     //Enable them and set scale
-                    f.readyToSpawn = false;
                     f.Activate();
                     f.OnDrop();
                     
                     f.syncer.CurrentScale = 0.5f;
-                    f.SetScale();
 
                     //Launch them outwards
                     switch (spawnedCount)
@@ -198,16 +191,6 @@ public class Fireball : MonoBehaviour
         f.col.enabled = enabled;
     }
 
-    public void SetScale()
-    {
-        float s = Mathf.Lerp(minSize, maxSize, syncer.CurrentScale);
-
-        Vector3 scale = new Vector3(s, s, s);
-        syncer.fireball.transform.localScale = scale;
-        syncer.explosion.transform.localScale = scale;
-        syncer.smokePuff.transform.localScale = scale;
-    }
-
     public void Activate()
     {
         syncer.IsActive = true;
@@ -223,10 +206,19 @@ public class Fireball : MonoBehaviour
         chargeIndicator.enabled = false;
     }
 
+    public void RequestRealtimes()
+    {
+        GetComponent<RealtimeTransform>().RequestOwnership();
+        syncer.smokePuff.GetComponent<RealtimeTransform>().RequestOwnership();
+        syncer.explosion.GetComponent<RealtimeTransform>().RequestOwnership();
+
+        syncer.fireball.GetComponent<RealtimeView>().RequestOwnership();
+        syncer.boostedParticleEffect.GetComponent<RealtimeView>().RequestOwnership();
+    }
+
     private void Reset()
     {
         syncer.CurrentScale = 0;
-        syncer.fireball.transform.localScale = new Vector3(minSize, minSize, minSize);
         syncer.mainFireball.StartColor = syncer.minColor;
         syncer.ember.StartColor = syncer.emberColor;
         syncer.fireTrail.StartColor = syncer.emberColor;

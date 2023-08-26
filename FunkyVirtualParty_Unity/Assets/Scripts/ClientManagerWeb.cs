@@ -38,8 +38,11 @@ public class ClientManagerWeb : MonoBehaviour
     //id of vr headset
     string hostID;
 
-    [DllImport("__Internal")]
-    private static extern void ReloadPage();
+#if UNITY_WEBGL
+        [DllImport("__Internal")]
+        private static extern void ReloadPage();
+#endif
+    
 
     //Check to make sure we do not load main menu consecutively
     private bool isInMainMenu = true;
@@ -61,7 +64,9 @@ public class ClientManagerWeb : MonoBehaviour
             manager.Socket.On<string, byte[]>("playerInfoToClient", playerInfoReceived);
             manager.Socket.On<string, string, int, float, int>("syncCustomizationsFromServer", SyncCustomizations);
             manager.Socket.On<byte, float, float, float, bool>("syncPlayerPosToClient", SyncPlayerPos);
-            manager.Socket.On("roomClosed", ReloadPage);
+#if UNITY_WEBGL
+        manager.Socket.On("roomClosed", ReloadPage);
+#endif
             manager.Socket.On<string>("minigameStart", LoadGame);
             manager.Socket.On("readyUpVR", OnVRReadyUp);
             manager.Socket.On<byte>("readyUp", OnReadyUp);
@@ -196,7 +201,9 @@ public class ClientManagerWeb : MonoBehaviour
 
         if(id.Equals(hostID))
         {
-            ReloadPage();
+#if UNITY_WEBGL
+        ReloadPage();
+#endif
         }
 
         if (GetPlayerBySocketID(id))

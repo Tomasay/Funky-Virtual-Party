@@ -7,29 +7,32 @@ using UnityEngine.EventSystems;
 
 public class KeyboardController : MonoBehaviour
 {
-    [DllImport("__Internal")]
-    private static extern void CreateDummyInput();
+#if UNITY_WEBGL
+        [DllImport("__Internal")]
+        private static extern void CreateDummyInput();
 
-    [DllImport("__Internal")]
-    private static extern void CloseInputKeyboard();
+        [DllImport("__Internal")]
+        private static extern void CloseInputKeyboard();
 
-    [DllImport("__Internal")]
-    private static extern void OnKeyboardInput();
+        [DllImport("__Internal")]
+        private static extern void OnKeyboardInput();
 
-    [DllImport("__Internal")]
-    private static extern void UpdateInputFieldText(string txt);
+        [DllImport("__Internal")]
+        private static extern void UpdateInputFieldText(string txt);
 
-    [DllImport("__Internal")]
-    private static extern void SetPointerDownOnButton(bool isDown);
+        [DllImport("__Internal")]
+        private static extern void SetPointerDownOnButton(bool isDown);
 
-    [DllImport("__Internal")]
-    private static extern void StoreNameData(string name);
+        [DllImport("__Internal")]
+        private static extern void StoreNameData(string name);
 
-    [DllImport("__Internal")]
-    private static extern string GetNameData();
+        [DllImport("__Internal")]
+        private static extern string GetNameData();
 
-    [DllImport("__Internal")]
-    private static extern string CheckURLPartyCode();
+        [DllImport("__Internal")]
+        private static extern string CheckURLPartyCode();
+#endif
+    
 
     [SerializeField] TMP_InputField nameField, codeField;
     [SerializeField] ButtonEvents nameFieldButton, codeFieldButton;
@@ -47,7 +50,7 @@ public class KeyboardController : MonoBehaviour
 #if UNITY_EDITOR
         nameFieldButton.gameObject.SetActive(false);
         codeFieldButton.gameObject.SetActive(false);
-#else
+#elif UNITY_WEBGL
         nameFieldButton.onPointerDown.AddListener(ButtonPointerDown);
         nameFieldButton.onPointerUp.AddListener(ButtonPointerUp);
         nameFieldButton.onPointerUp.AddListener(delegate { SetField(nameField); });
@@ -70,7 +73,7 @@ public class KeyboardController : MonoBehaviour
 
     }
 
-#if !UNITY_EDITOR
+#if !UNITY_EDITOR && UNITY_WEBGL
     private void Update()
     {
 

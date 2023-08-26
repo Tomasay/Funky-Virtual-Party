@@ -12,6 +12,7 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
     [SerializeField] public Rigidbody rb;
     //[SerializeField] public ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail, boostedParticleEffect;
     [SerializeField] public ParticleSystemSyncer mainFireball, explosion, smokePuff, ember, fireTrail, boostedParticleEffect;
+    [SerializeField] public float minSize, maxSize;
     [SerializeField] public Color minColor, maxColor;
     [SerializeField] public Color emberColor, emberColorBoosted;
     [SerializeField] public Color boostedMainColor, boostedSecondaryColor;
@@ -96,10 +97,19 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 #region Variable Callbacks
     void OnScaleChange(FireballSyncModel previousModel, float val)
     {
+        Debug.Log("Scale: " + val);
+
         if (!IsBoosted)
         {
-            mainFireball.StartColor = Color.Lerp(minColor, maxColor, CurrentScale);
+            mainFireball.StartColor = Color.Lerp(minColor, maxColor, val);
         }
+
+        float s = Mathf.Lerp(minSize, maxSize, val);
+
+        Vector3 scale = new Vector3(s, s, s);
+        fireball.transform.localScale = (s == 0) ? new Vector3(minSize, minSize, minSize) : scale;
+        explosion.transform.localScale = scale;
+        smokePuff.transform.localScale = scale;
     }
 
     void OnIsBoostedChange(FireballSyncModel previousModel, bool val)
@@ -111,6 +121,8 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 
     void OnIsActiveChange(FireballSyncModel previousModel, bool val)
     {
+        Debug.Log("IsActive: " + val);
+
         fireball.SetActive(val);
 
         rb.isKinematic = !val;

@@ -36,6 +36,9 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
 #if UNITY_ANDROID //Only host has to worry about triggering allPlayersReady event
     private void Start()
     {
+        State = "tutorial";
+        VRPlayerReady = false;
+
         tutorial.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
 
@@ -65,7 +68,9 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
             //Update to match new data
             if (model.vrPlayerReady && !isWeb)
             {
-                tutorial.ReadyUpVR();
+                Debug.Log("Trying to ready up");
+                tutorial.ReadyUpVR(); 
+                Debug.Log("Ready Upped!");
             }
             else if (model.vrPlayerReady && isWeb)
             {
