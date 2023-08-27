@@ -28,6 +28,8 @@ public class TutorialMenu : MonoBehaviour
 
     private void Awake()
     {
+        instance = this;
+
         if (allPlayersReady == null)
             allPlayersReady = new UnityEvent();
 
@@ -36,8 +38,6 @@ public class TutorialMenu : MonoBehaviour
 
     void Start()
     {
-        instance = this;
-
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();

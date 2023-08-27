@@ -15,10 +15,13 @@ public class TutorialMenuClient : MonoBehaviour
 
     private Dictionary<int, GameObject> clientPlayerIcons;
 
-    void Start()
+    private void Awake()
     {
         instance = this;
+    }
 
+    void Start()
+    {
         tutorialCanvas.enabled = true;
 
         clientPlayerIcons = new Dictionary<int, GameObject>();
