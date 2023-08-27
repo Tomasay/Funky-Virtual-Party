@@ -6,6 +6,8 @@ using TMPro;
 
 public class TutorialMenuClient : MonoBehaviour
 {
+    public static TutorialMenuClient instance;
+
     [SerializeField] Canvas tutorialCanvas, controllerCanvas;
 
     [SerializeField] GameObject playerIconPrefab, clientPlayerIconsParent;
@@ -15,6 +17,8 @@ public class TutorialMenuClient : MonoBehaviour
 
     void Start()
     {
+        instance = this;
+
         tutorialCanvas.enabled = true;
 
         clientPlayerIcons = new Dictionary<int, GameObject>();

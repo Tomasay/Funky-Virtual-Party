@@ -12,6 +12,8 @@ using UnityEngine.InputSystem;
 
 public class TutorialMenu : MonoBehaviour
 {
+    public static TutorialMenu instance;
+
     public UnityEvent allPlayersReady;
 
     [SerializeField] Canvas vrCanvas;
@@ -34,6 +36,8 @@ public class TutorialMenu : MonoBehaviour
 
     void Start()
     {
+        instance = this;
+
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();
@@ -83,12 +87,6 @@ public class TutorialMenu : MonoBehaviour
         }
     }
 
-    private void RemovePlayerIcon(int id)
-    {
-        Destroy(vrPlayerIcons[id]);
-        vrPlayerIcons.Remove(id);
-    }
-
     private void ReadyUp(ClientPlayer p)
     {
         vrPlayerIcons[p.realtimeView.ownerIDSelf].GetComponentInChildren<TMP_Text>().text = "READY";
@@ -113,11 +111,13 @@ public class TutorialMenu : MonoBehaviour
         newPlayerIcon.GetComponentsInChildren<Image>(true)[2].gameObject.SetActive(true);
 
         vrPlayerIcons.Add(-1, newPlayerIcon);
-        Debug.Log("Vr Player Icon Added!");
     }
 
     public void ReadyUpVR()
     {
+        if (!vrPlayerIcons.ContainsKey(-1))
+            return;
+
         vrPlayerIcons[-1].GetComponentInChildren<TMP_Text>().text = "READY";
         vrPlayerIcons[-1].GetComponent<Animator>().SetTrigger("Ready");
         vrPlayerIcons.Remove(-1);

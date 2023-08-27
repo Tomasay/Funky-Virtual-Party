@@ -15,9 +15,6 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
 
-    [SerializeField] private TutorialMenu tutorial;
-    [SerializeField] private TutorialMenuClient tutorialWeb;
-
     private bool isWeb;
 
     private void Awake()
@@ -36,15 +33,16 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
 #if UNITY_ANDROID //Only host has to worry about triggering allPlayersReady event
     private void Start()
     {
+        //Default states when entering scene
         State = "tutorial";
         VRPlayerReady = false;
 
-        tutorial.allPlayersReady.AddListener(delegate { State = "countdown"; });
+        TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
 
     private void OnDestroy()
     {
-        tutorial.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
+        TutorialMenu.instance.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
     }
 #endif
 
@@ -65,18 +63,6 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
                 currentModel.state = "tutorial";
             }
 
-            //Update to match new data
-            if (model.vrPlayerReady && !isWeb)
-            {
-                Debug.Log("Trying to ready up");
-                tutorial.ReadyUpVR(); 
-                Debug.Log("Ready Upped!");
-            }
-            else if (model.vrPlayerReady && isWeb)
-            {
-                tutorialWeb.ReadyUpVR();
-            }
-
             // Register for events
             currentModel.stateDidChange += OnStateChange;
             currentModel.vrPlayerReadyDidChange += OnVRPlayerReadyUp;
@@ -93,11 +79,11 @@ public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
     {
         if (val && !isWeb)
         {
-            tutorial.ReadyUpVR();
+            TutorialMenu.instance.ReadyUpVR();
         }
         else if (val && isWeb)
         {
-            tutorialWeb.ReadyUpVR();
+            TutorialMenuClient.instance.ReadyUpVR();
         }
     }
     #endregion

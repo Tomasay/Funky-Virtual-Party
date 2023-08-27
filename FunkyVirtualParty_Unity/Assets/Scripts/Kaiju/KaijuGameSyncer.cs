@@ -15,9 +15,6 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
 
-    [SerializeField] private TutorialMenu tutorial;
-    [SerializeField] private TutorialMenuClient tutorialWeb;
-
     private bool isWeb;
 
     private void Awake()
@@ -43,12 +40,12 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
 #if UNITY_ANDROID //Only host has to worry about triggering allPlayersReady event
     private void Start()
     {
-        tutorial.allPlayersReady.AddListener(delegate { State = "countdown"; });
+        TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
 
     private void OnDestroy()
     {
-        tutorial.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
+        TutorialMenu.instance.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
     }
 #endif
 
@@ -72,11 +69,11 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
             //Update to match new data
             if (model.vrPlayerReady && !isWeb)
             {
-                tutorial.ReadyUpVR();
+                TutorialMenu.instance.ReadyUpVR();
             }
             else if (model.vrPlayerReady && isWeb)
             {
-                tutorialWeb.ReadyUpVR();
+                TutorialMenuClient.instance.ReadyUpVR();
             }
 
             // Register for events
@@ -97,11 +94,11 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
     {
         if (val && !isWeb)
         {
-            tutorial.ReadyUpVR();
+            TutorialMenu.instance.ReadyUpVR();
         }
         else if (val && isWeb)
         {
-            tutorialWeb.ReadyUpVR();
+            TutorialMenuClient.instance.ReadyUpVR();
         }
     }
     #endregion

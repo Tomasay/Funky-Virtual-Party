@@ -17,8 +17,6 @@ public class KaijuGameSyncerWeb : RealtimeComponent<KaijuGameSyncModel>
 
     [SerializeField] private ParticleSystem countdownParticles;
 
-    [SerializeField] private TutorialMenuClient tutorial;
-
     public string State { get => model.state; set => model.state = value; }
 
     private void Awake()
@@ -51,7 +49,7 @@ public class KaijuGameSyncerWeb : RealtimeComponent<KaijuGameSyncModel>
             }
 
             //Update to match new data
-            if (model.vrPlayerReady) tutorial.ReadyUpVR();
+            if (model.vrPlayerReady) TutorialMenuClient.instance.ReadyUpVR();
 
             // Register for events
             currentModel.stateDidChange += OnStateChange;
@@ -89,7 +87,7 @@ public class KaijuGameSyncerWeb : RealtimeComponent<KaijuGameSyncModel>
         Debug.Log("VR PLAYER READIED UP");
         if (val)
         {
-            tutorial.ReadyUpVR();
+            TutorialMenuClient.instance.ReadyUpVR();
         }
     }
     #endregion
