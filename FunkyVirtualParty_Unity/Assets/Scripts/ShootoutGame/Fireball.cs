@@ -179,7 +179,7 @@ public class Fireball : MonoBehaviour
     {
         Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
         options.ownedByClient = true;
-        GameObject newHole = Realtime.Instantiate("IcebergHole", pos, Quaternion.identity, options);
+        GameObject newHole = Realtime.Instantiate("IcyIgnition/IcebergHole", pos, Quaternion.identity, options);
 
         float holeSize = Mathf.Lerp(minHoleScale, maxHoleScale, syncer.CurrentScale);
         newHole.transform.localScale = new Vector3(holeSize, holeSize, holeSize);

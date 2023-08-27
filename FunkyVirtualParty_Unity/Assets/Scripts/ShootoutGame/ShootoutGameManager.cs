@@ -10,6 +10,7 @@ using Normal.Realtime;
 public class ShootoutGameManager : MonoBehaviour
 {
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
+    private const int FIREBALLS_AMOUNT = 8;
     private TMP_Text vrInfoText, vrGameTimeText;
     private float timeRemaining;
 
@@ -26,6 +27,14 @@ public class ShootoutGameManager : MonoBehaviour
         ShootoutGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
+        //Spawn fireballs
+        for (int i = 0; i < FIREBALLS_AMOUNT; i++)
+        {
+            Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+            options.ownedByClient = true;
+            Realtime.Instantiate("IcyIgnition/Fireball", Vector3.zero, Quaternion.identity, options);
+        }
 
 #if UNITY_EDITOR
         //currentWaypoints = new Vector3[ClientManager.instance.Players.Count];

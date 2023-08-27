@@ -98,6 +98,9 @@ public class TutorialMenuClient : MonoBehaviour
 
     public void ReadyUpVR()
     {
+        if (!clientPlayerIcons.ContainsKey(-1))
+            return;
+
         clientPlayerIcons[-1].GetComponentInChildren<TMP_Text>().text = "READY";
         clientPlayerIcons[-1].GetComponent<Animator>().SetTrigger("Ready");
         clientPlayerIcons.Remove(-1);

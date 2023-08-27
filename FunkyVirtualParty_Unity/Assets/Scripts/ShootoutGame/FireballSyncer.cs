@@ -97,8 +97,6 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 #region Variable Callbacks
     void OnScaleChange(FireballSyncModel previousModel, float val)
     {
-        Debug.Log("Scale: " + val);
-
         if (!IsBoosted)
         {
             mainFireball.StartColor = Color.Lerp(minColor, maxColor, val);
@@ -121,8 +119,6 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 
     void OnIsActiveChange(FireballSyncModel previousModel, bool val)
     {
-        Debug.Log("IsActive: " + val);
-
         fireball.SetActive(val);
 
         rb.isKinematic = !val;
@@ -139,8 +135,15 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
             RealtimeSingletonWeb.instance.LocalPlayer.GetComponent<ShootoutGameClientPlayer>().CheckCollisionWithFireball(transform.position, Mathf.Max(2, model.currentScale * fireballExplosionRange));
 #endif
 
-            ExplosionTrigger = false;
+            Invoke("SetExplosionTriggerFalse", 0.5f);
         }
     }
-#endregion
+    #endregion
+
+    //Method to reset ExplosionTrigger back to false
+    //NOTE these are set back to false with a small delay, as setting them back immediately would cause the initial trigger to not invoke
+    void SetExplosionTriggerFalse()
+    {
+        model.explosionTrigger = false;
+    }
 }

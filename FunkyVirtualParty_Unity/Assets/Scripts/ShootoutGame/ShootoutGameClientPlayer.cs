@@ -26,7 +26,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     private SerializedVector3 splashPos;
 
-    const float frictionCoefficient = 0.0075f;
+    const float frictionCoefficient = 0.01f;
 
     public Camera cam;
 
@@ -136,6 +136,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         }
 
 #if UNITY_EDITOR
+        /*
         if (isDebugPlayer && isExplosion)
         {
             //ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
@@ -150,18 +151,13 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             explosionTimer = explosionTimerDefault;
         }
+        */
 #endif
         if (isLocal && isExplosion)
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(collisionVector.normalized * -0.5f));
             Move(collisionVector.normalized * -0.5f, false, false, input);
-
-            /*
-            Vector3 positionDifference = posFromHost - transform.position;
-            transform.Translate((movement + positionDifference / 4) * Time.deltaTime);
-            */
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -219,10 +215,10 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
         options.ownedByClient = true;
-        GameObject splash = Realtime.Instantiate("Water Splash", collisionPoint, Quaternion.identity, options);
+        GameObject splash = Realtime.Instantiate("IcyIgnition/Water Splash", collisionPoint, Quaternion.identity, options);
         splash.GetComponent<ParticleSystemStoppedEvent>().ParticleSystemStopped.AddListener(delegate { Realtime.Destroy(splash.gameObject); });
 
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
         TriggerHaptic(500);
 #endif
     }
@@ -234,6 +230,9 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         float dist = Vector3.Distance(firePos, transform.position);
         isExplosion = dist < radius;
+
+        Debug.Log("Checking collision, dist: " + dist + " radius: " + radius);
+
         if(isExplosion)
         {
             collisionVector = firePos - transform.position;

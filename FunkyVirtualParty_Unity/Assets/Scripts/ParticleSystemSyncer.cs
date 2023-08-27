@@ -74,7 +74,8 @@ public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
 
     void OnStartColorChange(ParticleSystemSyncModel previousModel, Color val)
     {
-        pSystem.startColor = val;
+        ParticleSystem.MainModule main = pSystem.main;
+        main.startColor = val;
     }
     #endregion
 
