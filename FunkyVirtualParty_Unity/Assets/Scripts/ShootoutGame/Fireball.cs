@@ -219,13 +219,10 @@ public class Fireball : MonoBehaviour
     private void Reset()
     {
         syncer.CurrentScale = 0;
-        syncer.mainFireball.StartColor = syncer.minColor;
-        syncer.ember.StartColor = syncer.emberColor;
-        syncer.fireTrail.StartColor = syncer.emberColor;
         syncer.IsActive = false;
+        syncer.IsBoosted = false;
         hasExploded = false;
         isDropped = false;
-        syncer.IsBoosted = false;
         chargeIndicator.fillAmount = 0;
         chargeIndicator.enabled = true;
         readyToSpawn = true;

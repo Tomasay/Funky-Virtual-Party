@@ -19,7 +19,7 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
     [SerializeField] SpriteRenderer indicator;
 
     private int maxIndicatorDistance = 4;
-    private int fireballExplosionRange = 1;
+    private int fireballExplosionRange = 2;
 
     public float scaleForBoosted = 0.8f; //What level currentScale has to be for fireball to become boosted
 
@@ -112,9 +112,9 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 
     void OnIsBoostedChange(FireballSyncModel previousModel, bool val)
     {
-        mainFireball.StartColor = boostedMainColor;
-        ember.StartColor = emberColorBoosted;
-        fireTrail.StartColor = boostedSecondaryColor;
+        mainFireball.StartColor =  val ? boostedMainColor : minColor;
+        ember.StartColor = val ? emberColorBoosted : emberColor;
+        fireTrail.StartColor = val ? boostedSecondaryColor : emberColor;
     }
 
     void OnIsActiveChange(FireballSyncModel previousModel, bool val)
@@ -132,7 +132,7 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
             rb.isKinematic = true;
 
 #if UNITY_WEBGL
-            RealtimeSingletonWeb.instance.LocalPlayer.GetComponent<ShootoutGameClientPlayer>().CheckCollisionWithFireball(transform.position, Mathf.Max(2, model.currentScale * fireballExplosionRange));
+            RealtimeSingletonWeb.instance.LocalPlayer.GetComponent<ShootoutGameClientPlayer>().CheckCollisionWithFireball(transform.position, fireballExplosionRange, model.currentScale);
 #endif
 
             Invoke("SetExplosionTriggerFalse", 0.5f);

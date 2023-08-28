@@ -41,7 +41,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         syncer.OnDeath.AddListener(OnPlayerDeath);
 
-        startingSpeed = 1.25f;
+        startingSpeed = 1.5f;
 
         base.Awake();
     }
@@ -157,7 +157,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-            Move(collisionVector.normalized * -0.5f, false, false, input);
+            Move(collisionVector * -1, false, false, input);
 
             explosionTimer -= Time.deltaTime;
             if (explosionTimer <= 0)
@@ -226,16 +226,15 @@ public class ShootoutGameClientPlayer : ClientPlayer
     bool isExplosion = false;
     float explosionTimer = 0.25f;
     const float explosionTimerDefault = 0.25f;
-    public void CheckCollisionWithFireball(Vector3 firePos, float radius)
+    public void CheckCollisionWithFireball(Vector3 firePos, float radius, float fireballScale)
     {
         float dist = Vector3.Distance(firePos, transform.position);
-        isExplosion = dist < radius;
-
-        Debug.Log("Checking collision, dist: " + dist + " radius: " + radius);
+        isExplosion = dist < (radius * fireballScale);
 
         if(isExplosion)
         {
-            collisionVector = firePos - transform.position;
+            Vector3 col = (firePos - transform.position) * (fireballScale * 2);
+            collisionVector = new Vector2(col.x, col.z);
         }
 
     }
