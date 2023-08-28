@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System.Runtime.InteropServices;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class KeyboardController : MonoBehaviour
 {
@@ -73,18 +74,31 @@ public class KeyboardController : MonoBehaviour
 
     }
 
-#if !UNITY_EDITOR && UNITY_WEBGL
+
     private void Update()
     {
-
+#if !UNITY_EDITOR && UNITY_WEBGL
         //If input field is active, update it accordingly
         if (currentField)
         {
             currentField.ActivateInputField();
             currentField.caretPosition = currentField.text.Length;
         }
+
+        if (Keyboard.current.tabKey.wasPressedThisFrame && currentField == nameField)
+        {
+            SetField(codeField);
+        }
+
+#elif UNITY_EDITOR && UNITY_WEBGL
+        if (Keyboard.current.tabKey.wasPressedThisFrame && nameField.isFocused)
+        {
+            codeField.Select();
+        }
+#endif
     }
 
+#if !UNITY_EDITOR && UNITY_WEBGL
     public void ButtonPointerDown()
     {
         SetPointerDownOnButton(true);
