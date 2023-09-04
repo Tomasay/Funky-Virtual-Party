@@ -7,7 +7,7 @@ using PaintIn3D;
 using System.Runtime.InteropServices;
 using System.Linq;
 
-public class ThreeDPaintGameManagerWeb : GameManagerWeb
+public class ThreeDPaintGameManagerWeb : MonoBehaviour
 {
 #if UNITY_WEBGL
     [DllImport("__Internal")]
@@ -70,24 +70,20 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
     Camera drawingPhaseCamera, guessingPhaseCamera;
 
     [SerializeField]
+    MannequinSolverClient mannequinSolver;
+
+    [SerializeField]
     GameObject leaderboardPlayerCardPrefab, leaderboardParent;
     List<GameObject> currentLeaderboardCards;
-
-    private ThreeDPaintGameState state;
-    public ThreeDPaintGameState State { get => state; set => state = value; }
 
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
     bool guessing = false; //Are players guessing?
 
-    string chosenAnswerOwner;
-    Dictionary<string, string> answers;
     List<AnswerOptionButton> answerButtons, answerResults;
 
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
-
-    bool vrTutorialCompleted;
 
     private void Awake()
     {
@@ -100,15 +96,9 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         answerInputButton.onPointerDown.AddListener(ButtonPointerDown);
         answerInputButton.onPointerUp.AddListener(ButtonPointerUp);
 
-        if (ClientManagerWeb.instance)
+        foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-            if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.On<string, string>("InfoToXR", InfoReceived);
-
-            foreach (ClientPlayer cp in ClientManagerWeb.instance.Players)
-            {
-                playerPoints.Add(cp.PlayerSocketID, 0);
-            }
+            playerPoints.Add(cp.realtimeView.viewUUID, 0);
         }
 
         inputCanvas.enabled = true;
@@ -116,14 +106,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         resultsCanvas.enabled = false;
     }
 
-    protected override void OnDisable()
+    private void Start()
     {
-        base.OnDisable();
-
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-        ClientManagerWeb.instance.Manager.Socket.Off("InfoToXR");
-#endif
+        VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
+        VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerSubmittedAnswer);
     }
 
     void Update()
@@ -153,165 +139,142 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         }
     }
 
-    void InfoReceived(string info, string playerID)
+    void PlayerSubmittedAnswer(string answers)
     {
-        if (playersAnswering)
-        {
-            //Add answer to list
-            answers.Add(playerID, info);
+        //Check to see if all players have answered and if we're waiting on vr player
+        string[] answersSeparated = answers.Split('\n');
 
-            //If all answers are in but VR player is still going through tutorial
-            if (answers.Count == ClientManagerWeb.instance.Players.Count && vrTutorialCompleted == false)
-            {
-                headerText.text = "Waiting for VR player to complete tutorial...";
-            }
+        if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
+        {
+            headerText.text = "Waiting for VR player to complete tutorial...";
         }
     }
 
-    void MethodCalledFromServer(string methodName, string data)
+    void SetNewPrompt(string p)
     {
-        if (methodName.Equals("SetNewPrompt"))
-        {
-            inputCanvas.enabled = true;
-            answerInputField.text = "";
-            headerText.text = data; //Set prompt text
-            playerInputParent.SetActive(true); //Enable input
-            playersAnswering = true;
+        inputCanvas.enabled = true;
+        answerInputField.text = "";
+        headerText.text = p; //Set prompt text
+        playerInputParent.SetActive(true); //Enable input
+        playersAnswering = true;
 
-            guessing = false;
-            drawingModel.transform.rotation = Quaternion.Euler(0, 180, 0);
-            linesParent.transform.rotation = Quaternion.identity;
+        guessing = false;
+        drawingModel.transform.rotation = Quaternion.Euler(0, 180, 0);
+        linesParent.transform.rotation = Quaternion.identity;
 
-            //Clear answers from previous round
-            answers = new Dictionary<string, string>();
-            ClearPlayerAnswers();
+        //Clear answers from previous round
+        ClearPlayerAnswers();
 
-            //Reset any painting from previous round
-            paintTexture.Clear();
-            pen.EraseAllLines();
+        //Reset any painting from previous round
+        paintTexture.Clear();
+        pen.EraseAllLines();
 
-            //Reset results from previous round
-            ClearPlayerResults();
-        }
-        else if (methodName.Equals("ShowBlurredView"))
-        {
-            inputCanvas.enabled = false;
-
-            drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
-            timerText.text = FormatTime(drawTimeRemaining);
-            drawTimerCountingDown = true;
-
-            drawingPhaseCamera.gameObject.SetActive(true);
-            guessingPhaseCamera.gameObject.SetActive(false);
-        }
-        else if(methodName.Equals("ChosenAnswerOwner"))
-        {
-            chosenAnswerOwner = data;
-        }
-        else if (methodName.Equals("DoneDrawing"))
-        {
-            playersAnswering = false;
-            guessing = true;
-
-            guessingCanvas.enabled = true;
-
-            drawTimerCountingDown = false;
-
-            drawingPhaseCamera.gameObject.SetActive(false);
-            guessingPhaseCamera.gameObject.SetActive(true);
-
-            //Answer buttons
-            foreach (KeyValuePair<string, string> entry in answers)
-            {
-                GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(entry.Value, entry.Key); });
-                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                aob.SetText(entry.Value);
-                aob.playerID = entry.Key;
-                answerButtons.Add(aob);
-            }
-
-            //Answer results
-            foreach (KeyValuePair<string, string> entry in answers)
-            {
-                GameObject ab = Instantiate(answerButtonPrefab, answerResultsParent.transform);
-                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                aob.SetText(entry.Value);
-                aob.playerID = entry.Key;
-                answerResults.Add(aob);
-            }
-        }
-        else if(methodName.Equals("PlayerGuessed"))
-        {
-            //PlayerID:AnswerPlayerID
-            string[] info = data.Split(':');
-
-            AddPlayerToResults(info[0], info[1]);
-            if (info[1].Equals(chosenAnswerOwner))
-            {
-                playerPoints[info[0]] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
-            }
-        }
-        else if (methodName.Equals("VRGuessing"))
-        {
-            foreach (AnswerOptionButton aob in answerResults)
-            {
-                aob.SetColor(aob.playerID.Equals(chosenAnswerOwner) ? Color.green : Color.red);
-            }
-
-            resultsCanvas.enabled = true;
-        }
-        else if (methodName.Equals("GameOver"))
-        {
-            StartCoroutine("EndGame");
-        }
-        else if (methodName.Equals("VRPlayerGuessed"))
-        {
-            if (int.TryParse(data, out int newPoints))
-            {
-                vrPlayerPoints = newPoints;
-            }
-
-            StartCoroutine("DisplayLeaderboard");
-        }
-        else if (methodName.Equals("VRDoneWithTutorial"))
-        {
-            vrTutorialCompleted = true;
-        }
+        //Reset results from previous round
+        ClearPlayerResults();
     }
 
-    protected override void OnStateChange(string s)
+    protected void OnStateChange(string s)
     {
-        if (System.Enum.TryParse(s, out ThreeDPaintGameState newGameState))
+        switch (s)
         {
-            State = newGameState;
+            case "clients answering":
+                answerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
+                answerTimerCountingDown = true;
+                break;
+            case "vr posing":
+                headerText.text = "Waiting for VR player to set a pose...";
+                break;
+            case "vr painting":
+                //Bake mannequin IK
+                mannequinSolver.SetPoseColliders();
 
-            switch (State)
-            {
-                case ThreeDPaintGameState.ClientsAnswering:
-                    answerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
-                    answerTimerCountingDown = true;
-                    break;
-                case ThreeDPaintGameState.VRPosing:
-                    headerText.text = "Waiting for VR player to set a pose...";
-                    break;
-                case ThreeDPaintGameState.VRPainting:
-                    break;
-                case ThreeDPaintGameState.ClientsGuessing:
-                    //Make sure there's no lingering drawings
-                    pen.CanPaint = false;
-                    sprayGun.CanPaint = false;
-                    break;
-                case ThreeDPaintGameState.VRGuessing:
-                    answerTimerCountingDown = false;
-                    break;
-                case ThreeDPaintGameState.ShowingLeaderboard:
-                    break;
-                case ThreeDPaintGameState.GameOver:
-                    break;
-                default:
-                    break;
-            }
+                //Show blurred view
+                inputCanvas.enabled = false;
+
+                drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
+                timerText.text = FormatTime(drawTimeRemaining);
+                drawTimerCountingDown = true;
+
+                drawingPhaseCamera.gameObject.SetActive(true);
+                guessingPhaseCamera.gameObject.SetActive(false);
+                break;
+            case "clients guessing":
+                //Make sure there's no lingering drawings
+                pen.CanPaint = false;
+                sprayGun.CanPaint = false;
+
+                playersAnswering = false;
+                guessing = true;
+
+                guessingCanvas.enabled = true;
+
+                drawTimerCountingDown = false;
+
+                drawingPhaseCamera.gameObject.SetActive(false);
+                guessingPhaseCamera.gameObject.SetActive(true);
+
+                
+                string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+
+                //Answer buttons
+                foreach (string a in answersSeparated)
+                {
+                    string[] ownerAndAnswer = a.Split(':');
+
+                    GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                    ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.viewUUID, ownerAndAnswer[0]); });
+                    AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                    aob.SetText(ownerAndAnswer[1]);
+                    aob.playerID = ownerAndAnswer[0];
+                    answerButtons.Add(aob);
+                }
+
+                //Answer results
+                foreach (string a in answersSeparated)
+                {
+                    string[] ownerAndAnswer = a.Split(':');
+
+                    GameObject ab = Instantiate(answerButtonPrefab, answerResultsParent.transform);
+                    AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                    aob.SetText(ownerAndAnswer[1]);
+                    aob.playerID = ownerAndAnswer[0];
+                    answerResults.Add(aob);
+                }
+                break;
+            case "vr guessing":
+                //All players have guessed, so add guesses to results
+                string[] guessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
+                foreach (string g in guessesSeparated)
+                {
+                    string[] guessOwnerAndGuess = g.Split(':');
+
+                    AddPlayerToResults(guessOwnerAndGuess[0], guessOwnerAndGuess[1]);
+                }
+
+                //Display results
+                foreach (AnswerOptionButton aob in answerResults)
+                {
+                    aob.SetColor(aob.playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.red);
+                }
+
+                resultsCanvas.enabled = true;
+
+                answerTimerCountingDown = false;
+                break;
+            case "leaderboard":
+                /*
+                if (int.TryParse(data, out int newPoints))
+                {
+                    vrPlayerPoints = newPoints;
+                }
+                */
+
+                StartCoroutine("DisplayLeaderboard");
+                break;
+            case "game over":
+                break;
+            default:
+                break;
         }
     }
 
@@ -360,7 +323,14 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
 
     public void SubmitAnswer()
     {
-        if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.Emit("InfoFromPlayer", answerInputField.text);
+        if (VRtistrySyncer.instance.Answers.Equals(""))
+        {
+            VRtistrySyncer.instance.Answers = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.viewUUID + ":" + answerInputField.text);
+        }
+        else
+        {
+            VRtistrySyncer.instance.Answers += ("\n" + RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.viewUUID + ":" + answerInputField.text);
+        }
 
         typingAnswer = false;
 #if UNITY_WEBGL
@@ -372,9 +342,17 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         playerInputParent.SetActive(false);
     }
 
-    void SubmitGuess(string guess, string guessPlayerID)
+    void SubmitGuess(string clientID, string clientGuessID)
     {
-        if (ClientManagerWeb.instance) ClientManagerWeb.instance.Manager.Socket.Emit("InfoFromPlayer", guessPlayerID);
+        if(VRtistrySyncer.instance.Guesses.Equals(""))
+        {
+            VRtistrySyncer.instance.Guesses = clientID + ":" + clientGuessID;
+        }
+        else
+        {
+            VRtistrySyncer.instance.Guesses += "\n" + clientID + ":" + clientGuessID;
+        }
+
         guessingCanvas.enabled = false;
     }
 
@@ -386,8 +364,8 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
             //Find the answer that the player chose
             if (aob.playerID.Equals(answerPlayerID))
             {
-                ClientManagerWeb inst = ClientManagerWeb.instance;
-                aob.AddPlayerIcon(inst.GetPlayerBySocketID(playerID).syncer.Name, inst.GetPlayerBySocketID(playerID).syncer.Color);
+                ClientPlayer cp = ClientPlayer.GetClientByViewID(playerID);
+                aob.AddPlayerIcon(cp.syncer.Name, cp.syncer.Color);
                 return;
             }
         }
@@ -416,6 +394,24 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         answerResults = new List<AnswerOptionButton>();
     }
 
+    string GetAnswerByViewID(string ID)
+    {
+        string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+
+        //Answer buttons
+        foreach (string a in answersSeparated)
+        {
+            string[] ownerAndAnswer = a.Split(':');
+
+            if(ID.Equals(ownerAndAnswer[0]))
+            {
+                return ownerAndAnswer[1];
+            }
+        }
+
+        return "";
+    }
+
     IEnumerator DisplayLeaderboard()
     {
         resultsCanvas.enabled = false;
@@ -437,8 +433,8 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         foreach (KeyValuePair<string, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientManagerWeb.instance.GetPlayerBySocketID(entry.Key).syncer.Name;
-            newCard.GetComponentsInChildren<TMP_Text>()[1].text = answers[entry.Key];
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByViewID(entry.Key).syncer.Name;
+            newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByViewID(entry.Key);
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 
             currentLeaderboardCards.Add(newCard);
@@ -464,10 +460,10 @@ public class ThreeDPaintGameManagerWeb : GameManagerWeb
         leaderboardCanvas.enabled = false;
     }
 
-    IEnumerator EndGame()
+    public string FormatTime(float time)
     {
-        yield return new WaitForSeconds(5);
-
-        ClientManagerWeb.instance.LoadMainMenu();
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 }

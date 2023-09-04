@@ -66,20 +66,13 @@ public class ThreeDPen : MonoBehaviour
 
     private void Awake()
     {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-        ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
-#endif
-
         tipMesh.material.color = currentColor;
     }
 
-    private void OnDisable()
+    private void Start()
     {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
-#endif
+        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { isPainting = true; });
+        VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
     }
 
     void Update()
@@ -106,10 +99,10 @@ public class ThreeDPen : MonoBehaviour
     {
         if (canPaint)
         {
-            isPainting = true;
-
             CreateNewLine();
-            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenTriggerPressed", "");
+
+            VRtistrySyncer.instance.realtimeView.RequestOwnership();
+            VRtistrySyncer.instance.IsDrawing = true;
 
             HapticsManager.instance.TriggerHaptic(h.left, 999, 0.1f);
         }
@@ -119,41 +112,9 @@ public class ThreeDPen : MonoBehaviour
     {
         if (canPaint)
         {
-            isPainting = false;
             HapticsManager.instance.StopHaptics(h.left);
 
-            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PenTriggerReleased", "");
-        }
-    }
-#endif
-
-#if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
-    {
-        if (methodName.Equals("PenTriggerPressed"))
-        {
-            isPainting = true;
-            CreateNewLine();
-        }
-        else if(methodName.Equals("PenTriggerReleased"))
-        {
-            isPainting = false;
-        }
-        else if (methodName.Equals("PenDisable"))
-        {
-            SetActive(false);
-        }
-        else if (methodName.Equals("PenEnable"))
-        {
-            SetActive(true);
-        }
-    }
-
-    void MethodCalledFromServer(string methodName, byte data)
-    {
-        if(methodName.Equals("ChangeColorPen"))
-        {
-            ChangeColor(data);
+            VRtistrySyncer.instance.IsDrawing = false;
         }
     }
 #endif
@@ -197,25 +158,23 @@ public class ThreeDPen : MonoBehaviour
         }
     }
 
-    public void ChangeColor(int c)
+    public void ChangeColor(Color c)
     {
 #if UNITY_ANDROID
         if (IsInHand)
         {
-            if(!currentColor.Equals(palette.colors[c]))
+            if(!(currentColor == c))
             {
                 RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
             }
 
-            currentColor = palette.colors[c];
-            tipMesh.material.color = palette.colors[c];
-
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "ChangeColorPen", (byte)c);
+            currentColor = c;
+            tipMesh.material.color =c;
         }
 #endif
 #if UNITY_WEBGL
-            currentColor = palette.colors[c];
-            tipMesh.material.color = palette.colors[c];
+            currentColor = c;
+            tipMesh.material.color = c;
 #endif
     }
 
@@ -227,7 +186,6 @@ public class ThreeDPen : MonoBehaviour
         col.enabled = active;
         tipCol.enabled = active;
         this.active = active;
-        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", active ? "PenEnable" : "PenDisable", "");
 #endif
 #if UNITY_WEBGL
         tipMesh.enabled = active;

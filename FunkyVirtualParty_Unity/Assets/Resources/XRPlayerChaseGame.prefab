@@ -256,37 +256,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!1 &4562025865744945624
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5539846018807683363}
-  m_Layer: 31
-  m_Name: Forward
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5539846018807683363
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4562025865744945624}
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2180686676893550724}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!1 &6377939926481934306
 GameObject:
   m_ObjectHideFlags: 0
@@ -833,6 +802,10 @@ PrefabInstance:
       propertyPath: objectsToDisable.Array.data[34]
       value: 
       objectReference: {fileID: 8637045242962245981}
+    - target: {fileID: 6463198709430915501, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: m_RootOrder
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 6707951067419483808, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: moveSpeed
       value: 4
@@ -950,7 +923,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9cb056324afa3f4392cfd0e8207ce42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardDirection: {fileID: 4562025865744945624}
+  forwardDirection: {fileID: 7958420880284064441}
   ahp: {fileID: 3270633542346178656}
   handMovementSpeed: 3
   maxSprintSeconds: 2
@@ -1023,3 +996,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &7958420880284064441 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2163152463741977721, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+  m_PrefabInstance: {fileID: 8103367799175913152}
+  m_PrefabAsset: {fileID: 0}

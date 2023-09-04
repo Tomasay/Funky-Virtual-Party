@@ -50,22 +50,15 @@ public class PaintSprayGun : MonoBehaviour
 
     private void Awake()
     {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-        ClientManagerWeb.instance.Manager.Socket.On<string, byte>("MethodCallToClientByte", MethodCalledFromServer);
-#endif
-
         paintColorMat.color = colors[colorIndex];
         ps.startColor = colors[colorIndex];
         paintSphere.Color = colors[colorIndex];
     }
 
-    private void OnDisable()
+    private void Start()
     {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClientByte");
-#endif
+        VRtistrySyncer.instance.StartedPainting.AddListener(ps.Play);
+        VRtistrySyncer.instance.StoppedPainting.AddListener(ps.Stop);
     }
 
 #if UNITY_ANDROID
@@ -73,8 +66,7 @@ public class PaintSprayGun : MonoBehaviour
     {
         if (canPaint)
         {
-            ps.Play();
-            if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStartSpray", "");
+            VRtistrySyncer.instance.IsPainting = true;
             OnSpray.Invoke();
         }
     }
@@ -90,61 +82,28 @@ public class PaintSprayGun : MonoBehaviour
 
     void StopPainting()
     {
-        ps.Stop();
-        if (ClientManager.instance && gm.State == ThreeDPaintGameState.VRPainting) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "PaintGunStopSpray", "");
+        VRtistrySyncer.instance.IsPainting = false;
     }
 
-#if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
-    {
-        if (methodName.Equals("PaintGunStartSpray"))
-        {
-            ps.Play();
-        }
-        else if(methodName.Equals("PaintGunStopSpray"))
-        {
-            ps.Stop();
-        }
-        else if (methodName.Equals("SprayGunDisable"))
-        {
-            SetActive(false);
-        }
-        else if (methodName.Equals("SprayGunEnable"))
-        {
-            SetActive(true);
-        }
-    }
-
-    void MethodCalledFromServer(string methodName, byte data)
-    {
-        if(methodName.Equals("ChangeColorSprayGun"))
-        {
-            ChangeColor(data);
-        }
-    }
-#endif
-
-    public void ChangeColor(int c)
+    public void ChangeColor(Color c)
     {
 #if UNITY_ANDROID
         if (IsInHand)
         {
-            if (!paintColorMat.color.Equals(palette.colors[c]))
+            if (!(paintColorMat.color == c))
             {
                 RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
             }
 
-            paintColorMat.color = palette.colors[c];
-            ps.startColor = palette.colors[c];
-            paintSphere.Color = palette.colors[c];
-
-            if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "ChangeColorSprayGun", (byte)c);
+            paintColorMat.color = c;
+            ps.startColor = c;
+            paintSphere.Color = c;
         }
 #endif
 #if UNITY_WEBGL
-            paintColorMat.color = palette.colors[c];
-            ps.startColor = palette.colors[c];
-            paintSphere.Color = palette.colors[c];
+            paintColorMat.color = c;
+            ps.startColor = c;
+            paintSphere.Color = c;
 #endif
     }
 
@@ -154,7 +113,6 @@ public class PaintSprayGun : MonoBehaviour
         baseMesh.enabled = active;
         col.enabled = active;
         this.active = active;
-        if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", active ? "SprayGunEnable" : "SprayGunDisable", "");
 #endif
 #if UNITY_WEBGL
         baseMesh.enabled = active;

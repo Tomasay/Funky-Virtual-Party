@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.1368}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6920817627791592057}
   m_RootOrder: 1
@@ -46,9 +47,11 @@ GameObject:
   - component: {fileID: 7458268346312224144}
   - component: {fileID: 7458268346312224140}
   - component: {fileID: 1114771459}
-  - component: {fileID: 6838958927684297173}
   - component: {fileID: 2750476897794741687}
   - component: {fileID: 4189939568797337253}
+  - component: {fileID: 8164021777672993061}
+  - component: {fileID: 1964613435646494720}
+  - component: {fileID: 6562981292038903040}
   m_Layer: 29
   m_Name: 3DPen
   m_TagString: Untagged
@@ -66,6 +69,7 @@ Transform:
   m_LocalRotation: {x: -0.458541, y: 0, z: 0, w: 0.88867325}
   m_LocalPosition: {x: 0.3353, y: -0.4213, z: 0.7188665}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5744335498431557464}
   - {fileID: 7458268347831345583}
@@ -194,6 +198,19 @@ MonoBehaviour:
   onGrab:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1964613435646494720}
+        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
+          Normcore
+        m_MethodName: RequestOwnership
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
       - m_Target: {fileID: 7458268346312224145}
         m_TargetAssemblyTypeName: UnityEngine.Rigidbody, UnityEngine
         m_MethodName: set_isKinematic
@@ -301,6 +318,7 @@ MonoBehaviour:
   tip: {fileID: 7458268347831345583}
   tipMesh: {fileID: 2020831445175293482}
   baseMesh: {fileID: 8088608048997232918}
+  palette: {fileID: 0}
   col: {fileID: 7458268346312224142}
   tipCol: {fileID: 7957478968766357229}
   rb: {fileID: 7458268346312224145}
@@ -428,23 +446,6 @@ MonoBehaviour:
     - {x: 0.03956462, y: -0.362823, z: -0.00011716784, w: 0.9310178}
     - {x: -0.000008029863, y: 0.0000010747461, z: -0.0000007860363, w: 1}
   leftPoseSet: 1
---- !u!114 &6838958927684297173
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7728315887617822915}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: 2
-  UpdatesPerSecond: 0
-  grabbable: {fileID: 7458268346312224144}
-  simulatePhysicsOnDrop: 1
-  rb: {fileID: 7458268346312224145}
 --- !u!114 &2750476897794741687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -482,6 +483,65 @@ ParentConstraint:
   m_IsContraintActive: 0
   m_IsLocked: 0
   m_Sources: []
+--- !u!114 &8164021777672993061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7728315887617822915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 1964613435646494720}
+  _childViews: []
+--- !u!114 &1964613435646494720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7728315887617822915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolate: 1
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 0
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 0
+--- !u!114 &6562981292038903040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7728315887617822915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d594320129f41364f8e6e89f03df4758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectsToDisable:
+  - {fileID: 7458268346312224145}
+  - {fileID: 7458268346312224142}
+  - {fileID: 7458268346312224144}
+  - {fileID: 1114771459}
+  - {fileID: 2750476897794741687}
 --- !u!1 &8069402188390524747
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,6 +571,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6920817627791592057}
   m_RootOrder: 0
