@@ -20,57 +20,42 @@ public class PaintPalette : MonoBehaviour
     public UnityEvent OnColorChanged;
 
 #if UNITY_ANDROID
-    [SerializeField]
-    PaintSprayGun sprayGun;
-
-    [SerializeField]
-    ThreeDPen pen;
-
-    int colorToSet;
+    Color colorToSet;
 #endif
 
     void Start()
     {
+        VRtistrySyncer.instance.PaletteMirrored.AddListener(Mirror);
+
         for (int i = 0; i < colorMeshes.Length; i++)
         {
             colorMeshes[i].material.color = colors[i];
 #if UNITY_ANDROID
             var i2 = i;
-            colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(i2); });
+            colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(colors[i2]); });
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(ColorPressed);
 #endif
         }
 
         mf = GetComponent<MeshFilter>();
         mc = GetComponent<MeshCollider>();
-
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-#endif
-    }
-
-    private void OnDisable()
-    {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-#endif
     }
 
 #if UNITY_ANDROID
-    void SetColor(int colorIndex)
+    void SetColor(Color c)
     {
-        colorToSet = colorIndex;
+        colorToSet = c;
     }
 
     void ColorPressed(Collider other)
     {
         if (other.name.Equals("Tip"))
         {
-            pen.ChangeColor(colorToSet);
+            VRtistrySyncer.instance.PenColor = colorToSet;
         }
         else if(other.name.Equals("Paint Spray Gun"))
         {
-            sprayGun.ChangeColor(colorToSet);
+            VRtistrySyncer.instance.SprayGunColor = colorToSet;
         }
 
         OnColorChanged.Invoke();
@@ -93,19 +78,5 @@ public class PaintPalette : MonoBehaviour
             newScale.Scale(new Vector3(-1, 1, 1));
             mr.gameObject.transform.localScale = newScale;
         }
-
-#if UNITY_ANDROID
-        if(ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MirrorPalette", "");
-#endif
     }
-
-#if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
-    {
-        if (methodName.Equals("MirrorPalette"))
-        {
-            Mirror();
-        }
-    }
-#endif
 }

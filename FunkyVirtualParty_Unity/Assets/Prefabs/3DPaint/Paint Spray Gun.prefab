@@ -27,6 +27,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4590413094623354106}
   m_RootOrder: 1
@@ -158,6 +159,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.0372, z: 0.0936}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4590413094623354106}
   m_RootOrder: 0
@@ -4924,6 +4926,7 @@ ParticleSystemRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 0
+  m_MeshDistribution: 0
   m_SortMode: 0
   m_MinParticleSize: 0
   m_MaxParticleSize: 0.5
@@ -4947,6 +4950,10 @@ ParticleSystemRenderer:
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
+  m_MeshWeighting: 1
+  m_MeshWeighting1: 1
+  m_MeshWeighting2: 1
+  m_MeshWeighting3: 1
   m_MaskInteraction: 0
 --- !u!114 &4590413093452200517
 MonoBehaviour:
@@ -5016,7 +5023,8 @@ MonoBehaviour:
   modifiers:
     modifiers: []
   references:
-    version: 1
+    version: 2
+    RefIds: []
 --- !u!114 &4590413093452200515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5055,7 +5063,8 @@ MonoBehaviour:
   modifiers:
     modifiers: []
   references:
-    version: 1
+    version: 2
+    RefIds: []
 --- !u!1 &4590413094623354086
 GameObject:
   m_ObjectHideFlags: 0
@@ -5071,10 +5080,12 @@ GameObject:
   - component: {fileID: 4590413094623354107}
   - component: {fileID: 4590413094623354109}
   - component: {fileID: 1320623855}
-  - component: {fileID: 6800828338441696193}
   - component: {fileID: 5967974369228407090}
   - component: {fileID: 707748359044679317}
   - component: {fileID: 6361721950504437107}
+  - component: {fileID: 1490745514258016597}
+  - component: {fileID: 3787740351373264215}
+  - component: {fileID: 6740574520016005874}
   m_Layer: 29
   m_Name: Paint Spray Gun
   m_TagString: Untagged
@@ -5092,6 +5103,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.5, z: 0.681}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4590413093452200519}
   - {fileID: 4590413093245808669}
@@ -5205,6 +5217,19 @@ MonoBehaviour:
   onGrab:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 3787740351373264215}
+        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
+          Normcore
+        m_MethodName: RequestOwnership
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 5967974369228407090}
         m_TargetAssemblyTypeName: PaintSprayGun, Assembly-CSharp
         m_MethodName: set_IsInHand
@@ -5463,23 +5488,6 @@ MonoBehaviour:
   minRange: 0
   testAngle: 0
   testRange: 0
---- !u!114 &6800828338441696193
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4590413094623354086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: 1
-  UpdatesPerSecond: 0
-  grabbable: {fileID: 4590413094623354107}
-  simulatePhysicsOnDrop: 1
-  rb: {fileID: 4590413094623354109}
 --- !u!114 &5967974369228407090
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5506,6 +5514,7 @@ MonoBehaviour:
   gm: {fileID: 0}
   paintSphere: {fileID: 4590413093452200516}
   baseMesh: {fileID: 4590413094623354104}
+  palette: {fileID: 0}
   col: {fileID: 4590413094623354108}
   active: 0
   OnSpray:
@@ -5548,3 +5557,62 @@ ParentConstraint:
   m_IsContraintActive: 0
   m_IsLocked: 0
   m_Sources: []
+--- !u!114 &1490745514258016597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4590413094623354086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 3787740351373264215}
+  _childViews: []
+--- !u!114 &3787740351373264215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4590413094623354086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolate: 1
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 0
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 0
+--- !u!114 &6740574520016005874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4590413094623354086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d594320129f41364f8e6e89f03df4758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectsToDisable:
+  - {fileID: 4590413094623354108}
+  - {fileID: 4590413094623354107}
+  - {fileID: 4590413094623354109}
+  - {fileID: 1320623855}
+  - {fileID: 707748359044679317}

@@ -36,25 +36,8 @@ public class MannequinSolver : MonoBehaviour
 
     Mesh colliderMesh;
 
-    bool updatePose = false;
+    bool updatePose = true;
     bool poseHeightAdjusted = false;
-
-    public byte[] Serialize()
-    {
-        using (MemoryStream m = new MemoryStream())
-        {
-            using (BinaryWriter writer = new BinaryWriter(m))
-            {
-                foreach (Transform t in mannequinIK.references.GetTransforms())
-                {
-                    writer.Write(t.position);
-                    writer.Write(t.rotation);
-                }
-
-            }
-            return m.ToArray();
-        }
-    }
 
     private void Update()
     {
@@ -89,11 +72,6 @@ public class MannequinSolver : MonoBehaviour
         skinnedMeshRenderer.BakeMesh(colliderMesh, true); ;
         meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = colliderMesh;
-
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByteArray", "IKData", Serialize());
-        }
     }
 
     public void EnablePosing()
