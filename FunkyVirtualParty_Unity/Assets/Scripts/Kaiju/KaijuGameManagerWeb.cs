@@ -90,17 +90,4 @@ public class KaijuGameManagerWeb : MonoBehaviour
         return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-
-#if UNITY_WEBGL
-    void SetupPlayerParams()
-    {
-        foreach (ClientPlayer plyr in ClientPlayer.clients )
-        {
-            GrabbableObjectSyncer g = RealtimeSingletonWeb.instance.Players[i].GetComponent<GrabbableObjectSyncer>();
-            g.objectID += (byte)i;
-            g.handAnchorLeft = playerGrabAnchorLeft;
-            g.handAnchorRight = playerGrabAnchorRight;
-        }
-    }
-#endif
 }

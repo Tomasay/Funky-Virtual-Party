@@ -1229,6 +1229,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7212281436343659920}
   - component: {fileID: 1572502805415702960}
+  - component: {fileID: 7672301955415547817}
+  - component: {fileID: 8601255339963234450}
   m_Layer: 12
   m_Name: Character_Base_Animated
   m_TagString: Untagged
@@ -1274,6 +1276,41 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &7672301955415547817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8024565084117808938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 8601255339963234450}
+  _childViews: []
+--- !u!114 &8601255339963234450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8024565084117808938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d96f3e4206daf2b4195e94925ae0177b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8143653906893471124
 GameObject:
   m_ObjectHideFlags: 0
@@ -1290,9 +1327,9 @@ GameObject:
   - component: {fileID: 7438992923791116873}
   - component: {fileID: 2390970669613709328}
   - component: {fileID: 4742599005701009078}
-  - component: {fileID: 8557081336447174041}
   - component: {fileID: 7968749215492345231}
   - component: {fileID: 82329251579384622}
+  - component: {fileID: -6217276134732043204}
   m_Layer: 12
   m_Name: KaijuClientPlayer
   m_TagString: Untagged
@@ -1663,23 +1700,6 @@ MonoBehaviour:
     - {x: 0.03908651, y: -0.21121895, z: 0.0061333873, w: 0.9766377}
     - {x: -0.000008029863, y: 0.0000010747461, z: -0.0000007860363, w: 1}
   leftPoseSet: 1
---- !u!114 &8557081336447174041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8143653906893471124}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee772b79ecbddc645ac02c8479e771a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectID: 100
-  UpdatesPerSecond: 0
-  grabbable: {fileID: 7438992923791116873}
-  simulatePhysicsOnDrop: 1
-  rb: {fileID: 7095686512168902855}
 --- !u!114 &7968749215492345231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1702,7 +1722,11 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 82329251579384622}
-  _childViews: []
+  - componentID: 2
+    component: {fileID: -6217276134732043204}
+  _childViews:
+  - componentID: 1
+    component: {fileID: 7672301955415547817}
 --- !u!114 &82329251579384622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1721,6 +1745,24 @@ MonoBehaviour:
   OnDeath:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-6217276134732043204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8143653906893471124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolate: 1
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 1
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 0
 --- !u!1 &8335237129105250394
 GameObject:
   m_ObjectHideFlags: 0
