@@ -17,10 +17,7 @@ public class MannequinSolver : MonoBehaviour
     VRIK followIK, mannequinIK;
 
     [SerializeField]
-    Transform xrplayer, xrplayerTrackersParent, character;
-
-    [SerializeField]
-    Transform leftController, leftHandRef, rightController, rightHandRef;
+    Transform character;
 
     [SerializeField]
     Vector3 leftHandRotationOffset, rightHandRotationOffset;
@@ -34,16 +31,33 @@ public class MannequinSolver : MonoBehaviour
     [SerializeField]
     MeshCollider meshCollider;
 
+    private VRtistryVRPlayerController vrPlayer;
+
     Mesh colliderMesh;
 
-    bool updatePose = true;
+    bool updatePose = false;
     bool poseHeightAdjusted = false;
+
+    private void Start()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();
+
+        //Set refs for Follow IK
+        followIK.solver.spine.headTarget = vrPlayer.cameraHead;
+        followIK.solver.leftArm.target = vrPlayer.leftHandRef;
+        followIK.solver.rightArm.target = vrPlayer.rightHandRef;
+    }
 
     private void Update()
     {
-        if (updatePose)
+        if (updatePose && vrPlayer)
         {
-            followIK.solver.locomotion.offset = xrplayer.position - character.position;
+            followIK.solver.locomotion.offset = vrPlayer.transform.position - character.position;
 
             Transform[] followTransforms = followIK.references.GetTransforms();
             Transform[] mannequinTransforms = mannequinIK.references.GetTransforms();
@@ -53,13 +67,13 @@ public class MannequinSolver : MonoBehaviour
                 mannequinTransforms[i].localRotation = followTransforms[i].localRotation;
             }
 
-            leftHandRef.position = leftController.position;
-            leftHandRef.rotation = leftController.rotation * Quaternion.Euler(leftHandRotationOffset);
+            vrPlayer.leftHandRef.position = vrPlayer.leftController.position;
+            vrPlayer.leftHandRef.rotation = vrPlayer.leftController.rotation * Quaternion.Euler(leftHandRotationOffset);
 
-            rightHandRef.position = rightController.position;
-            rightHandRef.rotation = rightController.rotation * Quaternion.Euler(rightHandRotationOffset);
+            vrPlayer.rightHandRef.position = vrPlayer.rightController.position;
+            vrPlayer.rightHandRef.rotation = vrPlayer.rightController.rotation * Quaternion.Euler(rightHandRotationOffset);
 
-            character.position = xrplayerTrackersParent.position;
+            character.position = vrPlayer.trackerOffsetsParent.position;
         }
     }
 

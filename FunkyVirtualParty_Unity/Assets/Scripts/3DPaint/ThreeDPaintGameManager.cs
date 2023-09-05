@@ -57,8 +57,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     EventInstance fmodInstance;
 
-    float drawTimeRemaining, clientAnswerTimeRemaining;
-
     float vrPlayerPoints;
     Dictionary<string, int> playerPoints;
 
@@ -83,9 +81,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         finishedPaintingEarlyButton.gameObject.SetActive(false);
 
-        drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
-        clientAnswerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
-
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
             playerPoints.Add(cp.realtimeView.viewUUID, 0);
@@ -99,6 +94,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private void Start()
     {
+        VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
+        VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
+
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
         VRtistrySyncer.instance.OnPlayerGuessed.AddListener(PlayerGuessed);
@@ -131,28 +129,28 @@ public class ThreeDPaintGameManager : MonoBehaviour
         switch (VRtistrySyncer.instance.State)
         {
             case "clients answering":
-                clientAnswerTimeRemaining -= Time.deltaTime;
+                VRtistrySyncer.instance.ClientAnswerTimer -= Time.deltaTime;
 
-                if (clientAnswerTimeRemaining <= 0)
+                if (VRtistrySyncer.instance.ClientAnswerTimer <= 0 && VRtistrySyncer.instance.VRCompletedTutorial)
                 {
                     VRtistrySyncer.instance.State = "vr posing";
                 }
                 break;
             case "vr painting":
                 //Draw timer
-                drawTimeRemaining -= Time.deltaTime;
-                timerText.text = FormatTime(drawTimeRemaining);
+                VRtistrySyncer.instance.DrawingTimer -= Time.deltaTime;
+                timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
 
-                if (drawTimeRemaining <= 15)
+                if (VRtistrySyncer.instance.DrawingTimer <= 15)
                 {
                     fmodInstance.setParameterByName("VRtistryClock", 2);
                 }
-                else if (drawTimeRemaining <= ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT / 2)
+                else if (VRtistrySyncer.instance.DrawingTimer <= ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT / 2)
                 {
                     fmodInstance.setParameterByName("VRtistryClock", 1);
                 }
 
-                if (drawTimeRemaining <= 0)
+                if (VRtistrySyncer.instance.DrawingTimer <= 0)
                 {
                     VRtistrySyncer.instance.State = "clients guessing";
                 }
@@ -193,10 +191,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     void OnStateChanged(string state)
     {
+        Debug.Log("State has changed to: " + state);
+
         switch (state)
         {
             case "clients answering":
-                clientAnswerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
+                VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
 
                 //Enable VR tools
                 pen.CanPaint = true;
@@ -428,7 +428,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         {
             VRtistrySyncer.instance.CurrentPrompt = GetPrompt();
             VRtistrySyncer.instance.State = "clients answering";
-            drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
+            VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
             VRtistrySyncer.instance.Answers = "";
 
             currentRound++;

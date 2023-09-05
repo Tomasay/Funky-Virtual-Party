@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using PaintIn3D;
 using System.Runtime.InteropServices;
@@ -28,10 +29,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     [SerializeField]
     TMP_Text timerText, inputTimerText;
-    float drawTimeRemaining;
-    bool drawTimerCountingDown;
-    float answerTimeRemaining;
-    bool answerTimerCountingDown;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -108,8 +105,16 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     private void Start()
     {
+        VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerSubmittedAnswer);
+    }
+
+    private void OnDestroy()
+    {
+        VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
+        VRtistrySyncer.instance.OnPromptChangedEvent.RemoveListener(SetNewPrompt);
+        VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerSubmittedAnswer);
     }
 
     void Update()
@@ -126,16 +131,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
         }
 
-        if(drawTimerCountingDown && drawTimeRemaining >= 0)
+        if(VRtistrySyncer.instance.DrawingTimer >= 0)
         {
-            drawTimeRemaining -= Time.deltaTime;
-            timerText.text = FormatTime(drawTimeRemaining);
+            timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
         }
 
-        if (answerTimerCountingDown && answerTimeRemaining >= 0)
+        if (VRtistrySyncer.instance.ClientAnswerTimer >= 0)
         {
-            answerTimeRemaining -= Time.deltaTime;
-            inputTimerText.text = FormatTime(answerTimeRemaining);
+            inputTimerText.text = FormatTime(VRtistrySyncer.instance.ClientAnswerTimer);
         }
     }
 
@@ -175,11 +178,12 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     protected void OnStateChange(string s)
     {
+        Debug.Log("State changed to: " + s);
+
         switch (s)
         {
             case "clients answering":
-                answerTimeRemaining = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
-                answerTimerCountingDown = true;
+                
                 break;
             case "vr posing":
                 headerText.text = "Waiting for VR player to set a pose...";
@@ -191,9 +195,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 //Show blurred view
                 inputCanvas.enabled = false;
 
-                drawTimeRemaining = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
-                timerText.text = FormatTime(drawTimeRemaining);
-                drawTimerCountingDown = true;
+                timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
 
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
@@ -207,8 +209,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 guessing = true;
 
                 guessingCanvas.enabled = true;
-
-                drawTimerCountingDown = false;
 
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);
@@ -258,8 +258,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 }
 
                 resultsCanvas.enabled = true;
-
-                answerTimerCountingDown = false;
                 break;
             case "leaderboard":
                 /*

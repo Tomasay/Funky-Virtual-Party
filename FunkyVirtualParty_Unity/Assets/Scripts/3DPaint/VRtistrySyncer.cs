@@ -24,6 +24,8 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public string CurrentPrompt { get => model.currentPrompt; set => model.currentPrompt = value; }
     public string ChosenAnswerOwner { get => model.chosenAnswerOwner; set => model.chosenAnswerOwner = value; }
     public string VRPlayerGuess { get => model.vrPlayerGuess; set => model.vrPlayerGuess = value; }
+    public float ClientAnswerTimer { get => model.clientAnswerTimer; set => model.clientAnswerTimer = value; }
+    public float DrawingTimer { get => model.drawingTimer; set => model.drawingTimer = value; }
     public bool VRCompletedTutorial { get => model.vrCompletedTutorial; set => model.vrCompletedTutorial = value; }
     public bool IsPainting { get => model.isPainting; set => model.isPainting = value; }
     public bool IsDrawing { get => model.isDrawing; set => model.isDrawing = value; }

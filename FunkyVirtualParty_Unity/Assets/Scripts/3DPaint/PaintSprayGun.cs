@@ -21,9 +21,6 @@ public class PaintSprayGun : MonoBehaviour
     ParticleSystem ps;
 
     [SerializeField]
-    ThreeDPaintGameManager gm;
-
-    [SerializeField]
     P3dPaintSphere paintSphere;
 
     [SerializeField]
@@ -32,10 +29,8 @@ public class PaintSprayGun : MonoBehaviour
     [SerializeField]
     PaintPalette palette;
 
-#if UNITY_ANDROID
     [SerializeField]
     Collider col;
-#endif
 
     private bool canPaint = true;
 
