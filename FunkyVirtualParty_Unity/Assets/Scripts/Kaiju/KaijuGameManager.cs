@@ -5,18 +5,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cinemachine;
 
-public enum KaijuGameLoopState
+public class KaijuGameManager : MonoBehaviour
 {
-    Not,
-    Prepare,
-    Fight,
-    Kill
-}
-
-
-public class KaijuGameManager : GameManager
-{
-    public KaijuGameLoopState KaijuGameState = KaijuGameLoopState.Not;
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50;
     [SerializeField] private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
@@ -31,50 +21,41 @@ public class KaijuGameManager : GameManager
 
 #endif
 
-    protected override void Start()
+    protected void Start()
     {
-        base.Start();
 
         timeRemaining = GAME_TIME_AMOUNT;
         //vrGameTimeText.text = FormatTime(timeRemaining);
 
-        if (ClientManager.instance)
-        {
+       
 
-            foreach (ClientPlayer p in ClientManager.instance.Players)
-            {
-                KaijuGameClientPlayer sp = (KaijuGameClientPlayer)p;
-            }
-        }
+       foreach (ClientPlayer p in ClientPlayer.clients)
+       {
+                KaijuGameClientPlayer sp = p.GetComponent<KaijuGameClientPlayer>();
+       }
+        
 
         //SetPlayerMovement(false);
         //SetVRPlayerMovementDelayed(false, 1);
 
 #if UNITY_EDITOR
-        //currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
-        //currentWaypointDistances = new float[ClientManager.instance.Players.Count];
+        
 #endif
     }
 
     void Update()
     {
-        switch (State)
+        switch (KaijuGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
+            case "tutorial":
                 break;
-            case GameState.Countdown:
+            case "countdown":
                 if (!countingDown)
                 {
                     StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 }
                 break;
-            case GameState.GameLoop:
-                switch (KaijuGameState)
-                {
-                    case KaijuGameLoopState.Not:
-                        KaijuGameState = KaijuGameLoopState.Prepare;
-                        break;
-                    case KaijuGameLoopState.Prepare:
+            case "prepare":
                         timeRemaining -= Time.deltaTime;
                         vrGameTimeText.text = FormatTime(timeRemaining);
 
@@ -84,12 +65,12 @@ public class KaijuGameManager : GameManager
                         }
                         if (timeRemaining <= 0) //Phase end
                         {
-                            KaijuGameState = KaijuGameLoopState.Fight;
+                            KaijuGameSyncer.instance.State = "fight";
                             timeRemaining = GAME_TIME_AMOUNT;
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
                         break;
-                    case KaijuGameLoopState.Fight:
+             case "fight":
                         timeRemaining -= Time.deltaTime;
                         vrGameTimeText.text = FormatTime(timeRemaining);
 
@@ -99,12 +80,12 @@ public class KaijuGameManager : GameManager
                         }
                         if (timeRemaining <= 0) //Phase end
                         {
-                            State = GameState.TimeEnded;
+                            KaijuGameSyncer.instance.State = "time ended";
                             timeRemaining = GAME_TIME_AMOUNT;
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
                         break;
-                    case KaijuGameLoopState.Kill:
+              case "kill":
                         timeRemaining -= Time.deltaTime;
                         vrGameTimeText.text = FormatTime(timeRemaining);
 
@@ -114,35 +95,31 @@ public class KaijuGameManager : GameManager
                         }
                         if (timeRemaining <= 0) //Phase end
                         {
-                            State = GameState.VRPlayerWins;
+                            KaijuGameSyncer.instance.State = "vr player won";
                             timeRemaining = GAME_TIME_AMOUNT;
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
                         break;
-                }
                 
-                break;
-            case GameState.VRPlayerWins:
+                
+            case "vr player won":
                 StartCoroutine(GameOver(2, "CITY SAVED!!\nYOU WIN!"));
                 break;
-            case GameState.TimeEnded:
+            case "time ended":
                 StartCoroutine(GameOver(2, "KAIJU DESTROYED\nTHE CITY!!\n YOU LOSE!!"));
                 break;
             default:
                 break;
         }
 
-#if UNITY_EDITOR
-        UpdateDebugPlayers();
-#endif
     }
 
     void CheckPartsCollected()
     {
-        if (KaijuGameState != KaijuGameLoopState.Fight)
+        if (KaijuGameSyncer.instance.State != "fight")
             return;
 
-        int partsNotCollected = 0;
+        int partsNotCollected = 1;
         /*foreach (SwordPart p in Game.Something.WhereverTheHellTheyEndUp)
         {
             SwordPart sp = (SwordPart)p;
@@ -154,17 +131,17 @@ public class KaijuGameManager : GameManager
         partsNotCollected = 1;
         if (partsNotCollected == 0)
         {
-            KaijuGameState = KaijuGameLoopState.Kill;
+            KaijuGameSyncer.instance.State = "kill";
             timeRemaining = 6;
         }
     }
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        SetClientPlayerParams();
+        
 
         countingDown = true;
-        SetVRPlayerCanThrowFireballs(true);
+        
 
         yield return new WaitForSeconds(1);
 
@@ -179,10 +156,7 @@ public class KaijuGameManager : GameManager
         yield return new WaitForSeconds(1);
         vrInfoText.text = "";
 
-        State = GameState.GameLoop;
-        SetPlayerMovement(true);
-
-        countingDown = false;
+        KaijuGameSyncer.instance.State = "prepare";
     }
 
     IEnumerator GameOver(int countdown, string txt)
@@ -190,61 +164,15 @@ public class KaijuGameManager : GameManager
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
-        SceneManager.LoadScene("MainMenu");
+        SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }
 
-    public override void OnAction(string id)
+    public string FormatTime(float time)
     {
-        ClientManager.instance.GetPlayerBySocketID(id).GetComponent<KaijuGameClientPlayer>().Action();
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
     }
 
-    private void SetVRPlayerCanThrowFireballs(bool canThrow)
-    {
-        //VRPlayer.GetComponent<KaijuGameVRPlayerController>().canThrowFireballs = canThrow;
-    }
 
-    void SetClientPlayerParams()
-    {
-        for (int i = 0; i < ClientManager.instance.Players.Count; i++)
-        {
-            GrabbableObjectSyncer g = ClientManager.instance.Players[i].GetComponent<GrabbableObjectSyncer>();
-            g.objectID += (byte)i;
-        }
-    }
-
-#if UNITY_EDITOR
-    private void UpdateDebugPlayers()
-    {
-        if(ClientManager.instance)
-        for (int i = 0; i < ClientManager.instance.Players.Count; i++)
-        {
-            if (ClientManager.instance.Players[i].isDebugPlayer)
-            {
-                UpdateDebugPlayerWaypoint(ClientManager.instance.Players[i], i);
-            }
-        }
-    }
-
-    private void UpdateDebugPlayerWaypoint(ClientPlayer cp, int index)
-    {
-        //If player does not have a waypoint, or has made it to their waypoint
-        /*if (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f)
-        {
-            //Get new waypoint
-            currentWaypoints[index] = debugWaypoints[Random.Range(0, debugWaypoints.Length)].position;
-            currentWaypointDistances[index] = Vector3.Distance(currentWaypoints[index], cp.transform.position);
-        }
-        //Else move towards next waypoint
-        else
-        {
-            Vector3 dir = (currentWaypoints[index] - cp.transform.position).normalized;
-
-            //Ease in & out speed
-            float dist = Vector3.Distance(currentWaypoints[index], cp.transform.position);
-            dir *= Mathf.Clamp(1 / (dist / currentWaypointDistances[index]), 0.1f, 1f);
-
-            ClientManager.instance.Manager.Socket.Emit("inputDebug", cp.SerializeInputData(dir));
-        }*/
-    }
-#endif
 }

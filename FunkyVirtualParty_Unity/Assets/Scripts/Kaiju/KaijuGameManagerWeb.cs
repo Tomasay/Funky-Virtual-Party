@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using Cinemachine;
 
-public class KaijuGameManagerWeb : GameManagerWeb
+public class KaijuGameManagerWeb : MonoBehaviour
 {
     public KaijuGameLoopState KaijuGameState = KaijuGameLoopState.Not;  
     private const int PHASE_COUNT = 2, COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50;
@@ -17,90 +17,44 @@ public class KaijuGameManagerWeb : GameManagerWeb
 
     [SerializeField] GameObject playerGrabAnchorLeft, playerGrabAnchorRight;
 
-
-    private void Awake()
-    {
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-    }
-
-    protected  override void OnDisable()
-    {
-#if UNITY_WEBGL
-        base.OnDisable();
-
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-#endif
-    }
-
-    void MethodCalledFromServer(string methodName, string data)
-    {
-
-    }
-
-    IEnumerator GameOver(int countdown, string gameOverMessage)
-    {
-        countdownText.enabled = true;
-        countdownText.text = gameOverMessage;
-        yield return new WaitForSeconds(5);
-
-        ClientManagerWeb.instance.LoadMainMenu();
-    }
-    IEnumerator StartCountdownTimer(int countdown)
-    {
-        countingDown = true;
-
-        yield return new WaitForSeconds(1);
-
-        for (int i = countdown; i > 0; i--)
-        {
-            countdownText.text = "" + i;
-            yield return new WaitForSeconds(1);
-        }
-
-        countdownText.text = "GO!";
-
-        yield return new WaitForSeconds(1);
-        countdownText.enabled = false;
-        SetPlayerMovement(true);
-
-        //cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_YDamping = 1;
-        //cinemachineCam.GetCinemachineComponent<CinemachineTrackedDolly>().m_ZDamping = 1;
-    }
     // Start is called before the first frame update
-    protected override void Start()
+    protected void Start()
     {
-        base.Start();
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
 
-        ClientManagerWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
+        RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
 
-        (ClientManagerWeb.instance.LocalPlayer as KaijuGameClientPlayer).cam = cam;
+        (RealtimeSingletonWeb.instance.LocalPlayer as KaijuGameClientPlayer).cam = cam;
 
-        cinemachineCam.Follow = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
-        cinemachineCam.LookAt = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+        cinemachineCam.Follow = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
+        cinemachineCam.LookAt = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
     }
 
-    protected override void OnStateChange(string s)
+    protected void OnStateChange(string s)
     {
-        base.OnStateChange(s);
-
-        switch (State)
+        switch (ShootoutGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
+            case "tutorial":
+
                 break;
-            case GameState.Countdown:
-#if UNITY_WEBGL
-                SetupPlayerParams(); // Set this on countdown because we know all players have spawned in
-#endif
+            case "countdown":
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
+                StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;
-            case GameState.GameLoop:
+            case "game loop":
+            case "prepare":
+            case "fight":
+            case "kill":
+                RealtimeSingletonWeb.instance.LocalPlayer.CanMove = true;
                 break;
-            case GameState.VRPlayerLoses:
+            case "vr player won":
+                countdownText.enabled = true;
+                countdownText.text = "VR PLAYER WINS";
                 break;
-            case GameState.VRPlayerWins:
-                break;
-            case GameState.TimeEnded:
+            case "time ended":
+                countdownText.enabled = true;
+                countdownText.text = "TIME'S UP!\nYOU WIN";
                 break;
             default:
                 break;
@@ -109,66 +63,41 @@ public class KaijuGameManagerWeb : GameManagerWeb
 
     void Update()
     {
-        switch (State)
+        switch (KaijuGameSyncer.instance.State)
         {
-            case GameState.Tutorial:
-                SetPlayerMovement(false);
+            case "tutorial":
                 break;
-            case GameState.Countdown:
-                if (!countingDown)
-                {
-                    StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
-                }
+            case "countdown":
                 break;
-            case GameState.GameLoop:
-                SetPlayerMovement(true);
-                switch (KaijuGameState)
-                {
-                    case KaijuGameLoopState.Not:
-                        KaijuGameState = KaijuGameLoopState.Prepare; 
-                        break;
-                    case KaijuGameLoopState.Prepare:
-                        countingDown = false;
-                        if (timeRemaining > 0) { timeRemaining -= Time.deltaTime; } else { timeRemaining = GAME_TIME_AMOUNT; KaijuGameState = KaijuGameLoopState.Fight; }
-                        gameTimeText.text = FormatTime(timeRemaining);
-                        break;
-                    case KaijuGameLoopState.Fight:
-                        countingDown = false;
-                        if (timeRemaining > 0) { timeRemaining -= Time.deltaTime; } else { State = GameState.TimeEnded; }
-                        gameTimeText.text = FormatTime(timeRemaining);
-                        break;
-                    case KaijuGameLoopState.Kill:
-                        countingDown = false;
-                        if (timeRemaining > 0) { timeRemaining -= Time.deltaTime; }
-                        gameTimeText.text = FormatTime(timeRemaining);
-                        break;
-                }
+            case "game loop":
+            case "prepare":
+            case "fight":
+            case "kill":
+                timeRemaining -= Time.deltaTime;
+                gameTimeText.text = FormatTime(timeRemaining);
                 break;
-            case GameState.VRPlayerWins:
-                if (!endingGame)
-                {
-                    StartCoroutine(GameOver(2, "KAIJU DEFEATED!\nYOU WIN!"));
-                    endingGame = true;
-                }
+            case "vr player won":
                 break;
-            case GameState.TimeEnded:
-                if (!endingGame)
-                {
-                    StartCoroutine(GameOver(2, "YOU LOSE!"));
-                    endingGame = true;
-                }
+            case "time ended":
                 break;
             default:
                 break;
         }
     }
+    public string FormatTime(float time)
+    {
+        int minutes = (int)time / 60;
+        int seconds = (int)time - (minutes * 60);
+        return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
 
 #if UNITY_WEBGL
     void SetupPlayerParams()
     {
-        for (int i = 0; i < ClientManagerWeb.instance.Players.Count; i++)
+        foreach (ClientPlayer plyr in ClientPlayer.clients )
         {
-            GrabbableObjectSyncer g = ClientManagerWeb.instance.Players[i].GetComponent<GrabbableObjectSyncer>();
+            GrabbableObjectSyncer g = RealtimeSingletonWeb.instance.Players[i].GetComponent<GrabbableObjectSyncer>();
             g.objectID += (byte)i;
             g.handAnchorLeft = playerGrabAnchorLeft;
             g.handAnchorRight = playerGrabAnchorRight;
