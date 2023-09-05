@@ -12,15 +12,9 @@ public class RequestOwnershipOnStart : MonoBehaviour
     {
         realtimeView = GetComponent<RealtimeView>();
 
-        if (realtimeView.isOwnedLocallyInHierarchy)
-            LocalStart();
-    }
-
-    void LocalStart()
-    {
         realtimeView.RequestOwnership();
 
-        if(TryGetComponent<RealtimeTransform>(out RealtimeTransform rt))
+        if (TryGetComponent<RealtimeTransform>(out RealtimeTransform rt))
         {
             rt.RequestOwnership();
         }
