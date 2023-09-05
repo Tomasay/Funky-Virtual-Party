@@ -5,8 +5,7 @@ using UnityEngine;
 using Cinemachine;
 
 public class KaijuGameManagerWeb : MonoBehaviour
-{
-    public KaijuGameLoopState KaijuGameState = KaijuGameLoopState.Not;  
+{  
     private const int PHASE_COUNT = 2, COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50;
     [SerializeField] private TMP_Text countdownText, gameTimeText;
     private bool countingDown = false;
