@@ -1084,8 +1084,14 @@ MonoBehaviour:
   ahp: {fileID: 9220413328791855576}
   leftHand: {fileID: 3703845334488246885}
   rightHand: {fileID: 3703845335188229686}
+  cameraHead: {fileID: 5536533662969178428}
+  trackerOffsetsParent: {fileID: 5536533662602044908}
+  leftController: {fileID: 5536533663477742032}
+  rightController: {fileID: 5536533662809802815}
   leftHandGrabPoint: {fileID: 1693648172}
   rightHandGrabPoint: {fileID: 1040735080}
+  leftHandRef: {fileID: 453443648}
+  rightHandRef: {fileID: 26928665}
   UIPointer: {fileID: 3092150495975368881}
   YButtonEvent: {fileID: 22047325}
   BButtonEvent: {fileID: 1388279578}
@@ -1111,6 +1117,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7942002212320107156, guid: a5226a72c9553294abfe172a458b5805, type: 3}
   m_PrefabInstance: {fileID: 2513590125155843960}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &5536533662809802815 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7942002211973936967, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+  m_PrefabInstance: {fileID: 2513590125155843960}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5536533662969178428 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7942002211881670212, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+  m_PrefabInstance: {fileID: 2513590125155843960}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5536533663242404285 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7942002211609493189, guid: a5226a72c9553294abfe172a458b5805, type: 3}
@@ -1122,6 +1138,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 245bee9b113e7144cb3549484bae2a0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &5536533663477742032 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7942002211305997992, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+  m_PrefabInstance: {fileID: 2513590125155843960}
+  m_PrefabAsset: {fileID: 0}
 --- !u!136 &5819144603717761016 stripped
 CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 8224648006296504448, guid: a5226a72c9553294abfe172a458b5805, type: 3}

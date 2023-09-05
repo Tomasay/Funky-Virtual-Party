@@ -36,9 +36,6 @@ public class ThreeDPen : MonoBehaviour
 
     [SerializeField]
     ThreeDPaintGameManager gm;
-
-    [SerializeField]
-    AutoHandPlayer ahp;
 #endif
 
     bool isPainting;
@@ -78,7 +75,7 @@ public class ThreeDPen : MonoBehaviour
     void Update()
     {
 #if UNITY_ANDROID
-        if (isPainting && (rb.velocity.magnitude > 0.025f || ahp.GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
+        if (isPainting && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             OnDraw.Invoke();

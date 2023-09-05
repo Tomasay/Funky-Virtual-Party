@@ -10,7 +10,7 @@ public class VRtistryVRPlayerController : VRPlayerController
     public Hand leftHand, rightHand;
 
     [SerializeField]
-    public Transform leftHandGrabPoint, rightHandGrabPoint;
+    public Transform cameraHead, trackerOffsetsParent, leftController, rightController, leftHandGrabPoint, rightHandGrabPoint, leftHandRef, rightHandRef;
 
     [SerializeField]
     public GameObject UIPointer;
