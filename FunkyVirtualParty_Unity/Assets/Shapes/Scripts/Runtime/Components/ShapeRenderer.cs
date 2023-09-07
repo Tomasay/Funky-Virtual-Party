@@ -155,31 +155,31 @@ namespace Shapes {
 
 		bool UsingDefaultMasking => stencilComp == DEFAULT_STENCIL_COMP && stencilOpPass == DEFAULT_STENCIL_OP && stencilRefID == DEFAULT_STENCIL_REF_ID && stencilReadMask == DEFAULT_STENCIL_MASK && stencilWriteMask == DEFAULT_STENCIL_MASK && colorMask == DEFAULT_COLOR_MASK;
 		[SerializeField] CompareFunction stencilComp = DEFAULT_STENCIL_COMP;
-		/// <inheritdoc cref="RenderState.colorMask"/>
+		/// <inheritdoc cref="RenderState.stencilComp"/>
 		public CompareFunction StencilComp {
 			get => stencilComp;
 			set => SetIntOnAllInstancedMaterials( ShapesMaterialUtils.propStencilComp, (int)( stencilComp = value ) );
 		}
 		[SerializeField] StencilOp stencilOpPass = DEFAULT_STENCIL_OP;
-		/// <inheritdoc cref="RenderState.stencilComp"/>
+		/// <inheritdoc cref="RenderState.stencilOpPass"/>
 		public StencilOp StencilOpPass {
 			get => stencilOpPass;
 			set => SetIntOnAllInstancedMaterials( ShapesMaterialUtils.propStencilOpPass, (int)( stencilOpPass = value ) );
 		}
 		[SerializeField] byte stencilRefID = DEFAULT_STENCIL_REF_ID;
-		/// <inheritdoc cref="RenderState.stencilOpPass"/>
+		/// <inheritdoc cref="RenderState.stencilRefID"/>
 		public byte StencilRefID {
 			get => stencilRefID;
 			set => SetIntOnAllInstancedMaterials( ShapesMaterialUtils.propStencilID, stencilRefID = value );
 		}
 		[SerializeField] byte stencilReadMask = DEFAULT_STENCIL_MASK;
-		/// <inheritdoc cref="RenderState.stencilRefID"/>
+		/// <inheritdoc cref="RenderState.stencilReadMask"/>
 		public byte StencilReadMask {
 			get => stencilReadMask;
 			set => SetIntOnAllInstancedMaterials( ShapesMaterialUtils.propStencilReadMask, stencilReadMask = value );
 		}
 		[SerializeField] byte stencilWriteMask = DEFAULT_STENCIL_MASK;
-		/// <inheritdoc cref="RenderState.stencilReadMask"/>
+		/// <inheritdoc cref="RenderState.stencilWriteMask"/>
 		public byte StencilWriteMask {
 			get => stencilWriteMask;
 			set => SetIntOnAllInstancedMaterials( ShapesMaterialUtils.propStencilWriteMask, stencilWriteMask = value );

@@ -234,27 +234,42 @@ namespace Shapes {
 			return WeightedSum( GetCubicBezierWeights( t ), a, b, c, d );
 		}
 
-		public static Vector3 CubicBezierDerivative( Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t ) {
+		// Note: this is neither the derivative nor the normalized direction
+		// equal to derivative / 3, for performance reasons since we only need the direction in our use case below
+		static Vector3 CubicBezierDirectionIsh( Vector3 a, Vector3 b, Vector3 c, Vector3 d, float t ) {
 			float omt = 1f - t;
-			float omt2 = omt * omt;
 			float t2 = t * t;
-			return
-				a * ( -3 * omt2 ) +
-				b * ( 9 * t2 - 12 * t + 3 ) +
-				c * ( 6 * t - 9 * t2 ) +
-				d * ( 3 * t2 );
+			float _3t2 = 3 * t2;
+			float sa = -omt * omt;
+			float sb = _3t2 - 4 * t + 1;
+			float sc = 2 * t - _3t2;
+			float sd = t2;
+
+			// derivative / 3 (faster), unrolled (also faster):
+			return new Vector3(
+				a.x * sa + b.x * sb + c.x * sc + d.x * sd,
+				a.y * sa + b.y * sb + c.y * sc + d.y * sd,
+				a.z * sa + b.z * sb + c.z * sc + d.z * sd
+			);
 		}
 
-		public static float GetApproximateCurveSum( Vector3 a, Vector3 b, Vector3 c, Vector3 d, int vertCount ) {
-			Vector2[] tangents = new Vector2[vertCount];
-			for( int i = 0; i < vertCount; i++ ) {
+		public static float GetApproximateAngularCurveSumDegrees( Vector3 a, Vector3 b, Vector3 c, Vector3 d, int vertCount ) {
+			float angSum = 0f;
+
+			// t = 0
+			Vector3 tangentPrev = b - a; // == CubicBezierDerivative( a, b, c, d, 0 ) / 3, but more optimized
+
+			// intermediate tangents (0 < t < 1)
+			for( int i = 1; i < vertCount - 1; i++ ) {
 				float t = i / ( vertCount - 1f );
-				tangents[i] = CubicBezierDerivative( a, b, c, d, t );
+				Vector3 tangent = CubicBezierDirectionIsh( a, b, c, d, t );
+				angSum += Vector3.Angle( tangentPrev, tangent );
+				tangentPrev = tangent;
 			}
 
-			float angSum = 0f;
-			for( int i = 0; i < vertCount - 1; i++ )
-				angSum += Vector2.Angle( tangents[i], tangents[i + 1] );
+			// t = 1
+			Vector3 finalTangent = d - c; // == CubicBezierDerivative( a, b, c, d, 1 ) / 3
+			angSum += Vector3.Angle( tangentPrev, finalTangent );
 
 			return angSum;
 		}

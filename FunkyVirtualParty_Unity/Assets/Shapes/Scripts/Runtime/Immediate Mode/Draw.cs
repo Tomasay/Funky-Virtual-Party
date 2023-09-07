@@ -34,6 +34,20 @@ namespace Shapes {
 		public static DrawCommand Command( Camera cam, CameraEvent cameraEvent = CameraEvent.BeforeImageEffects ) => ObjectPool<DrawCommand>.Alloc().Initialize( cam, cameraEvent );
 		#endif
 
+		/// <summary>Prepares Shapes to draw in IMGUI Repaint events,
+		/// by initializing the _ScreenParams variable to the current drawing context size.
+		/// This is necessary as Shapes relies on detecting pixel sizing for anti-aliasing,
+		/// which isn't set in IMGUI since there's no camera that sets these values for us</summary>
+		public static void PrepareForIMGUI() {
+			( float w, float h ) = ( Screen.width, Screen.height );
+			Vector4 screenParams = new Vector4( w, h, 1 + 1 / w, 1 + 1 / h );
+			Shader.SetGlobalVector( ShapesMaterialUtils.propScreenParams, screenParams );
+			// I suspect the following may be necessary as well, in some weird edge case somewhere
+			// Shader.SetGlobalVector( "_ProjectionParams", new Vector4( 1, 0, 1, 1 ) );
+			// Shader.SetGlobalMatrix( "unity_MatrixVP", Matrix4x4.TRS( new Vector2( w / 2, h / 2 ), Quaternion.identity, new Vector3( w, h ) ) );
+			// maybe I need to set unity_MatrixVP. keeping this just in case
+		}
+
 		static MpbLine2D mpbLine = new MpbLine2D();
 
 		[OvldGenCallTarget] static void Line_Internal( [OvldDefault( nameof(LineEndCaps) )] LineEndCap endCaps,
@@ -472,13 +486,48 @@ namespace Shapes {
 			}
 		}
 
+		static MpbCustomMesh mpbCustomMesh = new MpbCustomMesh();
+
+		/// <inheritdoc cref="Draw.Mesh(UnityEngine.Mesh,Material,MaterialPropertyBlock)"/>
+		public static void Mesh( Mesh mesh, Material mat ) => CustomMesh_Internal( mesh, mat, null );
+
+		/// <summary>Draws a custom mesh with a custom material as part of a Shapes command buffer.
+		/// Note: this will ignore global Shapes properties like color, thickness, etc, including render states like blending modes</summary>
+		/// <param name="mesh">The mesh asset to draw. Note: do not destroy this mesh before it has been drawn!</param>
+		/// <param name="mat">The material asset to draw with. Note: do not destroy this mesh before it has been drawn!</param>
+		/// <param name="mpb">The material property block to apply to the draw call</param>
+		public static void Mesh( Mesh mesh, Material mat, MaterialPropertyBlock mpb ) => CustomMesh_Internal( mesh, mat, mpb );
+
+		// /// <summary>Draws a custom mesh with a custom material as part of a Shapes command buffer.
+		// /// Note: this will ignore global Shapes properties like color, thickness, etc, including render states like blending modes</summary>
+		// /// <param name="mesh">The mesh asset to draw. Note: do not destroy this mesh before it has been drawn!</param>
+		// /// <param name="mat">The material asset to draw with. Note: do not destroy this mesh before it has been drawn!</param>
+		// /// <param name="properties">The properties to apply to the draw call</param>
+		// public static void Mesh( Mesh mesh, Material mat, DrawCallProperties properties ) => CustomMesh_Internal( mesh, mat, null );
+
+		static void CustomMesh_Internal( Mesh mesh, Material mat, MaterialPropertyBlock mpb /*, DrawCallProperties properties*/ ) {
+			using( IMDrawer drawer = new IMDrawer( mpbCustomMesh, mat, mesh, drawType: IMDrawer.DrawType.Custom, allowInstancing: false ) ) {
+				// will draw on dispose
+				mpbCustomMesh.mpbOverride = mpb;
+				// mpbCustomMesh.extraDrawCallProperties = properties;
+			}
+		}
+
 		static MpbTexture mpbTexture = new MpbTexture();
 
 		[OvldGenCallTarget] static void Texture_Internal( Texture texture, Rect rect, Rect uvs, [OvldDefault( nameof(Color) )] Color color ) {
+			if( texture == null )
+				return; // maybe I want to throw an error? idk
+
 			Material mat = ShapesMaterialUtils.matTexture[BlendMode];
 
-			using( new IMDrawer( mpbTexture, mat, ShapesMeshUtils.QuadMesh[0], allowInstancing: false ) ) {
-				mpbTexture.textures.Add( texture );
+			// finalize any previous texture draws if we've just switched textures
+			if( mpbTexture.texture != null && mpbTexture.texture != texture ) {
+				DrawCommand.CurrentWritingCommandBuffer.drawCalls.Add( mpbTexture.ExtractDrawCall() ); // finalize previous buffer
+			}
+
+			using( new IMDrawer( mpbTexture, mat, ShapesMeshUtils.QuadMesh[0], allowInstancing: true ) ) {
+				mpbTexture.texture = texture;
 				mpbTexture.color.Add( color.ColorSpaceAdjusted() );
 				mpbTexture.rect.Add( rect.ToVector4() );
 				mpbTexture.uvs.Add( uvs.ToVector4() );

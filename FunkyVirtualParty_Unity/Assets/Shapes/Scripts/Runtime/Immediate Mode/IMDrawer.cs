@@ -25,6 +25,7 @@ namespace Shapes {
 
 		public enum DrawType {
 			Shape,
+			Custom,
 			TextAssetClone,
 			TextPooledAuto,
 			TextPooledPersistent
@@ -44,22 +45,29 @@ namespace Shapes {
 				Draw.style.renderState.keywords = GetMaterialKeywords( sourceMat );
 				Draw.style.renderState.isTextMaterial = drawType == DrawType.TextPooledPersistent || drawType == DrawType.TextAssetClone;
 
-				// clone material if needed
-				if( drawType == DrawType.TextAssetClone ) {
-					// instantiate and then delete it after this DrawCommand has been executed
-					drawState.mat = Object.Instantiate( sourceMat );
-					ApplyGlobalPropertiesTMP( drawState.mat ); // a lil gross but sfine
-					DrawCommand.CurrentWritingCommandBuffer.cachedAssets.Add( drawState.mat );
-				} else if( drawType == DrawType.TextPooledPersistent ) {
-					// ApplyGlobalPropertiesTMP( sourceMat ); // I can't really edit this because *groans*
-					drawState.mat = sourceMat;
-				} else if( drawType == DrawType.TextPooledAuto ) {
-					drawState.mat = sourceMat;
-					DrawCommand.CurrentWritingCommandBuffer.cachedTextIds.Add( textAutoDisposeId );
-				} else {
-					drawState.mat = IMMaterialPool.GetMaterial( ref Draw.style.renderState );
+				switch( drawType ) {
+					// clone material if needed
+					case DrawType.TextAssetClone:
+						// instantiate and then delete it after this DrawCommand has been executed
+						drawState.mat = Object.Instantiate( sourceMat );
+						ApplyGlobalPropertiesTMP( drawState.mat ); // a lil gross but sfine
+						DrawCommand.CurrentWritingCommandBuffer.cachedAssets.Add( drawState.mat );
+						break;
+					case DrawType.TextPooledPersistent:
+						// ApplyGlobalPropertiesTMP( sourceMat ); // I can't really edit this because *groans*
+						drawState.mat = sourceMat;
+						break;
+					case DrawType.TextPooledAuto:
+						drawState.mat = sourceMat;
+						DrawCommand.CurrentWritingCommandBuffer.cachedTextIds.Add( textAutoDisposeId );
+						break;
+					case DrawType.Custom:
+						drawState.mat = sourceMat;
+						break;
+					default:
+						drawState.mat = IMMaterialPool.GetMaterial( ref Draw.style.renderState );
+						break;
 				}
-
 
 				// cache mesh
 				if( drawType == DrawType.TextAssetClone ) {
@@ -92,7 +100,8 @@ namespace Shapes {
 				drawState.submesh = submesh;
 				if( metaMpb.PreAppendCheck( drawState, mtx ) == false )
 					Debug.LogError( "Somehow PreAppendCheck failed for this draw" );
-				ApplyGlobalProperties( drawState.mat ); // this will set render state of the material. todo: will this modify the assets? this seems bad
+				if( drawType != DrawType.Custom )
+					ApplyGlobalProperties( drawState.mat ); // this will set render state of the material. todo: will this modify the assets? this seems bad
 			}
 		}
 

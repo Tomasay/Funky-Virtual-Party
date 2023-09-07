@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
@@ -45,7 +44,7 @@ namespace Shapes {
 		/// <summary>What to do with the contents of the stencil buffer if the stencil test (and the depth test) passes. Default: keep</summary>
 		public StencilOp stencilOpPass;
 
-		/// <summary>The stencil buffer id/reference value to be compared against</summary>
+		/// <summary>The stencil buffer id/reference value to be compared against. Default: 0</summary>
 		public byte stencilRefID;
 
 		/// <summary>A stencil buffer 8 bit mask as an 0–255 integer, used when comparing the reference value with the contents of the buffer. Default: 255</summary>
@@ -76,7 +75,13 @@ namespace Shapes {
 		static bool StrArrEquals( string[] a, string[] b ) {
 			if( a == null || b == null )
 				return a == b;
-			return a.Length == b.Length && a.SequenceEqual( b );
+			int aLen = a.Length;
+			if( aLen != b.Length )
+				return false;
+			for( int i = 0; i < aLen; i++ )
+				if( a[i] != b[i] )
+					return false;
+			return true;
 		}
 
 		public bool Equals( RenderState other ) =>

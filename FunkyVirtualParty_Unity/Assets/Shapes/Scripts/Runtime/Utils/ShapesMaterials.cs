@@ -26,7 +26,7 @@ namespace Shapes {
 		public static string GetMaterialName( string shaderName, string blendModeSuffix, params string[] keywords ) {
 			string keywordsSuffix = "";
 			if( keywords != null && keywords.Length > 0 ) {
-				keywordsSuffix = $" [{string.Join( "][", keywords )}]";
+				keywordsSuffix = $" ({string.Join( ")(", keywords )})";
 			}
 
 			return $"{shaderName} {blendModeSuffix}{keywordsSuffix}";

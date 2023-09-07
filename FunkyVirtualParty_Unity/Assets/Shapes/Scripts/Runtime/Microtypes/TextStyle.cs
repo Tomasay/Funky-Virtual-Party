@@ -48,7 +48,7 @@ namespace Shapes {
 		/// <summary>The spacing adjustment between paragraphs to use when drawing text</summary>
 		public float paragraphSpacing;
 
-		/// <summary>The margins to use when drawing text</summary>
+		/// <summary>The margins to use when drawing text (in order: left, top, right, bottom)</summary>
 		public Vector4 margins;
 
 		/// <summary>Whether or not to wrap (add line breaks) when the text reaches the end of its containing rectangle</summary>

@@ -13,6 +13,7 @@ namespace Shapes {
 		public bool HasContent => initialized;
 		int instanceCount = 0;
 		ShapeDrawState drawState;
+		public MaterialPropertyBlock mpbOverride = null;
 		Matrix4x4[] matrices = ArrayPool<Matrix4x4>.Alloc( UnityInfo.INSTANCES_MAX );
 		bool HasMultipleInstances => instanceCount > 1;
 		bool directMaterialApply = false;
@@ -89,18 +90,16 @@ namespace Shapes {
 
 			listFloat.Clear();
 		}
-		
-		protected void Transfer( int propertyID, List<Texture> listTex ) {
+
+		protected void Transfer( int propertyID, ref Texture tex ) {
 			if( directMaterialApply ) {
-				drawState.mat.SetTexture( propertyID, listTex[0] ); // direct draw
+				drawState.mat.SetTexture( propertyID, tex ); // direct draw
 			} else {
-				if( HasMultipleInstances )
-					Debug.LogError( "no GPU instancing support for textures" );
-				else
-					sdc.mpb.SetTexture( propertyID, listTex[0] ); // single draw command
+				// even if it has multiple instances, textures auto-disallow using multiple textures anyway
+				sdc.mpb.SetTexture( propertyID, tex ); // single draw command
 			}
 
-			listTex.Clear();
+			tex = null;
 		}
 
 		public bool PreAppendCheck( ShapeDrawState additionDrawState, Matrix4x4 mtx ) {
@@ -142,6 +141,11 @@ namespace Shapes {
 		}
 
 		internal void TransferAllProperties() {
+			if( this is MpbCustomMesh ) {
+				if( mpbOverride != null )
+					sdc.mpb = mpbOverride;
+				return; // don't transfer anything else
+			}
 			// all shapes have a color property (except TMP text)
 			if( this is MpbText == false )
 				Transfer( ShapesMaterialUtils.propColor, color );
