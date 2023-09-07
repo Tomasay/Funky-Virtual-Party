@@ -375,11 +375,11 @@ public class ClientPlayer : MonoBehaviour
         //Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
     }
 
-    public static ClientPlayer GetClientByViewID(string id)
+    public static ClientPlayer GetClientByOwnerID(int id)
     {
         foreach (ClientPlayer cp in clients)
         {
-            if(cp.realtimeView.viewUUID.Equals(id))
+            if(cp.realtimeView.ownerIDSelf == id)
             {
                 return cp;
             }

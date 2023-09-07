@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Animations;
 
 public class PaintPalette : MonoBehaviour
 {
@@ -13,7 +14,10 @@ public class PaintPalette : MonoBehaviour
     [SerializeField]
     Mesh leftHandMesh, rightHandMesh;
     public bool currentMeshLeft = true;
-    
+
+    [SerializeField]
+    ParentConstraint constraint;
+
     MeshFilter mf;
     MeshCollider mc;
 
@@ -27,6 +31,10 @@ public class PaintPalette : MonoBehaviour
     {
         VRtistrySyncer.instance.PaletteMirrored.AddListener(Mirror);
 
+#if UNITY_ANDROID
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+#endif
+
         for (int i = 0; i < colorMeshes.Length; i++)
         {
             colorMeshes[i].material.color = colors[i];
@@ -39,6 +47,25 @@ public class PaintPalette : MonoBehaviour
 
         mf = GetComponent<MeshFilter>();
         mc = GetComponent<MeshCollider>();
+    }
+
+    private void OnDestroy()
+    {
+        VRtistrySyncer.instance.PaletteMirrored.RemoveListener(Mirror);
+
+#if UNITY_ANDROID
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+#endif
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        //Setup default constraint
+        ConstraintSource newSource = new ConstraintSource();
+        newSource.sourceTransform = avatar.GetComponent<VRtistryVRPlayerController>().leftHandGrabPoint;
+        newSource.weight = 1;
+        constraint.AddSource(newSource);
+        constraint.constraintActive = true;
     }
 
 #if UNITY_ANDROID

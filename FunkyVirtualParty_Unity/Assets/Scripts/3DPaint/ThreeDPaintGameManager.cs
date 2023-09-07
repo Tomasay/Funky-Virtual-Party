@@ -58,7 +58,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     EventInstance fmodInstance;
 
     float vrPlayerPoints;
-    Dictionary<string, int> playerPoints;
+    Dictionary<int, int> playerPoints;
 
     int currentRound = 1;
 
@@ -70,7 +70,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private void Awake()
     {
-        playerPoints = new Dictionary<string, int>();
+        playerPoints = new Dictionary<int, int>();
 
         playerNameIcons = new List<GameObject>();
         currentLeaderboardCards = new List<GameObject>();
@@ -83,7 +83,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            playerPoints.Add(cp.realtimeView.viewUUID, 0);
+            playerPoints.Add(cp.realtimeView.ownerIDSelf, 0);
         }
 
         StartCoroutine("StartGame");
@@ -102,6 +102,23 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.OnPlayerGuessed.AddListener(PlayerGuessed);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
+        InvokeRepeating("Test", 1, 1);
+    }
+
+    void Test()
+    {
+        Debug.Log("Clearing ownership!");
+        VRtistrySyncer.instance.realtimeView.ClearOwnership();
+    }
+
+    private void OnDestroy()
+    {
+        VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChanged);
+        VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerAnswered);
+        VRtistrySyncer.instance.OnPlayerGuessed.RemoveListener(PlayerGuessed);
+
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
     }
 
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -168,10 +185,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.VRCompletedTutorial = true;
 
-        string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-        if (answersSeparated.Length >= ClientPlayer.clients.Count)
+        if (!VRtistrySyncer.instance.Answers.Equals(""))
         {
-            VRtistrySyncer.instance.State = "vr posing";
+            string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+
+            if (answersSeparated.Length >= ClientPlayer.clients.Count)
+            {
+                VRtistrySyncer.instance.State = "vr posing";
+            }
         }
 
         headerText.enabled = true;
@@ -220,10 +241,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 DropPalette();
 
                 //Get random answer
-                VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.viewUUID;
+                VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.ownerIDSelf;
 
                 //UI
-                headerText.text = "<u>Paint: " + GetAnswerByViewID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</u>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
+                headerText.text = "<u>Paint: " + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</u>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 //Clear practice painting
                 pen.EraseAllLines();
@@ -260,7 +281,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 sprayGun.CanPaint = true;
 
                 //UI
-                headerText.text = "Paint: " + GetAnswerByViewID(VRtistrySyncer.instance.ChosenAnswerOwner);
+                headerText.text = "Paint: " + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
                 timerText.enabled = true;
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
@@ -288,16 +309,23 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 {
                     string[] ownerAndGuess = VRtistrySyncer.instance.Guesses.Split(':');
 
-                    if (GetAnswerByViewID(ownerAndGuess[1]).Equals(GetAnswerByViewID(VRtistrySyncer.instance.ChosenAnswerOwner)))
+                    if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                     {
-                        AddPlayerToResults(ownerAndGuess[0], true);
+                        if (int.TryParse(ownerAndGuess[0], out int j))
+                        {
+                            AddPlayerToResults(j, true);
 
-                        vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
-                        playerPoints[ownerAndGuess[0]] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
+                            vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
+
+                            playerPoints[i] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
+                        }
                     }
                     else
                     {
-                        AddPlayerToResults(ownerAndGuess[0], false);
+                        if (int.TryParse(ownerAndGuess[0], out int j))
+                        {
+                            AddPlayerToResults(j, false);
+                        }
                     }
                 }
 
@@ -316,6 +344,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 break;
             case "leaderboard":
                 StartCoroutine("ShowLeaderboard");
+
+                VRtistrySyncer.instance.Guesses = "";
+
                 break;
             case "game over":
                 StartCoroutine("EndGame");
@@ -325,7 +356,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
     }
 
-    string GetAnswerByViewID(string ID)
+    string GetAnswerByOwnerID(int ID)
     {
         string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
 
@@ -334,7 +365,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         {
             string[] ownerAndAnswer = a.Split(':');
 
-            if (ID.Equals(ownerAndAnswer[0]))
+            if (int.TryParse(ownerAndAnswer[0], out int i) && ID == i)
             {
                 return ownerAndAnswer[1];
             }
@@ -387,15 +418,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
         //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowLeaderboard", "");
 
         //Sort player points
-        IOrderedEnumerable<KeyValuePair<string, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
+        IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
 
         int vrPlayerPos = 0;
         //Add player cards
-        foreach (KeyValuePair<string, int> entry in sortedDict)
+        foreach (KeyValuePair<int, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByViewID(entry.Key).syncer.Name;
-            newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByViewID(entry.Key);
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByOwnerID(entry.Key).syncer.Name;
+            newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 
             currentLeaderboardCards.Add(newCard);
@@ -448,8 +479,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     void PlayerGuessed(string guesses)
     {
+        Debug.Log("Guesses: " + guesses);
+
         //Check to see if all players have guessed, if so move to next state
         string[] guessesSeparated = guesses.Split('\n');
+
+        Debug.Log("Number of guesses: " + guessesSeparated.Length);
 
         if (guessesSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("clients guessing"))
         {
@@ -473,14 +508,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
         return newPrompt;
     }
 
-    void AddPlayerToResults(string playerID, bool correct)
+    void AddPlayerToResults(int playerID, bool correct)
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
-        pi.GetComponentInChildren<TMP_Text>(true).text = ClientPlayer.GetClientByViewID(playerID).syncer.Name;
+        pi.GetComponentInChildren<TMP_Text>(true).text = ClientPlayer.GetClientByOwnerID(playerID).syncer.Name;
         pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
         //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
-        pi.GetComponent<Image>().color = ClientPlayer.GetClientByViewID(playerID).syncer.Color;
+        pi.GetComponent<Image>().color = ClientPlayer.GetClientByOwnerID(playerID).syncer.Color;
 
         playerNameIcons.Add(pi);
     }
@@ -488,7 +523,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     /// <summary>
     /// Method called when VR player guesses which player wrote the selected prompt
     /// </summary>
-    public void GuessPlayerVR(string playerID)
+    public void GuessPlayerVR(int playerID)
     {
         VRtistrySyncer.instance.VRPlayerGuess = playerID;
 
@@ -499,7 +534,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
         else
         {
-            headerText.text = "Wrong! " + ClientPlayer.GetClientByViewID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote the answer";
+            headerText.text = "Wrong! " + ClientPlayer.GetClientByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote the answer";
         }
 
         VRtistrySyncer.instance.State = "leaderboard";
@@ -524,14 +559,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
         //Enable proper tool
         if (isSprayGun)
         {
-            sprayGun.SetActive(true);
-            pen.SetActive(false);
+            Debug.Log("Setting IsPenEnabled to false");
+            VRtistrySyncer.instance.IsPenEnabled = false;
             //sprayGun.transform.position = isToolHandLeft ? leftHandGrabPoint.transform.position : rightHandGrabPoint.transform.position;
         }
         else
         {
-            sprayGun.SetActive(false);
-            pen.SetActive(true);
+            Debug.Log("Setting IsPenEnabled to true");
+            VRtistrySyncer.instance.IsPenEnabled = true;
             //pen.transform.position = isToolHandLeft ? leftHandGrabPoint.transform.position : rightHandGrabPoint.transform.position;
         }
 
@@ -694,11 +729,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         SetColliders(false);
 
-        foreach (MeshRenderer mr in paintPalette.GetComponentsInChildren<MeshRenderer>())
-        {
-            mr.enabled = true;
-        }
-        
+        VRtistrySyncer.instance.IsPaletteEnabled = true;
+
         bool isPaletteHandLeft = !(toolHand == HandType.left);
 
         PaintPalette pp = paintPalette.GetComponent<PaintPalette>();
@@ -765,10 +797,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             vrPlayer.rightHand.ForceReleaseGrab();
         }
 
-        foreach (MeshRenderer mr in paintPalette.GetComponentsInChildren<MeshRenderer>())
-        {
-            mr.enabled = false;
-        }
+        VRtistrySyncer.instance.IsPaletteEnabled = false;
 
         paintPalette.GetComponent<MeshCollider>().enabled = false;
     }

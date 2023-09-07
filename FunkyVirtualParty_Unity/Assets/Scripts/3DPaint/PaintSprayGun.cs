@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using PaintIn3D;
 using UnityEngine.Events;
+using UnityEngine.Animations;
 
 #if UNITY_ANDROID
 using FMODUnity;
@@ -32,6 +33,9 @@ public class PaintSprayGun : MonoBehaviour
     [SerializeField]
     Collider col;
 
+    [SerializeField]
+    ParentConstraint constraint;
+
     private bool canPaint = true;
 
     bool isInHand;
@@ -54,6 +58,30 @@ public class PaintSprayGun : MonoBehaviour
     {
         VRtistrySyncer.instance.StartedPainting.AddListener(ps.Play);
         VRtistrySyncer.instance.StoppedPainting.AddListener(ps.Stop);
+
+#if UNITY_ANDROID
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+#endif
+    }
+
+    private void OnDestroy()
+    {
+        VRtistrySyncer.instance.StartedPainting.RemoveListener(ps.Play);
+        VRtistrySyncer.instance.StoppedPainting.RemoveListener(ps.Stop);
+
+#if UNITY_ANDROID
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+#endif
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        //Setup default constraint
+        ConstraintSource newSource = new ConstraintSource();
+        newSource.sourceTransform = avatar.GetComponent<VRtistryVRPlayerController>().rightHandGrabPoint;
+        newSource.weight = 1;
+        constraint.AddSource(newSource);
+        constraint.constraintActive = true;
     }
 
 #if UNITY_ANDROID

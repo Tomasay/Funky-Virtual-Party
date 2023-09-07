@@ -15,7 +15,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     ClientPlayer localPlayer;
 
-    RealtimeAvatarManager avatarManager;
+    RealtimeAvatarManager realtimeAvatarManager;
 
     [SerializeField]
     Realtime realtime;
@@ -51,8 +51,10 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public ClientPlayer LocalPlayer { get => localPlayer; }
 
-    public RealtimeAvatar VRAvatar { get => avatarManager.avatars[0]; }
-    public bool isVRAvatarSpawned { get => avatarManager.avatars.Count > 0; }
+    public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager; }
+
+    public RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
+    public bool isVRAvatarSpawned { get => realtimeAvatarManager.avatars.Count > 0; }
 
 #if UNITY_WEBGL
     [DllImport("__Internal")]
@@ -76,14 +78,14 @@ public class RealtimeSingletonWeb : MonoBehaviour
         if (LocalPlayerSpawned == null)
             LocalPlayerSpawned = new UnityEvent();
 
-        avatarManager = GetComponent<RealtimeAvatarManager>();
+        realtimeAvatarManager = GetComponent<RealtimeAvatarManager>();
 
         realtime.didConnectToRoom += ConnectedToRoom;
         realtime.didDisconnectFromRoom += CheckDisconnectedDueToNoHost;
 
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
-        avatarManager.avatarDestroyed += AvatarManager_avatarDestroyed;
+        realtimeAvatarManager.avatarDestroyed += AvatarManager_avatarDestroyed;
 
         DontDestroyOnLoad(gameObject);
     }
@@ -125,7 +127,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     void ConnectedToRoom(Realtime realtime)
     {
-        if (avatarManager.avatars.Count > 0)
+        if (realtimeAvatarManager.avatars.Count > 0)
         {
             SetJoinedUI();
 

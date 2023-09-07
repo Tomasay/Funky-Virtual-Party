@@ -4,6 +4,7 @@ using UnityEngine;
 using Shapes;
 using Autohand;
 using UnityEngine.Events;
+using UnityEngine.Animations;
 
 #if UNITY_ANDROID
 using FMODUnity;
@@ -25,9 +26,11 @@ public class ThreeDPen : MonoBehaviour
     MeshRenderer tipMesh, baseMesh;
 
     [SerializeField]
+    ParentConstraint constraint;
+
+    [SerializeField]
     PaintPalette palette;
 
-#if UNITY_ANDROID
     [SerializeField]
     Collider col, tipCol;
 
@@ -36,7 +39,6 @@ public class ThreeDPen : MonoBehaviour
 
     [SerializeField]
     ThreeDPaintGameManager gm;
-#endif
 
     bool isPainting;
 
@@ -68,8 +70,32 @@ public class ThreeDPen : MonoBehaviour
 
     private void Start()
     {
-        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { isPainting = true; });
+        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine();  isPainting = true; });
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
+
+#if UNITY_ANDROID
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+#endif
+    }
+
+    private void OnDestroy()
+    {
+        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); isPainting = true; });
+        VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPainting = false; });
+
+#if UNITY_ANDROID
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+#endif
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        //Setup default constraint
+        ConstraintSource newSource = new ConstraintSource();
+        newSource.sourceTransform = avatar.GetComponent<VRtistryVRPlayerController>().rightHandGrabPoint;
+        newSource.weight = 1;
+        constraint.AddSource(newSource);
+        constraint.constraintActive = true;
     }
 
     void Update()
@@ -96,8 +122,6 @@ public class ThreeDPen : MonoBehaviour
     {
         if (canPaint)
         {
-            CreateNewLine();
-
             VRtistrySyncer.instance.realtimeView.RequestOwnership();
             VRtistrySyncer.instance.IsDrawing = true;
 
@@ -134,6 +158,8 @@ public class ThreeDPen : MonoBehaviour
         currentLine = pl;
 
         lastPenPos = transform.position;
+
+        newLine.SetActive(false);
     }
 
     private void AddNewLinePoint()
@@ -144,6 +170,12 @@ public class ThreeDPen : MonoBehaviour
             currentLine.AddPoint(pos);
             currentPointCount++;
             lastPointTime = Time.time;
+        }
+
+        //Seems to be a bug with Shapes where polylines with less than 2 points render as incorrectly as a triangle...
+        if(currentLine.Count > 1)
+        {
+            currentLine.gameObject.SetActive(true);
         }
     }
 

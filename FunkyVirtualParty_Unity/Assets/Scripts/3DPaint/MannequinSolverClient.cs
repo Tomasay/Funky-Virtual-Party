@@ -7,9 +7,6 @@ using System.IO;
 public class MannequinSolverClient : MonoBehaviour
 {
     [SerializeField]
-    Transform[] ikRefs;
-
-    [SerializeField]
     SkinnedMeshRenderer skinnedMeshRenderer;
 
     [SerializeField]
@@ -18,6 +15,11 @@ public class MannequinSolverClient : MonoBehaviour
     Mesh colliderMesh;
 
     public void SetPoseColliders()
+    {
+        Invoke("SetPoseCollidersDelayed", 0.5f);
+    }
+
+    void SetPoseCollidersDelayed()
     {
         colliderMesh = new Mesh();
         skinnedMeshRenderer.BakeMesh(colliderMesh, true); ;
