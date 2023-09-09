@@ -126,6 +126,8 @@ public class ChaseGameClientPlayer : ClientPlayer
     {
         yield return new WaitForSeconds(delay);
 
+        animSyncer.Trigger = "";
+
         canMove = true;
     }
 

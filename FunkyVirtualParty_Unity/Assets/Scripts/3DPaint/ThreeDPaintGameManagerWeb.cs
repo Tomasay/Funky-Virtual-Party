@@ -81,7 +81,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     List<AnswerOptionButton> answerButtons, answerResults;
 
-    float vrPlayerPoints;
     Dictionary<int, int> playerPoints;
 
     private void Awake()
@@ -244,6 +243,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                     AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                     aob.SetText(ownerAndAnswer[1]);
                     aob.playerID = ownerAndAnswer[0];
+                    if (int.TryParse(ownerAndAnswer[0], out int i))
+                    {
+                        aob.SetColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.red);
+                    }
                     answerResults.Add(aob);
                 }
                 break;
@@ -252,14 +255,17 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 string[] guessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
                 foreach (string g in guessesSeparated)
                 {
-                    string[] guessOwnerAndGuess = g.Split(':');
+                    string[] ownerAndGuess = g.Split(':');
 
-                    if (int.TryParse(guessOwnerAndGuess[0], out int i))
+                    if (int.TryParse(ownerAndGuess[0], out int i))
                     {
-                        AddPlayerToResults(i, guessOwnerAndGuess[1]);
-                    }
+                        AddPlayerToResults(i, ownerAndGuess[1]);
 
-                    
+                        if (int.TryParse(ownerAndGuess[1], out int j) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
+                        {
+                            playerPoints[j] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
+                        }
+                    }
                 }
 
                 //Display results
@@ -452,7 +458,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
             currentLeaderboardCards.Add(newCard);
 
-            if (vrPlayerPoints < entry.Value)
+            if (VRtistrySyncer.instance.VRPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
             }
@@ -462,7 +468,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
-        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + vrPlayerPoints;
+        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);

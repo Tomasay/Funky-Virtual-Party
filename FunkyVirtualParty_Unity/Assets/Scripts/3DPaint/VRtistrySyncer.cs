@@ -25,6 +25,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public string Answers { get => model.answers; set => model.answers = value; }
     public string Guesses { get => model.guesses; set => model.guesses = value; }
     public string CurrentPrompt { get => model.currentPrompt; set => model.currentPrompt = value; }
+    public int VRPlayerPoints { get => model.vrPlayerPoints; set => model.vrPlayerPoints = value; }
     public int ChosenAnswerOwner { get => model.chosenAnswerOwner; set => model.chosenAnswerOwner = value; }
     public int VRPlayerGuess { get => model.vrPlayerGuess; set => model.vrPlayerGuess = value; }
     public float ClientAnswerTimer { get => model.clientAnswerTimer; set => model.clientAnswerTimer = value; }
@@ -67,8 +68,14 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     private void Start()
     {
         //Default states when entering scene
-        State = "clients guessing";
+        State = "clients answering";
+        Answers = "";
+        Guesses = "";
+        VRPlayerPoints = 0;
+        VRCompletedTutorial = false;
         IsPenEnabled = true;
+        PenColor = Color.black;
+        SprayGunColor = Color.black;
 
         //TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
@@ -102,7 +109,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             // If this is a model that has no data set on it
             if (currentModel.isFreshModel)
             {
-                currentModel.state = "clients guessing";
+                currentModel.state = "clients answering";
                 currentModel.isPenEnabled = true;
             }
 

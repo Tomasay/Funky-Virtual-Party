@@ -57,7 +57,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     EventInstance fmodInstance;
 
-    float vrPlayerPoints;
     Dictionary<int, int> playerPoints;
 
     int currentRound = 1;
@@ -106,9 +105,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
         InvokeRepeating("Test", 1, 1);
     }
 
+    //Temporary solution because ownership seems to randomly get taken by VR player, preventing clients from changing any values
     void Test()
     {
-        Debug.Log("Clearing ownership!");
         VRtistrySyncer.instance.realtimeView.ClearOwnership();
     }
 
@@ -307,7 +306,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 string[] guessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
                 foreach (string g in guessesSeparated)
                 {
-                    string[] ownerAndGuess = VRtistrySyncer.instance.Guesses.Split(':');
+                    string[] ownerAndGuess = g.Split(':');
 
                     if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                     {
@@ -315,7 +314,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                         {
                             AddPlayerToResults(j, true);
 
-                            vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
+                            VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
 
                             playerPoints[i] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
                         }
@@ -431,7 +430,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
             currentLeaderboardCards.Add(newCard);
 
-            if (vrPlayerPoints < entry.Value)
+            if (VRtistrySyncer.instance.VRPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
             }
@@ -441,7 +440,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
-        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + vrPlayerPoints;
+        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);
@@ -529,7 +528,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         if (playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner))
         {
-            vrPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_PLAYER;
+            VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_PLAYER;
             headerText.text = "Correct!";
         }
         else

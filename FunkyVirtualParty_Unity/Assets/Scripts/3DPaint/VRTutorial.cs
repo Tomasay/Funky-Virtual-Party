@@ -64,6 +64,11 @@ public class VRTutorial : MonoBehaviour
         palette.OnColorChanged.AddListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
     }
 
+    private void OnDestroy()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+    }
+
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();

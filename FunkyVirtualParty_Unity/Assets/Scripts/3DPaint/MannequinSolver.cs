@@ -43,6 +43,11 @@ public class MannequinSolver : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
     }
 
+    private void OnDestroy()
+    {
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+    }
+
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();
