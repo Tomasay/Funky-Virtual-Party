@@ -1,24 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!95 &6499989556497604711
-Animator:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2058171791658886308}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 7251fcdce1f64d4499c25c3f41a44d23, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &2950175573562831672
 GameObject:
   m_ObjectHideFlags: 0
@@ -47,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3736379750386412958}
   m_RootOrder: 2
@@ -180,6 +162,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 387.66284, y: -87.022125, z: -3.1242676}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 655621127824670353}
   m_RootOrder: 8
@@ -247,6 +230,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.85358995, y: 0.85358995, z: 0.85358995}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 655621127824670353}
   m_RootOrder: 9
@@ -298,6 +282,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 907872003436816, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 302192296906296028, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7041404
@@ -467,6 +455,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1332354175165732517, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1332354175165732517, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: -6144374641435577274, guid: 55d518cbeb8e2b14ab455669adcf5104, type: 3}
@@ -570,11 +562,39 @@ PrefabInstance:
       propertyPath: m_RootOrder
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 3189599276733166102, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3231443772201574281, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3625935380984854458, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3625935380984854458, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 874f297e27bf11f4cab0c09cf92e2a89, type: 2}
+    - target: {fileID: 3660136522747320444, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3774105281782733013, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3973163651989355182, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_text
       value: Avoid getting tagged! Use the left analog stick to move around the map
         and press buttons to alter the environment. Pump your arms like you are running
         to gain a speed boost!
+      objectReference: {fileID: 0}
+    - target: {fileID: 5121687864879345008, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5121687864879345008, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -583,6 +603,10 @@ PrefabInstance:
     - target: {fileID: 5911356241293066652, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6155755891636882117, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6155755891636882117, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -664,13 +688,21 @@ PrefabInstance:
       propertyPath: m_text
       value: MOVE
       objectReference: {fileID: 0}
+    - target: {fileID: 7733632646421294710, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7766667234104230889, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7967431335229403010, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_Name
       value: controller_l (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8242074907189261332, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_PresetInfoIsWorld
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8245816906965796612, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_LocalRotation.w
@@ -700,6 +732,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8318300861648209077, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8387415197627623678, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_Name
       value: MoveInfoText
@@ -710,6 +746,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8402087967492837606, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
       propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8449090772515728346, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8449090772515728346, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 874f297e27bf11f4cab0c09cf92e2a89, type: 2}
+    - target: {fileID: 8492575621355029532, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
+      propertyPath: m_SortingLayer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8492575621355029532, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
@@ -728,6 +776,27 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 2125251413195137544, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
   m_PrefabInstance: {fileID: 139172545976469164}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &6499989556497604711
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2058171791658886308}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7251fcdce1f64d4499c25c3f41a44d23, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!224 &3736379750386412958 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3617579241473092402, guid: fd059d030ab455d41846b56c1be6015b, type: 3}
