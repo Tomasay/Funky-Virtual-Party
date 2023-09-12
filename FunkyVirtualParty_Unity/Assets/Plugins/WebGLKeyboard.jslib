@@ -27,6 +27,24 @@ mergeInto(LibraryManager.library, {
 	{
 		window.isPointerDownOnButton = isDown;
 	},
+	StoreHandednessData: function (name)
+	{
+		if (typeof(Storage) !== "undefined") {
+		  localStorage.setItem("handedness", UTF8ToString(name));
+		}
+	},
+	GetHandednessData: function ()
+	{
+		if (typeof(Storage) !== "undefined") {
+		  var returnStr = localStorage.getItem("handedness");
+		  if(returnStr != null){
+		    var bufferSize = lengthBytesUTF8(returnStr) + 1;
+		    var buffer = _malloc(bufferSize);
+		    stringToUTF8(returnStr, buffer, bufferSize);
+			return buffer;
+		  }
+		}
+	},
 	StoreNameData: function (name)
 	{
 		if (typeof(Storage) !== "undefined") {
