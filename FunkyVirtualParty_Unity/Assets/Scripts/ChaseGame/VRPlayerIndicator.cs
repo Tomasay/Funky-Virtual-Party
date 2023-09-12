@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class VRPlayerIndicator : MonoBehaviour
 {
+    [SerializeField]
+    Image indicator;
+
     private CanvasGroup canvasGroup = null;
     protected CanvasGroup CanvasGroup
     {
@@ -47,20 +51,21 @@ public class VRPlayerIndicator : MonoBehaviour
 
     private void Update()
     {
-        if (RealtimeSingletonWeb.instance.isVRAvatarSpawned && !InSight())
+        if ((ChaseGameSyncer.instance.State.Equals("game loop") || ChaseGameSyncer.instance.State.Equals("countdown")) && RealtimeSingletonWeb.instance.isVRAvatarSpawned && !InSight())
         {
-            gameObject.SetActive(true);
+            indicator.gameObject.SetActive(true);
             RotateToTarget();
         }
         else
         {
-            gameObject.SetActive(false);
+            indicator.gameObject.SetActive(false);
         }
     }
 
     void RotateToTarget()
     {
-        Vector3 direction = RealtimeSingletonWeb.instance.VRAvatar.head.position;
+        Vector3 tPos = RealtimeSingletonWeb.instance.VRAvatar.head.position;
+        Vector3 direction = RealtimeSingletonWeb.instance.LocalPlayer.transform.position - tPos;
 
         // Rotate element on UI (only on z-axis)
         tRot = Quaternion.LookRotation(direction);
