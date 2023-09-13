@@ -20,6 +20,7 @@ public class ChaseGameVRPlayerController : VRPlayerController
     private bool handMovement = false, sprintCooldown;
     private float movementCooldown;
     private float walkSpeed;
+    
 
     private bool inWater;
 
@@ -27,7 +28,9 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
     private void Start()
     {
-        sprintAmount = maxSprintSeconds;
+        sprintAmount = (maxSprintSeconds / ClientPlayer.maxClients ) * ClientPlayer.clients.Count;
+        maxSprintSeconds = sprintAmount + 0.25f; // minimum half second max 2.25
+
         walkSpeed = ahp.maxMoveSpeed;
         currentHandMovementSpeed = handMovementSpeed;
     }

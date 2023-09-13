@@ -26,6 +26,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] public AnimatorSyncer animSyncer;
 
     public static List<ClientPlayer> clients;
+    public static int maxClients = 8;
 
     [SerializeField] public Texture2D colorPalette;
     public static List<Color> availableColors; //Colors not used from the available palette
