@@ -33,6 +33,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
     GameObject partyCodeInvalid;
 
     [SerializeField]
+    GameObject maxPlayersReached;
+
+    [SerializeField]
     Button submitButton;
 
     [SerializeField] Button enableCustomizationsButton;
@@ -44,6 +47,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     GameObject loadingCircle;
 
     bool disconnectingDueToNoHost;
+    bool disconnectingMaxPlayers;
 
 
     public UnityEvent LocalPlayerSpawned;
@@ -81,7 +85,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         realtimeAvatarManager = GetComponent<RealtimeAvatarManager>();
 
         realtime.didConnectToRoom += ConnectedToRoom;
-        realtime.didDisconnectFromRoom += CheckDisconnectedDueToNoHost;
+        realtime.didDisconnectFromRoom += CheckDisconnectedReason;
 
         SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
@@ -111,7 +115,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     private void OnDestroy()
     {
         realtime.didConnectToRoom -= ConnectedToRoom;
-        realtime.didDisconnectFromRoom -= CheckDisconnectedDueToNoHost;
+        realtime.didDisconnectFromRoom -= CheckDisconnectedReason;
 
         SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
     }
@@ -127,7 +131,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     void ConnectedToRoom(Realtime realtime)
     {
-        if (realtimeAvatarManager.avatars.Count > 0)
+        if (realtimeAvatarManager.avatars.Count > 0 && ClientPlayer.clients.Count < ClientPlayer.maxClients)
         {
             SetJoinedUI();
 
@@ -137,10 +141,15 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             SpawnPlayer();
         }
-        else
+        else if( !(realtimeAvatarManager.avatars.Count > 0) )
         {
             realtime.Disconnect();
             disconnectingDueToNoHost = true;
+        }
+        else
+        {
+            realtime.Disconnect();
+            disconnectingMaxPlayers = true;
         }
     }
 
@@ -159,7 +168,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         enableCustomizationsButton.gameObject.SetActive(true);
     }
 
-    void CheckDisconnectedDueToNoHost(Realtime realtime)
+    void CheckDisconnectedReason(Realtime realtime)
     {
         if(disconnectingDueToNoHost)
         {
@@ -170,6 +179,17 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             disconnectingDueToNoHost = false;
         }
+
+        if(disconnectingMaxPlayers)
+        {
+            loadingCircle.SetActive(false);
+
+            joinRoomCanvas.enabled = true;
+            maxPlayersReached.gameObject.SetActive(true);
+            
+            disconnectingMaxPlayers = false;
+        }
+
     }
 
     IEnumerator SpawnPlayerDelayed()
