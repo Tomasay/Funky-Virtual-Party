@@ -73,6 +73,8 @@ public class VRTutorial : MonoBehaviour
     {
         vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();
 
+        vrPlayer.Ahp.maxMoveSpeed = 0;
+
         vrPlayer.BButtonEvent.enabled = false;
         vrPlayer.YButtonEvent.enabled = false;
 
