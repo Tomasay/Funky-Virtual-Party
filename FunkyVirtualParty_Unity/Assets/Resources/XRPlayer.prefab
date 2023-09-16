@@ -1307,6 +1307,24 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 89076728adcc13a478c979eeb2e1da48, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5c2d1b17baea05a4a97375c330d0c6d3, type: 3}
+--- !u!1 &169606881879493808 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 5c2d1b17baea05a4a97375c330d0c6d3, type: 3}
+  m_PrefabInstance: {fileID: 1052709122693050849}
+  m_PrefabAsset: {fileID: 0}
+--- !u!135 &2972582464421605644
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169606881879493808}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Radius: 1.0876828
+  m_Center: {x: -0.46504992, y: -1.0493982, z: -0.00000011920932}
 --- !u!4 &653373943827387914 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5c2d1b17baea05a4a97375c330d0c6d3, type: 3}
@@ -1434,7 +1452,7 @@ PrefabInstance:
     - target: {fileID: 8834320319295017360, guid: fdc3ba53f4e81a040b0471bbbafbb10a, type: 3}
       propertyPath: headModel
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 169606881879493808}
     - target: {fileID: 8834320319295017360, guid: fdc3ba53f4e81a040b0471bbbafbb10a, type: 3}
       propertyPath: headCamera
       value: 

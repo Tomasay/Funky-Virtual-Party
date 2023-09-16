@@ -22,6 +22,11 @@ public class KaijuGameManagerWeb : MonoBehaviour
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
 
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+    }
+
+    void OnLocalPlayerSpawned()
+    {
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerIndicatorVisibility(true);
 
         (RealtimeSingletonWeb.instance.LocalPlayer as KaijuGameClientPlayer).cam = cam;

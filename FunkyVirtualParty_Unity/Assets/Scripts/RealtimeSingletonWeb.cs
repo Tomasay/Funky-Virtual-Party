@@ -131,7 +131,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     void ConnectedToRoom(Realtime realtime)
     {
-        if (realtimeAvatarManager.avatars.Count > 0 && ClientPlayer.clients.Count < ClientPlayer.maxClients)
+        if (realtimeAvatarManager.avatars.Count > 0 && (ClientPlayer.clients == null || (ClientPlayer.clients.Count < ClientPlayer.maxClients)))
         {
             SetJoinedUI();
 
