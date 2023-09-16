@@ -5,15 +5,16 @@ using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class MazeGameManager : GameManager
+public class MazeGameManager : MonoBehaviour
 {
     [SerializeField] GameObject maze;
 
     [SerializeField] Collider[] vrIgnoreColliders, mazeIgnoreColliders;
 
 
-    protected override void Start()
+    void Start()
     {
+        /*
         if (ClientManager.instance)
         {
             ClientManager.instance.SpawnPlayers(playerPrefab, playerSpawns, true);
@@ -28,6 +29,7 @@ public class MazeGameManager : GameManager
         {
             Debug.LogError("Client Manager Instance Not Found!");
         }
+        */
 
         foreach (Collider col in vrIgnoreColliders)
         {

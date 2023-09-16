@@ -25,17 +25,6 @@ public class MazeGameClientPlayer : ClientPlayer
         base.Awake();
 
         startingSpeed = speed = 0.05f; //Smol map = smol speed
-
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-#endif
-    }
-
-    private void OnDisable()
-    {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-#endif
     }
 
     public override void Move(Vector2 input, bool changeDirection = true, bool animate = true, Vector2 overrideRotation = default)
@@ -125,6 +114,7 @@ public class MazeGameClientPlayer : ClientPlayer
         if (methodName.Equals("MarbleCollision"))
         {
             //Player falls over
+            /*
             ClientPlayer player = ClientManagerWeb.instance.GetPlayerBySocketID(data);
             player.Anim.SetTrigger("Fall");
             TriggerBlinkingAnimation(3);
@@ -133,6 +123,7 @@ public class MazeGameClientPlayer : ClientPlayer
             {
                 TriggerHaptic(200);
             }
+            */
 
             //TODO: Reduce score for appropriate player
 

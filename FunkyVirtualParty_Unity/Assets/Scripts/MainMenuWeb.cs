@@ -43,19 +43,20 @@ public class MainMenuWeb : MonoBehaviour
         codeWebGLButton.gameObject.SetActive(false);
 #endif
 
-        ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
+        //ClientManagerWeb.instance.SpawnPlayers(playerPrefab);
         VRPlayer.SetActive(false);
         stage.SetActive(false);
 
         //Functionality for spawning new players who enter
         //ClientManagerWeb.instance.onClientConnect += SpawnPlayer;
         //ClientManagerWeb.instance.onClientConnect += SpawnPlayerIcon;
-        ClientManagerWeb.instance.onClientConnect += SwitchToController;
+        //ClientManagerWeb.instance.onClientConnect += SwitchToController;
         //ClientManagerWeb.instance.onClientDisonnect += RemovePlayerIcon;
 
-        ClientManagerWeb.instance.onClientFailedConnect += EnableFailedConnectDebug;
+        //ClientManagerWeb.instance.onClientFailedConnect += EnableFailedConnectDebug;
 
         //If this is isn't first time visiting main menu
+        /*
         if (ClientManagerWeb.instance.Players.Count > 0)
         {
             SwitchToController(null);
@@ -126,7 +127,7 @@ public class MainMenuWeb : MonoBehaviour
         //ClientManagerWeb.instance.onClientConnect -= SpawnPlayerIcon;
         //ClientManagerWeb.instance.onClientDisonnect -= RemovePlayerIcon;
 
-        ClientManagerWeb.instance.onClientFailedConnect -= EnableFailedConnectDebug;
+        //ClientManagerWeb.instance.onClientFailedConnect -= EnableFailedConnectDebug;
     }
 
     private void SpawnPlayer(GameObject player)
@@ -135,7 +136,7 @@ public class MainMenuWeb : MonoBehaviour
         {
             player.GetComponent<ClientPlayer>().InitialCustomize();
         }
-        player.transform.position = playerPositions[ClientManagerWeb.instance.Players.Count - 1].position;
+        //player.transform.position = playerPositions[ClientManagerWeb.instance.Players.Count - 1].position;
         player.GetComponent<ClientPlayer>().syncer.NameColor = Color.white;
     }
 
@@ -168,6 +169,6 @@ public class MainMenuWeb : MonoBehaviour
         controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
 
-        ClientManagerWeb.instance.onClientConnect -= SwitchToController;
+        //ClientManagerWeb.instance.onClientConnect -= SwitchToController;
     }
 }

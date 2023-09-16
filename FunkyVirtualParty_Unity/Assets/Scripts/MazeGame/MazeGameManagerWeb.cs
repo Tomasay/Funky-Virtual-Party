@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MazeGameManagerWeb : GameManagerWeb
+public class MazeGameManagerWeb : MonoBehaviour
 {
     [SerializeField] GameObject maze;
     [SerializeField] Transform[] spawnPoints;
 
-    protected override void Start()
+    void Start()
     {
+        /*
         ClientManagerWeb.instance.SpawnPlayers(playerPrefab, true, spawnPoints);
         State = GameState.Tutorial;
 
@@ -21,5 +22,6 @@ public class MazeGameManagerWeb : GameManagerWeb
             ClientManagerWeb.instance.Players[i].transform.parent = spawnPoints[i];
             ClientManagerWeb.instance.Players[i].transform.localPosition = Vector3.zero;
         }
+        */
     }
 }

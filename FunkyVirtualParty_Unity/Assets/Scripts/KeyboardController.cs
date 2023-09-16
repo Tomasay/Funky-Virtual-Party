@@ -40,8 +40,6 @@ public class KeyboardController : MonoBehaviour
 
     private TMP_InputField currentField;
 
-    public ClientManagerWeb manager;
-
     [SerializeField] private TMP_Text debugText;
 
     private void Start()
@@ -144,7 +142,6 @@ public class KeyboardController : MonoBehaviour
     public void SubmitButtonPressed()
     {
         CloseKeyboard();
-        manager.AttemptJoinRoom(codeField.text.ToUpper(), nameField.text);
         StoreNameData(nameField.text);
     }
 #endif

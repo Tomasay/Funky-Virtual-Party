@@ -34,17 +34,6 @@ public class KaijuGameClientPlayer : ClientPlayer
         startingSpeed = 10;
 
         base.Awake();
-
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.On<string, string>("MethodCallToClient", MethodCalledFromServer);
-#endif
-    }
-
-    private void OnDisable()
-    {
-#if UNITY_WEBGL
-        ClientManagerWeb.instance.Manager.Socket.Off("MethodCallToClient");
-#endif
     }
 
 #if !UNITY_WEBGL
@@ -126,15 +115,6 @@ public class KaijuGameClientPlayer : ClientPlayer
         }
 
     }
-
-#if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
-    {
-        if (methodName.Equals("Gamers"))
-        {
-        }
-    }
-#endif
 
     // Jumping fields
     [SerializeField] private int jumpForce = 500;

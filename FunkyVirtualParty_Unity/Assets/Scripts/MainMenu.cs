@@ -38,6 +38,7 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        /*
         if(ClientManager.instance.Manager != null)
         {
             ClientManager.instance.Manager.Socket.Emit("setIsGameInPlay", ClientManager.instance.Passcode, false);
@@ -55,12 +56,13 @@ public class MainMenu : MonoBehaviour
         ClientManager.instance.onClientConnect += SpawnPlayerIcon;
         ClientManager.instance.onClientDisonnect += RemovePlayerIcon;
         SetPartyCodeText(ClientManager.instance.Passcode);
+        */
 
         //Generate QR code
         if(qr != null)
         {
 #if !UNITY_WEBGL
-            qrCode.texture = qr.generate_qr_code(ClientManager.instance.QRURL + "/?partyCode=" + ClientManager.instance.Passcode);
+            //qrCode.texture = qr.generate_qr_code(ClientManager.instance.QRURL + "/?partyCode=" + ClientManager.instance.Passcode);
 #endif
         }
 
@@ -73,11 +75,12 @@ public class MainMenu : MonoBehaviour
 
         ToggleBackgroundColor(0);
 
-        ClientManager.instance.OnPlayerCustomized += OnPlayerCustomized;
+        //ClientManager.instance.OnPlayerCustomized += OnPlayerCustomized;
     }
 
     private void Update()
     {
+        /*
         if(ClientManager.instance.Manager.Socket.IsOpen)
         {
             partyCodeText.enabled = true;
@@ -99,6 +102,7 @@ public class MainMenu : MonoBehaviour
             connectingText.enabled = false;
             connectionErrorText.enabled = true;
         }
+        */
 
         CheckDiscoBallSwitch();
         UpdateLight();
@@ -106,10 +110,12 @@ public class MainMenu : MonoBehaviour
 
     private void OnDisable()
     {
+        /*
         ClientManager.instance.onClientConnect -= SpawnPlayer;
         ClientManager.instance.onClientConnect -= SpawnPlayerIcon;
         ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
         ClientManager.instance.OnPlayerCustomized -= OnPlayerCustomized;
+        */
     }
 
     void OnPlayerCustomized(string id, string color, int headShape, float height, int hatIndex)
@@ -122,8 +128,10 @@ public class MainMenu : MonoBehaviour
 
     private void SpawnPlayer(GameObject player)
     {
+        /*
         player.transform.position = playerPositions[ClientManager.instance.Players.Count-1].position;
         ClientManager.instance.SyncAllPlayerPos();
+        */
     }
 
     private void SpawnPlayerIcon(GameObject player)

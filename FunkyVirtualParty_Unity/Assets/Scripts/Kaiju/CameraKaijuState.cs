@@ -24,13 +24,13 @@ public class CameraKaijuState : MonoBehaviour
 
         if (!player)
         {
-            player = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+            player = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
         }
         cam.LookAt = player;
 
         if (!clientPlayer)
         {
-            clientPlayer = ClientManagerWeb.instance.LocalPlayer as KaijuGameClientPlayer;
+            clientPlayer = RealtimeSingletonWeb.instance.LocalPlayer as KaijuGameClientPlayer;
         }
     }
 
@@ -39,11 +39,11 @@ public class CameraKaijuState : MonoBehaviour
     {
         if (!player)
         {
-            player = ClientManagerWeb.instance.LocalPlayer.Anim.transform;
+            player = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
         }
         if (!clientPlayer)
         {
-            clientPlayer = ClientManagerWeb.instance.LocalPlayer as KaijuGameClientPlayer;
+            clientPlayer = RealtimeSingletonWeb.instance.LocalPlayer as KaijuGameClientPlayer;
         }
 
         switch (clientPlayer.state)

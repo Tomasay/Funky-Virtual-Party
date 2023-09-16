@@ -22,11 +22,6 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
     void Awake()
     {
-        if (ClientManager.instance)
-        {
-            ClientManager.instance.onPlayerSpawned.AddListener(SetupCollisionIgnore);
-        }
-
         ahp.handRight.OnTriggerGrab += OnGrabbed;
         ahp.handRight.OnTriggerRelease += OnRelease;
         ahp.handLeft.OnTriggerGrab += OnGrabbed;
@@ -176,7 +171,7 @@ public class ShootoutGameVRPlayerController : VRPlayerController
             {
                 Physics.IgnoreCollision(f.col, fingy.GetComponent<Collider>());
             }
-            foreach (ClientPlayer cp in ClientManager.instance.Players)
+            foreach (ClientPlayer cp in ClientPlayer.clients)
             {
                 ShootoutGameClientPlayer scp = cp.gameObject.GetComponent<ShootoutGameClientPlayer>();
                 if (scp != null)

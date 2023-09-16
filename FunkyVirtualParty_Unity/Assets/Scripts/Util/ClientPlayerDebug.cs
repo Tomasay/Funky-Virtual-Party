@@ -12,12 +12,12 @@ public class ClientPlayerDebug : MonoBehaviour
 
         Customize();
 
-        ClientManager.instance.onClientConnect += NewPlayerJoined;
+        //ClientManager.instance.onClientConnect += NewPlayerJoined;
     }
 
     void NewPlayerJoined(GameObject newPlayer)
     {
-        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color), cp.syncer.HeadType, cp.syncer.Height, -1);
+        //ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color), cp.syncer.HeadType, cp.syncer.Height, -1);
     }
 
     void Customize()
@@ -36,6 +36,6 @@ public class ClientPlayerDebug : MonoBehaviour
         //Height
         cp.syncer.Height = Random.Range(-0.2f, 0.75f);
 
-        ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color), headType, cp.syncer.Height, -1);
+        //ClientManager.instance.Manager.Socket.Emit("syncCustomizationsFromClientDebug", cp.PlayerSocketID, "#" + ColorUtility.ToHtmlStringRGB(cp.syncer.Color), headType, cp.syncer.Height, -1);
     }
 }

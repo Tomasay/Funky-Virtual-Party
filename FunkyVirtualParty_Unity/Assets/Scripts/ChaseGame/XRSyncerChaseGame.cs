@@ -2,13 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class XRSyncerChaseGame : XRSyncer
+public class XRSyncerChaseGame : MonoBehaviour
 {
     [SerializeField]
     SpriteRenderer groundReticle;
 
     void Update()
     {
+        /*
         Debug.DrawRay(Head.transform.position, Vector3.down * 10, Color.green);
 
         //Check to see if above ground
@@ -30,5 +31,6 @@ public class XRSyncerChaseGame : XRSyncer
         {
             groundReticle.enabled = false;
         }
+        */
     }
 }
