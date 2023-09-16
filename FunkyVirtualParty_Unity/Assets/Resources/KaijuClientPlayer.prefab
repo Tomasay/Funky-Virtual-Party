@@ -1231,6 +1231,7 @@ GameObject:
   - component: {fileID: 1572502805415702960}
   - component: {fileID: 7672301955415547817}
   - component: {fileID: 8601255339963234450}
+  - component: {fileID: 2058134517651584336}
   m_Layer: 12
   m_Name: Character_Base_Animated
   m_TagString: Untagged
@@ -1298,6 +1299,8 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 8601255339963234450}
+  - componentID: 2
+    component: {fileID: 2058134517651584336}
   _childViews: []
 --- !u!114 &8601255339963234450
 MonoBehaviour:
@@ -1311,6 +1314,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d96f3e4206daf2b4195e94925ae0177b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2058134517651584336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8024565084117808938}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolate: 1
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 1
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 0
 --- !u!1 &8143653906893471124
 GameObject:
   m_ObjectHideFlags: 0
@@ -1380,8 +1401,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fbf427c0385dd14b833423e27f5b049, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncer: {fileID: 0}
-  animSyncer: {fileID: 0}
+  syncer: {fileID: 82329251579384622}
+  animSyncer: {fileID: 8601255339963234450}
   colorPalette: {fileID: 2800000, guid: d5d5c7de2ae85aa41b13c39260d4a533, type: 3}
   playerNameText: {fileID: 8745307368580851738}
   playerIndicatorText: {fileID: 1269928041217091059}
@@ -1389,9 +1410,9 @@ MonoBehaviour:
   anim: {fileID: 1572502805415702960}
   spineBone: {fileID: 6925314124048163258}
   col: {fileID: 8143653906893471125}
-  realtimeView: {fileID: 0}
-  realtimeTransform: {fileID: 0}
-  animRealtimeTransform: {fileID: 0}
+  realtimeView: {fileID: 7968749215492345231}
+  realtimeTransform: {fileID: -6217276134732043204}
+  animRealtimeTransform: {fileID: 2058134517651584336}
   hats:
   - {fileID: 7885003046060197423, guid: 79a89ee6ebe00d04a91cc3ffb6b4c18a, type: 3}
   - {fileID: 6427412174012747889, guid: 40986a5ec695bec4f9b54f2048ef8121, type: 3}
@@ -1405,7 +1426,15 @@ MonoBehaviour:
   - {fileID: 5697767704901991110, guid: fc0a0648be4c39e45a32196ab7106cd9, type: 3}
   hatAttachPoint: {fileID: 3736771296390564255}
   hatPoofParticles: {fileID: 7934806903019245887}
-  spawnPoints: []
+  spawnPoints:
+  - {x: -50, y: 25.5, z: 50}
+  - {x: -45, y: 25.5, z: 45}
+  - {x: -55, y: 25.5, z: 45}
+  - {x: -40, y: 25.5, z: 40}
+  - {x: -60, y: 25.5, z: 40}
+  - {x: -45, y: 25.5, z: 35}
+  - {x: -55, y: 25.5, z: 35}
+  - {x: -50, y: 25.5, z: 33}
   isDebugPlayer: 0
   state: 0
   cam: {fileID: 0}
