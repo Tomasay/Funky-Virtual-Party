@@ -135,8 +135,6 @@ public class ShootoutGameManager : MonoBehaviour
             }
         }
 
-        Debug.Log("Players alive: " + playersAlive);
-
         if (playersAlive == 0)
         {
             ShootoutGameSyncer.instance.State = "vr player won";
@@ -145,9 +143,7 @@ public class ShootoutGameManager : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        SetVRPlayerCanThrowFireballs(true);
-
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(4);
 
         for (int i = countdown; i > 0; i--)
         {
@@ -156,6 +152,8 @@ public class ShootoutGameManager : MonoBehaviour
         }
 
         vrInfoText.text = "GO!";
+
+        SetVRPlayerCanThrowFireballs(true);
 
         yield return new WaitForSeconds(1);
         vrInfoText.text = "";

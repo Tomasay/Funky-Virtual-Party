@@ -14,6 +14,7 @@ public class ShootoutGameManagerWeb : MonoBehaviour
 
     [SerializeField] CinemachineVirtualCamera cinemachineCam;
     [SerializeField] Camera cam;
+    [SerializeField] Animator cameraAnim;
 
     protected void Start()
     {
@@ -89,7 +90,11 @@ public class ShootoutGameManagerWeb : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(2);
+
+        cameraAnim.SetTrigger("Zoom Out");
+
+        yield return new WaitForSeconds(2);
 
         for (int i = countdown; i > 0; i--)
         {
