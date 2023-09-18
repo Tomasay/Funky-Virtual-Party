@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using DG.Tweening;
 
 namespace Autohand{
     [RequireComponent(typeof(HingeJoint))]
@@ -17,6 +18,13 @@ namespace Autohand{
         protected virtual void Start(){
             joint = GetComponent<HingeJoint>(); 
             startRot = transform.localRotation;
+        }
+
+        public void DistancePress()
+        {
+            Vector3 rot = transform.localRotation.eulerAngles;
+            rot.z = (GetValue() == 1) ? rot.z - 100 : rot.z + 100;
+            transform.DOLocalRotate(rot, 0.5f);
         }
 
         /// <summary>Returns a -1 to 1 value representing the hinges angle from min-max</summary>

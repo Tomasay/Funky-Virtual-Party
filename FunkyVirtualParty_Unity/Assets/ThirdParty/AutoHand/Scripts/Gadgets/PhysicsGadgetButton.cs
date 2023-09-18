@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using FMODUnity;
+using DG.Tweening;
 
 namespace Autohand{
     //THIS MAY NOT WORK AS A GRABBABLE AT THIS TIME - Try PhysicsGadgetSlider instead
@@ -26,11 +27,15 @@ namespace Autohand{
             startPos = transform.localPosition;
         }
 
+        public void OnDistancePress()
+        {
+            transform.DOLocalMoveY(-(pressedThreshold / 10), 0.25f);
+            //transform.localPosition = new Vector3(transform.position.x, -0.25f, transform.position.z);
+            Pressed();
+        }
 
         protected void FixedUpdate(){
             var value = GetValue();
-
-            Debug.Log("Value: " + value);
 
             /*
             if(!pressed && value+threshold >= 1) {
