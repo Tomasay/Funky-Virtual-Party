@@ -37,6 +37,13 @@ public class RealtimeSingleton : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
         realtime.didConnectToRoom += Realtime_didConnectToRoom;
+
+        //Initializing client connected/disconnected callbacks so they can be referenced before a client is disconnected
+        if(ClientPlayer.OnClientConnected == null)
+            ClientPlayer.OnClientConnected = new MyCPEvent();
+
+        if (ClientPlayer.OnClientDisconnected == null)
+            ClientPlayer.OnClientDisconnected = new MyCPEvent();
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)

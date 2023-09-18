@@ -19,13 +19,16 @@ public class VinylPlayer : MonoBehaviour
     [SerializeField] TMP_Text titleText, descriptionText;
     [SerializeField] VideoPlayer videoPlayer;
     [SerializeField] RawImage videoTexture;
+    [SerializeField] Image playButtonIcon;
 
     [SerializeField] GameObject trianglesParent;
 
     private Animator anim;
-    private GameObject currentVinyl = null;
+    private VinylInfo currentVinyl = null;
 
     private bool isSceneLoading = false;
+
+    private bool clientsPresent; //Are there clients present? If not, cannot start game
 
     private void Start()
     {
@@ -34,6 +37,42 @@ public class VinylPlayer : MonoBehaviour
         titleText.enabled = false;
         descriptionText.enabled = false;
         videoTexture.enabled = false;
+
+        ClientPlayer.OnClientConnected.AddListener(OnClientConnected);
+        ClientPlayer.OnClientDisconnected.AddListener(OnClientSDisconnected);
+    }
+
+    public void PlayButtonPressed()
+    {
+        if(currentVinyl && clientsPresent)
+        {
+            isSceneLoading = true;
+            SceneChangerSyncer.instance.CurrentScene = currentVinyl.SceneToLoad;
+        }
+    }
+
+    void OnClientConnected(ClientPlayer cp)
+    {
+        CheckIfClientsPresent();
+    }
+
+    void OnClientSDisconnected(ClientPlayer cp)
+    {
+        CheckIfClientsPresent();
+    }
+
+    void CheckIfClientsPresent()
+    {
+        clientsPresent = ClientPlayer.clients != null && ClientPlayer.clients.Count > 0;
+
+        SetPlayButtonAlpha((clientsPresent && currentVinyl) ? 1 : 0.25f);
+    }
+
+    void SetPlayButtonAlpha(float a)
+    {
+        Color c = playButtonIcon.color;
+        c.a = a;
+        playButtonIcon.color = c;
     }
 
     private void OnTriggerStay(Collider other)
@@ -44,43 +83,43 @@ public class VinylPlayer : MonoBehaviour
 
             if (!g.IsHeld()) //If vinyl is released from hands
             {
-                currentVinyl = other.gameObject;
-                VinylInfo info = other.gameObject.GetComponent<VinylInfo>();
+                currentVinyl = other.gameObject.GetComponent<VinylInfo>();
 
                 //Set vinyl pos/rot
-                info.SetDiscOnPlayer();
+                currentVinyl.SetDiscOnPlayer();
                 anim.SetTrigger("Play");
 
                 //Set UI info
                 titleText.enabled = true;
                 descriptionText.enabled = true;
-                titleText.text = info.Title;
-                descriptionText.text = info.Description;
-                videoPlayer.clip = info.videoPreview;
+                titleText.text = currentVinyl.Title;
+                descriptionText.text = currentVinyl.Description;
+                videoPlayer.clip = currentVinyl.videoPreview;
                 videoTexture.enabled = true;
 
-                //Load game scene in 3 seconds
-                StartCoroutine(LoadSceneDelayed(info.SceneToLoad, 3));
+                CheckIfClientsPresent();
             }
         }
     }
 
-    /*
     private void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.Equals(currentVinyl)) //If current vinyl leaves the trigger
+        if (other.gameObject.TryGetComponent<VinylInfo>(out VinylInfo vi))
         {
-            //Reset physics
-            Rigidbody rb = currentVinyl.GetComponent<Rigidbody>();
-            rb.useGravity = true;
-            rb.isKinematic = false;
+            if (vi.Equals(currentVinyl) && !vi.isOnPlayer) //If current vinyl leaves the trigger
+            {
+                //Clear UI
+                titleText.enabled = false;
+                descriptionText.enabled = false;
+                videoTexture.enabled = false;
+                SetPlayButtonAlpha(0.25f);
 
-            currentVinyl = null;
+                currentVinyl = null;
 
-            anim.SetTrigger("Stop");
+                anim.SetTrigger("Stop");
+            }
         }
     }
-    */
 
     private void Update()
     {
@@ -114,14 +153,5 @@ public class VinylPlayer : MonoBehaviour
             }
         }
 #endif
-    }
-
-    IEnumerator LoadSceneDelayed(string sceneName, int delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        isSceneLoading = true;
-
-        SceneChangerSyncer.instance.CurrentScene = sceneName;
     }
 }
