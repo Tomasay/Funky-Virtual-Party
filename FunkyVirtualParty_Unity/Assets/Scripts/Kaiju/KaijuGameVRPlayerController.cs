@@ -40,7 +40,7 @@ public class KaijuGameVRPlayerController : VRPlayerController
 
     public void OnGrabbed(Hand hand, Grabbable grabbable)
     {
-        grabbable.gameObject.GetComponent<KaijuGameClientPlayer>().realtimeView.RequestOwnership();
+        grabbable.gameObject.GetComponent<KaijuGameClientPlayer>().realtimeTransform.RequestOwnership();
     }
 
     private void OnRelease(Hand hand, Grabbable grabbable)

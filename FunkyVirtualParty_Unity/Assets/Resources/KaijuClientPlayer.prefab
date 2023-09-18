@@ -1438,7 +1438,6 @@ MonoBehaviour:
   isDebugPlayer: 0
   state: 0
   cam: {fileID: 0}
-  waterSplash: {fileID: 0}
   prevVector: {x: 0, y: 0}
   jumpForce: 500
   jumpCooldown: 2
@@ -1789,9 +1788,9 @@ MonoBehaviour:
   _interpolate: 1
   _syncPosition: 1
   _syncRotation: 1
-  _syncScale: 1
+  _syncScale: 0
   _syncVelocity: 1
-  _maintainOwnershipWhileSleeping: 0
+  _maintainOwnershipWhileSleeping: 1
 --- !u!1 &8335237129105250394
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,14 +27,6 @@ public class KaijuGameClientPlayer : ClientPlayer
 
     private RigidbodyConstraints currentConstraints;
 
-    public Normal.Realtime.RealtimeTransform RealtimeTransform
-    {
-        get
-        {
-            return realtimeTransform;
-        }
-    }
-
     protected override void Awake()
     {
         startingSpeed = 10;

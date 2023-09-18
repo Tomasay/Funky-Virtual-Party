@@ -38,7 +38,7 @@ public class ClientPlayer : MonoBehaviour
     [SerializeField] protected Collider col; //Used to change height of player
 
     [SerializeField] public RealtimeView realtimeView;
-    [SerializeField] protected RealtimeTransform realtimeTransform, animRealtimeTransform;
+    [SerializeField] public  RealtimeTransform realtimeTransform, animRealtimeTransform;
 
     [SerializeField] public GameObject[] hats;
     [SerializeField] GameObject hatAttachPoint;
