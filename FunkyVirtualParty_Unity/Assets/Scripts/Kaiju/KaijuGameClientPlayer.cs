@@ -25,9 +25,15 @@ public class KaijuGameClientPlayer : ClientPlayer
 
     public Camera cam;
 
-    [SerializeField] ParticleSystem waterSplash;
-
     private RigidbodyConstraints currentConstraints;
+
+    public Normal.Realtime.RealtimeTransform RealtimeTransform
+    {
+        get
+        {
+            return realtimeTransform;
+        }
+    }
 
     protected override void Awake()
     {
@@ -46,7 +52,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     public Vector2 prevVector = Vector2.zero;
     protected override void CheckInput()
     {
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         if (isDebugPlayer && state < KaijuClientState.Grabbed)
         {
             Vector2 input = new Vector2(movement.x, movement.z);
@@ -64,7 +70,8 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             // do not send input if held by VR player
         }
-#endif
+    #endif
+
         if (IsLocal && state < KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
@@ -152,6 +159,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
+        realtimeTransform.RequestOwnership();
 
         CanMove = true;
 

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Autohand;
+using TMPro;
 
 public class KaijuGameVRPlayerController : VRPlayerController
 {
     [SerializeField] private float handMovementSpeed = 20, maxSprintSeconds = 2f, handMovementThreshold = 0;
     private float currentHandMovementSpeed;
+    public TMP_Text vrInfoText, vrGameTimeText;
 
     private Vector3 movement, newMovement, leftHandPos, rightHandPos; //Used to store previous frame hand positions
     private float handDistance = 0;
@@ -36,13 +38,14 @@ public class KaijuGameVRPlayerController : VRPlayerController
         ahp.transform.parent.Translate(movement);
     }
 
-    private void OnGrabbed(Hand hand, Grabbable grabbable)
+    public void OnGrabbed(Hand hand, Grabbable grabbable)
     {
-
+        grabbable.gameObject.GetComponent<KaijuGameClientPlayer>().realtimeView.RequestOwnership();
     }
 
     private void OnRelease(Hand hand, Grabbable grabbable)
     {
+        
 
     }
 }

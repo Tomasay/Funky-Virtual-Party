@@ -8,7 +8,7 @@ using Cinemachine;
 public class KaijuGameManager : MonoBehaviour
 {
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50;
-    [SerializeField] private TMP_Text vrInfoText, vrGameTimeText;
+    private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
 
@@ -26,10 +26,11 @@ public class KaijuGameManager : MonoBehaviour
 
         timeRemaining = GAME_TIME_AMOUNT;
         //vrGameTimeText.text = FormatTime(timeRemaining);
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 
-       
 
-       foreach (ClientPlayer p in ClientPlayer.clients)
+
+        foreach (ClientPlayer p in ClientPlayer.clients)
        {
                 KaijuGameClientPlayer sp = p.GetComponent<KaijuGameClientPlayer>();
        }
@@ -111,6 +112,21 @@ public class KaijuGameManager : MonoBehaviour
             default:
                 break;
         }
+
+    }
+
+    private void OnDestroy()
+    {
+
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+    }
+
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        vrInfoText = avatar.GetComponent<KaijuGameVRPlayerController>().vrInfoText;
+
+        vrGameTimeText = avatar.GetComponent<KaijuGameVRPlayerController>().vrGameTimeText;
+        vrGameTimeText.text = FormatTime(timeRemaining);
 
     }
 
