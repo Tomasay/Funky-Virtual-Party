@@ -23,6 +23,8 @@ public class VinylInfo : MonoBehaviour
     [SerializeField] Material previewMat;
 #endif
 
+    public bool isOnPlayer;
+
     AutoHandPlayer vrPlayer;
 
     Grabbable grabbable;
@@ -99,6 +101,14 @@ public class VinylInfo : MonoBehaviour
         }
     }
 
+    public void OnGrabbed(Hand hand, Grabbable g)
+    {
+        rb.isKinematic = false;
+        rb.useGravity = true;
+        isSpinning = false;
+        isOnPlayer = false;
+    }
+
     public void OnHighlight(Hand hand, Grabbable g)
     {
         HapticsManager.instance.TriggerHaptic(hand.left, 0.1f, 0.1f);
@@ -121,10 +131,12 @@ public class VinylInfo : MonoBehaviour
     public void SetDiscOnPlayer()
     {
         rb.velocity = Vector3.zero;
-        rb.useGravity = false;
+        rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
+        rb.useGravity = false;
         transform.position = vinylParentPosition;
         transform.rotation = Quaternion.Euler(Vector3.zero);
         isSpinning = true;
+        isOnPlayer = true;
     }
 }

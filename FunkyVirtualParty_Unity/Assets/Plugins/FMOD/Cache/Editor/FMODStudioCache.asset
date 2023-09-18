@@ -1,5 +1,32 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9135276966667573688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/ButtonDown
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/ButtonDown
+  Guid:
+    Data1: -667264956
+    Data2: 1146989201
+    Data3: -442454886
+    Data4: 1093563050
+  Banks:
+  - {fileID: 1786547578719203088}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 65
 --- !u!114 &-3489532395887286795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42,10 +69,10 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638170198748685495
+  lastModified: 638305705670711235
   FileSizes:
   - Name: Desktop
-    Value: 1334
+    Value: 1420
   Exists: 1
 --- !u!114 &-1060322754376276002
 MonoBehaviour:
@@ -62,7 +89,7 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Music.bank
   Name: Music
   StudioPath: bank:/Music
-  lastModified: 638170198767082019
+  lastModified: 638305705670994336
   FileSizes:
   - Name: Desktop
     Value: 3593024
@@ -91,12 +118,14 @@ MonoBehaviour:
   - {fileID: 397026873310947440}
   - {fileID: 3828734369981536026}
   - {fileID: 5266432385895195812}
+  - {fileID: -9135276966667573688}
+  - {fileID: 5840535404609622549}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8547906298644744342}
   StringsBanks:
   - {fileID: -1657200388165055800}
-  cacheTime: 638170198767360150
+  cacheTime: 638305705671332068
   cacheVersion: 131591
 --- !u!114 &397026873310947440
 MonoBehaviour:
@@ -167,10 +196,10 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/SFX.bank
   Name: SFX
   StudioPath: bank:/SFX
-  lastModified: 638170198767360150
+  lastModified: 638305705671332068
   FileSizes:
   - Name: Desktop
-    Value: 7488
+    Value: 15648
   Exists: 1
 --- !u!114 &3828734369981536026
 MonoBehaviour:
@@ -252,6 +281,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 8000
+--- !u!114 &5840535404609622549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/ButtonUp
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/ButtonUp
+  Guid:
+    Data1: 86572430
+    Data2: 1219243157
+    Data3: 90646952
+    Data4: 505023824
+  Banks:
+  - {fileID: 1786547578719203088}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 60
 --- !u!114 &7170981953767192235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -318,7 +374,7 @@ MonoBehaviour:
   Path: ../FunkyVirtualParty_FMOD/FunkyVirtualParty/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638170198748670596
+  lastModified: 638305705670701301
   FileSizes:
   - Name: Desktop
     Value: 1588

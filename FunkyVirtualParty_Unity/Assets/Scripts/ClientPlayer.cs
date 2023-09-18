@@ -73,42 +73,30 @@ public class ClientPlayer : MonoBehaviour
     public Collider Col { get => col; }
     public SkinnedMeshRenderer Smr { get => smr; }
 
-    public static MyCPEvent OnReadyUp;
+    public static MyCPEvent OnClientConnected, OnClientDisconnected, OnReadyUp;
 
 #if UNITY_EDITOR
     public bool isDebugPlayer;
 #endif
 
-    protected virtual void Start()
+    protected virtual void Awake()
     {
         if (clients == null)
             clients = new List<ClientPlayer>();
+
+        if (OnClientConnected == null)
+            OnClientConnected = new MyCPEvent();
+
+        if (OnClientDisconnected == null)
+            OnClientDisconnected = new MyCPEvent();
 
         if (OnReadyUp == null)
             OnReadyUp = new MyCPEvent();
 
         clients.Add(this);
 
-        DontDestroyOnLoad(gameObject);
-
-        if (realtimeView.isOwnedLocallyInHierarchy)
-            LocalStart();
-    }
-
-    protected virtual void LocalStart()
-    {
-        realtimeTransform.RequestOwnership();
-        animRealtimeTransform.RequestOwnership();
-
-        SetSpawnPoint();
-
-        playerInput.actions["Action"].started += Action;
-    }
-
-    protected virtual void Awake()
-    {
         //Instantiate list of available colors from palette
-        if(availableColors == null)
+        if (availableColors == null)
         {
             availableColors = new List<Color>();
             for (int i = 0; i < colorPalette.width; i++)
@@ -130,9 +118,31 @@ public class ClientPlayer : MonoBehaviour
         spinePos = spineBone.transform.localPosition;
     }
 
+    protected virtual void Start()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        if (realtimeView.isOwnedLocallyInHierarchy)
+            LocalStart();
+
+        OnClientConnected.Invoke(this);
+    }
+
+    protected virtual void LocalStart()
+    {
+        realtimeTransform.RequestOwnership();
+        animRealtimeTransform.RequestOwnership();
+
+        SetSpawnPoint();
+
+        playerInput.actions["Action"].started += Action;
+    }
+
     private void OnDestroy()
     {
         playerInput.actions["Action"].started -= Action;
+
+        OnClientDisconnected.Invoke(this);
 
         clients.Remove(this);
     }
