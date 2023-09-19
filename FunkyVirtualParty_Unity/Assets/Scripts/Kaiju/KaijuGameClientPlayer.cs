@@ -142,6 +142,8 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", true);
         state = KaijuClientState.Grabbed;
+
+        realtimeView.RequestOwnership();
         realtimeTransform.RequestOwnership();
 
         CanMove = false;
@@ -153,6 +155,8 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
+
+        realtimeView.RequestOwnership();
         realtimeTransform.RequestOwnership();
 
         CanMove = true;
