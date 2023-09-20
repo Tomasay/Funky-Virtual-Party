@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 541959942280848130}
   - component: {fileID: 541959942280848129}
   - component: {fileID: 7002962728004766221}
+  - component: {fileID: 1662788342823229992}
   m_Layer: 0
   m_Name: Grab
   m_TagString: Untagged
@@ -29,6 +30,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.035, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3895495710045743702}
   m_Father: {fileID: 541959942315602618}
@@ -46,22 +48,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 822bc9090447b9c40833509c4a32e597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ignoreMe: 0
   body: {fileID: 0}
-  heldPositionOffset: {x: 0, y: 0, z: 0}
-  heldRotationOffset: {x: 0, y: 0, z: 0}
+  hightlightMaterial: {fileID: 0}
+  isGrabbable: 1
+  CopySettings: {fileID: 0}
+  grabType: 0
   handType: 0
   singleHandOnly: 1
-  releaseOnTeleport: 1
-  parentOnGrab: 0
-  lockHandOnGrab: 0
-  maintainGrabOffset: 1
+  allowHeldSwapping: 1
   instantGrab: 0
-  throwMultiplyer: 1
-  hightlightMaterial: {fileID: 0}
-  pullApartBreakOnly: 1
-  makeChildrenGrabbable: 1
+  useGentleGrab: 0
+  maintainGrabOffset: 1
+  ignoreWeight: 0
+  parentOnGrab: 0
+  throwPower: 1
   jointBreakForce: 2000
-  jointBreakTorque: 2000
+  showAdvancedSettings: 1
+  makeChildrenGrabbable: 1
+  grabPriorityWeight: 1
+  ignoreReleaseTime: 0.5
+  heldPositionOffset: {x: 0, y: 0, z: 0}
+  heldRotationOffset: {x: 0, y: 0, z: 0}
+  customGrabJoint: {fileID: 0}
+  jointedBodies: []
+  heldIgnoreColliders: []
+  pullApartBreakOnly: 1
+  showEvents: 1
   onGrab:
     m_PersistentCalls:
       m_Calls: []
@@ -74,10 +87,16 @@ MonoBehaviour:
   onUnsqueeze:
     m_PersistentCalls:
       m_Calls: []
+  onHighlight:
+    m_PersistentCalls:
+      m_Calls: []
+  onUnhighlight:
+    m_PersistentCalls:
+      m_Calls: []
   OnJointBreak:
     m_PersistentCalls:
       m_Calls: []
-  hideEvents: 0
+  lockHandOnGrab: 0
 --- !u!54 &541959942280848129
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -102,6 +121,7 @@ HingeJoint:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 541959942280848254}
   m_ConnectedBody: {fileID: 8312931125755603957}
+  m_ConnectedArticulationBody: {fileID: 0}
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
@@ -129,6 +149,20 @@ HingeJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!64 &1662788342823229992
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 541959942280848254}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &541959942315602617
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,6 +189,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.9, y: 0.8, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 541959942280848255}
   - {fileID: 8090422786880260594}
@@ -190,6 +225,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
   m_LocalPosition: {x: 0, y: 0.007012155, z: 0.09}
   m_LocalScale: {x: 1.5060972, y: 2.0204322, z: 0.5152573}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 541959942280848255}
   m_RootOrder: 0
@@ -213,6 +249,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
@@ -253,7 +290,7 @@ MeshCollider:
   m_GameObject: {fileID: 3145129131110457006}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
@@ -288,6 +325,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
   m_LocalPosition: {x: 0, y: 0.017499983, z: 0}
   m_LocalScale: {x: 12.0738125, y: 12.073815, z: 1.7111306}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 541959942315602618}
   m_RootOrder: 1
@@ -311,6 +349,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1

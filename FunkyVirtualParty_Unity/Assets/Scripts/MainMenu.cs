@@ -6,14 +6,14 @@ using TMPro;
 using epoching.easy_qr_code;
 using UnityEngine.InputSystem.EnhancedTouch;
 using Autohand;
+using Unity.Mathematics;
+using DG.Tweening;
 
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] private Transform[] playerPositions;
 
     [SerializeField] private TMP_Text partyCodeText, partyCodeQRText, inviteYourFriendsText, connectingText, connectionErrorText;
-
-    [SerializeField] private const float TIMEOUT_TIME = 5.0f;
 
     [SerializeField] Generate_qr_code qr = null;
     [SerializeField] RawImage qrCode;
@@ -29,7 +29,7 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] GameObject discoBall;
 
-    [SerializeField] GameObject lightDial;
+    [SerializeField] GameObject lightSlider;
 
     [SerializeField] PhysicsGadgetHingeAngleReader discoBallSwitch;
     private bool isDiscoBallOn;
@@ -38,26 +38,6 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        if(ClientManager.instance.Manager != null)
-        {
-            ClientManager.instance.Manager.Socket.Emit("setIsGameInPlay", ClientManager.instance.Passcode, false);
-        }
-
-        //Spawn all existing players
-        ClientManager.instance.SpawnPlayers(playerPrefab, playerPositions);
-        foreach (ClientPlayer cp in ClientManager.instance.Players)
-        {
-            SpawnPlayerIcon(cp.gameObject);
-        }
-
-        //Functionality for spawning new players who enter
-        ClientManager.instance.onClientConnect += SpawnPlayer;
-        ClientManager.instance.onClientConnect += SpawnPlayerIcon;
-        ClientManager.instance.onClientDisonnect += RemovePlayerIcon;
-        SetPartyCodeText(ClientManager.instance.Passcode);
-        */
-
         //Generate QR code
         if(qr != null)
         {
@@ -75,63 +55,15 @@ public class MainMenu : MonoBehaviour
 
         ToggleBackgroundColor(0);
 
-        //ClientManager.instance.OnPlayerCustomized += OnPlayerCustomized;
+        Vector3 pos = lightSlider.transform.localPosition;
+        pos.z = -0.05f;
+        lightSlider.transform.localPosition = pos;
     }
 
     private void Update()
     {
-        /*
-        if(ClientManager.instance.Manager.Socket.IsOpen)
-        {
-            partyCodeText.enabled = true;
-            inviteYourFriendsText.enabled = true;
-            connectingText.enabled = false;
-            connectionErrorText.enabled = false;
-        }
-        else if(!ClientManager.instance.Manager.Socket.IsOpen && Time.time < TIMEOUT_TIME)
-        {
-            partyCodeText.enabled = false;
-            inviteYourFriendsText.enabled = false;
-            connectingText.enabled = true;
-            connectionErrorText.enabled = false;
-        }
-        else if (!ClientManager.instance.Manager.Socket.IsOpen && Time.time > TIMEOUT_TIME)
-        {
-            partyCodeText.enabled = false;
-            inviteYourFriendsText.enabled = false;
-            connectingText.enabled = false;
-            connectionErrorText.enabled = true;
-        }
-        */
-
         CheckDiscoBallSwitch();
         UpdateLight();
-    }
-
-    private void OnDisable()
-    {
-        /*
-        ClientManager.instance.onClientConnect -= SpawnPlayer;
-        ClientManager.instance.onClientConnect -= SpawnPlayerIcon;
-        ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
-        ClientManager.instance.OnPlayerCustomized -= OnPlayerCustomized;
-        */
-    }
-
-    void OnPlayerCustomized(string id, string color, int headShape, float height, int hatIndex)
-    {
-        if (ColorUtility.TryParseHtmlString(color, out Color newCol))
-        {
-            UpdatePlayerIconColor(id, newCol);
-        }
-    }
-
-    private void SpawnPlayer(GameObject player)
-    {
-        /*
-        player.transform.position = playerPositions[ClientManager.instance.Players.Count-1].position;
-        ClientManager.instance.SyncAllPlayerPos();
-        */
     }
 
     private void SpawnPlayerIcon(GameObject player)
@@ -173,20 +105,11 @@ public class MainMenu : MonoBehaviour
         }
     }
 
-    private void SetPartyCodeText(string code)
-    {
-        if (partyCodeText)
-        {
-            partyCodeText.text = "Party Code: " + code;
-            partyCodeQRText.text = code;
-        }
-    }
-
     public void ToggleBackgroundColor(int index = -1)
     {
-        if (index == -1 || index > backgroundColors.Length || index < 0)
+        if (index == -1 || index >= backgroundColors.Length || index < 0)
         {
-            if (currentColorIndex == backgroundColors.Length)
+            if (currentColorIndex == backgroundColors.Length-1)
             {
                 currentColorIndex = 0;
             }
@@ -210,9 +133,15 @@ public class MainMenu : MonoBehaviour
         discoBall.transform.parent.GetComponent<Animator>().SetTrigger(down ? "Down" : "Up");
     }
 
+    public void DistanceTurnDial()
+    {
+        lightSlider.transform.DOLocalMoveZ((lightSlider.transform.localPosition.z >= 0.04f) ? -0.05f : 0.05f, 0.5f);
+    }
+
     void UpdateLight()
     {
-        float lightLevel = lightDial.transform.localRotation.eulerAngles.y / 180.0f;
+        float lightLevel = lightSlider.transform.localPosition.z / 0.05f;
+        lightLevel = math.remap(-1, 1, 0, 1, lightLevel);
 
         float h, s, v;
         Color.RGBToHSV(Camera.main.backgroundColor, out h, out s, out v);
