@@ -73,7 +73,7 @@ public class ClientPlayer : MonoBehaviour
     public Collider Col { get => col; }
     public SkinnedMeshRenderer Smr { get => smr; }
 
-    public static MyCPEvent OnClientConnected, OnClientDisconnected, OnReadyUp;
+    public static MyCPEvent OnClientConnected, OnClientDisconnected, OnReadyUp, OnColorChanged;
 
 #if UNITY_EDITOR
     public bool isDebugPlayer;
@@ -92,6 +92,9 @@ public class ClientPlayer : MonoBehaviour
 
         if (OnReadyUp == null)
             OnReadyUp = new MyCPEvent();
+
+        if (OnColorChanged == null)
+            OnColorChanged = new MyCPEvent();
 
         clients.Add(this);
 

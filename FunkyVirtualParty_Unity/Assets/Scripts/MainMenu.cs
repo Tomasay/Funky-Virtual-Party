@@ -58,6 +58,23 @@ public class MainMenu : MonoBehaviour
         Vector3 pos = lightSlider.transform.localPosition;
         pos.z = -0.05f;
         lightSlider.transform.localPosition = pos;
+
+        ClientPlayer.OnClientConnected.AddListener(SpawnPlayerIcon);
+        ClientPlayer.OnClientDisconnected.AddListener(RemovePlayerIcon);
+        ClientPlayer.OnColorChanged.AddListener(UpdatePlayerIconColor);
+
+        //If this is consecutive time in main menu, spawn all current players
+        if(RealtimeSingleton.instance.Realtime.connected)
+        {
+            Invoke("SpawnAllCurrentPlayerIcons", 0.5f);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        ClientPlayer.OnClientConnected.RemoveListener(SpawnPlayerIcon);
+        ClientPlayer.OnClientDisconnected.RemoveListener(RemovePlayerIcon);
+        ClientPlayer.OnColorChanged.RemoveListener(UpdatePlayerIconColor);
     }
 
     private void Update()
@@ -66,39 +83,39 @@ public class MainMenu : MonoBehaviour
         UpdateLight();
     }
 
-    private void SpawnPlayerIcon(GameObject player)
+    private void SpawnAllCurrentPlayerIcons()
     {
-        StartCoroutine(SpawnPlayerIconDelayed(player, 0.5f));
+        foreach (ClientPlayer c in ClientPlayer.clients)
+        {
+            SpawnPlayerIcon(c);
+        }
     }
 
-    IEnumerator SpawnPlayerIconDelayed(GameObject player, float delay)
+    private void SpawnPlayerIcon(ClientPlayer cp)
     {
-        yield return new WaitForSeconds(delay);
-
-        ClientPlayer cp = player.GetComponent<ClientPlayer>();
         GameObject newIcon = Instantiate(playerIconPrefab, playerNamesList.transform);
-        newIcon.name = cp.PlayerSocketID;
+        newIcon.name = "" + cp.realtimeView.ownerIDSelf;
         newIcon.GetComponent<Animator>().cullingMode = AnimatorCullingMode.CullUpdateTransforms; //Weird workaround with Unity's animator
         newIcon.GetComponent<Image>().color = cp.syncer.Color;
         newIcon.GetComponentInChildren<TMP_Text>().text = cp.syncer.Name;
     }
 
-    public void UpdatePlayerIconColor(string id, Color c)
+    public void UpdatePlayerIconColor(ClientPlayer cp)
     {
         foreach (Transform t in playerNamesList.GetComponentsInChildren<Transform>())
         {
-            if (t.name.Equals(id))
+            if (t.name.Equals("" + cp.realtimeView.ownerIDSelf))
             {
-                t.GetComponent<Image>().color = c;
+                t.GetComponent<Image>().color = cp.syncer.Color;
             }
         }
     }
 
-    private void RemovePlayerIcon(string id)
+    private void RemovePlayerIcon(ClientPlayer cp)
     {
         foreach (Transform t in playerNamesList.GetComponentsInChildren<Transform>())
         {
-            if(t.name.Equals(id))
+            if(t.name.Equals("" + cp.realtimeView.ownerIDSelf))
             {
                 Destroy(t.gameObject);
             }

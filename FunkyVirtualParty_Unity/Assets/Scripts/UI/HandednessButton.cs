@@ -28,7 +28,6 @@ public class HandednessButton : MonoBehaviour
         //Check local storage for handedness preference
 #if UNITY_WEBGL && !UNITY_EDITOR
         string storedHandedness = GetHandednessData();
-        Debug.Log("Checking handedness: " + storedHandedness);
         if (storedHandedness != null && storedHandedness.Equals("left"))
         {
             HandednessSwitch(false);

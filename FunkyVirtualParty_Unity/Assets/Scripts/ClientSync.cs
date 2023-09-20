@@ -84,6 +84,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     private void OnColorChange(ClientSyncModel model, Color val)
     {
         cp.ChangeColor(val);
+        ClientPlayer.OnColorChanged.Invoke(cp);
     }
 
     void OnNameChange(ClientSyncModel previousModel, string val)

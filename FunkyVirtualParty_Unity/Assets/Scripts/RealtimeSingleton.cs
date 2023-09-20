@@ -44,6 +44,9 @@ public class RealtimeSingleton : MonoBehaviour
 
         if (ClientPlayer.OnClientDisconnected == null)
             ClientPlayer.OnClientDisconnected = new MyCPEvent();
+
+        if (ClientPlayer.OnColorChanged == null)
+            ClientPlayer.OnColorChanged = new MyCPEvent();
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
