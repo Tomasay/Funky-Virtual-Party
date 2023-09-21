@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
 using Autohand;
+#if !UNITY_WEBGL
 using FMODUnity;
+#endif
 
 public class VinylInfo : MonoBehaviour
 {
@@ -89,7 +91,9 @@ public class VinylInfo : MonoBehaviour
 
         if (Vector3.Distance(discPos, distanceCheckerPosition) > distanceToRespawn)
         {
+#if !UNITY_WEBGL
             RuntimeManager.PlayOneShot("event:/SFX/Pop", transform.position);
+#endif
             Instantiate(poofEffect, transform.position, transform.rotation);
 
             RespawnDisc();

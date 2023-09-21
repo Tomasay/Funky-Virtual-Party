@@ -8,8 +8,10 @@ using Autohand;
 using Autohand.Demo;
 using System.Linq;
 using UnityEngine.Animations;
+#if !UNITY_WEBGL
 using FMOD.Studio;
 using FMODUnity;
+#endif
 using Normal.Realtime;
 
 public class ThreeDPaintGameManager : MonoBehaviour
@@ -52,10 +54,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     P3dPaintableTexture mannequinUVs;
 
+#if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
 
     EventInstance fmodInstance;
+#endif
 
     Dictionary<int, int> playerPoints;
 
@@ -87,8 +91,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         StartCoroutine("StartGame");
 
+#if !UNITY_WEBGL
         fmodInstance = RuntimeManager.CreateInstance(musicEvent);
         fmodInstance.start();
+#endif
     }
 
     private void Start()
@@ -157,6 +163,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 VRtistrySyncer.instance.DrawingTimer -= Time.deltaTime;
                 timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
 
+#if !UNITY_WEBGL
                 if (VRtistrySyncer.instance.DrawingTimer <= 15)
                 {
                     fmodInstance.setParameterByName("VRtistryClock", 2);
@@ -165,6 +172,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 {
                     fmodInstance.setParameterByName("VRtistryClock", 1);
                 }
+#endif
 
                 if (VRtistrySyncer.instance.DrawingTimer <= 0)
                 {
@@ -227,7 +235,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 break;
             case "vr posing":
+#if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 1);
+#endif
 
                 solver.EnablePosing();
 
@@ -283,8 +293,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
             case "clients guessing":
+#if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 0);
                 fmodInstance.setParameterByName("VRtistryClock", 0);
+#endif
 
                 VRtistrySyncer.instance.Guesses = "";
 
@@ -381,11 +393,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     IEnumerator EndGame()
     {
+#if !UNITY_WEBGL
         fmodInstance.setParameterByName("VRtistryPhase", 2);
+#endif
 
         yield return new WaitForSeconds(4);
 
+#if !UNITY_WEBGL
         fmodInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+#endif
 
         yield return new WaitForSeconds(1);
 

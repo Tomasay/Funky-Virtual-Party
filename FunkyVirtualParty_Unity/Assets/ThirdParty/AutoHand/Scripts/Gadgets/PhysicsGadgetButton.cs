@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.Events;
+#if !UNITY_WEBGL
 using FMODUnity;
+#endif
 using DG.Tweening;
 
 namespace Autohand{
@@ -64,7 +66,9 @@ namespace Autohand{
 
 
         public void Pressed() {
+#if !UNITY_WEBGL
             RuntimeManager.PlayOneShot("event:/SFX/ButtonDown", transform.position);
+#endif
             pressed = true;
             pressedValue = GetValue();
             pressedPos = transform.localPosition;
@@ -72,7 +76,9 @@ namespace Autohand{
         }
 
         public void Unpressed(){
+#if !UNITY_WEBGL
             RuntimeManager.PlayOneShot("event:/SFX/ButtonUp", transform.position);
+#endif
             pressed = false;
             OnUnpressed?.Invoke();
         }
