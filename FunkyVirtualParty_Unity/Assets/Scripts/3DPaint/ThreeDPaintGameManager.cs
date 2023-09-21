@@ -211,8 +211,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     void OnStateChanged(string state)
     {
-        Debug.Log("State has changed to: " + state);
-
         switch (state)
         {
             case "clients answering":
@@ -558,13 +556,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
         //Enable proper tool
         if (isSprayGun)
         {
-            Debug.Log("Setting IsPenEnabled to false");
             VRtistrySyncer.instance.IsPenEnabled = false;
             //sprayGun.transform.position = isToolHandLeft ? leftHandGrabPoint.transform.position : rightHandGrabPoint.transform.position;
         }
         else
         {
-            Debug.Log("Setting IsPenEnabled to true");
             VRtistrySyncer.instance.IsPenEnabled = true;
             //pen.transform.position = isToolHandLeft ? leftHandGrabPoint.transform.position : rightHandGrabPoint.transform.position;
         }
@@ -799,6 +795,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.IsPaletteEnabled = false;
 
         paintPalette.GetComponent<MeshCollider>().enabled = false;
+
+        ParentConstraint pc = paintPalette.GetComponent<ParentConstraint>();
+
+        pc.RemoveSource(0);
+        ConstraintSource src = new ConstraintSource();
+        src.sourceTransform = isPaletteHandLeft ? vrPlayer.leftHandGrabPoint : vrPlayer.rightHandGrabPoint;
+        src.weight = 1;
+        pc.AddSource(src);
+        pc.constraintActive = true;
     }
 
     //Enable/Disable colliders that could get in the way of grabbing
