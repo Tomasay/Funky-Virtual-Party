@@ -36,6 +36,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
     GameObject maxPlayersReached;
 
     [SerializeField]
+    GameObject minigameInProgress;
+
+    [SerializeField]
     Button submitButton;
 
     [SerializeField] Button enableCustomizationsButton;
@@ -46,8 +49,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     [SerializeField]
     GameObject loadingCircle;
 
-    bool disconnectingDueToNoHost;
-    bool disconnectingMaxPlayers;
+    bool disconnectingDueToNoHost, disconnectingMaxPlayers, disconnectingMinigameInProgress;
 
 
     public UnityEvent LocalPlayerSpawned;
@@ -127,30 +129,45 @@ public class RealtimeSingletonWeb : MonoBehaviour
         //Display loading indicator
         joinRoomCanvas.enabled = false;
         loadingCircle.SetActive(true);
+
+        partyCodeInvalid.gameObject.SetActive(false);
+        maxPlayersReached.gameObject.SetActive(false);
+        minigameInProgress.gameObject.SetActive(false);
     }
 
     void ConnectedToRoom(Realtime realtime)
     {
-        if (realtimeAvatarManager.avatars.Count > 0 && (ClientPlayer.clients == null || (ClientPlayer.clients.Count < ClientPlayer.maxClients)))
+        //Disconnect circumstances
+        if(!(realtimeAvatarManager.avatars.Count > 0))
         {
-            SetJoinedUI();
+            realtime.Disconnect();
+            disconnectingDueToNoHost = true;
+            return;
+        }
+
+        if (ClientPlayer.clients != null && ClientPlayer.clients.Count >= ClientPlayer.maxClients)
+        {
+            realtime.Disconnect();
+            disconnectingMaxPlayers = true;
+            return;
+        }
+
+        if (!SceneChangerSyncer.instance.CurrentScene.Equals("MainMenu") && !SceneChangerSyncer.instance.CurrentScene.Equals(""))
+        {
+            realtime.Disconnect();
+            disconnectingMinigameInProgress = true;
+            return;
+        }
+
+
+        //If all good, connect and spawn player
+        SetJoinedUI();
 
 #if !UNITY_EDITOR && UNITY_WEBGL
             if(keyboardController) keyboardController.CloseKeyboard();
 #endif
 
-            SpawnPlayer();
-        }
-        else if( !(realtimeAvatarManager.avatars.Count > 0) )
-        {
-            realtime.Disconnect();
-            disconnectingDueToNoHost = true;
-        }
-        else
-        {
-            realtime.Disconnect();
-            disconnectingMaxPlayers = true;
-        }
+        SpawnPlayer();
     }
 
     void SetJoinedUI()
@@ -188,6 +205,16 @@ public class RealtimeSingletonWeb : MonoBehaviour
             maxPlayersReached.gameObject.SetActive(true);
             
             disconnectingMaxPlayers = false;
+        }
+
+        if (disconnectingMinigameInProgress)
+        {
+            loadingCircle.SetActive(false);
+
+            joinRoomCanvas.enabled = true;
+            minigameInProgress.gameObject.SetActive(true);
+
+            disconnectingMinigameInProgress = false;
         }
 
     }
