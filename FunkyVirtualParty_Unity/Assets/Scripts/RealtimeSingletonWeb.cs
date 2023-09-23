@@ -168,6 +168,19 @@ public class RealtimeSingletonWeb : MonoBehaviour
 #endif
 
         SpawnPlayer();
+
+        CheckForDuplicateAvatars();
+    }
+
+    //Temporary fix
+    void CheckForDuplicateAvatars()
+    {
+        RealtimeAvatar[] avatars = GameObject.FindObjectsOfType<RealtimeAvatar>();
+        for (int i = 0; i < avatars.Length-1; i++)
+        {
+            Debug.Log("Destroying: " + avatars[i].gameObject.name);
+            Destroy(avatars[i].gameObject);
+        }
     }
 
     void SetJoinedUI()

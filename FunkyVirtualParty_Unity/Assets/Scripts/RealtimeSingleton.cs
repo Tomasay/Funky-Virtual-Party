@@ -14,6 +14,8 @@ public class RealtimeSingleton : MonoBehaviour
 
     public string[] vinylDiscNames;
 
+    public List<GameObject> discs;
+
     public Realtime Realtime { get => realtime; }
     public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager;}
     public RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
@@ -47,6 +49,9 @@ public class RealtimeSingleton : MonoBehaviour
 
         if (ClientPlayer.OnColorChanged == null)
             ClientPlayer.OnColorChanged = new MyCPEvent();
+
+        if (discs == null)
+            discs = new List<GameObject>();
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -79,7 +84,7 @@ public class RealtimeSingleton : MonoBehaviour
 
         foreach (string s in vinylDiscNames)
         {
-            Realtime.Instantiate("Vinyls/Vinyl_" + s, options);
+            discs.Add(Realtime.Instantiate("Vinyls/Vinyl_" + s, options));
         }
     }
 }

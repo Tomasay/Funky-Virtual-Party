@@ -10,6 +10,7 @@ using Normal.Realtime;
 public class Fireball : MonoBehaviour
 {
     public static List<Fireball> pool;
+    public static List<GameObject> holes;
 
     [SerializeField] public FireballSyncer syncer;
     [SerializeField] public Rigidbody rb;
@@ -34,17 +35,17 @@ public class Fireball : MonoBehaviour
         }
         pool.Add(this);
 
+        if (holes == null)
+        {
+            holes = new List<GameObject>();
+        }
+
         chargeCanvas.transform.SetParent(null);
     }
 
     private void Start()
     {
         Reset();
-    }
-
-    private void OnDisable()
-    {
-        pool = null;
     }
 
     void Update()
@@ -183,6 +184,8 @@ public class Fireball : MonoBehaviour
 
         float holeSize = Mathf.Lerp(minHoleScale, maxHoleScale, syncer.CurrentScale);
         newHole.transform.localScale = new Vector3(holeSize, holeSize, holeSize);
+
+        holes.Add(newHole);
     }
 
     IEnumerator SetColliderDelayed(Fireball f, bool enabled, float delay)
