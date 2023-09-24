@@ -36,7 +36,7 @@ public class MannequinSolver : MonoBehaviour
     Mesh colliderMesh;
 
     bool updatePose = false;
-    bool poseHeightAdjusted = false;
+    static bool poseHeightAdjusted;
 
     private void Start()
     {

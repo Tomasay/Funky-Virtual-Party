@@ -6,20 +6,13 @@ using Normal.Realtime;
 
 public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 {
-    [SerializeField]
-    PaintSprayGun sprayGun;
-
-    [SerializeField]
-    ThreeDPen pen;
-
-    [SerializeField]
-    PaintPalette paintPalette;
-
     public static VRtistrySyncer instance;
 
     public MyStringEvent OnStateChangeEvent, OnPromptChangedEvent, OnPlayerAnswered, OnPlayerGuessed;
 
     public UnityEvent StartedPainting, StoppedPainting, StartedDrawing, StoppedDrawing, PaletteMirrored;
+    public UnityEvent<bool> penEnabledChanged, paletteEnabledChanged;
+    public UnityEvent<Color> penColorChanged, spraygunColorChanged;
 
     public string State { get => model.state; set => model.state = value; }
     public string Answers { get => model.answers; set => model.answers = value; }
@@ -59,6 +52,12 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         StoppedDrawing = new UnityEvent();
         PaletteMirrored = new UnityEvent();
 
+        penEnabledChanged = new UnityEvent<bool>();
+        paletteEnabledChanged = new UnityEvent<bool>();
+
+        penColorChanged = new UnityEvent<Color>();
+        spraygunColorChanged = new UnityEvent<Color>();
+
 #if UNITY_WEBGL
         isWeb = true;
 #endif
@@ -71,9 +70,16 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         State = "clients answering";
         Answers = "";
         Guesses = "";
+        CurrentPrompt = "";
         VRPlayerPoints = 0;
+        DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
+        ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
         VRCompletedTutorial = false;
+        IsPainting = false;
+        IsDrawing = false;
         IsPenEnabled = true;
+        IsPaletteMirrored = false;
+        IsPaletteEnabled = false;
         PenColor = Color.black;
         SprayGunColor = Color.black;
 
@@ -176,8 +182,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 
     private void OnIsPenEnabledChanged(VRtistrySyncModel model, bool value)
     {
-        pen.SetActive(value);
-        sprayGun.SetActive(!value);
+        penEnabledChanged.Invoke(value);
     }
 
     private void OnIsPaletteMirroredChanged(VRtistrySyncModel model, bool value)
@@ -187,20 +192,17 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 
     private void OnIsPaletteEnabledChanged(VRtistrySyncModel model, bool value)
     {
-        foreach (MeshRenderer mr in paintPalette.GetComponentsInChildren<MeshRenderer>())
-        {
-            mr.enabled = value;
-        }
+        paletteEnabledChanged.Invoke(value);
     }
 
     private void OnPenColorChanged(VRtistrySyncModel model, Color value)
     {
-        pen.ChangeColor(value);
+        penColorChanged.Invoke(value);
     }
 
     private void OnSprayGunColorChanged(VRtistrySyncModel model, Color value)
     {
-        sprayGun.ChangeColor(value);
+        spraygunColorChanged.Invoke(value);
     }
 
     private void OnPromptChanged(VRtistrySyncModel model, string value)

@@ -1985,9 +1985,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fcd9d2d3371a6449be29ad0bb0afb01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprayGun: {fileID: 140390364}
-  pen: {fileID: 784611663}
-  paintPalette: {fileID: 2056088995}
   OnStateChangeEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -2013,6 +2010,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   PaletteMirrored:
+    m_PersistentCalls:
+      m_Calls: []
+  penEnabledChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  paletteEnabledChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  penColorChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  spraygunColorChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &580198652
@@ -5734,7 +5743,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 75e3d6b4f9a11794b84506f7b6fdf762, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.0007533412
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 75e3d6b4f9a11794b84506f7b6fdf762, type: 3}
       propertyPath: m_LocalPosition.z

@@ -30,6 +30,7 @@ public class PaintPalette : MonoBehaviour
     void Start()
     {
         VRtistrySyncer.instance.PaletteMirrored.AddListener(Mirror);
+        VRtistrySyncer.instance.paletteEnabledChanged.AddListener(SetActive);
 
 #if UNITY_ANDROID
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
@@ -52,6 +53,7 @@ public class PaintPalette : MonoBehaviour
     private void OnDestroy()
     {
         VRtistrySyncer.instance.PaletteMirrored.RemoveListener(Mirror);
+        VRtistrySyncer.instance.paletteEnabledChanged.RemoveListener(SetActive);
 
 #if UNITY_ANDROID
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
@@ -104,6 +106,14 @@ public class PaintPalette : MonoBehaviour
             Vector3 newScale = mr.gameObject.transform.localScale;
             newScale.Scale(new Vector3(-1, 1, 1));
             mr.gameObject.transform.localScale = newScale;
+        }
+    }
+
+    public void SetActive(bool active)
+    {
+        foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.enabled = active;
         }
     }
 }

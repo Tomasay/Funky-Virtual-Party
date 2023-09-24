@@ -6281,9 +6281,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fcd9d2d3371a6449be29ad0bb0afb01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprayGun: {fileID: 4590413093659771401}
-  pen: {fileID: 7458268345991492319}
-  paintPalette: {fileID: 2548461492699794804}
   OnStateChangeEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -6309,6 +6306,18 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   PaletteMirrored:
+    m_PersistentCalls:
+      m_Calls: []
+  penEnabledChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  paletteEnabledChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  penColorChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  spraygunColorChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &736423440
@@ -11544,6 +11553,7 @@ MonoBehaviour:
   AllowFadeout: 1
   TriggerOnce: 0
   Preload: 0
+  AllowNonRigidbodyDoppler: 0
   Params: []
   OverrideAttenuation: 0
   OverrideMinDistance: 1
@@ -17600,7 +17610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 75e3d6b4f9a11794b84506f7b6fdf762, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.0007533412
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 75e3d6b4f9a11794b84506f7b6fdf762, type: 3}
       propertyPath: m_LocalPosition.z
