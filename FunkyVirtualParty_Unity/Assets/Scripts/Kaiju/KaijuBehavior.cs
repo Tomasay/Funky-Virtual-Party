@@ -12,6 +12,11 @@ public class KaijuBehavior : MonoBehaviour
     public int speed = 1;
 
     [SerializeField]
+    Normal.Realtime.RealtimeView realtimeView;
+    [SerializeField]
+    Normal.Realtime.RealtimeTransform realtimeTransform;
+
+    [SerializeField]
     Transform Target;
 
     //for regenerating stature
@@ -19,7 +24,8 @@ public class KaijuBehavior : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        realtimeTransform.RequestOwnership();
+        realtimeView.RequestOwnership();
     }
 
     // Update is called once per frame
