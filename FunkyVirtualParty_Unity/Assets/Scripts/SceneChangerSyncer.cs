@@ -83,6 +83,13 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
             SceneManager.LoadScene(val);
         }
 #elif UNITY_ANDROID
+        //Destroy discs
+        foreach (GameObject d in RealtimeSingleton.instance.discs)
+        {
+            Realtime.Destroy(d);
+        }
+        RealtimeSingleton.instance.discs.Clear();
+
         //Unregister current avatar as it will be destroyed on scene change
         if (RealtimeSingleton.instance.Realtime.connected)
         {

@@ -99,9 +99,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private void Start()
     {
-        VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
-        VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
-
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
         VRtistrySyncer.instance.OnPlayerGuessed.AddListener(PlayerGuessed);
@@ -492,12 +489,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     void PlayerGuessed(string guesses)
     {
-        Debug.Log("Guesses: " + guesses);
-
         //Check to see if all players have guessed, if so move to next state
         string[] guessesSeparated = guesses.Split('\n');
-
-        Debug.Log("Number of guesses: " + guessesSeparated.Length);
 
         if (guessesSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("clients guessing"))
         {

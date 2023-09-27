@@ -158,6 +158,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     void SetNewPrompt(string p)
     {
+        if(p.Equals(""))
+        {
+            return;
+        }
+
         inputCanvas.enabled = true;
         answerInputField.text = "";
         headerText.text = p; //Set prompt text
@@ -333,7 +338,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 #if UNITY_WEBGL && !UNITY_EDITOR
         UpdateInputFieldText(f.text);
 #endif
-
     }
 
     public void SubmitAnswer()
@@ -359,8 +363,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     void SubmitGuess(int clientID, string clientGuessID)
     {
-        Debug.Log("Submitting guess: " + (clientID + ":" + clientGuessID));
-
         if(VRtistrySyncer.instance.Guesses.Equals(""))
         {
             VRtistrySyncer.instance.Guesses = clientID + ":" + clientGuessID;
@@ -371,8 +373,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         }
 
         guessingCanvas.enabled = false;
-
-        Debug.Log("Guesses: " + VRtistrySyncer.instance.Guesses);
     }
 
     void AddPlayerToResults(int playerID, string answerPlayerID)

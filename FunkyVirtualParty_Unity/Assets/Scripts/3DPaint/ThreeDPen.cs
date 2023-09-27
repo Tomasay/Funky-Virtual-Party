@@ -72,6 +72,8 @@ public class ThreeDPen : MonoBehaviour
     {
         VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine();  isPainting = true; });
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
+        VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
+        VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
 
 #if UNITY_ANDROID
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
@@ -82,6 +84,8 @@ public class ThreeDPen : MonoBehaviour
     {
         VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); isPainting = true; });
         VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPainting = false; });
+        VRtistrySyncer.instance.penEnabledChanged.RemoveListener(SetActive);
+        VRtistrySyncer.instance.penColorChanged.RemoveListener(ChangeColor);
 
 #if UNITY_ANDROID
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;

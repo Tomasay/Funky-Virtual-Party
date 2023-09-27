@@ -58,6 +58,8 @@ public class PaintSprayGun : MonoBehaviour
     {
         VRtistrySyncer.instance.StartedPainting.AddListener(ps.Play);
         VRtistrySyncer.instance.StoppedPainting.AddListener(ps.Stop);
+        VRtistrySyncer.instance.penEnabledChanged.AddListener(IsPenEnabledChanged);
+        VRtistrySyncer.instance.spraygunColorChanged.AddListener(ChangeColor);
 
 #if UNITY_ANDROID
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
@@ -68,6 +70,8 @@ public class PaintSprayGun : MonoBehaviour
     {
         VRtistrySyncer.instance.StartedPainting.RemoveListener(ps.Play);
         VRtistrySyncer.instance.StoppedPainting.RemoveListener(ps.Stop);
+        VRtistrySyncer.instance.penEnabledChanged.RemoveListener(IsPenEnabledChanged);
+        VRtistrySyncer.instance.spraygunColorChanged.RemoveListener(ChangeColor);
 
 #if UNITY_ANDROID
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
@@ -128,6 +132,11 @@ public class PaintSprayGun : MonoBehaviour
             ps.startColor = c;
             paintSphere.Color = c;
 #endif
+    }
+
+    void IsPenEnabledChanged(bool penEnabled)
+    {
+        SetActive(!penEnabled);
     }
 
     public void SetActive(bool active)
