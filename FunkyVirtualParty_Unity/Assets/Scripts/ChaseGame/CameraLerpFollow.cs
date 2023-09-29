@@ -8,6 +8,8 @@ public class CameraLerpFollow : MonoBehaviour
     CinemachineFreeLook cam;
     [SerializeField] Transform player;
 
+    [SerializeField] Transform editorTestPlayer;
+
     float valueToLerpTo = 0;
     float maxRotation = 25;
 
@@ -18,6 +20,9 @@ public class CameraLerpFollow : MonoBehaviour
         if(!player)
         {
             player = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
+        #if UNITY_EDITOR
+            player = editorTestPlayer;
+        #endif
         }
     }
 

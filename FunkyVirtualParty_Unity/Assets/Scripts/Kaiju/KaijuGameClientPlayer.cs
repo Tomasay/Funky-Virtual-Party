@@ -30,7 +30,9 @@ public class KaijuGameClientPlayer : ClientPlayer
     protected override void Awake()
     {
         startingSpeed = 10;
-
+#if UNITY_EDITOR
+        canMove = true;
+#endif
         base.Awake();
     }
 
@@ -44,7 +46,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     public Vector2 prevVector = Vector2.zero;
     protected override void CheckInput()
     {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (isDebugPlayer && state < KaijuClientState.Grabbed)
         {
             Vector2 input = new Vector2(movement.x, movement.z);
@@ -62,7 +64,28 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             // do not send input if held by VR player
         }
-    #endif
+
+        if (true)
+        {
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+
+            //Input should be relative to camera, which is always facing forward from the player
+            if (input.magnitude > 0.1f)
+            {
+                float magnitude = input.magnitude;
+                input = input.normalized;
+                float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + cam.transform.eulerAngles.y; // + camera eulerAngles y
+                Vector3 newInput = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
+                input = new Vector2(newInput.x, newInput.z) * magnitude;
+            }
+
+            if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
+            {
+                //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
+                Move(input);
+            }
+        }
+#endif
 
         if (IsLocal && state < KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
         {

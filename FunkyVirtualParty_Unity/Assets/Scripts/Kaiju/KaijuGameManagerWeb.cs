@@ -22,7 +22,10 @@ public class KaijuGameManagerWeb : MonoBehaviour
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
 
+#if !UNITY_EDITOR
         RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+#endif
+
     }
 
     void OnLocalPlayerSpawned()
@@ -37,7 +40,7 @@ public class KaijuGameManagerWeb : MonoBehaviour
 
     protected void OnStateChange(string s)
     {
-        switch (ShootoutGameSyncer.instance.State)
+        switch (KaijuGameSyncer.instance.State)
         {
             case "tutorial":
 
@@ -67,6 +70,7 @@ public class KaijuGameManagerWeb : MonoBehaviour
 
     void Update()
     {
+#if !UNITY_EDITOR
         switch (KaijuGameSyncer.instance.State)
         {
             case "tutorial":
@@ -87,6 +91,7 @@ public class KaijuGameManagerWeb : MonoBehaviour
             default:
                 break;
         }
+#endif
     }
     public string FormatTime(float time)
     {
