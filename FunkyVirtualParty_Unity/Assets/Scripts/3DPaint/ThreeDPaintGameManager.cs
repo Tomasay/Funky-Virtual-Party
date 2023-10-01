@@ -258,14 +258,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 vrPlayer.YButtonEvent.Pressed.RemoveAllListeners();
                 vrPlayer.BButtonEvent.Pressed.RemoveAllListeners();
 
-                vrPlayer.YButtonEvent.Pressed.AddListener(SetPose);
-                vrPlayer.BButtonEvent.Pressed.AddListener(SetPose);
-                vrPlayer.AButtonEvent.Pressed.AddListener(SetPose);
-                vrPlayer.XButtonEvent.Pressed.AddListener(SetPose);
-                vrPlayer.RightTriggerEvent.Pressed.AddListener(SetPose);
-                vrPlayer.LeftTriggerEvent.Pressed.AddListener(SetPose);
-                vrPlayer.RightGripEvent.Pressed.AddListener(SetPose);
-                vrPlayer.LeftGripEvent.Pressed.AddListener(SetPose);
+                //Give a 2 second buffer for players to realize what's happening so they don't accidentally press a button too soon
+                Invoke("EnablePoseCallbacks", 2);
 
                 break;
             case "vr painting":
@@ -360,6 +354,18 @@ public class ThreeDPaintGameManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void EnablePoseCallbacks()
+    {
+        vrPlayer.YButtonEvent.Pressed.AddListener(SetPose);
+        vrPlayer.BButtonEvent.Pressed.AddListener(SetPose);
+        vrPlayer.AButtonEvent.Pressed.AddListener(SetPose);
+        vrPlayer.XButtonEvent.Pressed.AddListener(SetPose);
+        vrPlayer.RightTriggerEvent.Pressed.AddListener(SetPose);
+        vrPlayer.LeftTriggerEvent.Pressed.AddListener(SetPose);
+        vrPlayer.RightGripEvent.Pressed.AddListener(SetPose);
+        vrPlayer.LeftGripEvent.Pressed.AddListener(SetPose);
     }
 
     string GetAnswerByOwnerID(int ID)
