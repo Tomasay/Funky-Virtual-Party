@@ -309,6 +309,7 @@ public class ClientPlayer : MonoBehaviour
             transform.Translate(movement * Time.deltaTime);
 
             //Magnitude of movement for animations
+#if !UNITY_EDITOR
             if (animate)
             {
                 float val = Mathf.Abs(input.magnitude);
@@ -325,7 +326,24 @@ public class ClientPlayer : MonoBehaviour
             {
                 syncer.AnimSpeed = 0;
             }
-
+#else 
+            if (animate)
+            {
+                float val = Mathf.Abs(input.magnitude);
+                if ((val > 0.05) || (val < -0.05))
+                {
+                    anim.speed = val;
+                }
+                else
+                {
+                    anim.speed = 0;
+                }
+            }
+            else
+            {
+                anim.speed = 0;
+            }
+#endif
             //Update rotation
             if (changeDirection)
             {

@@ -1351,6 +1351,7 @@ GameObject:
   - component: {fileID: 7968749215492345231}
   - component: {fileID: 82329251579384622}
   - component: {fileID: -6217276134732043204}
+  - component: {fileID: 2448561904894974972}
   m_Layer: 29
   m_Name: KaijuClientPlayer
   m_TagString: Untagged
@@ -1803,6 +1804,18 @@ MonoBehaviour:
   _syncScale: 0
   _syncVelocity: 1
   _maintainOwnershipWhileSleeping: 1
+--- !u!75 &2448561904894974972
+ConstantForce:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8143653906893471124}
+  m_Enabled: 1
+  m_Force: {x: 0, y: 8, z: 0}
+  m_RelativeForce: {x: 0, y: 0, z: 0}
+  m_Torque: {x: 0, y: 0, z: 0}
+  m_RelativeTorque: {x: 0, y: 0, z: 0}
 --- !u!1 &8335237129105250394
 GameObject:
   m_ObjectHideFlags: 0

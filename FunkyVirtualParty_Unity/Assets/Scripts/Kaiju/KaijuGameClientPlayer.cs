@@ -4,8 +4,12 @@ using UnityEngine;
 using UnityEngine.Events;
 using Cinemachine;
 using Autohand;
+
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
+#endif
+#if UNITY_EDITOR
+using UnityEngine.InputSystem;
 #endif
 
 public class KaijuGameClientPlayer : ClientPlayer
@@ -127,6 +131,15 @@ public class KaijuGameClientPlayer : ClientPlayer
             playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
         }
 #endif
+
+#if UNITY_EDITOR
+        if(Keyboard.current.zKey.wasPressedThisFrame)
+        {
+            state = KaijuClientState.Thrown;
+            anim.SetBool("Flying", true);
+            gameObject.transform.position = new Vector3(gameObject.transform.position.x, 45, gameObject.transform.position.z);
+        }
+#endif
     }
 
     protected override void OnCollisionEnter(Collision collision)
@@ -135,6 +148,8 @@ public class KaijuGameClientPlayer : ClientPlayer
         if (collision.collider.CompareTag("Untagged"))
         {
             state = KaijuClientState.OnGround;
+            anim.SetBool("Flying", false);
+
         }
 
     }
@@ -178,7 +193,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
-
+        anim.SetBool("Flying", true);
         realtimeView.RequestOwnership();
         realtimeTransform.RequestOwnership();
 
