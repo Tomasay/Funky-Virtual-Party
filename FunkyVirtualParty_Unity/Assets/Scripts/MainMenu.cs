@@ -34,6 +34,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] PhysicsGadgetHingeAngleReader discoBallSwitch;
     private bool isDiscoBallOn;
 
+    [SerializeField] Camera startingCamera;
+
 
     // Start is called before the first frame update
     void Start()
@@ -63,6 +65,8 @@ public class MainMenu : MonoBehaviour
         ClientPlayer.OnClientDisconnected.AddListener(RemovePlayerIcon);
         ClientPlayer.OnColorChanged.AddListener(UpdatePlayerIconColor);
 
+        RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
         //If this is consecutive time in main menu, spawn all current players
         if(RealtimeSingleton.instance.Realtime.connected)
         {
@@ -70,11 +74,18 @@ public class MainMenu : MonoBehaviour
         }
     }
 
+    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        startingCamera.gameObject.SetActive(false);
+    }
+
     private void OnDestroy()
     {
         ClientPlayer.OnClientConnected.RemoveListener(SpawnPlayerIcon);
         ClientPlayer.OnClientDisconnected.RemoveListener(RemovePlayerIcon);
         ClientPlayer.OnColorChanged.RemoveListener(UpdatePlayerIconColor);
+
+        RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
     }
 
     private void Update()
