@@ -461,6 +461,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             if (VRtistrySyncer.instance.VRPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
+                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 1);
+            }
+            else
+            {
+                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 2);
             }
         }
 
@@ -469,6 +474,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
         vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
+        vrCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (vrPlayerPos + 1);
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);
