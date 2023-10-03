@@ -330,7 +330,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 }
 
                 //Header
-                headerText.text = "The prompt was: " + VRtistrySyncer.instance.CurrentPrompt + "\nWhich player do you think wrote the given answer?";
+                headerText.text = "The prompt was: <i>" + VRtistrySyncer.instance.CurrentPrompt + "</i>\nWhich player do you think wrote the given answer?";
                 foreach (GameObject g in playerNameIcons)
                 {
                     g.GetComponentInChildren<Button>().interactable = true;
@@ -444,12 +444,17 @@ public class ThreeDPaintGameManager : MonoBehaviour
             newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByOwnerID(entry.Key).syncer.Name;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
-
+            
             currentLeaderboardCards.Add(newCard);
 
             if (VRtistrySyncer.instance.VRPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
+                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 1);
+            }
+            else
+            {
+                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex());
             }
         }
 
@@ -458,6 +463,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
         vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
+        vrCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (vrPlayerPos + 1);
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);
