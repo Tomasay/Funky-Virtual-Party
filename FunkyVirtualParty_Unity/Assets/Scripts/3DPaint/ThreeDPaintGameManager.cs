@@ -20,7 +20,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     TextAsset promptList;
 
     [SerializeField]
-    TMP_Text headerText, timerText;
+    TMP_Text headerText, playerResultsHeaderText, timerText;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -79,6 +79,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         currentLeaderboardCards = new List<GameObject>();
 
         headerText.text = "";
+        playerResultsHeaderText.text = "";
         timerText.text = "";
         headerText.enabled = false;
 
@@ -248,7 +249,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.ownerIDSelf;
 
                 //UI
-                headerText.text = "<u>Paint: " + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</u>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
+                headerText.text = "Paint: <i>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</i>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 //Clear practice painting
                 pen.EraseAllLines();
@@ -279,7 +280,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 sprayGun.CanPaint = true;
 
                 //UI
-                headerText.text = "Paint: " + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
+                headerText.text = "Paint: <i>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</i>";
                 timerText.enabled = true;
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
@@ -330,7 +331,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 }
 
                 //Header
-                headerText.text = "The prompt was: <i>" + VRtistrySyncer.instance.CurrentPrompt + "</i>\nWhich player do you think wrote the given answer?";
+                headerText.text = "";
+                playerResultsHeaderText.text = "The prompt was: <i>" + VRtistrySyncer.instance.CurrentPrompt + "</i>\nWhich player do you think wrote the given answer?";
                 foreach (GameObject g in playerNameIcons)
                 {
                     g.GetComponentInChildren<Button>().interactable = true;
@@ -429,6 +431,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         //Show leaderboard
         headerText.text = "";
+        playerResultsHeaderText.text = "";
         timerText.text = "";
         leaderboardParent.SetActive(true);
         //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowLeaderboard", "");
@@ -454,7 +457,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             }
             else
             {
-                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex());
+                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 2);
             }
         }
 
