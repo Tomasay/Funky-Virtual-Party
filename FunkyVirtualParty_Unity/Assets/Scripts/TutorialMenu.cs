@@ -46,10 +46,15 @@ public class TutorialMenu : MonoBehaviour
 
         ClientPlayer.OnReadyUp.AddListener(ReadyUp);
 
+#if UNITY_EDITOR
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            //ClientManager.instance.onClientDisonnect += RemovePlayerIcon;
+            if (cp.isDebugPlayer)
+            {
+                ReadyUpDebugPlayer(cp);
+            }
         }
+#endif
     }
 
     private void Update()
@@ -78,10 +83,32 @@ public class TutorialMenu : MonoBehaviour
     {
         for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
+#if UNITY_EDITOR
+            if (vrPlayerIcons.ContainsKey(ClientPlayer.clients[i].debugPlayerIndex))
+            {
+                continue;
+            }
+#endif
+
             GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);
             TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
             txt.color = ClientPlayer.clients[i].syncer.Color;
             txt.text = ClientPlayer.clients[i].syncer.Name;
+
+#if UNITY_EDITOR
+            if (ClientPlayer.clients[i].isDebugPlayer)
+            {
+                if (vrPlayerIcons.ContainsKey(ClientPlayer.clients[i].debugPlayerIndex))
+                {
+                    continue;
+                }
+                else
+                {
+                    vrPlayerIcons.Add(ClientPlayer.clients[i].debugPlayerIndex, newPlayerIcon);
+                    continue;
+                }
+            }
+#endif
 
             vrPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf, newPlayerIcon);
         }
@@ -102,6 +129,25 @@ public class TutorialMenu : MonoBehaviour
         allPlayersReady.Invoke();
         this.gameObject.SetActive(false);
     }
+
+#if UNITY_EDITOR
+    private void ReadyUpDebugPlayer(ClientPlayer p)
+    {
+        vrPlayerIcons[p.debugPlayerIndex].GetComponentInChildren<TMP_Text>().text = "READY";
+        vrPlayerIcons[p.debugPlayerIndex].GetComponent<Animator>().SetTrigger("Ready");
+        vrPlayerIcons.Remove(p.debugPlayerIndex);
+
+        //Check if every player is ready
+        if (vrPlayerIcons.Count > 0)
+        {
+            return;
+        }
+
+        allPlayersReady.Invoke();
+        this.gameObject.SetActive(false);
+    }
+#endif
+
     private void SpawnVRPlayerIcon()
     {
         GameObject newPlayerIcon = Instantiate(playerIconPrefab, VRPlayerIconsParent.transform);

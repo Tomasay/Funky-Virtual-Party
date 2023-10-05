@@ -77,6 +77,10 @@ public class ClientPlayer : MonoBehaviour
 
 #if UNITY_EDITOR
     public bool isDebugPlayer;
+
+    public static int debugPlayerCount = 0;
+
+    public int debugPlayerIndex;
 #endif
 
     protected virtual void Awake()
@@ -133,6 +137,14 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void LocalStart()
     {
+#if UNITY_EDITOR
+        if (isDebugPlayer)
+        {
+            debugPlayerIndex = debugPlayerCount;
+            debugPlayerCount++;
+        }
+#endif
+
         realtimeTransform.RequestOwnership();
         animRealtimeTransform.RequestOwnership();
 
@@ -175,6 +187,14 @@ public class ClientPlayer : MonoBehaviour
 
     protected void SetSpawnPoint()
     {
+#if UNITY_EDITOR
+        if (isDebugPlayer)
+        {
+            transform.position = spawnPoints[debugPlayerIndex];
+            return;
+        }
+#endif
+
         transform.position = spawnPoints[realtimeView.ownerIDSelf-1];
     }
 
@@ -309,7 +329,6 @@ public class ClientPlayer : MonoBehaviour
             transform.Translate(movement * Time.deltaTime);
 
             //Magnitude of movement for animations
-#if !UNITY_EDITOR
             if (animate)
             {
                 float val = Mathf.Abs(input.magnitude);
@@ -326,24 +345,7 @@ public class ClientPlayer : MonoBehaviour
             {
                 syncer.AnimSpeed = 0;
             }
-#else 
-            if (animate)
-            {
-                float val = Mathf.Abs(input.magnitude);
-                if ((val > 0.05) || (val < -0.05))
-                {
-                    anim.speed = val;
-                }
-                else
-                {
-                    anim.speed = 0;
-                }
-            }
-            else
-            {
-                anim.speed = 0;
-            }
-#endif
+
             //Update rotation
             if (changeDirection)
             {

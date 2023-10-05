@@ -37,10 +37,17 @@ public class ShootoutGameManager : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        //currentWaypoints = new Vector3[ClientManager.instance.Players.Count];
-        //currentWaypointDistances = new float[ClientManager.instance.Players.Count];
+        Invoke("InitializeWaypoints", 3); //Give debug client players a second to spawn
 #endif
     }
+
+#if UNITY_EDITOR
+    void InitializeWaypoints()
+    {
+        currentWaypoints = new Vector3[ClientPlayer.debugPlayerCount];
+        currentWaypointDistances = new float[ClientPlayer.debugPlayerCount];
+    }
+#endif
 
     private void OnDestroy()
     {
@@ -91,7 +98,7 @@ public class ShootoutGameManager : MonoBehaviour
         }
 
 #if UNITY_EDITOR
-        //UpdateDebugPlayers();
+        UpdateDebugPlayers();
 #endif
     }
 
@@ -201,44 +208,52 @@ public class ShootoutGameManager : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    /*
     private void UpdateDebugPlayers()
     {
-        if (ClientManager.instance)
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
-            for (int i = 0; i < ClientManager.instance.Players.Count; i++)
+            if (ClientPlayer.clients[i].isDebugPlayer)
             {
-                if (ClientManager.instance.Players[i].isDebugPlayer)
-                {
-                    UpdateDebugPlayerWaypoint(ClientManager.instance.Players[i], i);
-                }
+                UpdateDebugPlayerWaypoint(ClientPlayer.clients[i] as ShootoutGameClientPlayer, i);
             }
         }
-
     }
 
-    private void UpdateDebugPlayerWaypoint(ClientPlayer cp, int index)
+    private void UpdateDebugPlayerWaypoint(ShootoutGameClientPlayer cp, int index)
     {
         //If player does not have a waypoint, or has made it to their waypoint
-        if (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f)
+        if (currentWaypoints != null && (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f))
         {
             //Get new waypoint
             currentWaypoints[index] = debugWaypoints[Random.Range(0, debugWaypoints.Length)].position;
             currentWaypointDistances[index] = Vector3.Distance(currentWaypoints[index], cp.transform.position);
+            
         }
         //Else move towards next waypoint
-        else
+        else if(currentWaypoints != null)
         {
-            Vector3 dir = (currentWaypoints[index] - cp.transform.position).normalized;
+            Vector3 dir3 = (currentWaypoints[index] - cp.transform.position).normalized;
+            Vector2 dir2 = new Vector2(dir3.x, dir3.z) * 0.25f;
 
             //Ease in & out speed
+            /*
             float dist = Vector3.Distance(currentWaypoints[index], cp.transform.position);
-            dir *= Mathf.Clamp(1/(dist / currentWaypointDistances[index]), 0.1f, 1f);
+            dir2 *= Mathf.Clamp((dist / currentWaypointDistances[index]) * 2, 0.25f, 0.5f);
+            */
 
-            //ClientManager.instance.Manager.Socket.Emit("inputDebug", cp.SerializeInputData(dir));
+            cp.Move(dir2);
         }
     }
-    */
+
+    void OnDrawGizmos()
+    {
+        if(currentWaypoints != null)
+        {
+            // Draw a yellow sphere at the transform's position
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawSphere(currentWaypoints[0], 0.1f);
+        }
+    }
 #endif
 
     public string FormatTime(float time)

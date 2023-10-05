@@ -14,6 +14,8 @@ public class RealtimeSingleton : MonoBehaviour
 
     public string[] vinylDiscNames;
 
+    public string[] debugPlayers;
+
     public List<GameObject> discs;
 
     public Realtime Realtime { get => realtime; }
@@ -65,12 +67,27 @@ public class RealtimeSingleton : MonoBehaviour
             {
                 SpawnDiscs();
             }
+
+#if UNITY_EDITOR
+            if (scene.name.Equals("MainMenu"))
+            {
+                Invoke("SpawnDebugPlayers", 1);
+            }
+            else
+            {
+                SpawnDebugPlayers();
+            }
+#endif
         }
     }
 
     private void Realtime_didConnectToRoom(Realtime realtime)
     {
         SpawnDiscs();
+
+#if UNITY_EDITOR
+        SpawnDebugPlayers();
+#endif
     }
 
     /// <summary>
@@ -87,4 +104,48 @@ public class RealtimeSingleton : MonoBehaviour
             discs.Add(Realtime.Instantiate("Vinyls/Vinyl_" + s, options));
         }
     }
+
+#if UNITY_EDITOR
+    void SpawnDebugPlayers()
+    {
+        //Delete and save reference to any old debug client players
+        List<ClientPlayer> oldDebugClientPlayers = new List<ClientPlayer>();
+        if (ClientPlayer.clients != null)
+        {
+            foreach (ClientPlayer cp in ClientPlayer.clients)
+            {
+                if (cp.isDebugPlayer)
+                {
+                    oldDebugClientPlayers.Add(cp);
+                }
+            }
+        }
+
+        //Spawn new debug client players
+        ClientPlayer.debugPlayerCount = 0;
+        for (int i = 0; i < debugPlayers.Length; i++)
+        {
+            string currentScene = SceneManager.GetActiveScene().name;
+
+            GameObject newPlayer = Realtime.Instantiate(currentScene + "ClientPlayer", Realtime.InstantiateOptions.defaults);
+            ClientPlayer newPlayerCP = newPlayer.GetComponent<ClientPlayer>();
+
+            newPlayerCP.isDebugPlayer = true;
+            newPlayerCP.IsLocal = true;
+
+            if (oldDebugClientPlayers.Count > i) //If player has already been spawned before
+            {
+                newPlayerCP.syncer.Name = oldDebugClientPlayers[i].syncer.Name;
+                newPlayerCP.SetCustomizations(oldDebugClientPlayers[i].syncer.Color, oldDebugClientPlayers[i].syncer.HeadType, oldDebugClientPlayers[i].syncer.Height, oldDebugClientPlayers[i].syncer.HatIndex);
+
+                Realtime.Destroy(oldDebugClientPlayers[i].gameObject);
+            }
+            else
+            {
+                newPlayerCP.syncer.Name = debugPlayers[i];
+                newPlayerCP.InitialCustomize();
+            }
+        }
+    }
+#endif
 }

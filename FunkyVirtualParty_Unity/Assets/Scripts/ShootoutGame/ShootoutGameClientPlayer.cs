@@ -66,33 +66,14 @@ public class ShootoutGameClientPlayer : ClientPlayer
     public Vector2 prevVector = Vector2.zero;
     protected override void CheckInput()
     {
-#if UNITY_EDITOR
-        if (isDebugPlayer && !isColliding)
-        {
-            Vector2 input = new Vector2(movement.x, movement.z);
-
-            if (prevVector == Vector2.zero)
-                prevVector = input;
-
-            Vector2 delta = (input - prevVector) * frictionCoefficient;
-            Vector2 target = prevVector + delta;
-            prevVector = target;
-        }
-        else if(isDebugPlayer && isColliding)
-        {
-            //ClientManager.instance.Manager.Socket.Emit("inputDebug", SerializeInputData(collisionVector.normalized * -0.5f));
-
-            collisionTimer -= Time.deltaTime;
-            if (collisionTimer <= 0)
-            {
-                isColliding = false;
-                collisionTimer = collisionTimerDefault;
-            }
-        }
-#endif
         if (IsLocal && !isColliding) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+
+#if UNITY_EDITOR
+            if (isDebugPlayer)
+                input = input = new Vector2(movement.x, movement.z) * 3;
+#endif
 
             //Friction
             if (prevVector == Vector2.zero)
@@ -104,8 +85,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
             if (!(target == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
             {
-                //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(target));
-
                 bool isSliding = (input == Vector2.zero && target.magnitude > 0);
                 Move(target, !isSliding, !isSliding, input);
             }
