@@ -75,13 +75,12 @@ public class ClientPlayer : MonoBehaviour
 
     public static MyCPEvent OnClientConnected, OnClientDisconnected, OnReadyUp, OnColorChanged;
 
-#if UNITY_EDITOR
-    public bool isDebugPlayer;
+    //Debug client player variables
+    public static int debugPlayerCount = 10; //Starting at 10 so debug player's index doesn't interfere with real clients
 
-    public static int debugPlayerCount = 0;
+    protected int debugPlayerIndex;
 
-    public int debugPlayerIndex;
-#endif
+    public int DebugPlayerIndex { get => debugPlayerIndex; }
 
     protected virtual void Awake()
     {
@@ -129,22 +128,20 @@ public class ClientPlayer : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
 
+        if (syncer.IsDebugPlayer)
+        {
+            debugPlayerIndex = debugPlayerCount;
+            debugPlayerCount++;
+        }
+
         if (realtimeView.isOwnedLocallyInHierarchy)
             LocalStart();
-
+        
         OnClientConnected.Invoke(this);
     }
 
     protected virtual void LocalStart()
     {
-#if UNITY_EDITOR
-        if (isDebugPlayer)
-        {
-            debugPlayerIndex = debugPlayerCount;
-            debugPlayerCount++;
-        }
-#endif
-
         realtimeTransform.RequestOwnership();
         animRealtimeTransform.RequestOwnership();
 
@@ -187,13 +184,11 @@ public class ClientPlayer : MonoBehaviour
 
     protected void SetSpawnPoint()
     {
-#if UNITY_EDITOR
-        if (isDebugPlayer)
+        if (syncer.IsDebugPlayer)
         {
-            transform.position = spawnPoints[debugPlayerIndex];
+            transform.position = spawnPoints[debugPlayerIndex - 9];
             return;
         }
-#endif
 
         transform.position = spawnPoints[realtimeView.ownerIDSelf-1];
     }

@@ -46,7 +46,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
         base.Awake();
     }
 
-#if UNITY_WEBGL
     private void OnTriggerEnter(Collider other)
     {
         if (isLocal)
@@ -61,7 +60,6 @@ public class ShootoutGameClientPlayer : ClientPlayer
             }
         }
     }
-#endif
 
     public Vector2 prevVector = Vector2.zero;
     protected override void CheckInput()
@@ -70,10 +68,8 @@ public class ShootoutGameClientPlayer : ClientPlayer
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
-#if UNITY_EDITOR
-            if (isDebugPlayer)
+            if (syncer.IsDebugPlayer)
                 input = input = new Vector2(movement.x, movement.z) * 3;
-#endif
 
             //Friction
             if (prevVector == Vector2.zero)

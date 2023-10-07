@@ -14,11 +14,10 @@ public class ShootoutGameManager : MonoBehaviour
     private TMP_Text vrInfoText, vrGameTimeText;
     private float timeRemaining;
 
-#if UNITY_EDITOR
+    //Debug player variables
     [SerializeField] private Transform[] debugWaypoints;
     private Vector3[] currentWaypoints;
     private float[] currentWaypointDistances;
-#endif
 
     void Start()
     {
@@ -36,18 +35,14 @@ public class ShootoutGameManager : MonoBehaviour
             Realtime.Instantiate("IcyIgnition/Fireball", Vector3.zero, Quaternion.identity, options);
         }
 
-#if UNITY_EDITOR
         Invoke("InitializeWaypoints", 3); //Give debug client players a second to spawn
-#endif
     }
 
-#if UNITY_EDITOR
     void InitializeWaypoints()
     {
         currentWaypoints = new Vector3[ClientPlayer.debugPlayerCount];
         currentWaypointDistances = new float[ClientPlayer.debugPlayerCount];
     }
-#endif
 
     private void OnDestroy()
     {
@@ -88,6 +83,9 @@ public class ShootoutGameManager : MonoBehaviour
                     ShootoutGameSyncer.instance.State = "time ended";
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
+
+                UpdateDebugPlayers();
+
                 break;
             case "vr player won":
                 break;
@@ -96,10 +94,6 @@ public class ShootoutGameManager : MonoBehaviour
             default:
                 break;
         }
-
-#if UNITY_EDITOR
-        UpdateDebugPlayers();
-#endif
     }
 
     void OnStateChanged(string newState)
@@ -207,12 +201,11 @@ public class ShootoutGameManager : MonoBehaviour
         RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
     }
 
-#if UNITY_EDITOR
     private void UpdateDebugPlayers()
     {
         for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
-            if (ClientPlayer.clients[i].isDebugPlayer)
+            if (ClientPlayer.clients[i].syncer.IsDebugPlayer)
             {
                 UpdateDebugPlayerWaypoint(ClientPlayer.clients[i] as ShootoutGameClientPlayer, i);
             }
@@ -254,7 +247,6 @@ public class ShootoutGameManager : MonoBehaviour
             Gizmos.DrawSphere(currentWaypoints[0], 0.1f);
         }
     }
-#endif
 
     public string FormatTime(float time)
     {

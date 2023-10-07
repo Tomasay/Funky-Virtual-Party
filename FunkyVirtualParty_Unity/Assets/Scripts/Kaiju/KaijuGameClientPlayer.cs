@@ -51,7 +51,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     protected override void CheckInput()
     {
 #if UNITY_EDITOR
-        if (isDebugPlayer && state < KaijuClientState.Grabbed)
+        if (syncer.IsDebugPlayer && state < KaijuClientState.Grabbed)
         {
             Vector2 input = new Vector2(movement.x, movement.z);
 
@@ -64,7 +64,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
             
         }
-        else if(isDebugPlayer)
+        else if(syncer.IsDebugPlayer)
         {
             // do not send input if held by VR player
         }

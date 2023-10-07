@@ -68,7 +68,6 @@ public class RealtimeSingleton : MonoBehaviour
                 SpawnDiscs();
             }
 
-#if UNITY_EDITOR
             if (scene.name.Equals("MainMenu"))
             {
                 Invoke("SpawnDebugPlayers", 1);
@@ -77,7 +76,6 @@ public class RealtimeSingleton : MonoBehaviour
             {
                 SpawnDebugPlayers();
             }
-#endif
         }
     }
 
@@ -85,9 +83,7 @@ public class RealtimeSingleton : MonoBehaviour
     {
         SpawnDiscs();
 
-#if UNITY_EDITOR
         SpawnDebugPlayers();
-#endif
     }
 
     /// <summary>
@@ -105,7 +101,6 @@ public class RealtimeSingleton : MonoBehaviour
         }
     }
 
-#if UNITY_EDITOR
     void SpawnDebugPlayers()
     {
         //Delete and save reference to any old debug client players
@@ -114,7 +109,7 @@ public class RealtimeSingleton : MonoBehaviour
         {
             foreach (ClientPlayer cp in ClientPlayer.clients)
             {
-                if (cp.isDebugPlayer)
+                if (cp.syncer.IsDebugPlayer)
                 {
                     oldDebugClientPlayers.Add(cp);
                 }
@@ -122,7 +117,7 @@ public class RealtimeSingleton : MonoBehaviour
         }
 
         //Spawn new debug client players
-        ClientPlayer.debugPlayerCount = 0;
+        ClientPlayer.debugPlayerCount = 10;
         for (int i = 0; i < debugPlayers.Length; i++)
         {
             string currentScene = SceneManager.GetActiveScene().name;
@@ -130,7 +125,7 @@ public class RealtimeSingleton : MonoBehaviour
             GameObject newPlayer = Realtime.Instantiate(currentScene + "ClientPlayer", Realtime.InstantiateOptions.defaults);
             ClientPlayer newPlayerCP = newPlayer.GetComponent<ClientPlayer>();
 
-            newPlayerCP.isDebugPlayer = true;
+            newPlayerCP.syncer.IsDebugPlayer = true;
             newPlayerCP.IsLocal = true;
 
             if (oldDebugClientPlayers.Count > i) //If player has already been spawned before
@@ -147,5 +142,4 @@ public class RealtimeSingleton : MonoBehaviour
             }
         }
     }
-#endif
 }
