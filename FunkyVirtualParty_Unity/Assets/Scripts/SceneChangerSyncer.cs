@@ -83,13 +83,6 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
             SceneManager.LoadScene(val);
         }
 #elif UNITY_ANDROID
-        //Destroy discs
-        foreach (GameObject d in RealtimeSingleton.instance.discs)
-        {
-            Realtime.Destroy(d);
-        }
-        RealtimeSingleton.instance.discs.Clear();
-
         //Unregister current avatar as it will be destroyed on scene change
         if (RealtimeSingleton.instance.Realtime.connected)
         {
@@ -106,10 +99,20 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
     IEnumerator LoadSceneDelayed(string scene)
     {
         yield return new WaitForSeconds(1);
+
+#if UNITY_ANDROID
+        //Destroy discs
+        foreach (GameObject d in RealtimeSingleton.instance.discs)
+        {
+            Realtime.Destroy(d);
+        }
+        RealtimeSingleton.instance.discs.Clear();
+#endif
+
         SceneManager.LoadScene(scene);
     }
 
-#endregion
+    #endregion
 
     private void FadeInScene(Scene arg0, LoadSceneMode arg1)
     {
