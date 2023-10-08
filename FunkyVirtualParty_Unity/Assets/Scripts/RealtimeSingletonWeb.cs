@@ -114,7 +114,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     {
         if (realtime.connected)
         {
-            StartCoroutine("SpawnPlayerDelayed");
+            Invoke("SpawnPlayer", 1);
         }
     }
 
@@ -244,13 +244,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
             disconnectingMinigameInProgress = false;
         }
 
-    }
-
-    IEnumerator SpawnPlayerDelayed()
-    {
-        yield return new WaitForSeconds(1);
-
-        SpawnPlayer();
     }
 
     public void SpawnPlayer()

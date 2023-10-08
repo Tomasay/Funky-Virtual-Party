@@ -39,13 +39,15 @@ public class TutorialMenu : MonoBehaviour
     void Start()
     {
         ClientPlayer.OnReadyUp.AddListener(ReadyUp);
+        ClientPlayer.OnClientDisconnected.AddListener(RemovePlayerIcon);
 
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();
         }
         SpawnPlayerIcons();
-        SpawnDebugPlayerIcons();
+
+        Invoke("SpawnDebugPlayerIcons", 3);
     }
 
     private void Update()
@@ -63,11 +65,7 @@ public class TutorialMenu : MonoBehaviour
     private void OnDestroy()
     {
         ClientPlayer.OnReadyUp.RemoveListener(ReadyUp);
-
-        foreach (ClientPlayer cp in ClientPlayer.clients)
-        {
-            //ClientManager.instance.onClientDisonnect -= RemovePlayerIcon;
-        }
+        ClientPlayer.OnClientDisconnected.RemoveListener(RemovePlayerIcon);
     }
 
     private void SpawnPlayerIcons()
@@ -101,6 +99,25 @@ public class TutorialMenu : MonoBehaviour
             }
         }
 
+        DebugPlayersReadyUp();
+    }
+
+    void RemovePlayerIcon(ClientPlayer cp)
+    {
+        if(cp.syncer.IsDebugPlayer && vrPlayerIcons.ContainsKey(cp.DebugPlayerIndex))
+        {
+            Destroy(vrPlayerIcons[cp.DebugPlayerIndex]);
+            vrPlayerIcons.Remove(cp.DebugPlayerIndex);
+        }
+        else if(vrPlayerIcons.ContainsKey(cp.realtimeView.ownerIDSelf))
+        {
+            Destroy(vrPlayerIcons[cp.realtimeView.ownerIDSelf]);
+            vrPlayerIcons.Remove(cp.realtimeView.ownerIDSelf);
+        }
+    }
+
+    void DebugPlayersReadyUp()
+    {
         //Ready up
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {

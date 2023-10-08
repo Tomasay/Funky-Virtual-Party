@@ -24,52 +24,66 @@ public class TutorialMenuClient : MonoBehaviour
     {
         tutorialCanvas.enabled = true;
 
+        ClientPlayer.OnReadyUp.AddListener(ReadyUp);
+        ClientPlayer.OnClientDisconnected.AddListener(RemovePlayerIcon);
+
         clientPlayerIcons = new Dictionary<int, GameObject>();
         SpawnVRPlayerIcon();
         SpawnPlayerIcons();
-
-        ClientPlayer.OnReadyUp.AddListener(ReadyUp);
-
-
-        //cm.onVRReadyUp += ReadyUpVR;
-        //cm.onClientDisonnect += RemovePlayerIcon;
+        Invoke("SpawnDebugPlayerIcons", 2);
     }
 
     private void OnDestroy()
     {
         ClientPlayer.OnReadyUp.RemoveListener(ReadyUp);
-
-        //cm.onVRReadyUp -= ReadyUpVR;
+        ClientPlayer.OnClientDisconnected.RemoveListener(RemovePlayerIcon);
     }
 
     private void SpawnPlayerIcons()
     {
         for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
-            if (ClientPlayer.clients[i].syncer.IsDebugPlayer && clientPlayerIcons.ContainsKey(ClientPlayer.clients[i].DebugPlayerIndex))
+            if (!clientPlayerIcons.ContainsKey(ClientPlayer.clients[i].realtimeView.ownerIDSelf))
             {
-                continue;
+                GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
+                TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+                txt.color = ClientPlayer.clients[i].syncer.Color;
+                txt.text = ClientPlayer.clients[i].syncer.Name;
+
+                clientPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf, newPlayerIcon);
             }
-
-            GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
-            TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
-            txt.color = ClientPlayer.clients[i].syncer.Color;
-            txt.text = ClientPlayer.clients[i].syncer.Name;
-
-            if (ClientPlayer.clients[i].syncer.IsDebugPlayer && !clientPlayerIcons.ContainsKey(ClientPlayer.clients[i].DebugPlayerIndex))
-            {
-                clientPlayerIcons.Add(ClientPlayer.clients[i].DebugPlayerIndex, newPlayerIcon);
-                continue;
-            }
-
-            clientPlayerIcons.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf, newPlayerIcon);
         } 
     }
 
-    private void RemovePlayerIcon(int id)
+    private void SpawnDebugPlayerIcons()
     {
-        Destroy(clientPlayerIcons[id]);
-        clientPlayerIcons.Remove(id);
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
+        {
+            if (ClientPlayer.clients[i].syncer.IsDebugPlayer && !clientPlayerIcons.ContainsKey(ClientPlayer.clients[i].DebugPlayerIndex))
+            {
+                GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
+                TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
+                txt.color = ClientPlayer.clients[i].syncer.Color;
+                txt.text = ClientPlayer.clients[i].syncer.Name;
+
+                clientPlayerIcons.Add(ClientPlayer.clients[i].DebugPlayerIndex, newPlayerIcon);
+                continue;
+            }
+        }
+    }
+
+    void RemovePlayerIcon(ClientPlayer cp)
+    {
+        if (cp.syncer.IsDebugPlayer && clientPlayerIcons.ContainsKey(cp.DebugPlayerIndex))
+        {
+            Destroy(clientPlayerIcons[cp.DebugPlayerIndex]);
+            clientPlayerIcons.Remove(cp.DebugPlayerIndex);
+        }
+        else if (clientPlayerIcons.ContainsKey(cp.realtimeView.ownerIDSelf))
+        {
+            Destroy(clientPlayerIcons[cp.realtimeView.ownerIDSelf]);
+            clientPlayerIcons.Remove(cp.realtimeView.ownerIDSelf);
+        }
     }
 
     public void ReadyUpButtonPressed()
