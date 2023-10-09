@@ -128,6 +128,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SubmitButtonPressed()
     {
+        submitButton.interactable = false;
+
         realtime.Connect(partyCodeInput.text);
 
         //Display loading indicator
@@ -223,6 +225,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             joinRoomCanvas.enabled = true;
             partyCodeInvalid.gameObject.SetActive(true);
+            CheckValidPartyCode(partyCodeInput.text);
 
             disconnectingDueToNoHost = false;
         }
@@ -233,7 +236,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             joinRoomCanvas.enabled = true;
             maxPlayersReached.gameObject.SetActive(true);
-            
+            CheckValidPartyCode(partyCodeInput.text);
+
             disconnectingMaxPlayers = false;
         }
 
@@ -243,6 +247,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             joinRoomCanvas.enabled = true;
             minigameInProgress.gameObject.SetActive(true);
+            CheckValidPartyCode(partyCodeInput.text);
 
             disconnectingMinigameInProgress = false;
         }
