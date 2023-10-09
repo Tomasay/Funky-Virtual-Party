@@ -38,9 +38,6 @@ public class TutorialMenu : MonoBehaviour
 
     void Start()
     {
-        ClientPlayer.OnReadyUp.AddListener(ReadyUp);
-        ClientPlayer.OnClientDisconnected.AddListener(RemovePlayerIcon);
-
         if (VrPlayerReady != null)
         {
             SpawnVRPlayerIcon();
@@ -48,6 +45,9 @@ public class TutorialMenu : MonoBehaviour
         SpawnPlayerIcons();
 
         Invoke("SpawnDebugPlayerIcons", 3);
+
+        ClientPlayer.OnReadyUp.AddListener(ReadyUp);
+        ClientPlayer.OnClientDisconnected.AddListener(RemovePlayerIcon);
     }
 
     private void Update()

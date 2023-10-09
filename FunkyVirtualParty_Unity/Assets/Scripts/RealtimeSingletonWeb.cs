@@ -173,6 +173,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
         SpawnPlayer();
 
+        GameObject tracker = Realtime.Instantiate("ClientConnectedTracker", Realtime.InstantiateOptions.defaults);
+        tracker.GetComponent<RealtimeView>().RequestOwnership();
+
         CheckForDuplicateAvatars();
     }
 

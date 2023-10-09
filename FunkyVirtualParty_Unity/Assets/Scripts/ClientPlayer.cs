@@ -154,8 +154,6 @@ public class ClientPlayer : MonoBehaviour
     {
         playerInput.actions["Action"].started -= Action;
 
-        OnClientDisconnected.Invoke(this);
-
         clients.Remove(this);
     }
 
@@ -408,7 +406,7 @@ public class ClientPlayer : MonoBehaviour
     {
         foreach (ClientPlayer cp in clients)
         {
-            if(cp.realtimeView.ownerIDSelf == id)
+            if (cp.realtimeView.ownerIDSelf == id)
             {
                 return cp;
             }
