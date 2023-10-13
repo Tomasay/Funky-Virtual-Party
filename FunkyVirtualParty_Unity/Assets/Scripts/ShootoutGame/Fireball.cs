@@ -79,6 +79,7 @@ public class Fireball : MonoBehaviour
         if(collision.gameObject.name.Equals("Iceberg_Collider"))
         {
             Vector3 point = collision.GetContact(0).point;
+            point.y = collision.gameObject.transform.position.y;
 
             TriggerIcebergHole(point);
             TriggerExplosion();

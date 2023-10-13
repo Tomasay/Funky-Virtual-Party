@@ -1,14 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 using Normal.Realtime;
+using DG.Tweening;
 
 public class ShootoutGameManager : MonoBehaviour
 {
+    public UnityEvent CountdownStarted;
+
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private const int FIREBALLS_AMOUNT = 8;
     private TMP_Text vrInfoText, vrGameTimeText;
@@ -84,7 +88,7 @@ public class ShootoutGameManager : MonoBehaviour
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
 
-                UpdateDebugPlayers();
+                //UpdateDebugPlayers();
 
                 break;
             case "vr player won":
@@ -103,6 +107,9 @@ public class ShootoutGameManager : MonoBehaviour
             case "tutorial":
                 break;
             case "countdown":
+
+                CountdownStarted.Invoke();
+
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
 
                 //Setup client death events. Waiting till countdown to ensure all clients have been spawned in
@@ -215,7 +222,7 @@ public class ShootoutGameManager : MonoBehaviour
     private void UpdateDebugPlayerWaypoint(ShootoutGameClientPlayer cp, int index)
     {
         //If player does not have a waypoint, or has made it to their waypoint
-        if (currentWaypoints != null && (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.1f))
+        if (currentWaypoints != null && (currentWaypoints[index] == Vector3.zero || Vector3.Distance(cp.transform.position, currentWaypoints[index]) < 0.01f))
         {
             //Get new waypoint
             currentWaypoints[index] = debugWaypoints[Random.Range(0, debugWaypoints.Length)].position;

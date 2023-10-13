@@ -26,7 +26,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
 
     private SerializedVector3 splashPos;
 
-    const float frictionCoefficient = 0.01f;
+    const float frictionCoefficient = 1;
 
     public Camera cam;
 
@@ -41,7 +41,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         syncer.OnDeath.AddListener(OnPlayerDeath);
 
-        startingSpeed = 1.5f;
+        startingSpeed = 0.1f;
 
         base.Awake();
     }
@@ -247,7 +247,9 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         syncer.OnDeathTrigger = true;
 
-        splashPos = new Vector3(holeCenterPos.x, 25, holeCenterPos.z);
+        GameObject water = GameObject.Find("WaterBottom");
+
+        splashPos = new Vector3(holeCenterPos.x, water.transform.position.y + 0.01f, holeCenterPos.z);
 
         CanMove = false;
 
