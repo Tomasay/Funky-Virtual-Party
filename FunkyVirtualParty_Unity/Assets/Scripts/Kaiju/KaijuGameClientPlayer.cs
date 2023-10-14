@@ -147,8 +147,8 @@ public class KaijuGameClientPlayer : ClientPlayer
         // collide with objects
         if (collision.collider.CompareTag("Untagged"))
         {
-            state = KaijuClientState.OnGround;
             anim.SetBool("Flying", false);
+            state = KaijuClientState.OnGround;
 
         }
 
