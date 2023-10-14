@@ -70,7 +70,7 @@ public class MainMenu : MonoBehaviour
         //If this is consecutive time in main menu, spawn all current players
         if(RealtimeSingleton.instance.Realtime.connected)
         {
-            Invoke("SpawnAllCurrentPlayerIcons", 0.5f);
+            Invoke("SpawnAllCurrentPlayerIcons", 1);
         }
     }
 
@@ -104,6 +104,15 @@ public class MainMenu : MonoBehaviour
 
     private void SpawnPlayerIcon(ClientPlayer cp)
     {
+        //Check for duplicates
+        foreach (Image i in playerNamesList.GetComponentsInChildren<Image>())
+        {
+            if(i.gameObject.name.Equals("" + cp.realtimeView.ownerIDSelf))
+            {
+                return;
+            }
+        }
+
         GameObject newIcon = Instantiate(playerIconPrefab, playerNamesList.transform);
         newIcon.name = "" + cp.realtimeView.ownerIDSelf;
         newIcon.GetComponent<Animator>().cullingMode = AnimatorCullingMode.CullUpdateTransforms; //Weird workaround with Unity's animator
