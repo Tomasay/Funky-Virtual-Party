@@ -16,7 +16,6 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private TMP_Text partyCodeText, partyCodeQRText, inviteYourFriendsText, connectingText, connectionErrorText;
 
     [SerializeField] Generate_qr_code qr = null;
-    [SerializeField] RawImage qrCode;
 
     [SerializeField] GameObject playerPrefab;
 
@@ -40,13 +39,6 @@ public class MainMenu : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Generate QR code
-        if(qr != null)
-        {
-#if !UNITY_WEBGL
-            //qrCode.texture = qr.generate_qr_code(ClientManager.instance.QRURL + "/?partyCode=" + ClientManager.instance.Passcode);
-#endif
-        }
 
         // Display.displays[0] is the primary, default display and is always ON, so start at index 1.
         // Check if additional displays are available and activate each.
@@ -77,6 +69,16 @@ public class MainMenu : MonoBehaviour
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         startingCamera.gameObject.SetActive(false);
+
+        //Generate QR code
+        if (qr != null)
+        {
+#if !UNITY_WEBGL
+            RawImage qrCode = avatar.GetComponentInChildren<RawImage>();
+            qrCode.texture = qr.generate_qr_code("https://partycrashers.app" + "/?partyCode=" + RealtimeSingleton.instance.Realtime.room.name);
+            qrCode.GetComponentInChildren<TMP_Text>().text = "Code: " + RealtimeSingleton.instance.Realtime.room.name;
+#endif
+        }
     }
 
     private void OnDestroy()
