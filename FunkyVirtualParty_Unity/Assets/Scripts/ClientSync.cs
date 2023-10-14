@@ -28,6 +28,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public int HeadType { get => model.headType; set => model.headType = value; }
     public bool IsReady { get => model.isReady; set => model.isReady = value; }
     public bool OnDeathTrigger { get => model.onDeathTrigger; set => model.onDeathTrigger = value; }
+    public bool IsDebugPlayer { get => model.isDebugPlayer; set => model.isDebugPlayer = value; }
 
     #endregion
 
@@ -127,7 +128,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     void OnDeathTriggerChanged(ClientSyncModel previousModel, bool val)
     {
-        Debug.Log("OnDeath: " + val);
         if (val)
         {
             OnDeath.Invoke();

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Runtime.InteropServices;
+using DG.Tweening;
 
 public class RealtimeSingletonWeb : MonoBehaviour
 {
@@ -40,6 +41,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     [SerializeField]
     Button submitButton;
+
+    [SerializeField]
+    Camera mainMenuCam;
 
     [SerializeField] Button enableCustomizationsButton;
 
@@ -76,7 +80,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         }
         else
         {
-            SetJoinedUI();
+            SetJoinedUI(false);
             instance.keyboardController = keyboardController;
             Destroy(gameObject);
         }
@@ -110,7 +114,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     {
         if (realtime.connected)
         {
-            StartCoroutine("SpawnPlayerDelayed");
+            Invoke("SpawnPlayer", 1);
         }
     }
 
@@ -124,6 +128,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SubmitButtonPressed()
     {
+        submitButton.interactable = false;
+
         realtime.Connect(partyCodeInput.text);
 
         //Display loading indicator
@@ -161,13 +167,16 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
 
         //If all good, connect and spawn player
-        SetJoinedUI();
+        SetJoinedUI(true);
 
 #if !UNITY_EDITOR && UNITY_WEBGL
             if(keyboardController) keyboardController.CloseKeyboard();
 #endif
 
         SpawnPlayer();
+
+        GameObject tracker = Realtime.Instantiate("ClientConnectedTracker", Realtime.InstantiateOptions.defaults);
+        tracker.GetComponent<RealtimeView>().RequestOwnership();
 
         CheckForDuplicateAvatars();
     }
@@ -178,12 +187,11 @@ public class RealtimeSingletonWeb : MonoBehaviour
         RealtimeAvatar[] avatars = GameObject.FindObjectsOfType<RealtimeAvatar>();
         for (int i = 0; i < avatars.Length-1; i++)
         {
-            Debug.Log("Destroying: " + avatars[i].gameObject.name);
             Destroy(avatars[i].gameObject);
         }
     }
 
-    void SetJoinedUI()
+    void SetJoinedUI(bool animate)
     {
         loadingCircle.SetActive(false);
 
@@ -192,8 +200,19 @@ public class RealtimeSingletonWeb : MonoBehaviour
             g.SetActive(true);
         }
 
-        joinRoomCanvas.enabled = false;
-        logoCanvas.enabled = false;
+        if(animate)
+        {
+            joinRoomCanvas.GetComponent<Animator>().SetTrigger("Close");
+            logoCanvas.GetComponent<Animator>().SetTrigger("Close");
+            mainMenuCam.transform.DORotate(new Vector3(45, 0, 0), 1.5f);
+        }
+        else
+        {
+            joinRoomCanvas.gameObject.SetActive(false);
+            logoCanvas.gameObject.SetActive(false);
+            mainMenuCam.transform.Rotate(90, 0, 0);
+        }
+
         controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
     }
@@ -206,6 +225,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             joinRoomCanvas.enabled = true;
             partyCodeInvalid.gameObject.SetActive(true);
+            CheckValidPartyCode(partyCodeInput.text);
 
             disconnectingDueToNoHost = false;
         }
@@ -216,7 +236,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             joinRoomCanvas.enabled = true;
             maxPlayersReached.gameObject.SetActive(true);
-            
+            CheckValidPartyCode(partyCodeInput.text);
+
             disconnectingMaxPlayers = false;
         }
 
@@ -226,17 +247,11 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
             joinRoomCanvas.enabled = true;
             minigameInProgress.gameObject.SetActive(true);
+            CheckValidPartyCode(partyCodeInput.text);
 
             disconnectingMinigameInProgress = false;
         }
 
-    }
-
-    IEnumerator SpawnPlayerDelayed()
-    {
-        yield return new WaitForSeconds(1);
-
-        SpawnPlayer();
     }
 
     public void SpawnPlayer()
