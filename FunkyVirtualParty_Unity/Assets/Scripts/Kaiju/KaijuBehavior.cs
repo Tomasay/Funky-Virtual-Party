@@ -26,21 +26,26 @@ public class KaijuBehavior : MonoBehaviour
     {
         realtimeTransform.RequestOwnership();
         realtimeView.RequestOwnership();
+        stature = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        counter += Time.deltaTime;
-        Vector3 diff = Target.position - gameObject.transform.position;
-        Debug.Log(diff);
-        gameObject.transform.position += System.Convert.ToInt32(stature > 0) * (diff.normalized * speed * Time.deltaTime);
-        if (counter > 1)
+        if (KaijuGameSyncer.instance.State.Equals("fight") )
         {
-            stature++;
-            counter = 0;
-        }
+            counter += Time.deltaTime;
+            Vector3 diff = Target.position - gameObject.transform.position;
+            Debug.Log(diff);
+            gameObject.transform.position += System.Convert.ToInt32(stature > 0) * (diff.normalized * speed * Time.deltaTime);
+            if (counter > 1)
+            {
+                if (stature < 30)
+                    stature++;
 
+                counter = 0;
+            }
+        }
     }
 
     void TakeDamage(int dmg) 

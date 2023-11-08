@@ -121,7 +121,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
     IEnumerator FadeIn()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
         {
             for (int i = 0; i < 60; i++)

@@ -82,7 +82,7 @@ public class KaijuGameManager : MonoBehaviour
                         if (timeRemaining <= 0) //Phase end
                         {
                             KaijuGameSyncer.instance.State = "time ended";
-                            timeRemaining = GAME_TIME_AMOUNT;
+                            timeRemaining = COUNTDOWN_AMOUNT;
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
                         break;
