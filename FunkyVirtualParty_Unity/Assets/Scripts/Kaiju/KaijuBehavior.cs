@@ -36,7 +36,6 @@ public class KaijuBehavior : MonoBehaviour
         {
             counter += Time.deltaTime;
             Vector3 diff = Target.position - gameObject.transform.position;
-            Debug.Log(diff);
             gameObject.transform.position += System.Convert.ToInt32(stature > 0) * (diff.normalized * speed * Time.deltaTime);
             if (counter > 1)
             {

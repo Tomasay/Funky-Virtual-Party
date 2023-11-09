@@ -89,7 +89,6 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
     #region Variable Callbacks
     void OnStateChange(KaijuGameSyncModel previousModel, string val)
     {
-        Debug.Log("State changed to: " + val + "   previous model: " + previousModel.state);
 
         OnStateChangeEvent.Invoke(val);
     }
