@@ -91,7 +91,7 @@ public class KaijuGameClientPlayer : ClientPlayer
         }
 #endif
 
-        if (IsLocal && state < KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
+        if (IsLocal && state != KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
@@ -110,7 +110,8 @@ public class KaijuGameClientPlayer : ClientPlayer
                 //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
                 Move(input);
             }
-
+            realtimeView.RequestOwnership();
+            realtimeTransform.RequestOwnership();
 
         }
         else if (IsLocal)
@@ -194,11 +195,9 @@ public class KaijuGameClientPlayer : ClientPlayer
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
         anim.SetBool("Flying", true);
-        realtimeView.RequestOwnership();
-        realtimeTransform.RequestOwnership();
+
 
         CanMove = true;
 
-        //Cool flying mechanics here
     }
 }

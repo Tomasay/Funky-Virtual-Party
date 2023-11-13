@@ -14,7 +14,6 @@ public class KaijuGameManagerWeb : MonoBehaviour
     [SerializeField] CinemachineFreeLook cinemachineCam;
     [SerializeField] Camera cam;
 
-    [SerializeField] GameObject playerGrabAnchorLeft, playerGrabAnchorRight;
 
     // Start is called before the first frame update
     protected void Start()
