@@ -21,10 +21,14 @@ public class KaijuGameManagerWeb : MonoBehaviour
         timeRemaining = GAME_TIME_AMOUNT;
         gameTimeText.text = FormatTime(timeRemaining);
 
-#if !UNITY_EDITOR
         RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
-#endif
+        KaijuGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
+    }
 
+    private void OnDestroy()
+    {
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
+        KaijuGameSyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
     }
 
     void OnLocalPlayerSpawned()

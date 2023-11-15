@@ -80,6 +80,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
         if (SceneUtility.GetBuildIndexByScenePath(val) != -1)
         {
+            DestroyDiscs();
             SceneManager.LoadScene(val);
         }
 #elif UNITY_ANDROID
@@ -100,6 +101,13 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
     {
         yield return new WaitForSeconds(1);
 
+        DestroyDiscs();
+
+        SceneManager.LoadScene(scene);
+    }
+
+    void DestroyDiscs()
+    {
 #if UNITY_ANDROID
         //Destroy discs
         foreach (GameObject d in RealtimeSingleton.instance.discs)
@@ -107,9 +115,12 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
             Realtime.Destroy(d);
         }
         RealtimeSingleton.instance.discs.Clear();
+#elif UNITY_WEBGL
+        foreach (GameObject d in GameObject.FindGameObjectsWithTag("Vinyl"))
+        {
+            Realtime.Destroy(d);
+        }
 #endif
-
-        SceneManager.LoadScene(scene);
     }
 
     #endregion

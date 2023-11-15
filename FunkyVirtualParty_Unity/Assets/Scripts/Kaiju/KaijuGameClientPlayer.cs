@@ -124,7 +124,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     {
         // Make the player name track to the camera
 #if UNITY_WEBGL
-        playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
+        //playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
         CheckInput();
 #else
         if (Camera.main)
