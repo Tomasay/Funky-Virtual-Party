@@ -33,7 +33,7 @@ public class KaijuGameClientPlayer : ClientPlayer
 
     protected override void Awake()
     {
-        startingSpeed = 10;
+        startingSpeed = 4;
 #if UNITY_EDITOR
         canMove = true;
 #endif
