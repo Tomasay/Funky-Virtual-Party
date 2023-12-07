@@ -110,8 +110,6 @@ public class KaijuGameClientPlayer : ClientPlayer
                 //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
                 Move(input);
             }
-            realtimeView.RequestOwnership();
-            realtimeTransform.RequestOwnership();
 
         }
         else if (IsLocal)
@@ -150,7 +148,10 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             anim.SetBool("Flying", false);
             state = KaijuClientState.OnGround;
-
+#if UNITY_WEBGL
+            realtimeView.RequestOwnership();
+            realtimeTransform.RequestOwnership();
+#endif
         }
 
     }
@@ -181,10 +182,10 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", true);
         state = KaijuClientState.Grabbed;
-
+#if !UNITY_WEBGL
         realtimeView.RequestOwnership();
         realtimeTransform.RequestOwnership();
-
+#endif
         CanMove = false;
     }
 
