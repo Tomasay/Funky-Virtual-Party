@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Cinemachine;
+using DG.Tweening;
 
 public class KaijuGameManagerWeb : MonoBehaviour
 {  
@@ -73,6 +74,7 @@ public class KaijuGameManagerWeb : MonoBehaviour
 
     void Update()
     {
+
 #if !UNITY_EDITOR
         switch (KaijuGameSyncer.instance.State)
         {
@@ -83,9 +85,21 @@ public class KaijuGameManagerWeb : MonoBehaviour
             case "game loop":
             case "prepare":
             case "fight":
+                if (timeRemaining <= 0) //Phase end
+                {
+                        timeRemaining = GAME_TIME_AMOUNT;
+                }
+                timeRemaining -= Time.deltaTime;
+                gameTimeText.text = FormatTime(timeRemaining);
+                
+                break;
             case "kill":
                 timeRemaining -= Time.deltaTime;
                 gameTimeText.text = FormatTime(timeRemaining);
+                 if (timeRemaining < 0) //Phase end
+                {
+                        timeRemaining = 0;
+                }
                 break;
             case "vr player won":
                 break;
@@ -101,6 +115,27 @@ public class KaijuGameManagerWeb : MonoBehaviour
         int minutes = (int)time / 60;
         int seconds = (int)time - (minutes * 60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    IEnumerator StartCountdownTimer(int countdown)
+    {
+        yield return new WaitForSeconds(1);
+
+        for (int i = countdown; i > 0; i--)
+        {
+            countdownText.text = "" + i;
+            countdownText.transform.localScale = new Vector3(0.5f, 0.5f, 1);
+            countdownText.transform.DOScale(1, 0.25f);
+            yield return new WaitForSeconds(1);
+        }
+
+        
+        countdownText.text = "GO!";
+        countdownText.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        countdownText.transform.DOScale(1, 0.25f);
+
+        yield return new WaitForSeconds(1);
+        countdownText.enabled = false;
     }
 
 }

@@ -1436,8 +1436,8 @@ MonoBehaviour:
   - {x: -45, y: 25.5, z: 35}
   - {x: -55, y: 25.5, z: 35}
   - {x: -50, y: 25.5, z: 33}
-  isDebugPlayer: 0
   state: 0
+  fakePlayer: {fileID: 0}
   cam: {fileID: 0}
   prevVector: {x: 0, y: 0}
   jumpForce: 500
@@ -1803,7 +1803,7 @@ MonoBehaviour:
   _syncRotation: 1
   _syncScale: 0
   _syncVelocity: 1
-  _maintainOwnershipWhileSleeping: 1
+  _maintainOwnershipWhileSleeping: 0
 --- !u!75 &2448561904894974972
 ConstantForce:
   m_ObjectHideFlags: 0

@@ -148,10 +148,6 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             anim.SetBool("Flying", false);
             state = KaijuClientState.OnGround;
-#if UNITY_WEBGL
-            realtimeView.RequestOwnership();
-            realtimeTransform.RequestOwnership();
-#endif
         }
 
     }
@@ -182,10 +178,6 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         anim.SetBool("Grabbed", true);
         state = KaijuClientState.Grabbed;
-#if !UNITY_WEBGL
-        realtimeView.RequestOwnership();
-        realtimeTransform.RequestOwnership();
-#endif
         CanMove = false;
     }
 
@@ -196,7 +188,10 @@ public class KaijuGameClientPlayer : ClientPlayer
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
         anim.SetBool("Flying", true);
-
+#if UNITY_WEBGL
+        realtimeView.RequestOwnership();
+        realtimeTransform.RequestOwnership();
+#endif
 
         CanMove = true;
 

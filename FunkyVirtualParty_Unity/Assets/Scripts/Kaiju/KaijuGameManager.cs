@@ -97,7 +97,6 @@ public class KaijuGameManager : MonoBehaviour
                         if (timeRemaining <= 0) //Phase end
                         {
                             KaijuGameSyncer.instance.State = "vr player won";
-                            timeRemaining = GAME_TIME_AMOUNT;
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
                         break;
