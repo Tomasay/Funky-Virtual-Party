@@ -63,13 +63,10 @@ public class RealtimeSingleton : MonoBehaviour
             realtimeAvatarManager.localAvatarPrefab = Resources.Load("XRPlayer" + scene.name) as GameObject;
             realtimeAvatarManager.CreateAvatarIfNeeded();
 
-            if (scene.name.Equals("MainMenu"))
-            {
-                SpawnDiscs();
-            }
 
             if (scene.name.Equals("MainMenu"))
             {
+                SpawnDiscs();
                 Invoke("SpawnDebugPlayers", 1);
             }
             else

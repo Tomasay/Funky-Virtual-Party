@@ -21,6 +21,7 @@ public class PlatformSwitcher : EditorWindow
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Shootout/ShootoutClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Kaiju/KaijuClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/VRTistryClient.unity", true));
+        editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MazeGame/MazeGameClient.unity", true));
         EditorBuildSettings.scenes = editorBuildSettingsScenes.ToArray();
 
         //Normcore Package Version
@@ -43,6 +44,7 @@ public class PlatformSwitcher : EditorWindow
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Shootout/Shootout.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Kaiju/Kaiju.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/VRTistry.unity", true));
+        editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MazeGame/MazeGame.unity", true));
         EditorBuildSettings.scenes = editorBuildSettingsScenes.ToArray();
 
         //Normcore Package Version

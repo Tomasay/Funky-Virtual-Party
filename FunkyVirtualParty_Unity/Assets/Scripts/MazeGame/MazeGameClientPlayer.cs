@@ -13,12 +13,18 @@ public class MazeGameClientPlayer : ClientPlayer
         private static extern void TriggerHaptic(int hapticTime);
 #endif
 
+    public Camera cam;
+
     private bool collidingWithWall;
 
     public GameObject maze;
 
     //The last non zero input by player
     private Vector3 lastInput;
+
+    public bool isAlive = true;
+
+    public GameObject playerRef; //Childed gameobject used to reference position
 
     protected override void Awake()
     {
@@ -27,15 +33,39 @@ public class MazeGameClientPlayer : ClientPlayer
         startingSpeed = speed = 0.05f; //Smol map = smol speed
     }
 
+    bool localStartCalled;
+    protected override void LocalStart()
+    {
+        base.LocalStart();
+
+        playerRef.transform.position = transform.position;
+
+        localStartCalled = true;
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+
+        if (IsLocal && localStartCalled)
+        {
+            transform.position = playerRef.transform.position;
+            transform.rotation = maze.transform.rotation;
+        }
+    }
+
     public override void Move(Vector2 input, bool changeDirection = true, bool animate = true, Vector2 overrideRotation = default)
     {
         //Reorient x and y for maze local space
-        Vector3 newInput = maze.transform.rotation * new Vector3(input.x, 0, input.y);
+        //Vector3 newInput = maze.transform.rotation * new Vector3(input.x, 0, input.y);
+        //Vector3 newInput = maze.transform.InverseTransformVector(new Vector3(input.x, 0, input.y));
 
         if (canMove)
         {
-            movement = new Vector3(input.x * speed, 0, input.y * speed) * .01f;
-            transform.Translate(movement * Time.deltaTime);
+            movement = new Vector3(input.x * speed, 0, input.y * speed);
+            playerRef.transform.Translate(movement * Time.deltaTime, Space.Self);
+
+            Debug.Log("movement: " + movement + "    movement * Time.deltaTime: " + (movement * Time.deltaTime));
 
             //Magnitude of movement for animations
             if (animate)
@@ -70,14 +100,13 @@ public class MazeGameClientPlayer : ClientPlayer
 
                 if (lookDirection != Vector3.zero)
                 {
-                    anim.transform.rotation = Quaternion.LookRotation(lookDirection, Vector3.up);
-                    //anim.transform.DORotateQuaternion(syncer.LookRotation, inputPollRate);
+                    anim.transform.localRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
                 }
             }
 
-            if (newInput != Vector3.zero)
+            if (movement != Vector3.zero)
             {
-                lastInput = newInput;
+                lastInput = movement;
             }
         }
         else
@@ -89,22 +118,12 @@ public class MazeGameClientPlayer : ClientPlayer
 
     protected override void CheckInput()
     {
-        //Constantly update player rotation to be in line with maze board
-        if(lastInput == Vector3.zero && maze)
+        if (IsLocal)
         {
-            //Players look north by default, before any input
-            lastInput = maze.transform.rotation * new Vector3(0, 0, 1);
+            base.CheckInput();
+
+            CustomCollision();
         }
-        anim.transform.rotation = Quaternion.LookRotation(lastInput, maze.transform.up);
-
-        base.CheckInput();
-
-        //Keep player centered vertically in maze
-        Vector3 localPos = transform.localPosition;
-        localPos.y = 0;
-        transform.localPosition = localPos;
-
-        CustomCollision();
     }
 
 
@@ -138,16 +157,20 @@ public class MazeGameClientPlayer : ClientPlayer
         {
             if(hit.collider.transform.tag.Equals("Wall"))
             {
-                transform.Translate(-movement * Time.deltaTime);
+                //transform.Translate(-movement * Time.deltaTime);
+                mazePlayerOffset -= (movement * Time.deltaTime);
             }
         }
 
 #elif UNITY_WEBGL
-        if (isLocal && Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
+        //Debug.DrawRay(t, smr.transform.forward * 0.01f, Color.green);
+        if (isLocal && Physics.Raycast(playerRef.transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
         {
             if (hit.collider.transform.tag.Equals("Wall"))
             {
-                transform.Translate(-movement * Time.deltaTime);
+                Debug.Log("Hitting Wall");
+                //transform.Translate(-movement * Time.deltaTime);
+                playerRef.transform.localPosition -= (movement * Time.deltaTime);
             }
         }
 #endif
