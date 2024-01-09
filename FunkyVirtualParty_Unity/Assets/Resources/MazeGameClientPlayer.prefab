@@ -7,6 +7,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 624035471942958305, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: _interpolate
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1095973178372798655, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.13774236
@@ -268,6 +272,7 @@ MonoBehaviour:
   cam: {fileID: 0}
   maze: {fileID: 0}
   isAlive: 1
+  playerRef: {fileID: 0}
 --- !u!136 &5379739014452712363 stripped
 CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 8143653906893471125, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}

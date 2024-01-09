@@ -128,6 +128,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     void OnDeathTriggerChanged(ClientSyncModel previousModel, bool val)
     {
+        Debug.Log("Death trigger changed: " + val);
         if (val)
         {
             OnDeath.Invoke();

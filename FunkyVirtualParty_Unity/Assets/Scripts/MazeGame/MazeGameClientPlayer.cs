@@ -38,6 +38,8 @@ public class MazeGameClientPlayer : ClientPlayer
     {
         base.LocalStart();
 
+        syncer.OnDeath.AddListener(HitByMarble);
+
         playerRef.transform.position = transform.position;
 
         localStartCalled = true;
@@ -73,16 +75,16 @@ public class MazeGameClientPlayer : ClientPlayer
                 float val = Mathf.Abs(input.magnitude);
                 if ((val > 0.05) || (val < -0.05))
                 {
-                    anim.SetFloat("Speed", val);
+                    syncer.AnimSpeed = val;
                 }
                 else
                 {
-                    anim.SetFloat("Speed", 0);
+                    syncer.AnimSpeed = 0;
                 }
             }
             else
             {
-                anim.SetFloat("Speed", 0);
+                syncer.AnimSpeed = 0;
             }
 
             //Update rotation
@@ -112,7 +114,7 @@ public class MazeGameClientPlayer : ClientPlayer
         else
         {
             movement = Vector3.zero;
-            anim.SetFloat("Speed", 0);
+            syncer.AnimSpeed = 0;
         }
     }
 
@@ -126,43 +128,32 @@ public class MazeGameClientPlayer : ClientPlayer
         }
     }
 
-
-#if UNITY_WEBGL
-    void MethodCalledFromServer(string methodName, string data)
+    void HitByMarble()
     {
-        if (methodName.Equals("MarbleCollision"))
+        canMove = false;
+        animSyncer.Trigger = ("Fall");
+        TriggerBlinkingAnimation(3);
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        TriggerHaptic(200);
+#endif
+
+        //TODO: Reduce score for appropriate player
+    }
+
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        base.OnCollisionEnter(collision);
+
+        if (collision.gameObject.name.Equals("Marble"))
         {
-            //Player falls over
-            /*
-            ClientPlayer player = ClientManagerWeb.instance.GetPlayerBySocketID(data);
-            player.Anim.SetTrigger("Fall");
-            TriggerBlinkingAnimation(3);
-
-            if(player.IsLocal)
-            {
-                TriggerHaptic(200);
-            }
-            */
-
-            //TODO: Reduce score for appropriate player
-
+            syncer.OnDeathTrigger = true;
         }
     }
-#endif
 
     void CustomCollision()
     {
-#if UNITY_ANDROID
-        if (Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
-        {
-            if(hit.collider.transform.tag.Equals("Wall"))
-            {
-                //transform.Translate(-movement * Time.deltaTime);
-                mazePlayerOffset -= (movement * Time.deltaTime);
-            }
-        }
-
-#elif UNITY_WEBGL
+#if UNITY_WEBGL
         //Debug.DrawRay(t, smr.transform.forward * 0.01f, Color.green);
         if (isLocal && Physics.Raycast(playerRef.transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
         {
@@ -191,5 +182,8 @@ public class MazeGameClientPlayer : ClientPlayer
             smr.enabled = true;
             yield return new WaitForSeconds(0.25f);
         }
+
+        canMove = true;
+        animSyncer.Trigger = ("Idle1");
     }
 }

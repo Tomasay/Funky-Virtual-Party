@@ -40,15 +40,14 @@ public class Marble : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         //Collision should be dictated by host
+        /*
 #if UNITY_ANDROID
-        if (collision.gameObject.TryGetComponent<MazeGameClientPlayer>(out MazeGameClientPlayer player))
+        if (collision.gameObject.TryGetComponent<MazeGameClientPlayer>(out MazeGameClientPlayer player) && player.IsLocal)
         {
-            //ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "MarbleCollision", player.PlayerSocketID);
-
-            player.Anim.SetTrigger("Fall");
-            player.TriggerBlinkingAnimation(3);
+            player.syncer.OnDeathTrigger = true;
         }
 #endif
+        */
     }
 
     private Vector3 GetPosRelativeToMaze()
