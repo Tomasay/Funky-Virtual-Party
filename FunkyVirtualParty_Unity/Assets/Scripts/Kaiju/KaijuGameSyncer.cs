@@ -15,6 +15,9 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
 
+    public int PlayGrabbedEvent { get => model.grabbedPlayerEvent; set => model.grabbedPlayerEvent = value; }
+    public int PlayDroppedEvent { get => model.droppedPlayerEvent; set => model.droppedPlayerEvent = value; }
+
     private bool isWeb;
 
     private void Awake()
@@ -60,6 +63,8 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
             // Unregister from events
             previousModel.stateDidChange -= OnStateChange;
             previousModel.vrPlayerReadyDidChange -= OnVRPlayerReadyUp;
+            previousModel.grabbedPlayerEventDidChange -= OnPlayerGrabbedEventDidFire;
+            previousModel.droppedPlayerEventDidChange -= OnPlayerDroppedEventDidFire;
         }
 
         if (currentModel != null)
@@ -83,6 +88,8 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
             // Register for events
             currentModel.stateDidChange += OnStateChange;
             currentModel.vrPlayerReadyDidChange += OnVRPlayerReadyUp;
+            currentModel.grabbedPlayerEventDidChange += OnPlayerGrabbedEventDidFire;
+            currentModel.droppedPlayerEventDidChange += OnPlayerDroppedEventDidFire;
         }
     }
 
@@ -102,6 +109,24 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
         else if (val && isWeb)
         {
             TutorialMenuClient.instance.ReadyUpVR();
+        }
+    }
+
+    void OnPlayerGrabbedEventDidFire(KaijuGameSyncModel previousModel, int id)
+    {
+        ClientPlayer cp = ClientPlayer.GetClientByOwnerID(id);
+        if (cp)
+        {
+            (cp as KaijuGameClientPlayer).Grabbed();
+        }
+    }
+
+    void OnPlayerDroppedEventDidFire(KaijuGameSyncModel previousModel, int id)
+    {
+        ClientPlayer cp = ClientPlayer.GetClientByOwnerID(id);
+        if (cp)
+        {
+            (cp as KaijuGameClientPlayer).Dropped();
         }
     }
     #endregion

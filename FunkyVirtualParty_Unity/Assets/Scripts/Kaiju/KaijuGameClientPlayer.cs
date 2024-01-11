@@ -169,7 +169,20 @@ public class KaijuGameClientPlayer : ClientPlayer
         }
     }
 
+    /// <summary>
+    /// Grab event triggered on vr host side only
+    /// </summary>
+    /// <param name="h">Hand that user was grabbed by</param>
+    /// <param name="g">Grabbable component on the player</param>
     public void OnGrabbed(Hand h, Grabbable g)
+    {
+        KaijuGameSyncer.instance.PlayGrabbedEvent = realtimeView.ownerIDSelf;
+    }
+
+    /// <summary>
+    /// Logic for when the player has been grabbed. Called for every user
+    /// </summary>
+    public void Grabbed()
     {
         currentConstraints = rb.constraints;
         rb.constraints = RigidbodyConstraints.None;
@@ -181,7 +194,20 @@ public class KaijuGameClientPlayer : ClientPlayer
         CanMove = false;
     }
 
+    /// <summary>
+    /// Drop event triggered on vr host side only
+    /// </summary>
+    /// <param name="h">Hand that user was dropped by</param>
+    /// <param name="g">Grabbable component on the player</param>
     public void OnDropped(Hand h, Grabbable g)
+    {
+        KaijuGameSyncer.instance.PlayDroppedEvent = realtimeView.ownerIDSelf;
+    }
+
+    /// <summary>
+    /// Logic for when the player has been dropped. Called for every user
+    /// </summary>
+    public void Dropped()
     {
         rb.constraints = currentConstraints;
 
@@ -194,6 +220,5 @@ public class KaijuGameClientPlayer : ClientPlayer
 #endif
 
         CanMove = true;
-
     }
 }
