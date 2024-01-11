@@ -92,7 +92,7 @@ public class MazeGameManagerWeb : MonoBehaviour
                 countdownText.enabled = true;
                 countdownText.text = "VR PLAYER WINS";
                 break;
-            case "time ended":
+            case "vr player lost":
                 countdownText.enabled = true;
                 countdownText.text = "TIME'S UP!\nYOU WIN";
                 break;
@@ -115,7 +115,7 @@ public class MazeGameManagerWeb : MonoBehaviour
                 break;
             case "vr player won":
                 break;
-            case "time ended":
+            case "vr player lost":
                 break;
             default:
                 break;
@@ -124,8 +124,6 @@ public class MazeGameManagerWeb : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        yield return new WaitForSeconds(2);
-
         yield return new WaitForSeconds(2);
 
         for (int i = countdown; i > 0; i--)

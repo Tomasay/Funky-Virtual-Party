@@ -13,7 +13,7 @@ public class MazeGameManager : MonoBehaviour
 
     [SerializeField] Collider[] mazeIgnoreColliders;
 
-    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 90;
+    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private TMP_Text vrInfoText, vrGameTimeText;
     private float timeRemaining;
 
@@ -74,13 +74,13 @@ public class MazeGameManager : MonoBehaviour
                 }
                 if (timeRemaining <= 0) //Game end, VR player wins
                 {
-                    MazeGameSyncer.instance.State = "time ended";
+                    MazeGameSyncer.instance.State = "vr player lost";
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
                 break;
             case "vr player won":
                 break;
-            case "time ended":
+            case "vr player lost":
                 break;
             default:
                 break;
@@ -108,7 +108,7 @@ public class MazeGameManager : MonoBehaviour
             case "vr player won":
                 StartCoroutine(GameOver(2, "YOU WIN!"));
                 break;
-            case "time ended":
+            case "vr player lost":
                 StartCoroutine(GameOver(2, "TIMES UP!\nYOU LOSE"));
                 break;
             default:
@@ -135,7 +135,7 @@ public class MazeGameManager : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(2);
 
         for (int i = countdown; i > 0; i--)
         {
