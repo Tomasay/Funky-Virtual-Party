@@ -31,14 +31,14 @@ public class MazeGameClientPlayer : ClientPlayer
         base.Awake();
 
         startingSpeed = speed = 0.05f; //Smol map = smol speed
+
+        syncer.OnDeath.AddListener(HitByMarble);
     }
 
     bool localStartCalled;
     protected override void LocalStart()
     {
         base.LocalStart();
-
-        syncer.OnDeath.AddListener(HitByMarble);
 
         playerRef.transform.position = transform.position;
 
@@ -130,15 +130,18 @@ public class MazeGameClientPlayer : ClientPlayer
 
     void HitByMarble()
     {
-        canMove = false;
-        animSyncer.Trigger = ("Fall");
-        TriggerBlinkingAnimation(3);
+        isAlive = false;
+
+        if (isLocal)
+        {
+            canMove = false;
+            animSyncer.Trigger = ("Fall");
+            TriggerBlinkingAnimation(3);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
         TriggerHaptic(200);
 #endif
-
-        //TODO: Reduce score for appropriate player
+        }
     }
 
     protected override void OnCollisionEnter(Collision collision)
@@ -183,7 +186,7 @@ public class MazeGameClientPlayer : ClientPlayer
             yield return new WaitForSeconds(0.25f);
         }
 
-        canMove = true;
-        animSyncer.Trigger = ("Idle1");
+        //canMove = true;
+        //animSyncer.Trigger = ("Idle1");
     }
 }
