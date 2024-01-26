@@ -6,10 +6,6 @@ using DG.Tweening;
 
 public class MazeGameManagerWeb : MonoBehaviour
 {
-    [SerializeField] GameObject maze;
-
-    [SerializeField] GameObject playerRef;
-
     /*
     void Start()
     {
@@ -58,8 +54,6 @@ public class MazeGameManagerWeb : MonoBehaviour
 
         localPlayer.SetPlayerIndicatorVisibility(true);
         localPlayer.cam = cam;
-        localPlayer.maze = maze;
-        localPlayer.playerRef = playerRef;
     }
 
     void SetVRPlayerVisibility(bool isVisible)

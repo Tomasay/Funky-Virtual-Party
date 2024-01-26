@@ -12,6 +12,8 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
 
     public MyStringEvent OnStateChangeEvent;
 
+    public GameObject maze;
+
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
 

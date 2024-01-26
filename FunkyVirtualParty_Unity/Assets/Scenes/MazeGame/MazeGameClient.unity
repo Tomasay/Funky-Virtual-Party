@@ -226,7 +226,7 @@ Transform:
   m_GameObject: {fileID: 149628859}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.006, y: 0.0148, z: -0.0001}
-  m_LocalScale: {x: 0.009451592, y: 0.022536376, z: 0.009451592}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 80734150}
@@ -844,8 +844,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00f7b33d076b3744584319d22ba7ba66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maze: {fileID: 80734149}
-  playerRef: {fileID: 149628859}
   countdownText: {fileID: 1401713175}
   gameTimeText: {fileID: 2052924632}
   countdownParticles: {fileID: 219077454}
@@ -934,6 +932,7 @@ MonoBehaviour:
   OnStateChangeEvent:
     m_PersistentCalls:
       m_Calls: []
+  maze: {fileID: 80734149}
 --- !u!114 &845778944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1383,6 +1382,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Marble
       objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933941, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_Drag
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4132452954677399492, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
     - {fileID: 1097079118135933938, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
@@ -1407,7 +1410,7 @@ MonoBehaviour:
   _interpolate: 1
   _syncPosition: 1
   _syncRotation: 1
-  _syncScale: 1
+  _syncScale: 0
   _syncVelocity: 1
   _maintainOwnershipWhileSleeping: 0
 --- !u!114 &1611362866

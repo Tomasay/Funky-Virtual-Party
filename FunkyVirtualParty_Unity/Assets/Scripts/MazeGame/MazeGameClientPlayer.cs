@@ -17,14 +17,10 @@ public class MazeGameClientPlayer : ClientPlayer
 
     private bool collidingWithWall;
 
-    public GameObject maze;
-
     //The last non zero input by player
     private Vector3 lastInput;
 
     public bool isAlive = true;
-
-    public GameObject playerRef; //Childed gameobject used to reference position
 
     protected override void Awake()
     {
@@ -33,41 +29,27 @@ public class MazeGameClientPlayer : ClientPlayer
         startingSpeed = speed = 0.05f; //Smol map = smol speed
 
         syncer.OnDeath.AddListener(HitByMarble);
+        transform.parent = MazeGameSyncer.instance.maze.transform;
     }
 
     bool localStartCalled;
     protected override void LocalStart()
     {
         base.LocalStart();
-
-        playerRef.transform.position = transform.position;
-
         localStartCalled = true;
     }
 
     protected override void Update()
     {
         base.Update();
-
-        if (IsLocal && localStartCalled)
-        {
-            transform.position = playerRef.transform.position;
-            transform.rotation = maze.transform.rotation;
-        }
     }
 
     public override void Move(Vector2 input, bool changeDirection = true, bool animate = true, Vector2 overrideRotation = default)
     {
-        //Reorient x and y for maze local space
-        //Vector3 newInput = maze.transform.rotation * new Vector3(input.x, 0, input.y);
-        //Vector3 newInput = maze.transform.InverseTransformVector(new Vector3(input.x, 0, input.y));
-
         if (canMove)
         {
-            movement = new Vector3(input.x * speed, 0, input.y * speed);
-            playerRef.transform.Translate(movement * Time.deltaTime, Space.Self);
-
-            Debug.Log("movement: " + movement + "    movement * Time.deltaTime: " + (movement * Time.deltaTime));
+            movement = new Vector3(input.x, 0, input.y) * speed;
+            transform.Translate(movement * Time.deltaTime, Space.Self);
 
             //Magnitude of movement for animations
             if (animate)
@@ -144,27 +126,17 @@ public class MazeGameClientPlayer : ClientPlayer
         }
     }
 
-    protected override void OnCollisionEnter(Collision collision)
-    {
-        base.OnCollisionEnter(collision);
-
-        if (collision.gameObject.name.Equals("Marble"))
-        {
-            syncer.OnDeathTrigger = true;
-        }
-    }
-
     void CustomCollision()
     {
 #if UNITY_WEBGL
         //Debug.DrawRay(t, smr.transform.forward * 0.01f, Color.green);
-        if (isLocal && Physics.Raycast(playerRef.transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
+        if (isLocal && Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
         {
             if (hit.collider.transform.tag.Equals("Wall"))
             {
                 Debug.Log("Hitting Wall");
                 //transform.Translate(-movement * Time.deltaTime);
-                playerRef.transform.localPosition -= (movement * Time.deltaTime);
+                transform.localPosition -= (movement * Time.deltaTime);
             }
         }
 #endif
