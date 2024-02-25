@@ -43,8 +43,7 @@ public class Marble : MonoBehaviour
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
             MazeGameClientPlayer mcp = cp as MazeGameClientPlayer;
-            Debug.Log("Distance: " + Vector3.Distance(transform.position, mcp.transform.position));
-            if (mcp.isAlive & Vector3.Distance(transform.position, mcp.transform.position) < 0.0075f)
+            if (mcp.isAlive & Vector3.Distance(transform.position, mcp.transform.position) < 0.015f)
             {
                 mcp.syncer.OnDeathTrigger = true;
             }
