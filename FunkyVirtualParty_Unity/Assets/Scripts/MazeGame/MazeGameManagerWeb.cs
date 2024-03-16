@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Cinemachine;
 using DG.Tweening;
+using CW.Common;
 
 public class MazeGameManagerWeb : MonoBehaviour
 {
@@ -30,6 +32,9 @@ public class MazeGameManagerWeb : MonoBehaviour
     private float timeRemaining;
 
     [SerializeField] Camera cam;
+    [SerializeField] CinemachineVirtualCamera cinemachineCam;
+    [SerializeField] Animator cameraAnim;
+    [SerializeField] LocalLerpFollow playerFollow;
 
     protected void Start()
     {
@@ -54,6 +59,8 @@ public class MazeGameManagerWeb : MonoBehaviour
 
         localPlayer.SetPlayerIndicatorVisibility(true);
         localPlayer.cam = cam;
+        playerFollow.target = RealtimeSingletonWeb.instance.LocalPlayer.transform;
+        cinemachineCam.Follow = playerFollow.gameObject.transform;
     }
 
     void SetVRPlayerVisibility(bool isVisible)
