@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2056377434}
-  m_IndirectSpecularColor: {r: 0.36278537, g: 0.56615317, b: 0.84371275, a: 1}
+  m_IndirectSpecularColor: {r: 0.11268882, g: 0.28156924, b: 0.7091791, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3124,6 +3124,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Marble
       objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933941, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_Drag
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4132452954677399492, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
@@ -3147,7 +3151,7 @@ MonoBehaviour:
   _interpolate: 1
   _syncPosition: 1
   _syncRotation: 1
-  _syncScale: 1
+  _syncScale: 0
   _syncVelocity: 1
   _maintainOwnershipWhileSleeping: 0
 --- !u!114 &1480470052
@@ -3697,6 +3701,7 @@ MonoBehaviour:
   OnStateChangeEvent:
     m_PersistentCalls:
       m_Calls: []
+  maze: {fileID: 1872234904}
 --- !u!114 &1859736910
 MonoBehaviour:
   m_ObjectHideFlags: 0

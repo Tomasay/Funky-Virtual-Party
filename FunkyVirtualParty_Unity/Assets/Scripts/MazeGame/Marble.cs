@@ -6,20 +6,14 @@ public class Marble : MonoBehaviour
 {
     [SerializeField] GameObject handheldMaze;
     [SerializeField] Collider mazeBounds;
-    Rigidbody RB, mazeRB;
 
     private float threshold = 0.005f, startingMazeHeight;
     private Vector3 previousValidPoint;
 
     void Start()
     {
-        RB = GetComponent<Rigidbody>();
-        mazeRB = handheldMaze.GetComponent<Rigidbody>();
-
         previousValidPoint = GetPosRelativeToMaze();
         startingMazeHeight = GetPosRelativeToMaze().y;
-
-        Debug.Log("Starting height: " + startingMazeHeight);
     }
 
     void Update()
@@ -35,19 +29,27 @@ public class Marble : MonoBehaviour
         {
             previousValidPoint = GetPosRelativeToMaze();
         }
+
+        if(MazeGameSyncer.instance.State.Equals("game loop"))
+        {
+            CheckCollisionWithPlayers();
+        }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    void CheckCollisionWithPlayers()
     {
         //Collision should be dictated by host
-        /*
 #if UNITY_ANDROID
-        if (collision.gameObject.TryGetComponent<MazeGameClientPlayer>(out MazeGameClientPlayer player) && player.IsLocal)
+        foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            player.syncer.OnDeathTrigger = true;
+            MazeGameClientPlayer mcp = cp as MazeGameClientPlayer;
+            if (mcp.isAlive & Vector3.Distance(transform.position, mcp.transform.position) < 0.015f)
+            {
+                mcp.syncer.OnDeathTrigger = true;
+            }
         }
 #endif
-        */
+
     }
 
     private Vector3 GetPosRelativeToMaze()

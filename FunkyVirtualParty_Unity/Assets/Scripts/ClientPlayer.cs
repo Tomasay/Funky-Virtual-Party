@@ -118,8 +118,8 @@ public class ClientPlayer : MonoBehaviour
 
         speed = startingSpeed;
 
-        rb = GetComponent<Rigidbody>();
-        playerInput = GetComponent<PlayerInput>();
+        TryGetComponent<Rigidbody>(out rb);
+        TryGetComponent<PlayerInput>(out playerInput);
 
         spinePos = spineBone.transform.localPosition;
     }
