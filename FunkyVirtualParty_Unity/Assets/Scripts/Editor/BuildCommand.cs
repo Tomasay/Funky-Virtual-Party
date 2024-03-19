@@ -9,14 +9,14 @@ public class BuildCommand : MonoBehaviour
     {
         // Build the player.\
         BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-        buildPlayerOptions.scenes = new[] { 
+        buildPlayerOptions.scenes = new[] {
         "Assets/Scenes/MainMenu/MainMenuClient.unity",
         "Assets/Scenes/ChaseGame/ChaseGameClient.unity",
         "Assets/Scenes/Shootout/ShootoutClient.unity",
         "Assets/Scenes/Kaiju/KaijuClient.unity",
         "Assets/Scenes/VRTistry/VRTistryClient.unity",
         "Assets/Scenes/MazeGame/MazeGameClient.unity" };
-        buildPlayerOptions.locationPathName = "yourLocationNameHere";
+        buildPlayerOptions.locationPathName = "Build/WebGL";
         buildPlayerOptions.target = BuildTarget.WebGL;
         buildPlayerOptions.options = BuildOptions.None; // set whatever you want here
         buildPlayerOptions.targetGroup = BuildTargetGroup.WebGL;
