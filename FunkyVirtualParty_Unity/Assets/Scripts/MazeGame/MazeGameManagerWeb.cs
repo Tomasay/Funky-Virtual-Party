@@ -32,7 +32,7 @@ public class MazeGameManagerWeb : MonoBehaviour
     private float timeRemaining;
 
     [SerializeField] Camera cam;
-    [SerializeField] CinemachineVirtualCamera cinemachineCam;
+    [SerializeField] CinemachineVirtualCamera cinemachineCam, vrPlayerCam1, vrPlayerCam2;
     [SerializeField] Animator cameraAnim;
     [SerializeField] LocalLerpFollow playerFollow;
 
@@ -83,6 +83,7 @@ public class MazeGameManagerWeb : MonoBehaviour
             case "countdown":
                 RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
+                StartCoroutine("SetCamera");
 
                 SetVRPlayerVisibility(false);
                 break;
@@ -142,6 +143,23 @@ public class MazeGameManagerWeb : MonoBehaviour
 
         yield return new WaitForSeconds(1);
         countdownText.enabled = false;
+    }
+
+    IEnumerator SetCamera()
+    {
+        cinemachineCam.Priority = 10;
+        vrPlayerCam1.Priority = 10;
+        vrPlayerCam2.Priority = 20;
+
+        yield return new WaitForSeconds(2);
+
+        cinemachineCam.Priority = 20;
+        vrPlayerCam1.Priority = 10;
+        vrPlayerCam2.Priority = 10;
+
+        yield return new WaitForSeconds(1);
+
+        cam.cullingMask &= ~(1 << LayerMask.NameToLayer("VROnly"));
     }
 
     public string FormatTime(float time)
