@@ -93,14 +93,27 @@ public class MazeGameManagerWeb : MonoBehaviour
             case "vr player won":
                 countdownText.enabled = true;
                 countdownText.text = "VR PLAYER WINS";
+                SetPlayerDoNotDestroy();
                 break;
             case "vr player lost":
                 countdownText.enabled = true;
                 countdownText.text = "TIME'S UP!\nYOU WIN";
+                SetPlayerDoNotDestroy();
                 break;
             default:
                 break;
         }
+    }
+
+    /// <summary>
+    /// Sets local client player to DoNotDestroyOnLoad.
+    /// This needs to be applied before loading back to the main menu,
+    /// as childing to the maze removes this flag
+    /// </summary>
+    void SetPlayerDoNotDestroy()
+    {
+        RealtimeSingletonWeb.instance.LocalPlayer.gameObject.transform.parent = null;
+        DontDestroyOnLoad(RealtimeSingletonWeb.instance.LocalPlayer.gameObject);
     }
 
     void Update()

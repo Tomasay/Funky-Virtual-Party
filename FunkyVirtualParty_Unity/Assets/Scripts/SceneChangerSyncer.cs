@@ -112,13 +112,15 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
         //Destroy discs
         foreach (GameObject d in RealtimeSingleton.instance.discs)
         {
-            Realtime.Destroy(d);
+            if(d)
+                Realtime.Destroy(d);
         }
         RealtimeSingleton.instance.discs.Clear();
 #elif UNITY_WEBGL
         foreach (GameObject d in GameObject.FindGameObjectsWithTag("Vinyl"))
         {
-            Realtime.Destroy(d);
+            if(d)
+                Realtime.Destroy(d);
         }
 #endif
     }

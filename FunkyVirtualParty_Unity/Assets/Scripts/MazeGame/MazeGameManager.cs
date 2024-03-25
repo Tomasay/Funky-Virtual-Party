@@ -156,27 +156,6 @@ public class MazeGameManager : MonoBehaviour
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
 
-        //Destroy fireballs
-        if (Fireball.pool != null)
-        {
-            foreach (Fireball f in Fireball.pool)
-            {
-                Realtime.Destroy(f.gameObject);
-            }
-            Fireball.pool.Clear();
-            Fireball.pool = null;
-        }
-
-        //Destroy holes
-        if (Fireball.holes != null)
-        {
-            foreach (GameObject h in Fireball.holes)
-            {
-                Realtime.Destroy(h.gameObject);
-            }
-            Fireball.holes.Clear();
-        }
-
         SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }
 
