@@ -22,6 +22,8 @@ public class MazeGameClientPlayer : ClientPlayer
 
     public bool isAlive = true;
 
+    private GameObject playerProxy;
+
     protected override void Awake()
     {
         base.Awake();
@@ -29,19 +31,21 @@ public class MazeGameClientPlayer : ClientPlayer
         startingSpeed = speed = 0.05f; //Smol map = smol speed
 
         syncer.OnDeath.AddListener(HitByMarble);
-        transform.parent = MazeGameSyncer.instance.maze.transform;
+        //transform.parent = MazeGameSyncer.instance.maze.transform;
+
+        IsLocal = true;
     }
 
     bool localStartCalled;
     protected override void LocalStart()
     {
         base.LocalStart();
-        localStartCalled = true;
-    }
 
-    protected override void Update()
-    {
-        base.Update();
+        playerProxy = GameObject.Find("PlayerProxy");
+        playerProxy.transform.position = transform.position;
+        playerProxy.transform.rotation = transform.rotation;
+
+        localStartCalled = true;
     }
 
     public override void Move(Vector2 input, bool changeDirection = true, bool animate = true, Vector2 overrideRotation = default)
@@ -49,7 +53,8 @@ public class MazeGameClientPlayer : ClientPlayer
         if (canMove)
         {
             movement = new Vector3(input.x, 0, input.y) * speed;
-            transform.Translate(movement * Time.deltaTime, Space.Self);
+            playerProxy.transform.Translate(movement * Time.deltaTime, Space.Self);
+            transform.SetPositionAndRotation(playerProxy.transform.position, playerProxy.transform.rotation);
 
             //Magnitude of movement for animations
             if (animate)
@@ -102,9 +107,21 @@ public class MazeGameClientPlayer : ClientPlayer
 
     protected override void CheckInput()
     {
-        if (IsLocal)
+        if (IsLocal) //Only read values from analog stick, and emit movement if being done from local device
         {
-            base.CheckInput();
+            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
+
+            if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to call Move if input is 0 and we're already not moving
+            {
+                Move(input);
+            }
+            else
+            {
+                if (playerProxy)
+                {
+                    transform.SetPositionAndRotation(playerProxy.transform.position, playerProxy.transform.rotation);
+                }
+            }
 
             CustomCollision();
         }
@@ -129,15 +146,17 @@ public class MazeGameClientPlayer : ClientPlayer
     void CustomCollision()
     {
 #if UNITY_WEBGL
-        //Debug.DrawRay(t, smr.transform.forward * 0.01f, Color.green);
-        if (isLocal && Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f))
+        if (Physics.Raycast(transform.position, smr.transform.forward, out RaycastHit hit, 0.01f) && hit.collider.transform.tag.Equals("Wall"))
         {
-            if (hit.collider.transform.tag.Equals("Wall"))
-            {
-                Debug.Log("Hitting Wall");
-                //transform.Translate(-movement * Time.deltaTime);
-                transform.localPosition -= (movement * Time.deltaTime);
-            }
+            Debug.DrawRay(transform.position, smr.transform.forward * 0.01f, Color.green);
+            Debug.Log("Hitting Wall");
+
+            transform.localPosition -= (movement * Time.deltaTime);
+        }
+        else
+        {
+            Debug.DrawRay(transform.position, smr.transform.forward * 0.01f, Color.red);
+            Debug.Log("NOT Hitting Wall");
         }
 #endif
 

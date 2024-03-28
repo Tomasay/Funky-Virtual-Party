@@ -118,6 +118,9 @@ public class MazeGameManagerWeb : MonoBehaviour
 
     void Update()
     {
+        if (!MazeGameSyncer.instance)
+            return;
+
         switch (MazeGameSyncer.instance.State)
         {
             case "tutorial":
