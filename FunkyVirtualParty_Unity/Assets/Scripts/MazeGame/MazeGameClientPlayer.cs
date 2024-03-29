@@ -24,7 +24,7 @@ public class MazeGameClientPlayer : ClientPlayer
 
     public bool isAlive = true;
 
-    private Transform playerProxy;
+    public Transform playerProxy;
 
     protected override void Awake()
     {

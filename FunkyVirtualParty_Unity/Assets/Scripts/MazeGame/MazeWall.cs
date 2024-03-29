@@ -6,8 +6,6 @@ public class MazeWall : MonoBehaviour
 {
     Collider col;
 
-    Vector3 contactPoint = Vector3.zero;
-
     private void Awake()
     {
         col = GetComponent<Collider>();

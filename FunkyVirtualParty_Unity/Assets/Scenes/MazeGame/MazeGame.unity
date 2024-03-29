@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 2056377434}
-  m_IndirectSpecularColor: {r: 0.36278537, g: 0.56615317, b: 0.84371275, a: 1}
+  m_IndirectSpecularColor: {r: 0.11268882, g: 0.28156924, b: 0.7091791, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -845,13 +845,14 @@ GameObject:
   m_Component:
   - component: {fileID: 338507692}
   - component: {fileID: 338507693}
+  - component: {fileID: 338507694}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &338507692
 Transform:
   m_ObjectHideFlags: 0
@@ -929,6 +930,26 @@ Light:
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &338507694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 338507691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 474bcb49853aa07438625e644c072ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Version: 1
+  m_UsePipelineSettings: 1
+  m_AdditionalLightsShadowResolutionTier: 2
+  m_LightLayerMask: 1
+  m_CustomShadowLayers: 0
+  m_ShadowLayerMask: 1
+  m_LightCookieSize: {x: 1, y: 1}
+  m_LightCookieOffset: {x: 0, y: 0}
 --- !u!1 &347459786
 GameObject:
   m_ObjectHideFlags: 0
@@ -988,6 +1009,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 347459787}
     m_Modifications:
+    - target: {fileID: 138847449764476860, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
     - target: {fileID: 655621127824670353, guid: bef354025ac2f4346851109010a19b44, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1088,6 +1113,10 @@ PrefabInstance:
       propertyPath: m_text
       value: Maze Game
       objectReference: {fileID: 0}
+    - target: {fileID: 1410481696878956553, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
     - target: {fileID: 3095263522779282477, guid: bef354025ac2f4346851109010a19b44, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -1120,15 +1149,47 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 3257813697582799141, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
+    - target: {fileID: 3291510197707601082, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
+    - target: {fileID: 3685380968587435728, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
+    - target: {fileID: 3728868023171641622, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
     - target: {fileID: 3949080708076256258, guid: bef354025ac2f4346851109010a19b44, type: 3}
       propertyPath: m_text
-      value: Tilt the maze to control the marbles, rolling them into players to knock
+      value: Tilt the maze to control the marbles, roll them into players to knock
         them out
       objectReference: {fileID: 0}
+    - target: {fileID: 5115406703602822108, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
+    - target: {fileID: 6089944144994815081, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
     - target: {fileID: 6297084851260562699, guid: bef354025ac2f4346851109010a19b44, type: 3}
       propertyPath: m_Name
       value: ShootoutTutorialScreenVR
       objectReference: {fileID: 0}
+    - target: {fileID: 7649027526665749829, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
+    - target: {fileID: 7691322824046422234, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
     - target: {fileID: 7699958476130976218, guid: bef354025ac2f4346851109010a19b44, type: 3}
       propertyPath: m_text
       value: Grab Maze handles
@@ -1137,6 +1198,14 @@ PrefabInstance:
       propertyPath: m_PresetInfoIsWorld
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8373810434392212144, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
+    - target: {fileID: 8408013777588366710, guid: bef354025ac2f4346851109010a19b44, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9c2c907846e3c844b892d1394b766f27, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bef354025ac2f4346851109010a19b44, type: 3}
 --- !u!224 &381192822 stripped
@@ -1245,6 +1314,7 @@ MonoBehaviour:
   - {fileID: 1909835406}
   - {fileID: 1640973671}
   - {fileID: 1382180171}
+  marbleCollider: {fileID: 1480470053}
   debugWaypoints: []
 --- !u!4 &466098077
 Transform:
@@ -3128,6 +3198,10 @@ PrefabInstance:
       propertyPath: m_Drag
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933943, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1d3f5e26fb40e13409e237b908ad8d56, type: 2}
     m_RemovedComponents:
     - {fileID: 4132452954677399492, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
@@ -3177,6 +3251,11 @@ MonoBehaviour:
   - componentID: 1
     component: {fileID: 1480470051}
   _childViews: []
+--- !u!135 &1480470053 stripped
+SphereCollider:
+  m_CorrespondingSourceObject: {fileID: 1097079118135933942, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+  m_PrefabInstance: {fileID: 1480470049}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1512933830
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4649,55 +4728,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: HandheldMaze
       objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 2363442964410467573}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[1].m_Target
-      value: 
-      objectReference: {fileID: 2363442964410467574}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: RequestOwnership
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
-      value: set_isKinematic
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
-        Normcore
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
-      value: UnityEngine.Rigidbody, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 2363442965236056165, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
     - target: {fileID: 2363442965236056167, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -4742,32 +4772,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8704489494616968379, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: _interpolate
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8704489494616968379, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-      propertyPath: _syncVelocity
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
---- !u!114 &2363442964410467573 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8704489494616968379, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-  m_PrefabInstance: {fileID: 2363442964410467572}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1872234904}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!54 &2363442964410467574 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 2363442965236056166, guid: 47944dcc58e64b34a90631bde2f50bd6, type: 3}
-  m_PrefabInstance: {fileID: 2363442964410467572}
-  m_PrefabAsset: {fileID: 0}
 --- !u!33 &2768136951188032542
 MeshFilter:
   m_ObjectHideFlags: 0

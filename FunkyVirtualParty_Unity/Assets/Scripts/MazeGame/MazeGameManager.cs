@@ -13,6 +13,8 @@ public class MazeGameManager : MonoBehaviour
 
     [SerializeField] Collider[] mazeIgnoreColliders;
 
+    [SerializeField] Collider marbleCollider;
+
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private TMP_Text vrInfoText, vrGameTimeText;
     private float timeRemaining;
@@ -51,6 +53,8 @@ public class MazeGameManager : MonoBehaviour
             {
                 Physics.IgnoreCollision(col, col2);
             }
+
+            Physics.IgnoreCollision(col, marbleCollider);
         }
 
         //SetVRPlayerMovement(false);
