@@ -67,6 +67,7 @@ public class ClientPlayer : MonoBehaviour
     public string PlayerIP { get => playerIP; set => playerIP = value; }
 
     public bool IsLocal { get => isLocal; set => isLocal = value; }
+    public Vector3 Movement { get => movement; }
     public bool CanMove { get => canMove; set => canMove = value; }
 
     public Animator Anim { get => anim;}

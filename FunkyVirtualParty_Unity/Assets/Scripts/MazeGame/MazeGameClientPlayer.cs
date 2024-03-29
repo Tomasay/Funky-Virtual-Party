@@ -18,9 +18,13 @@ public class MazeGameClientPlayer : ClientPlayer
     private bool collidingWithWall;
 
     //The last non zero input by player
-    private Vector3 lastInput;
+    private Vector2 lastInput;
+
+    public Vector2 LastInput { get => lastInput; }
 
     public bool isAlive = true;
+
+    private Transform playerProxy;
 
     protected override void Awake()
     {
@@ -30,12 +34,17 @@ public class MazeGameClientPlayer : ClientPlayer
 
         syncer.OnDeath.AddListener(HitByMarble);
         transform.parent = MazeGameSyncer.instance.maze.transform;
+
+        playerProxy = GameObject.Find("Player Proxy").transform;
     }
 
     bool localStartCalled;
     protected override void LocalStart()
     {
         base.LocalStart();
+
+        playerProxy.transform.localPosition = transform.localPosition;
+
         localStartCalled = true;
     }
 
@@ -50,6 +59,7 @@ public class MazeGameClientPlayer : ClientPlayer
         {
             movement = new Vector3(input.x, 0, input.y) * speed;
             transform.Translate(movement * Time.deltaTime, Space.Self);
+            playerProxy.Translate(movement * Time.deltaTime, Space.Self);
 
             //Magnitude of movement for animations
             if (animate)
@@ -88,9 +98,9 @@ public class MazeGameClientPlayer : ClientPlayer
                 }
             }
 
-            if (movement != Vector3.zero)
+            if (input != Vector2.zero)
             {
-                lastInput = movement;
+                lastInput = input;
             }
         }
         else
@@ -106,7 +116,7 @@ public class MazeGameClientPlayer : ClientPlayer
         {
             base.CheckInput();
 
-            CustomCollision();
+            //CustomCollision();
         }
     }
 
