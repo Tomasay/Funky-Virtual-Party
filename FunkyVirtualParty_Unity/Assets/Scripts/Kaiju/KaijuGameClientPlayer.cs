@@ -51,7 +51,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     protected override void CheckInput()
     {
 #if UNITY_EDITOR
-        if (syncer.IsDebugPlayer && state < KaijuClientState.Grabbed)
+        if (syncer.IsDebugPlayer && CanMove)
         {
             Vector2 input = new Vector2(movement.x, movement.z);
 
@@ -68,30 +68,9 @@ public class KaijuGameClientPlayer : ClientPlayer
         {
             // do not send input if held by VR player
         }
-
-        if (true)
-        {
-            Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
-
-            //Input should be relative to camera, which is always facing forward from the player
-            if (input.magnitude > 0.1f)
-            {
-                float magnitude = input.magnitude;
-                input = input.normalized;
-                float targetAngle = Mathf.Atan2(input.x, input.y) * Mathf.Rad2Deg + cam.transform.eulerAngles.y; // + camera eulerAngles y
-                Vector3 newInput = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-                input = new Vector2(newInput.x, newInput.z) * magnitude;
-            }
-
-            if (!(input == Vector2.zero && movement == Vector3.zero)) //No need to send input if we're sending 0 and we're already not moving
-            {
-                //ClientManagerWeb.instance.Manager.Socket.Emit("IS", SerializeInputData(input));
-                Move(input);
-            }
-        }
 #endif
 
-        if (IsLocal && state != KaijuClientState.Grabbed) //Only read values from analog stick, and emit movement if being done from local device
+        if (IsLocal && CanMove ) //Only read values from analog stick, and emit movement if being done from local device
         {
             Vector2 input = playerInput.actions["Move"].ReadValue<Vector2>();
 
@@ -138,17 +117,26 @@ public class KaijuGameClientPlayer : ClientPlayer
             anim.SetBool("Flying", true);
             gameObject.transform.position = new Vector3(gameObject.transform.position.x, 45, gameObject.transform.position.z);
         }
+
+        if( Keyboard.current.xKey.wasPressedThisFrame)
+        {
+            anim.SetBool("Flying", false);
+            state = KaijuClientState.OnGround;
+            CanMove = true;
+        }
+
 #endif
     }
 
     protected override void OnCollisionEnter(Collision collision)
     {
         // collide with objects
-        if (collision.collider.CompareTag("Untagged"))
-        {
+        //if (collision.collider.CompareTag("Untagged"))
+        //{
             anim.SetBool("Flying", false);
             state = KaijuClientState.OnGround;
-        }
+            CanMove = true;
+        //}
 
     }
 
@@ -214,10 +202,6 @@ public class KaijuGameClientPlayer : ClientPlayer
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
         anim.SetBool("Flying", true);
-#if UNITY_WEBGL
-        realtimeView.RequestOwnership();
-        realtimeTransform.RequestOwnership();
-#endif
 
         CanMove = true;
     }
