@@ -14,8 +14,12 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
 
     public GameObject maze;
 
+    public GameObject clientMarble;
+    private Vector3 latestMarblePos;
+
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
+    public Vector3 MarbleMazePos { get => model.marbleMazePos; set => model.marbleMazePos = value; }
 
     private bool isWeb;
 
@@ -26,6 +30,8 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
 
         if (OnStateChangeEvent == null)
             OnStateChangeEvent = new MyStringEvent();
+
+        latestMarblePos = clientMarble.transform.localPosition;
 
 #if UNITY_WEBGL
         isWeb = true;
@@ -42,6 +48,14 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
         TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
 
+    private void Update()
+    {
+        if (clientMarble)
+        {
+            clientMarble.transform.localPosition = Vector3.Lerp(clientMarble.transform.localPosition, latestMarblePos, Time.deltaTime * 10);
+        }
+    }
+
     private void OnDestroy()
     {
         TutorialMenu.instance.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
@@ -55,6 +69,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
             // Unregister from events
             previousModel.stateDidChange -= OnStateChange;
             previousModel.vrPlayerReadyDidChange -= OnVRPlayerReadyUp;
+            previousModel.marbleMazePosDidChange -= OnMarbleMazePosDidChange;
         }
 
         if (currentModel != null)
@@ -68,6 +83,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
             // Register for events
             currentModel.stateDidChange += OnStateChange;
             currentModel.vrPlayerReadyDidChange += OnVRPlayerReadyUp;
+            currentModel.marbleMazePosDidChange += OnMarbleMazePosDidChange;
         }
     }
 
@@ -86,6 +102,14 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
         else if (val && isWeb)
         {
             TutorialMenuClient.instance.ReadyUpVR();
+        }
+    }
+
+    void OnMarbleMazePosDidChange(MazeGameSyncModel previousModel, Vector3 newPos)
+    {
+        if(clientMarble)
+        {
+            latestMarblePos = newPos;
         }
     }
     #endregion

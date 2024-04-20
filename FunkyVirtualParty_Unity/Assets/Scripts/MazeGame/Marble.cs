@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class Marble : MonoBehaviour
 {
@@ -37,6 +38,9 @@ public class Marble : MonoBehaviour
         if(MazeGameSyncer.instance.State.Equals("game loop"))
         {
             CheckCollisionWithPlayers();
+
+            //Sync marble
+            MazeGameSyncer.instance.MarbleMazePos = handheldMaze.transform.InverseTransformPoint(rb.position);
         }
     }
 

@@ -3187,6 +3187,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1927282086}
     - target: {fileID: 1097079118135933938, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: testMarble
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933938, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: handheldMaze
       value: 
       objectReference: {fileID: 1872234904}
@@ -3205,69 +3209,11 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 4132452954677399492, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
---- !u!1 &1480470050 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1097079118135933940, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
-  m_PrefabInstance: {fileID: 1480470049}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1480470051
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480470050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolate: 1
-  _syncPosition: 1
-  _syncRotation: 0
-  _syncScale: 0
-  _syncVelocity: 1
-  _maintainOwnershipWhileSleeping: 1
---- !u!114 &1480470052
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480470050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _realtime: {fileID: 0}
-  _sceneViewUUID: 
-  _viewUUID: 89e2b02f-79a0-4541-93d8-5d870b97989c
-  _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
-  _sceneViewDestroyWhenLastClientLeaves: 1
-  _components:
-  - componentID: 1
-    component: {fileID: 1480470051}
-  _childViews: []
 --- !u!135 &1480470053 stripped
 SphereCollider:
   m_CorrespondingSourceObject: {fileID: 1097079118135933942, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_PrefabInstance: {fileID: 1480470049}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1480470054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480470050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e01a1f6e4638f394fa69e2165dcd5384, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1512933830
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3793,6 +3739,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   maze: {fileID: 1872234904}
+  clientMarble: {fileID: 0}
 --- !u!114 &1859736910
 MonoBehaviour:
   m_ObjectHideFlags: 0
