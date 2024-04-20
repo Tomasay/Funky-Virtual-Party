@@ -7,11 +7,15 @@ public class Marble : MonoBehaviour
     [SerializeField] GameObject handheldMaze;
     [SerializeField] Collider mazeBounds;
 
+    Rigidbody rb;
+
     private float threshold = 0.005f, startingMazeHeight;
     private Vector3 previousValidPoint;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+
         previousValidPoint = GetPosRelativeToMaze();
         startingMazeHeight = GetPosRelativeToMaze().y;
     }
@@ -21,7 +25,7 @@ public class Marble : MonoBehaviour
         //If marble is at incorrect height in maze, or out of the bounds
         if(Mathf.Abs(GetPosRelativeToMaze().y - startingMazeHeight) > threshold || !CheckIfInBounds())
         {
-            transform.position = handheldMaze.transform.TransformPoint(previousValidPoint);
+            rb.position = handheldMaze.transform.TransformPoint(previousValidPoint);
             //Debug.Log("OUT OF THRESHOLD, setting new pos to: " + handheldMaze.transform.TransformPoint(previousValidPoint));
             //Debug.Log("New height: " + GetPosRelativeToMaze().y);
         }
@@ -43,7 +47,7 @@ public class Marble : MonoBehaviour
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
             MazeGameClientPlayer mcp = cp as MazeGameClientPlayer;
-            if (mcp.isAlive & Vector3.Distance(transform.position, mcp.transform.position) < 0.015f)
+            if (mcp.isAlive & Vector3.Distance(rb.position, mcp.transform.position) < 0.015f)
             {
                 mcp.syncer.OnDeathTrigger = true;
             }
@@ -54,12 +58,12 @@ public class Marble : MonoBehaviour
 
     private Vector3 GetPosRelativeToMaze()
     {
-        Vector3 relativePoint = handheldMaze.transform.InverseTransformPoint(transform.position);
+        Vector3 relativePoint = handheldMaze.transform.InverseTransformPoint(rb.position);
         return relativePoint;
     }
 
     private bool CheckIfInBounds()
     {
-        return (mazeBounds.bounds.Contains(transform.position));
+        return (mazeBounds.bounds.Contains(rb.position));
     }
 }

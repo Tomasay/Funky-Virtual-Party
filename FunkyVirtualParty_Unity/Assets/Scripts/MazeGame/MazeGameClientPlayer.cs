@@ -35,7 +35,9 @@ public class MazeGameClientPlayer : ClientPlayer
         syncer.OnDeath.AddListener(HitByMarble);
         transform.parent = MazeGameSyncer.instance.maze.transform;
 
+#if !UNITY_ANDROID
         playerProxy = GameObject.Find("Player Proxy").transform;
+#endif
     }
 
     bool localStartCalled;

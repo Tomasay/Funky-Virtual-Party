@@ -3224,10 +3224,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolate: 1
   _syncPosition: 1
-  _syncRotation: 1
+  _syncRotation: 0
   _syncScale: 0
   _syncVelocity: 1
-  _maintainOwnershipWhileSleeping: 0
+  _maintainOwnershipWhileSleeping: 1
 --- !u!114 &1480470052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3256,6 +3256,18 @@ SphereCollider:
   m_CorrespondingSourceObject: {fileID: 1097079118135933942, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_PrefabInstance: {fileID: 1480470049}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1480470054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480470050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e01a1f6e4638f394fa69e2165dcd5384, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1512933830
 PrefabInstance:
   m_ObjectHideFlags: 0
