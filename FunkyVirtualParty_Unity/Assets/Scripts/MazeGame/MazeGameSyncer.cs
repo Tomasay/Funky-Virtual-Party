@@ -31,10 +31,13 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
         if (OnStateChangeEvent == null)
             OnStateChangeEvent = new MyStringEvent();
 
-        latestMarblePos = clientMarble.transform.localPosition;
-
 #if UNITY_WEBGL
         isWeb = true;
+
+        if (clientMarble)
+        {
+            latestMarblePos = clientMarble.transform.localPosition;
+        }
 #endif
     }
 
@@ -48,17 +51,19 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
         TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
 
+    private void OnDestroy()
+    {
+        TutorialMenu.instance.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
+    }
+#endif
+
+#if UNITY_WEBGL
     private void Update()
     {
         if (clientMarble)
         {
             clientMarble.transform.localPosition = Vector3.Lerp(clientMarble.transform.localPosition, latestMarblePos, Time.deltaTime * 10);
         }
-    }
-
-    private void OnDestroy()
-    {
-        TutorialMenu.instance.allPlayersReady.RemoveListener(delegate { State = "countdown"; });
     }
 #endif
 
@@ -87,7 +92,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
         }
     }
 
-    #region Variable Callbacks
+#region Variable Callbacks
     void OnStateChange(MazeGameSyncModel previousModel, string val)
     {
         OnStateChangeEvent.Invoke(val);
@@ -112,5 +117,5 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
             latestMarblePos = newPos;
         }
     }
-    #endregion
+#endregion
 }
