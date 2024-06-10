@@ -23,9 +23,6 @@ public class PlatformSwitcher : EditorWindow
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/VRTistryClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MazeGame/MazeGameClient.unity", true));
         EditorBuildSettings.scenes = editorBuildSettingsScenes.ToArray();
-
-        //Normcore Package Version
-        Client.Add("com.normalvr.normcore@3.0.0-webgl-alpha.1");
     }
 
     [MenuItem("Window/Platform Switcher/Switch to Android")]
@@ -46,8 +43,5 @@ public class PlatformSwitcher : EditorWindow
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/VRTistry.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MazeGame/MazeGame.unity", true));
         EditorBuildSettings.scenes = editorBuildSettingsScenes.ToArray();
-
-        //Normcore Package Version
-        Client.Add("com.normalvr.normcore@2.4.2");
     }
 }

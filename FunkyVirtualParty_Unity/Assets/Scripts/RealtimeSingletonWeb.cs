@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Events;
 using System.Runtime.InteropServices;
 using DG.Tweening;
+using NaughtyAttributes;
 
 public class RealtimeSingletonWeb : MonoBehaviour
 {
@@ -126,6 +127,15 @@ public class RealtimeSingletonWeb : MonoBehaviour
         SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
     }
 
+    [SerializeField]
+    public string roomCode;
+
+    [Button]
+    public void ManualConnect()
+    {
+        realtime.Connect(roomCode);
+    }
+
     public void SubmitButtonPressed()
     {
         submitButton.interactable = false;
@@ -143,8 +153,14 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     void ConnectedToRoom(Realtime realtime)
     {
+        Invoke("CheckProperConnection", 1);
+    }
+
+    void CheckProperConnection()
+    {
         //Disconnect circumstances
-        if(!(realtimeAvatarManager.avatars.Count > 0))
+        Debug.Log("Avatars: " + realtimeAvatarManager.avatars.Count);
+        if (!(realtimeAvatarManager.avatars.Count > 0))
         {
             realtime.Disconnect();
             disconnectingDueToNoHost = true;
