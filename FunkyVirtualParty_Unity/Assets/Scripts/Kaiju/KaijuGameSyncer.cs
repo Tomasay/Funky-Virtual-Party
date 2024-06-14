@@ -15,8 +15,8 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
 
-    public int PlayGrabbedEvent { get => model.grabbedPlayerEvent; set => model.grabbedPlayerEvent = value; }
-    public int PlayDroppedEvent { get => model.droppedPlayerEvent; set => model.droppedPlayerEvent = value; }
+    public int PlayerGrabbedEvent { get => model.grabbedPlayerEvent; set => model.grabbedPlayerEvent = value; }
+    public int PlayerDroppedEvent { get => model.droppedPlayerEvent; set => model.droppedPlayerEvent = value; }
 
     private bool isWeb;
 
@@ -46,6 +46,8 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
         //Default states when entering scene
         State = "tutorial";
         VRPlayerReady = false;
+        PlayerGrabbedEvent = -1;
+        PlayerDroppedEvent = -1;
 
         TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
@@ -73,6 +75,8 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
             if (currentModel.isFreshModel)
             {
                 currentModel.state = "tutorial";
+                currentModel.grabbedPlayerEvent = -1;
+                currentModel.droppedPlayerEvent = -1;
             }
 
             //Update to match new data
@@ -96,7 +100,6 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
     #region Variable Callbacks
     void OnStateChange(KaijuGameSyncModel previousModel, string val)
     {
-
         OnStateChangeEvent.Invoke(val);
     }
 
@@ -119,6 +122,13 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
         {
             (cp as KaijuGameClientPlayer).Grabbed();
         }
+
+        Invoke("ResetPlayerGrabbedEvent", 1);
+    }
+
+    void ResetPlayerGrabbedEvent()
+    {
+        PlayerGrabbedEvent = -1;
     }
 
     void OnPlayerDroppedEventDidFire(KaijuGameSyncModel previousModel, int id)
@@ -128,6 +138,13 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
         {
             (cp as KaijuGameClientPlayer).Dropped();
         }
+
+        Invoke("ResetPlayerDroppedEvent", 1);
+    }
+
+    void ResetPlayerDroppedEvent()
+    {
+        PlayerDroppedEvent = -1;
     }
     #endregion
 }

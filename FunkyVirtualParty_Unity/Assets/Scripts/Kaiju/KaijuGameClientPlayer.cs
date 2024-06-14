@@ -164,7 +164,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// <param name="g">Grabbable component on the player</param>
     public void OnGrabbed(Hand h, Grabbable g)
     {
-        KaijuGameSyncer.instance.PlayGrabbedEvent = realtimeView.ownerIDSelf;
+        KaijuGameSyncer.instance.PlayerGrabbedEvent = realtimeView.ownerIDSelf;
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// <param name="g">Grabbable component on the player</param>
     public void OnDropped(Hand h, Grabbable g)
     {
-        KaijuGameSyncer.instance.PlayDroppedEvent = realtimeView.ownerIDSelf;
+        KaijuGameSyncer.instance.PlayerDroppedEvent = realtimeView.ownerIDSelf;
     }
 
     /// <summary>
