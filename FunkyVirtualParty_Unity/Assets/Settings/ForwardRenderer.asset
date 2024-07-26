@@ -59,6 +59,20 @@ MonoBehaviour:
     downsample: 2
     copyToFramebuffer: 0
     targetName: _blurTexture
+--- !u!114 &-6236674305467259316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cca7768aaaea4b0081f14e7f9d4b5ad, type: 3}
+  m_Name: FlatKitOutline
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  settings: {fileID: 11400000, guid: 72e7aa8fd5528d548bd8c8dc62af4b07, type: 2}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79,7 +93,8 @@ MonoBehaviour:
   - {fileID: 4389231147199425811}
   - {fileID: 1165411266715888411}
   - {fileID: -7324891528145188439}
-  m_RendererFeatureMap: 7e90124b651f6d2d6fec241050464f9213ede62579aee93c1babd6595f5f2c10a949a3cef6c1589a
+  - {fileID: -6236674305467259316}
+  m_RendererFeatureMap: 7e90124b651f6d2d6fec241050464f9213ede62579aee93c1babd6595f5f2c10a949a3cef6c1589a4c66d132c3e172a9
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
