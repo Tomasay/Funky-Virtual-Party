@@ -5,18 +5,20 @@ using Normal.Realtime;
 using UnityEngine.Events;
 using TMPro;
 using Autohand;
+using NaughtyAttributes;
 
 public class FireballSyncer : RealtimeComponent<FireballSyncModel>
 {
     [SerializeField] public GameObject fireball;
     [SerializeField] public Rigidbody rb;
-    //[SerializeField] public ParticleSystem mainFireball, explosion, smokePuff, ember, fireTrail, boostedParticleEffect;
-    [SerializeField] public ParticleSystemSyncer mainFireball, explosion, smokePuff, ember, fireTrail, boostedParticleEffect;
+    [SerializeField] public ParticleSystemSyncer flame1, flame2, flame3, flame4, sparks, glow, boostedParticleEffect, explosion, smokePuff;
     [SerializeField] public float minSize, maxSize;
     [SerializeField] public Color minColor, maxColor;
-    [SerializeField] public Color emberColor, emberColorBoosted;
+    [SerializeField] public Color glowColor, glowColorBoosted;
     [SerializeField] public Color boostedMainColor, boostedSecondaryColor;
+    [SerializeField] public Color explosionColor;
     [SerializeField] SpriteRenderer indicator;
+    [SerializeField] Gradient boostedColorOverLifetime;
 
     private int maxIndicatorDistance = 4;
     private int fireballExplosionRange = 2;
@@ -99,22 +101,50 @@ public class FireballSyncer : RealtimeComponent<FireballSyncModel>
     {
         if (!IsBoosted)
         {
-            mainFireball.StartColor = Color.Lerp(minColor, maxColor, val);
+            Color newFlameCol = Color.Lerp(Color.red, Color.white, val);
+            Color.RGBToHSV(newFlameCol, out float H, out float S, out float V);
+
+            flame1.MaterialTintColor = newFlameCol;
+            flame2.MaterialTintColor = newFlameCol;
+            flame3.MaterialTintColor = newFlameCol;
+            flame4.MaterialTintColor = newFlameCol;
         }
 
         float s = Mathf.Lerp(minSize, maxSize, val);
 
         Vector3 scale = new Vector3(s, s, s);
         fireball.transform.localScale = (s == 0) ? new Vector3(minSize, minSize, minSize) : scale;
-        explosion.transform.localScale = scale;
-        smokePuff.transform.localScale = scale;
+        explosion.transform.localScale = scale * 2;
+        smokePuff.transform.localScale = scale * 2;
     }
 
     void OnIsBoostedChange(FireballSyncModel previousModel, bool val)
     {
-        mainFireball.StartColor =  val ? boostedMainColor : minColor;
-        ember.StartColor = val ? emberColorBoosted : emberColor;
-        fireTrail.StartColor = val ? boostedSecondaryColor : emberColor;
+        /*
+        if (val)
+        {
+            flame1.MaterialTintColor = Color.white;
+            flame2.MaterialTintColor = Color.white;
+            flame3.MaterialTintColor = Color.white;
+            flame4.MaterialTintColor = Color.white;
+        }
+        */
+
+        SetParticleSystemColorOverLifetime(flame1.PSystem, val ? boostedColorOverLifetime : flame1.initialColorOverLifetime);
+        SetParticleSystemColorOverLifetime(flame2.PSystem, val ? boostedColorOverLifetime : flame2.initialColorOverLifetime);
+        SetParticleSystemColorOverLifetime(flame3.PSystem, val ? boostedColorOverLifetime : flame3.initialColorOverLifetime);
+        SetParticleSystemColorOverLifetime(flame4.PSystem, val ? boostedColorOverLifetime : flame4.initialColorOverLifetime);
+
+        glow.StartColor = val ? glowColorBoosted : glowColor;
+        //sparks.StartColor = val ? boostedSecondaryColor : glowColor;
+        explosion.MaterialEmissionColor = val ? glowColorBoosted : explosionColor;
+    }
+
+    [Button]
+    public void SetParticleSystemColorOverLifetime(ParticleSystem p, Gradient g)
+    {
+        var col = p.colorOverLifetime;
+        col.color = g;
     }
 
     void OnIsActiveChange(FireballSyncModel previousModel, bool val)

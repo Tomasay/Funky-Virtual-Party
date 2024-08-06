@@ -7,9 +7,14 @@ using Normal.Realtime;
 public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
 {
     ParticleSystem pSystem;
+    ParticleSystemRenderer pRenderer;
+
+    public Gradient initialColorOverLifetime;
 
     public ParticleSystem PSystem { get => pSystem;}
     public Color StartColor { get => model.startColor; set => model.startColor = value; }
+    public Color MaterialEmissionColor { get => model.materialEmissionColor; set => model.materialEmissionColor = value; }
+    public Color MaterialTintColor { get => model.materialTintColor; set => model.materialTintColor = value; }
 
     public void Play()
     {
@@ -24,6 +29,9 @@ public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
     private void Awake()
     {
         pSystem = GetComponent<ParticleSystem>();
+        pRenderer = GetComponent<ParticleSystemRenderer>();
+
+        initialColorOverLifetime = pSystem.colorOverLifetime.color.gradient;
     }
 
     protected override void OnRealtimeModelReplaced(ParticleSystemSyncModel previousModel, ParticleSystemSyncModel currentModel)
@@ -34,6 +42,8 @@ public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
             previousModel.playParticlesDidChange -= OnPlayParticlesChange;
             previousModel.stopParticlesDidChange -= OnStopParticlesChange;
             previousModel.startColorDidChange -= OnStartColorChange;
+            previousModel.materialEmissionColorDidChange -= OnMaterialEmissionColorChange;
+            previousModel.materialTintColorDidChange -= OnMaterialTintColorChange;
         }
 
         if (currentModel != null)
@@ -50,13 +60,15 @@ public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
             currentModel.playParticlesDidChange += OnPlayParticlesChange;
             currentModel.stopParticlesDidChange += OnStopParticlesChange;
             currentModel.startColorDidChange += OnStartColorChange;
+            currentModel.materialEmissionColorDidChange += OnMaterialEmissionColorChange;
+            currentModel.materialTintColorDidChange += OnMaterialTintColorChange;
         }
     }
 
     #region Variable Callbacks
     void OnPlayParticlesChange(ParticleSystemSyncModel previousModel, bool val)
     {
-        if (val)
+        if (val && pSystem)
         {
             pSystem.Play();
             Invoke("SetPlayFalse", 0.5f);
@@ -65,7 +77,7 @@ public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
 
     void OnStopParticlesChange(ParticleSystemSyncModel previousModel, bool val)
     {
-        if (val)
+        if (val && pSystem)
         {
             pSystem.Stop();
             Invoke("SetStopFalse", 0.5f);
@@ -76,6 +88,16 @@ public class ParticleSystemSyncer : RealtimeComponent<ParticleSystemSyncModel>
     {
         ParticleSystem.MainModule main = pSystem.main;
         main.startColor = val;
+    }
+
+    void OnMaterialEmissionColorChange(ParticleSystemSyncModel previousModel, Color val)
+    {
+        pRenderer.material.SetColor("_EmissionColor", val);
+    }
+
+    void OnMaterialTintColorChange(ParticleSystemSyncModel previousModel, Color val)
+    {
+        pRenderer.material.SetColor("_TintColor", val);
     }
     #endregion
 

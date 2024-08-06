@@ -215,7 +215,10 @@ public class Fireball : MonoBehaviour
         syncer.smokePuff.GetComponent<RealtimeTransform>().RequestOwnership();
         syncer.explosion.GetComponent<RealtimeTransform>().RequestOwnership();
 
-        syncer.fireball.GetComponent<RealtimeView>().RequestOwnership();
+        syncer.flame1.GetComponent<RealtimeView>().RequestOwnership();
+        syncer.flame2.GetComponent<RealtimeView>().RequestOwnership();
+        syncer.flame3.GetComponent<RealtimeView>().RequestOwnership();
+        syncer.flame4.GetComponent<RealtimeView>().RequestOwnership();
         syncer.boostedParticleEffect.GetComponent<RealtimeView>().RequestOwnership();
     }
 
