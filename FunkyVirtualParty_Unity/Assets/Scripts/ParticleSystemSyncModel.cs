@@ -15,6 +15,12 @@ public partial class ParticleSystemSyncModel
 
     [RealtimeProperty(3, true, true)]
     private Color _startColor;
+
+    [RealtimeProperty(4, true, true)]
+    private Color _materialEmissionColor;
+
+    [RealtimeProperty(5, true, true)]
+    private Color _materialTintColor;
 }
 
 

@@ -8,7 +8,6 @@ using TMPro;
 public class ShootoutGameVRPlayerController : VRPlayerController
 {
     [SerializeField] GameObject fireballPrefab, fireballHandAnchorLeft, fireballHandAnchorRight;
-    [SerializeField] GameObject handFireEffectLeft, handFireEffectRight;
 
     public TMP_Text vrInfoText, vrGameTimeText;
 
@@ -56,13 +55,11 @@ public class ShootoutGameVRPlayerController : VRPlayerController
 
         if (hand.left)
         {
-            handFireEffectLeft.SetActive(true);
             isGrabbingLeft = true;
             fireball.isInLeftHand = true;
         }
         else
         {
-            handFireEffectRight.SetActive(true);
             isGrabbingRight = true;
             fireball.isInRightHand = true;
         }
@@ -84,15 +81,6 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         }
 
         PreloadFireball(hand.left);
-
-        if (hand.left)
-        {
-            handFireEffectLeft.SetActive(false);
-        }
-        else
-        {
-            handFireEffectRight.SetActive(false);
-        }
     }
 
     private void PreloadFireball(bool isLeftHand)

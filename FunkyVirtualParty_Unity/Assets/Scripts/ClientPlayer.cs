@@ -295,6 +295,10 @@ public class ClientPlayer : MonoBehaviour
         }
         availableColors.Remove(col);
         mesh.colors = colors;
+
+        Color.RGBToHSV(col, out float H, out float S, out float V);
+        smr.material.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
+        smr.material.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
     }
 
     public int GetColorIndex()

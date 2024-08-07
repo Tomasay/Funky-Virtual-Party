@@ -30,6 +30,8 @@ public class MainMenu : MonoBehaviour
 
     [SerializeField] GameObject lightSlider;
 
+    [SerializeField] Image UI_BG;
+
     [SerializeField] PhysicsGadgetHingeAngleReader discoBallSwitch;
     private bool isDiscoBallOn;
 
@@ -183,9 +185,10 @@ public class MainMenu : MonoBehaviour
         lightLevel = math.remap(-1, 1, 0, 1, lightLevel);
 
         float h, s, v;
-        Color.RGBToHSV(Camera.main.backgroundColor, out h, out s, out v);
-        v = Mathf.Lerp(1.0f, 0.25f, lightLevel);
+        Color.RGBToHSV(backgroundColors[currentColorIndex], out h, out s, out v);
+        v = Mathf.Lerp(v, 0.25f, lightLevel);
         Camera.main.backgroundColor = Color.HSVToRGB(h, s, v);
+        UI_BG.color = Color.Lerp(new Color(1, 1, 1, 0.07f), Color.black, lightLevel);
 
         Color.RGBToHSV(RenderSettings.ambientLight, out h, out s, out v);
         v = Mathf.Lerp(0.25f, 0.0f, lightLevel);
