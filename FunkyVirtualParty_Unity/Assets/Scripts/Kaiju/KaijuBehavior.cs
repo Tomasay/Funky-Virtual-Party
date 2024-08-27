@@ -50,8 +50,10 @@ public class KaijuBehavior : MonoBehaviour
     void TakeDamage(int dmg) 
     {
         // this variable controls whether the kaiju is moving
+        Debug.Log("Kaiju TakeDamage called.");
         stature = System.Convert.ToInt32(stature > 0) * (stature - (dmg / 2)); // Why do I have to do this conversion????
         health -= System.Convert.ToInt32(stature < 0) * dmg;
+        Debug.Log("Remaining Health: " + health + " Stature: " + stature);
 
 
     }
