@@ -117,9 +117,11 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
 
     void OnPlayerGrabbedEventDidFire(KaijuGameSyncModel previousModel, int id)
     {
-        ClientPlayer cp = ClientPlayer.GetClientByOwnerID(id);
+        Debug.Log("Grabbed syncer level " + id);
+        ClientPlayer cp = ClientPlayer.GetClientByInitialOwnerID(id);
         if (cp)
         {
+            Debug.Log("CP: " + cp.realtimeView.ownerIDSelf);
             (cp as KaijuGameClientPlayer).Grabbed();
         }
 
@@ -133,7 +135,8 @@ public class KaijuGameSyncer : RealtimeComponent<KaijuGameSyncModel>
 
     void OnPlayerDroppedEventDidFire(KaijuGameSyncModel previousModel, int id)
     {
-        ClientPlayer cp = ClientPlayer.GetClientByOwnerID(id);
+        Debug.Log("Dropped syncer level " + id);
+        ClientPlayer cp = ClientPlayer.GetClientByInitialOwnerID(id);
         if (cp)
         {
             (cp as KaijuGameClientPlayer).Dropped();

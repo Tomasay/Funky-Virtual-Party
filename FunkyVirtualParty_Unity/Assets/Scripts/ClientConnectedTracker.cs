@@ -14,7 +14,7 @@ public class ClientConnectedTracker : MonoBehaviour
     {
         DontDestroyOnLoad(this);
 
-        cp = ClientPlayer.GetClientByOwnerID(realtimeView.ownerIDSelf);
+        cp = ClientPlayer.GetClientByCurrentOwnerID(realtimeView.ownerIDSelf);
     }
 
 

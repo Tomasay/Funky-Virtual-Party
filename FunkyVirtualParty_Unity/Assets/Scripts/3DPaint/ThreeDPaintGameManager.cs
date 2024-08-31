@@ -444,7 +444,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         foreach (KeyValuePair<int, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByOwnerID(entry.Key).syncer.Name;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Name;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
             
@@ -532,11 +532,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
     void AddPlayerToResults(int playerID, bool correct)
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
-        pi.GetComponentInChildren<TMP_Text>(true).text = ClientPlayer.GetClientByOwnerID(playerID).syncer.Name;
+        pi.GetComponentInChildren<TMP_Text>(true).text = ClientPlayer.GetClientByCurrentOwnerID(playerID).syncer.Name;
         pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
         //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
-        pi.GetComponent<Image>().color = ClientPlayer.GetClientByOwnerID(playerID).syncer.Color;
+        pi.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(playerID).syncer.Color;
 
         playerNameIcons.Add(pi);
     }
@@ -555,7 +555,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
         else
         {
-            headerText.text = "Wrong! " + ClientPlayer.GetClientByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote the answer";
+            headerText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote the answer";
         }
 
         VRtistrySyncer.instance.State = "leaderboard";

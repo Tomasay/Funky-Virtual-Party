@@ -164,7 +164,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// <param name="g">Grabbable component on the player</param>
     public void OnGrabbed(Hand h, Grabbable g)
     {
-        KaijuGameSyncer.instance.PlayerGrabbedEvent = realtimeView.ownerIDSelf;
+        KaijuGameSyncer.instance.PlayerGrabbedEvent = initialOwnerID;
     }
 
     /// <summary>
@@ -172,6 +172,8 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// </summary>
     public void Grabbed()
     {
+        Debug.Log("Grabbed client level");
+
         currentConstraints = rb.constraints;
         rb.constraints = RigidbodyConstraints.None;
 
@@ -189,7 +191,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// <param name="g">Grabbable component on the player</param>
     public void OnDropped(Hand h, Grabbable g)
     {
-        KaijuGameSyncer.instance.PlayerDroppedEvent = realtimeView.ownerIDSelf;
+        KaijuGameSyncer.instance.PlayerDroppedEvent = initialOwnerID;
     }
 
     /// <summary>
@@ -197,15 +199,21 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// </summary>
     public void Dropped()
     {
-        rb.constraints = currentConstraints;
-
         anim.SetBool("Grabbed", false);
         state = KaijuClientState.Thrown;
         anim.SetBool("Flying", true);
 
         CanMove = true;
 
-        Invoke("RequestClientOwnership", 0.5f);
+        //Invoke("RequestClientOwnership", 0.5f);
+
+#if UNITY_WEBGL
+        realtimeView.RequestOwnership();
+        realtimeTransform.RequestOwnership();
+        rb.angularVelocity = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        rb.constraints = RigidbodyConstraints.FreezeRotation; // set to 80 for X and Z?
+#endif
     }
 
     public void RequestClientOwnership()
@@ -213,6 +221,9 @@ public class KaijuGameClientPlayer : ClientPlayer
 #if UNITY_WEBGL
         realtimeView.RequestOwnership();
         realtimeTransform.RequestOwnership();
+
+        rb.angularVelocity = Vector3.zero;
+        transform.rotation = Quaternion.identity;
 #endif
     }
 }

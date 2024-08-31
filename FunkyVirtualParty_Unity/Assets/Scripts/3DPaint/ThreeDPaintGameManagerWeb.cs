@@ -383,7 +383,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             //Find the answer that the player chose
             if (aob.playerID.Equals(answerPlayerID))
             {
-                ClientPlayer cp = ClientPlayer.GetClientByOwnerID(playerID);
+                ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(playerID);
                 aob.AddPlayerIcon(cp.syncer.Name, cp.syncer.Color);
                 return;
             }
@@ -452,7 +452,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         foreach (KeyValuePair<int, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
-            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByOwnerID(entry.Key).syncer.Name;
+            newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Name;
             newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
             newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
 

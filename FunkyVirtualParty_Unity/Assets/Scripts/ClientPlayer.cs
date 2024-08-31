@@ -50,13 +50,15 @@ public class ClientPlayer : MonoBehaviour
     protected string playerSocketID;
     protected byte playerByteID;
 
+    protected int initialOwnerID;
+
     protected string playerIP;
     protected bool isLocal = false; //Is this the player being controlled by device?
     private Vector3 spinePos;
 
     protected Vector3 movement;
     protected float startingSpeed = 5, speed;
-    protected bool canMove = true;
+    public bool canMove = true;
 
     protected Rigidbody rb;
 
@@ -68,6 +70,7 @@ public class ClientPlayer : MonoBehaviour
 
     public bool IsLocal { get => isLocal; set => isLocal = value; }
     public Vector3 Movement { get => movement; }
+
     public bool CanMove { get => canMove; set => canMove = value; }
 
     public Animator Anim { get => anim;}
@@ -139,6 +142,9 @@ public class ClientPlayer : MonoBehaviour
             LocalStart();
         
         OnClientConnected.Invoke(this);
+
+        initialOwnerID = realtimeView.ownerIDSelf;
+        Debug.Log("initialOwnerID: " + initialOwnerID);
     }
 
     protected virtual void LocalStart()
@@ -179,6 +185,8 @@ public class ClientPlayer : MonoBehaviour
         }
 
         CheckInput();
+
+        //Debug.Log("ID: " + realtimeView.ownerIDSelf);
     }
 
     protected void SetSpawnPoint()
@@ -407,11 +415,30 @@ public class ClientPlayer : MonoBehaviour
         //Debug.Log("COLLIDING WITH: " + collision.gameObject.name + " WITH TAG " + collision.gameObject.tag);
     }
 
-    public static ClientPlayer GetClientByOwnerID(int id)
+    public static ClientPlayer GetClientByCurrentOwnerID(int id)
     {
+        Debug.Log("GetClientByCurrentOwnerID");
         foreach (ClientPlayer cp in clients)
         {
+            Debug.Log("Testing for: " + id + " Current id: " + cp.realtimeView.ownerIDSelf);
             if (cp.realtimeView.ownerIDSelf == id)
+            {
+                return cp;
+            }
+        }
+
+        return null;
+    }
+
+    //This method was made for Kaiju
+    //It solves the issue of Owner ID changing on grab/release
+    public static ClientPlayer GetClientByInitialOwnerID(int id)
+    {
+        Debug.Log("GetClientByInitialOwnerID");
+        foreach (ClientPlayer cp in clients)
+        {
+            Debug.Log("Testing for: " + id + " Current id: " + cp.initialOwnerID);
+            if (cp.initialOwnerID == id)
             {
                 return cp;
             }
