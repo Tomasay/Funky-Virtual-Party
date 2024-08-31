@@ -204,5 +204,10 @@ public class KaijuGameClientPlayer : ClientPlayer
         anim.SetBool("Flying", true);
 
         CanMove = true;
+
+#if UNITY_WEBGL
+        realtimeView.RequestOwnership();
+        realtimeTransform.RequestOwnership();
+#endif
     }
 }
