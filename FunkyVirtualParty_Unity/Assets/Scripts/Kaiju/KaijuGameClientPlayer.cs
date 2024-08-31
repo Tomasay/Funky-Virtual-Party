@@ -197,11 +197,6 @@ public class KaijuGameClientPlayer : ClientPlayer
     /// </summary>
     public void Dropped()
     {
-#if UNITY_WEBGL
-        realtimeView.RequestOwnership();
-        realtimeTransform.RequestOwnership();
-#endif
-
         rb.constraints = currentConstraints;
 
         anim.SetBool("Grabbed", false);
@@ -209,5 +204,15 @@ public class KaijuGameClientPlayer : ClientPlayer
         anim.SetBool("Flying", true);
 
         CanMove = true;
+
+        Invoke("RequestClientOwnership", 0.5f);
+    }
+
+    public void RequestClientOwnership()
+    {
+#if UNITY_WEBGL
+        realtimeView.RequestOwnership();
+        realtimeTransform.RequestOwnership();
+#endif
     }
 }
