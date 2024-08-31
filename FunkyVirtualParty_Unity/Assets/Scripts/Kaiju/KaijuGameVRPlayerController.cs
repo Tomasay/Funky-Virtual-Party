@@ -24,7 +24,7 @@ public class KaijuGameVRPlayerController : VRPlayerController
         walkSpeed = ahp.maxMoveSpeed;
         currentHandMovementSpeed = handMovementSpeed;
 
-        SetupCollisionIgnore();
+        //SetupCollisionIgnore();
     }
 
     void Update()

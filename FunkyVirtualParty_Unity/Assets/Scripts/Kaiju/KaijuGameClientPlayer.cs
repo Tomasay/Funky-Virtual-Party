@@ -205,9 +205,11 @@ public class KaijuGameClientPlayer : ClientPlayer
 
         CanMove = true;
 
+        /*
 #if UNITY_WEBGL
         realtimeView.RequestOwnership();
         realtimeTransform.RequestOwnership();
 #endif
+        */
     }
 }
