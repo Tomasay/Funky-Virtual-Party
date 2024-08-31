@@ -23,6 +23,8 @@ public class KaijuGameVRPlayerController : VRPlayerController
     {
         walkSpeed = ahp.maxMoveSpeed;
         currentHandMovementSpeed = handMovementSpeed;
+
+        SetupCollisionIgnore();
     }
 
     void Update()
@@ -51,5 +53,23 @@ public class KaijuGameVRPlayerController : VRPlayerController
     private void OnRelease(Hand hand, Grabbable grabbable)
     {
 
+    }
+
+    void SetupCollisionIgnore()
+    {
+        foreach (ClientPlayer kcp in ClientPlayer.clients)
+        {
+            Physics.IgnoreCollision(kcp.Col, ahp.headModel.GetComponent<Collider>());
+            Physics.IgnoreCollision(kcp.Col, ahp.handLeft.GetComponent<Collider>());
+            Physics.IgnoreCollision(kcp.Col, ahp.handRight.GetComponent<Collider>());
+            foreach (Finger fingy in ahp.handLeft.fingers)
+            {
+                Physics.IgnoreCollision(kcp.Col, fingy.GetComponent<Collider>());
+            }
+            foreach (Finger fingy in ahp.handRight.fingers)
+            {
+                Physics.IgnoreCollision(kcp.Col, fingy.GetComponent<Collider>());
+            }
+        }
     }
 }
