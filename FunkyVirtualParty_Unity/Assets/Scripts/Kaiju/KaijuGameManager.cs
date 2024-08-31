@@ -153,8 +153,6 @@ public class KaijuGameManager : MonoBehaviour
 
     IEnumerator StartCountdownTimer(int countdown)
     {
-        
-
         countingDown = true;
         
 
