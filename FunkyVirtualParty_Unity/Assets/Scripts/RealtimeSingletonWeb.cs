@@ -62,6 +62,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public ClientPlayer LocalPlayer { get => localPlayer; }
 
+    public Realtime Realtime { get => realtime; }
+
     public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager; }
 
     public RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
