@@ -4,13 +4,15 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cinemachine;
+using Normal.Realtime;
 
 public class KaijuGameManager : MonoBehaviour
 {
-    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50, FINISHING_BLOW_AMOUNT = 10;
+    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50, FINISHING_BLOW_AMOUNT = 10, POWERUP_SPAWN_TIME = 2;
     private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
+    private float spawnTimer = POWERUP_SPAWN_TIME;
     [SerializeField]
     KaijuBehavior kaiju;
 
@@ -33,10 +35,38 @@ public class KaijuGameManager : MonoBehaviour
 
 
         foreach (ClientPlayer p in ClientPlayer.clients)
-       {
+        {
                 KaijuGameClientPlayer sp = p.GetComponent<KaijuGameClientPlayer>();
-       }
+        }
         
+        for(int type = 0; type < 4; type++)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+                options.ownedByClient = true;
+                GameObject powerup = null;
+                
+                switch (type)
+                {
+                    case (int)KaijuPowerup.PowerupType.Fireball:
+                    default:
+                        powerup = Realtime.Instantiate("Kaiju/FireballPowerup", new Vector3( Random.Range(-74,-35), 26.5f, Random.Range(30,65) ), Quaternion.identity, options);
+                        break;
+                    case (int)KaijuPowerup.PowerupType.Bomb:
+                        powerup = Realtime.Instantiate("Kaiju/BombPowerup", new Vector3(Random.Range(-74, -35), 26.5f, Random.Range(30, 65)), Quaternion.identity, options);
+                        break;
+                    case (int)KaijuPowerup.PowerupType.Speed:
+                        powerup = Realtime.Instantiate("Kaiju/SpeedPowerup", new Vector3(Random.Range(-74, -35), 26.5f, Random.Range(30, 65)), Quaternion.identity, options);
+                        break;
+                    case (int)KaijuPowerup.PowerupType.Weight:
+                        powerup = Realtime.Instantiate("Kaiju/WeightPowerup", new Vector3(Random.Range(-74, -35), 26.5f, Random.Range(30, 65)), Quaternion.identity, options);
+                        break;
+                }
+                powerup.SetActive(false);
+                
+            }
+        }
 
         //SetPlayerMovement(false);
         //SetVRPlayerMovementDelayed(false, 1);
@@ -95,6 +125,18 @@ public class KaijuGameManager : MonoBehaviour
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
 
+                        spawnTimer -= Time.deltaTime;
+                        if( spawnTimer <= 0 )
+                        {
+                            spawnTimer = POWERUP_SPAWN_TIME;
+                            int rspowerup = Random.Range(0, KaijuPowerup.pool.Count);
+
+                            if (KaijuPowerup.pool[rspowerup].gameObject.activeSelf)
+                                spawnTimer = 0;
+                            
+                            KaijuPowerup.pool[rspowerup].gameObject.SetActive(true);
+                        }
+
                         break;
               case "kill":
                         timeRemaining -= Time.deltaTime;
@@ -104,6 +146,7 @@ public class KaijuGameManager : MonoBehaviour
                         if (timeRemaining <= 5) //Display final 5 seconds for VR player
                         {
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", true);
+                            vrInfoText.text = "";
                         }
                         if (timeRemaining <= 0) //Phase end
                         {
@@ -187,6 +230,17 @@ public class KaijuGameManager : MonoBehaviour
     {
         vrInfoText.text = txt;
         yield return new WaitForSeconds(3);
+
+        //Destroy powerups
+        if (KaijuPowerup.pool != null)
+        {
+            foreach (KaijuPowerup p in KaijuPowerup.pool)
+            {
+                Realtime.Destroy(p.gameObject);
+            }
+            KaijuPowerup.pool.Clear();
+            KaijuPowerup.pool = null;
+        }
 
         SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }

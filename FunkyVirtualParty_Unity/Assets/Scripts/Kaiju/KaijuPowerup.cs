@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class KaijuPowerup : MonoBehaviour
 {
+    public static List<KaijuPowerup> pool;
 
-    enum PowerupType
+    public enum PowerupType
     {
         Fireball,
         Bomb,
@@ -17,6 +18,15 @@ public class KaijuPowerup : MonoBehaviour
     [SerializeField]
     PowerupType type;
 
+
+    private void Awake()
+    {
+        if (pool == null)
+        {
+            pool = new List<KaijuPowerup>();
+        }
+        pool.Add(this);
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -46,7 +56,7 @@ public class KaijuPowerup : MonoBehaviour
                     break;
 
             }
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
     }
 }
