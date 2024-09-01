@@ -7,10 +7,12 @@ using Cinemachine;
 
 public class KaijuGameManager : MonoBehaviour
 {
-    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50;
+    private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 50, FINISHING_BLOW_AMOUNT = 10;
     private TMP_Text vrInfoText, vrGameTimeText;
     private bool countingDown = false;
     private float timeRemaining;
+    [SerializeField]
+    KaijuBehavior kaiju;
 
 
 #if UNITY_EDITOR
@@ -85,10 +87,19 @@ public class KaijuGameManager : MonoBehaviour
                             timeRemaining = COUNTDOWN_AMOUNT;
                             vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                         }
+                        
+                        if(kaiju.health <= 0) // Kaiju Killed, move to kill phase
+                        {
+                            KaijuGameSyncer.instance.State = "kill";
+                            timeRemaining = FINISHING_BLOW_AMOUNT;
+                            vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
+                        }
+
                         break;
               case "kill":
                         timeRemaining -= Time.deltaTime;
                         vrGameTimeText.text = FormatTime(timeRemaining);
+                        vrInfoText.text = "FINISH IT!!\n DEAL THE FINAL BLOW!";
 
                         if (timeRemaining <= 5) //Display final 5 seconds for VR player
                         {

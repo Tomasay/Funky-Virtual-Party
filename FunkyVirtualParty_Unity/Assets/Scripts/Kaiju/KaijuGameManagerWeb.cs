@@ -61,11 +61,11 @@ public class KaijuGameManagerWeb : MonoBehaviour
                 break;
             case "vr player won":
                 countdownText.enabled = true;
-                countdownText.text = "VR PLAYER WINS";
+                countdownText.text = "YOU WIN";
                 break;
             case "time ended":
                 countdownText.enabled = true;
-                countdownText.text = "TIME'S UP!\nYOU WIN";
+                countdownText.text = "CITY DESTORYED!\nYOU LOSE";
                 break;
             default:
                 break;

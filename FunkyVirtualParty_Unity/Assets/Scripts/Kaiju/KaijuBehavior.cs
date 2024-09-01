@@ -17,7 +17,9 @@ public class KaijuBehavior : MonoBehaviour
     Normal.Realtime.RealtimeTransform realtimeTransform;
 
     [SerializeField]
-    Transform Target;
+    List<Transform> Targets;
+
+    public int currentTarget = 0;
 
     //for regenerating stature
     float counter = 0;
@@ -35,8 +37,18 @@ public class KaijuBehavior : MonoBehaviour
         if (KaijuGameSyncer.instance.State.Equals("fight") )
         {
             counter += Time.deltaTime;
-            Vector3 diff = Target.position - gameObject.transform.position;
+            Vector3 diff = Targets[currentTarget].position - gameObject.transform.position;
+            diff.y = 0;
+            if (diff.x > -0.01 && diff.x < 0.01 && diff.z > -0.01 && diff.z < 0.01)
+            {
+                currentTarget++;
+                if (currentTarget == Targets.Count)
+                    currentTarget = 0;
+            }
+
             gameObject.transform.position += System.Convert.ToInt32(stature > 0) * (diff.normalized * speed * Time.deltaTime);
+
+
             if (counter > 1)
             {
                 if (stature < 30)
@@ -49,6 +61,11 @@ public class KaijuBehavior : MonoBehaviour
 
     void TakeDamage(int dmg) 
     {
+        if(KaijuGameSyncer.instance.State.Equals("kill") )
+        {
+            Destroy(this);
+        }
+
         // this variable controls whether the kaiju is moving
         Debug.Log("Kaiju TakeDamage called.");
         stature = System.Convert.ToInt32(stature > 0) * (stature - (dmg / 2)); // Why do I have to do this conversion????
