@@ -16,11 +16,11 @@ public class Destructible : MonoBehaviour
         
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.collider.gameObject.name.Equals("Kaiju"))
+        if (other.gameObject.name.Equals("Kaiju"))
         {
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
 }

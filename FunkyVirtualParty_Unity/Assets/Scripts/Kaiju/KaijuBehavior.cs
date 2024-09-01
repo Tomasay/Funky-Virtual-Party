@@ -63,7 +63,7 @@ public class KaijuBehavior : MonoBehaviour
     {
         if(KaijuGameSyncer.instance.State.Equals("kill") )
         {
-            Destroy(this);
+            Destroy(gameObject);
         }
 
         // this variable controls whether the kaiju is moving
