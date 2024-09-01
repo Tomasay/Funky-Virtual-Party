@@ -15,9 +15,16 @@ public class MazeGameManager : MonoBehaviour
 
     [SerializeField] Collider marbleCollider;
 
+    [SerializeField] Transform[] coinSpawnLocations;
+
+    Dictionary<Transform, MazeCoin> spawnedCoins; //[Coin location, Coin (null if not spawned)]
+
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private TMP_Text vrInfoText, vrGameTimeText;
     private float timeRemaining;
+
+    private const int MAX_COINS = 4; //Max amount of coins on screen at one time
+    private const int COINS_SPAWN_DELAY = 3; //Amount of time it takes another coin to spawn once one has been collected
 
     //Debug player variables
     [SerializeField] private Transform[] debugWaypoints;
@@ -29,6 +36,12 @@ public class MazeGameManager : MonoBehaviour
         MazeGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
+        spawnedCoins = new Dictionary<Transform, MazeCoin>();
+        for (int i = 0; i < coinSpawnLocations.Length; i++)
+        {
+            spawnedCoins.Add(coinSpawnLocations[i], null);
+        }
     }
 
     private void OnDestroy()
@@ -107,7 +120,7 @@ public class MazeGameManager : MonoBehaviour
                 }
                 break;
             case "game loop":
-
+                SpawnCoins();
                 break;
             case "vr player won":
                 StartCoroutine(GameOver(2, "YOU WIN!"));
@@ -117,6 +130,48 @@ public class MazeGameManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    void SpawnCoins()
+    {
+        for (int i = 0; i < MAX_COINS; i++)
+        {
+            Transform t = GetValidCoinSpawnLocation();
+
+            if (t)
+            {
+                Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+                options.ownedByClient = true;
+                MazeCoin newCoin = Realtime.Instantiate("MazeGame/Coin", t.position, t.rotation, options).GetComponent<MazeCoin>();
+            }
+        }
+    }
+
+    Transform GetValidCoinSpawnLocation()
+    {
+        //Check if max amount of coins have been spawned
+        int coinsSpawned = 0;
+        List<Transform> validSpawnLocations = new List<Transform>();
+        foreach (KeyValuePair<Transform, MazeCoin> entry in spawnedCoins)
+        {
+            if(entry.Value)
+            {
+                coinsSpawned++;
+            }
+            else
+            {
+                validSpawnLocations.Add(entry.Key);
+            }
+        }
+
+        if (coinsSpawned == MAX_COINS) //If yes, return null
+        {
+            return null;
+        }
+        else //If not, get a random valid transform for a new spawn
+        {
+            return validSpawnLocations[Random.Range(0, validSpawnLocations.Count)];
         }
     }
 
