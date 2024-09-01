@@ -39,6 +39,7 @@ public class KaijuGameManager : MonoBehaviour
                 KaijuGameClientPlayer sp = p.GetComponent<KaijuGameClientPlayer>();
         }
         
+        // Spawn Powerups
         for(int type = 0; type < 4; type++)
         {
             for (int i = 0; i < 8; i++)
@@ -51,19 +52,19 @@ public class KaijuGameManager : MonoBehaviour
                 {
                     case (int)KaijuPowerup.PowerupType.Fireball:
                     default:
-                        powerup = Realtime.Instantiate("Kaiju/FireballPowerup", new Vector3( Random.Range(-74,-35), 26.5f, Random.Range(30,65) ), Quaternion.identity, options);
+                        powerup = Realtime.Instantiate("Kaiju/FireballPowerup", new Vector3( Random.Range(-74,-35), -1026.5f, Random.Range(30,65) ), Quaternion.identity, options);
                         break;
                     case (int)KaijuPowerup.PowerupType.Bomb:
-                        powerup = Realtime.Instantiate("Kaiju/BombPowerup", new Vector3(Random.Range(-74, -35), 26.5f, Random.Range(30, 65)), Quaternion.identity, options);
+                        powerup = Realtime.Instantiate("Kaiju/BombPowerup", new Vector3(Random.Range(-74, -35), -1026.5f, Random.Range(30, 65)), Quaternion.identity, options);
                         break;
                     case (int)KaijuPowerup.PowerupType.Speed:
-                        powerup = Realtime.Instantiate("Kaiju/SpeedPowerup", new Vector3(Random.Range(-74, -35), 26.5f, Random.Range(30, 65)), Quaternion.identity, options);
+                        powerup = Realtime.Instantiate("Kaiju/SpeedPowerup", new Vector3(Random.Range(-74, -35), -1026.5f, Random.Range(30, 65)), Quaternion.identity, options);
                         break;
                     case (int)KaijuPowerup.PowerupType.Weight:
-                        powerup = Realtime.Instantiate("Kaiju/WeightPowerup", new Vector3(Random.Range(-74, -35), 26.5f, Random.Range(30, 65)), Quaternion.identity, options);
+                        powerup = Realtime.Instantiate("Kaiju/WeightPowerup", new Vector3(Random.Range(-74, -35), -1026.5f, Random.Range(30, 65)), Quaternion.identity, options);
                         break;
                 }
-                powerup.SetActive(false);
+                //powerup.SetActive(false);
                 
             }
         }
@@ -131,10 +132,13 @@ public class KaijuGameManager : MonoBehaviour
                             spawnTimer = POWERUP_SPAWN_TIME;
                             int rspowerup = Random.Range(0, KaijuPowerup.pool.Count);
 
-                            if (KaijuPowerup.pool[rspowerup].gameObject.activeSelf)
+                            if (KaijuPowerup.pool[rspowerup].gameObject.transform.position.y == 26.5f)
                                 spawnTimer = 0;
-                            
-                            KaijuPowerup.pool[rspowerup].gameObject.SetActive(true);
+
+                            KaijuPowerup.pool[rspowerup].gameObject.transform.position.Set(
+                                KaijuPowerup.pool[rspowerup].gameObject.transform.position.x, 
+                                26.5f, 
+                                KaijuPowerup.pool[rspowerup].gameObject.transform.position.z );
                         }
 
                         break;

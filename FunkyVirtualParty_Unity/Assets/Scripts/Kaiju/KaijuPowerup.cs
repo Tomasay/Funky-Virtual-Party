@@ -56,7 +56,7 @@ public class KaijuPowerup : MonoBehaviour
                     break;
 
             }
-            gameObject.SetActive(false);
+            gameObject.transform.position.Set(gameObject.transform.position.x, -1026.5f, gameObject.transform.position.z);
         }
     }
 }
