@@ -34,10 +34,18 @@ public class PingDetector : MonoBehaviour
 
     public void CheckPing()
     {
+#if UNITY_WEBGL
         if (RealtimeSingletonWeb.instance.Realtime.connected)
         {
             lastPing = RealtimeSingletonWeb.instance.Realtime.ping;
             highLatencyIcon.SetActive(lastPing >= highPingThreshold);
         }
+#elif UNITY_ANDROID
+        if (RealtimeSingleton.instance.Realtime.connected)
+        {
+            lastPing = RealtimeSingleton.instance.Realtime.ping;
+            highLatencyIcon.SetActive(lastPing >= highPingThreshold);
+        }
+#endif
     }
 }
