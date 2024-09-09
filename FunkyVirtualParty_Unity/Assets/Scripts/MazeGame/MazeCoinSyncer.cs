@@ -65,10 +65,10 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
 #region Variable Callbacks
     void IsActiveChange(MazeCoinSyncModel previousModel, bool val)
     {
-        meshRenderer.enabled = val;
+        meshRenderer.enabled = !val;
 
 #if UNITY_ANDROID //Only VR host manages trigger enter
-        col.enabled = val;
+        col.enabled = !val;
 #endif
     }
     #endregion
