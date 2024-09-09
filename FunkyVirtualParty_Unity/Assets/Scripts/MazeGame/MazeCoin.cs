@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
+using NaughtyAttributes;
 
 public class MazeCoin : MonoBehaviour
 {
@@ -19,18 +20,10 @@ public class MazeCoin : MonoBehaviour
         }
         pool.Add(this);
 #endif
-
-        //Setup constraint to parent to maze
-        parentConstraint = GetComponent<ParentConstraint>();
-        ConstraintSource src = new ConstraintSource();
-        src.sourceTransform = MazeGameSyncer.instance.maze.transform;
-        src.weight = 1;
-        parentConstraint.AddSource(src);
-        parentConstraint.constraintActive = true;
     }
 
     private void Update()
     {
-        transform.Rotate(0, 10 * Time.deltaTime, 0);
+        transform.Rotate(0, 20 * Time.deltaTime, 0);
     }
 }

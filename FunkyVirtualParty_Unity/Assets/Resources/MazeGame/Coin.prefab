@@ -13,8 +13,7 @@ GameObject:
   - component: {fileID: 4128001236878320889}
   - component: {fileID: 3651334113389734310}
   - component: {fileID: 3118407655821105317}
-  - component: {fileID: 9134258935694861063}
-  - component: {fileID: 8059364184196125042}
+  - component: {fileID: 7943778750266840685}
   m_Layer: 0
   m_Name: Coin
   m_TagString: Untagged
@@ -119,9 +118,11 @@ MonoBehaviour:
   _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
   _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
-  _components: []
+  _components:
+  - componentID: 1
+    component: {fileID: 7943778750266840685}
   _childViews: []
---- !u!114 &9134258935694861063
+--- !u!114 &7943778750266840685
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,28 +131,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 2410918165565624357}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5a3f292e8776fe428dcbf0090f3a2cf, type: 3}
+  m_Script: {fileID: 11500000, guid: c4afa52cfd857e8439361f9309d4cd8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1773428102 &8059364184196125042
-ParentConstraint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2410918165565624357}
-  m_Enabled: 1
-  m_Weight: 1
-  m_TranslationAtRest: {x: 0, y: -0.55860126, z: 0.8126668}
-  m_RotationAtRest: {x: -25.816, y: 0, z: 0}
-  m_TranslationOffsets: []
-  m_RotationOffsets: []
-  m_AffectTranslationX: 1
-  m_AffectTranslationY: 1
-  m_AffectTranslationZ: 1
-  m_AffectRotationX: 1
-  m_AffectRotationY: 1
-  m_AffectRotationZ: 1
-  m_IsContraintActive: 0
-  m_IsLocked: 0
-  m_Sources: []
