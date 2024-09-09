@@ -8,5 +8,5 @@ using Normal.Realtime.Serialization;
 public partial class MazeCoinSyncModel
 {
     [RealtimeProperty(1, true, true)]
-    private bool _isActive;
+    private bool _isCollected;
 }

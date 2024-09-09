@@ -12,7 +12,7 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
     MeshRenderer meshRenderer;
     BoxCollider col;
 
-    public bool IsActive { get => model.isActive; set => model.isActive = value; }
+    public bool IsCollected { get => model.isCollected; set => model.isCollected = value; }
 
     private void Awake()
     {
@@ -22,15 +22,18 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
 
     private void Update()
     {
-        transform.Rotate(0, 20 * Time.deltaTime, 0);
+        transform.Rotate(0, 40 * Time.deltaTime, 0);
 
 #if UNITY_ANDROID //Only VR host manages coin collection check
-        List<ClientPlayer> cps = MazeGameClientPlayer.clients;
-        foreach (ClientPlayer cp in cps)
+        if (IsCollected == false)
         {
-            if (col.bounds.Contains(cp.transform.position))
+            List<ClientPlayer> cps = ClientPlayer.clients;
+            foreach (ClientPlayer cp in cps)
             {
-                IsActive = false;
+                if (col.bounds.Contains(cp.transform.position))
+                {
+                    IsCollected = true;
+                }
             }
         }
 #endif
@@ -41,7 +44,7 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
         if (previousModel != null)
         {
             // Unregister from events
-            previousModel.isActiveDidChange -= IsActiveChange;
+            previousModel.isCollectedDidChange -= IsActiveChange;
         }
 
         if (currentModel != null)
@@ -49,12 +52,13 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
             // If this is a model that has no data set on it
             if (currentModel.isFreshModel)
             {
+
             }
 
             //Update to match new data
 
             // Register for events
-            currentModel.isActiveDidChange += IsActiveChange;
+            currentModel.isCollectedDidChange += IsActiveChange;
         }
     }
 
