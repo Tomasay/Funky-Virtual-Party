@@ -43,7 +43,7 @@ public class TutorialMenuClient : MonoBehaviour
     {
         for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
-            if (!clientPlayerIcons.ContainsKey(ClientPlayer.clients[i].realtimeView.ownerIDSelf))
+            if (!ClientPlayer.clients[i].syncer.IsDebugPlayer && !clientPlayerIcons.ContainsKey(ClientPlayer.clients[i].realtimeView.ownerIDSelf))
             {
                 GameObject newPlayerIcon = Instantiate(playerIconPrefab, clientPlayerIconsParent.transform);
                 TMP_Text txt = newPlayerIcon.GetComponentInChildren<TMP_Text>();
