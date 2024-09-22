@@ -9,16 +9,13 @@ using NaughtyAttributes;
 
 public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
 {
+    [SerializeField]
     MeshRenderer meshRenderer;
+
+    [SerializeField]
     BoxCollider col;
 
     public bool IsCollected { get => model.isCollected; set => model.isCollected = value; }
-
-    private void Awake()
-    {
-        meshRenderer = GetComponent<MeshRenderer>();
-        col = GetComponent<BoxCollider>();
-    }
 
     private void Update()
     {
