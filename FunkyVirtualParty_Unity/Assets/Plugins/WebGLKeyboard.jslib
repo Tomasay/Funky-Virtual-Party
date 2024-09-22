@@ -65,8 +65,19 @@ mergeInto(LibraryManager.library, {
 	},
 	ReloadPage: function ()
 	{
-		//window.location.reload();
-		window.location = "https://www.partycrashers.app"
+		//Reload to correct domain, removing party code parameter
+		if(window.location.href.includes("partycrashers.app/Testing")
+		{
+			window.location = "https://www.partycrashers.app/Testing";
+		}
+		else if(window.location.href.includes("partycrashers.app/TestingToo")
+		{
+			window.location = "https://www.partycrashers.app/TestingToo";
+		}
+		else
+		{
+			window.location = "https://www.partycrashers.app"
+		}
 	},
 	CheckURLPartyCode: function ()
 	{
