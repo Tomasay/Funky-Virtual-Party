@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using Autohand;
 using Normal.Realtime;
+using DG.Tweening;
 
 public class MazeGameManager : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class MazeGameManager : MonoBehaviour
     [SerializeField] Collider[] mazeIgnoreColliders;
 
     [SerializeField] Collider marbleCollider;
+
+    [SerializeField] MeshRenderer leftHandle, rightHandle;
 
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private TMP_Text vrInfoText, vrGameTimeText;
@@ -63,6 +66,7 @@ public class MazeGameManager : MonoBehaviour
         //SetVRPlayerMovement(false);
     }
 
+    Tweener leftHandleTweener, rightHandleTweener;
     void Update()
     {
         switch (MazeGameSyncer.instance.State)
@@ -91,6 +95,32 @@ public class MazeGameManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+
+        //Maze handle pulsing
+        if (!leftHandleGrabbed)
+        {
+            Debug.Log("outline width: " + leftHandle.material.GetFloat("_OutlineWidth"));
+            if (leftHandle.material.GetFloat("_OutlineWidth") == 0)
+            {
+                leftHandleTweener = leftHandle.material.DOFloat(0.75f, "_OutlineWidth", 1);
+            }
+            else if (leftHandle.material.GetFloat("_OutlineWidth") == 0.75f)
+            {
+                leftHandleTweener = leftHandle.material.DOFloat(0, "_OutlineWidth", 1);
+            }
+        }
+
+        if (!rightHandleGrabbed)
+        {
+            if (rightHandle.material.GetFloat("_OutlineWidth") == 0)
+            {
+                rightHandleTweener = rightHandle.material.DOFloat(0.75f, "_OutlineWidth", 1);
+            }
+            else if (rightHandle.material.GetFloat("_OutlineWidth") == 0.75f)
+            {
+                rightHandleTweener = rightHandle.material.DOFloat(0, "_OutlineWidth", 1);
+            }
         }
     }
 
@@ -210,9 +240,21 @@ public class MazeGameManager : MonoBehaviour
         SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }
 
-    protected void SetVRPlayerMovement(bool canPlayerMove)
+    bool leftHandleGrabbed, rightHandleGrabbed;
+    public void OnMazeGrabbed(Autohand.Hand h, Grabbable g)
     {
-        RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
+        if(h.left) leftHandleGrabbed = true;
+        if(!h.left) rightHandleGrabbed = true;
+
+        if (leftHandleGrabbed && rightHandleGrabbed)
+        {
+            MazeGameSyncer.instance.VRPlayerReady = true;
+
+            leftHandleTweener.Kill();
+            leftHandle.material.SetFloat("_OutlineWidth", 0);
+            rightHandleTweener.Kill();
+            rightHandle.material.SetFloat("_OutlineWidth", 0);
+        }
     }
 
     public string FormatTime(float time)
