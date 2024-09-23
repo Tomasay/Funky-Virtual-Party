@@ -249,12 +249,18 @@ public class MazeGameManager : MonoBehaviour
         if (leftHandleGrabbed && rightHandleGrabbed)
         {
             MazeGameSyncer.instance.VRPlayerReady = true;
+            SetVRPlayerMovement(false);
 
             leftHandleTweener.Kill();
             leftHandle.material.SetFloat("_OutlineWidth", 0);
             rightHandleTweener.Kill();
             rightHandle.material.SetFloat("_OutlineWidth", 0);
         }
+    }
+
+    protected void SetVRPlayerMovement(bool canPlayerMove)
+    {
+        RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().useMovement = canPlayerMove;
     }
 
     public string FormatTime(float time)
