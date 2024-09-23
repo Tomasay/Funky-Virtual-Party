@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.XR;
 using TMPro;
 using UnityEngine.SceneManagement;
@@ -12,11 +13,15 @@ public class MazeGameManager : MonoBehaviour
 {
     [SerializeField] GameObject maze;
 
+    [SerializeField] GameObject marble;
+
     [SerializeField] Collider[] mazeIgnoreColliders;
 
-    [SerializeField] Collider marbleCollider;
-
     [SerializeField] MeshRenderer leftHandle, rightHandle;
+
+    SphereCollider marbleCollider;
+    Rigidbody marbleRB;
+    ParentConstraint marbleConstraint;
 
     private const int COUNTDOWN_AMOUNT = 3, GAME_TIME_AMOUNT = 30;
     private TMP_Text vrInfoText, vrGameTimeText;
@@ -35,6 +40,10 @@ public class MazeGameManager : MonoBehaviour
         MazeGameSyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+
+        marbleCollider = marble.GetComponent<SphereCollider>();
+        marbleRB = marble.GetComponent<Rigidbody>();
+        marbleConstraint = marble.GetComponent<ParentConstraint>();
     }
 
     private void OnDestroy()
@@ -140,7 +149,10 @@ public class MazeGameManager : MonoBehaviour
                 }
                 break;
             case "game loop":
-
+                marbleCollider.enabled = true;
+                marbleRB.useGravity = true;
+                marbleRB.isKinematic = false;
+                marbleConstraint.constraintActive = false;
                 break;
             case "vr player won":
                 StartCoroutine(GameOver(2, "YOU WIN!"));

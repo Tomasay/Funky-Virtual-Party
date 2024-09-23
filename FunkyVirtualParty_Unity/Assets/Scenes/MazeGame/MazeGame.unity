@@ -1274,6 +1274,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maze: {fileID: 1872234904}
+  marble: {fileID: 1480470050}
   mazeIgnoreColliders:
   - {fileID: 1543375314}
   - {fileID: 813816838}
@@ -1314,7 +1315,6 @@ MonoBehaviour:
   - {fileID: 1909835406}
   - {fileID: 1640973671}
   - {fileID: 1382180171}
-  marbleCollider: {fileID: 1480470053}
   leftHandle: {fileID: 2363442964410467575}
   rightHandle: {fileID: 2363442964410467574}
   debugWaypoints: []
@@ -3490,15 +3490,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.81204
+      value: 0.81204003
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9747303
+      value: 0.97473025
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.2233851
+      value: -0.22338516
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalRotation.y
@@ -3506,7 +3506,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933937, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3540,6 +3540,18 @@ PrefabInstance:
       propertyPath: m_Drag
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933941, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933941, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_IsKinematic
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1097079118135933942, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1097079118135933943, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -3547,11 +3559,37 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 4132452954677399492, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
---- !u!135 &1480470053 stripped
-SphereCollider:
-  m_CorrespondingSourceObject: {fileID: 1097079118135933942, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
+--- !u!1 &1480470050 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1097079118135933940, guid: eb8ba494c03fe3643a082fb615b0750c, type: 3}
   m_PrefabInstance: {fileID: 1480470049}
   m_PrefabAsset: {fileID: 0}
+--- !u!1773428102 &1480470054
+ParentConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1480470050}
+  m_Enabled: 1
+  m_Weight: 1
+  m_TranslationAtRest: {x: 0.0151, y: -0.55936, z: 0.81204}
+  m_RotationAtRest: {x: -25.815876, y: 0, z: 0}
+  m_TranslationOffsets:
+  - {x: 0.0151, y: 0.009589851, z: 0.006905377}
+  m_RotationOffsets:
+  - {x: 0, y: 0, z: 0}
+  m_AffectTranslationX: 1
+  m_AffectTranslationY: 1
+  m_AffectTranslationZ: 1
+  m_AffectRotationX: 1
+  m_AffectRotationY: 1
+  m_AffectRotationZ: 1
+  m_IsContraintActive: 1
+  m_IsLocked: 1
+  m_Sources:
+  - sourceTransform: {fileID: 2363442964410467573}
+    weight: 1
 --- !u!1001 &1512933830
 PrefabInstance:
   m_ObjectHideFlags: 0

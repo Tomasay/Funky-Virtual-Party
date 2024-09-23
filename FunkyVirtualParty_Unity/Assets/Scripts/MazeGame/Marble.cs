@@ -38,7 +38,10 @@ public class Marble : MonoBehaviour
         if(MazeGameSyncer.instance.State.Equals("game loop"))
         {
             CheckCollisionWithPlayers();
+        }
 
+        if (MazeGameSyncer.instance.State.Equals("game loop") || MazeGameSyncer.instance.State.Equals("countdown"))
+        {
             //Sync marble
             MazeGameSyncer.instance.MarbleMazePos = handheldMaze.transform.InverseTransformPoint(rb.position);
         }
