@@ -66,11 +66,11 @@ mergeInto(LibraryManager.library, {
 	ReloadPage: function ()
 	{
 		//Reload to correct domain, removing party code parameter
-		if(window.location.href.includes("partycrashers.app/Testing")
+		if(window.location.href.includes("partycrashers.app/Testing"))
 		{
 			window.location = "https://www.partycrashers.app/Testing";
 		}
-		else if(window.location.href.includes("partycrashers.app/TestingToo")
+		else if(window.location.href.includes("partycrashers.app/TestingToo"))
 		{
 			window.location = "https://www.partycrashers.app/TestingToo";
 		}
