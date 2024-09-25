@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using Cinemachine;
 using DG.Tweening;
+using Michsky.UI.MTP;
 
 public class ShootoutGameManagerWeb : MonoBehaviour
 {
@@ -15,6 +16,8 @@ public class ShootoutGameManagerWeb : MonoBehaviour
     [SerializeField] CinemachineVirtualCamera cinemachineCam;
     [SerializeField] Camera cam;
     [SerializeField] Animator cameraAnim;
+
+    [SerializeField] StyleManager gameOverText;
 
     protected void Start()
     {
@@ -55,12 +58,16 @@ public class ShootoutGameManagerWeb : MonoBehaviour
                 RealtimeSingletonWeb.instance.LocalPlayer.CanMove = true;
                 break;
             case "vr player won":
-                countdownText.enabled = true;
-                countdownText.text = "VR PLAYER WINS";
+                //countdownText.enabled = true;
+                //countdownText.text = "VR PLAYER WINS";
+                gameOverText.textItems[0].text = "VR PLAYER WINS";
+                gameOverText.gameObject.SetActive(true);
                 break;
             case "time ended":
-                countdownText.enabled = true;
-                countdownText.text = "TIME'S UP!\nYOU WIN";
+                //countdownText.enabled = true;
+                //countdownText.text = "TIME'S UP!\nYOU WIN";
+                gameOverText.textItems[0].text = "TIME'S UP! YOU WIN";
+                gameOverText.gameObject.SetActive(true);
                 break;
             default:
                 break;
