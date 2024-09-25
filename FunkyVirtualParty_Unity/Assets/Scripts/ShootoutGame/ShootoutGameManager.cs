@@ -115,10 +115,10 @@ public class ShootoutGameManager : MonoBehaviour
                 SetVRPlayerCanThrowFireballs(true);
                 break;
             case "vr player won":
-                StartCoroutine(GameOver(2, "YOU WIN!"));
+                StartCoroutine(GameOver(4, "YOU WIN!"));
                 break;
             case "time ended":
-                StartCoroutine(GameOver(2, "TIMES UP!\nYOU LOSE"));
+                StartCoroutine(GameOver(4, "TIMES UP!\nYOU LOSE"));
                 break;
             default:
                 break;
@@ -162,10 +162,10 @@ public class ShootoutGameManager : MonoBehaviour
         ShootoutGameSyncer.instance.State = "game loop";
     }
 
-    IEnumerator GameOver(int countdown, string txt)
+    IEnumerator GameOver(int delay, string txt)
     {
         vrInfoText.text = txt;
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(delay);
 
         //Destroy fireballs
         if (Fireball.pool != null)
