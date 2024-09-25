@@ -165,7 +165,7 @@ public class ShootoutGameManager : MonoBehaviour
     IEnumerator GameOver(int countdown, string txt)
     {
         vrInfoText.text = txt;
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4);
 
         //Destroy fireballs
         if (Fireball.pool != null)
