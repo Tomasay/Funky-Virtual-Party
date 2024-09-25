@@ -21,7 +21,7 @@ public class VinylInfo : MonoBehaviour
 
     [SerializeField] GameObject poofEffect;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
     [SerializeField] Material previewMat;
 #endif
 
@@ -53,7 +53,7 @@ public class VinylInfo : MonoBehaviour
         grabbable.onHighlight.AddListener(OnHighlight);
         grabbable.onUnhighlight.AddListener(OnUnhighlight);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         if (previewMat)
         {
             vinylPreview.material = previewMat;
