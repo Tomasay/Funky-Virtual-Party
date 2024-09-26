@@ -21,7 +21,7 @@ public class VinylInfo : MonoBehaviour
 
     [SerializeField] GameObject poofEffect;
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if UNITY_ANDROID
     [SerializeField] Material previewMat;
 #endif
 
