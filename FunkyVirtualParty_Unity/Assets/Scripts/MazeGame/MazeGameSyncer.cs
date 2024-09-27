@@ -11,6 +11,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
     public static MazeGameSyncer instance;
 
     public MyStringEvent OnStateChangeEvent;
+    public UnityEvent<int> OnCoinsToGoChangeEvent;
 
     public GameObject maze;
 
@@ -20,6 +21,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
     public string State { get => model.state; set => model.state = value; }
     public bool VRPlayerReady { get => model.vrPlayerReady; set => model.vrPlayerReady = value; }
     public Vector3 MarbleMazePos { get => model.marbleMazePos; set => model.marbleMazePos = value; }
+    public int CoinsToGo { get => model.coinsToGo; set => model.coinsToGo = value; }
 
     private bool isWeb;
 
@@ -31,6 +33,9 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
         if (OnStateChangeEvent == null)
             OnStateChangeEvent = new MyStringEvent();
 
+        if (OnCoinsToGoChangeEvent == null)
+            OnCoinsToGoChangeEvent = new UnityEvent<int>();
+
 #if UNITY_WEBGL
         isWeb = true;
 
@@ -41,7 +46,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
 #endif
     }
 
-#if UNITY_ANDROID //Only host has to worry about triggering allPlayersReady event
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN //Only host has to worry about triggering allPlayersReady event
     private void Start()
     {
         //Default states when entering scene
@@ -75,6 +80,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
             previousModel.stateDidChange -= OnStateChange;
             previousModel.vrPlayerReadyDidChange -= OnVRPlayerReadyUp;
             previousModel.marbleMazePosDidChange -= OnMarbleMazePosDidChange;
+            previousModel.coinsToGoDidChange -= OnCoinsToGoDidChange;
         }
 
         if (currentModel != null)
@@ -89,6 +95,7 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
             currentModel.stateDidChange += OnStateChange;
             currentModel.vrPlayerReadyDidChange += OnVRPlayerReadyUp;
             currentModel.marbleMazePosDidChange += OnMarbleMazePosDidChange;
+            currentModel.coinsToGoDidChange += OnCoinsToGoDidChange;
         }
     }
 
@@ -117,5 +124,16 @@ public class MazeGameSyncer : RealtimeComponent<MazeGameSyncModel>
             latestMarblePos = newPos;
         }
     }
-#endregion
+
+    void OnCoinsToGoDidChange(MazeGameSyncModel previousModel, int coins)
+    {
+        OnCoinsToGoChangeEvent.Invoke(coins);
+
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+        MazeGameVRPlayerController vrPlayer = RealtimeSingleton.instance.VRAvatar.GetComponent<MazeGameVRPlayerController>();
+        vrPlayer.vrCoinCounterText.text = "Coins: <color=yellow>" + coins + "</color> to go";
+        vrPlayer.vrCoinCounterText.GetComponent<Animator>().SetTrigger("PulsateOnce");
+#endif
+    }
+    #endregion
 }

@@ -11,7 +11,7 @@ public class MazeGameVRPlayerController : VRPlayerController
 
     public Collider[] vrIgnoreColliders;
 
-    public TMP_Text vrInfoText, vrGameTimeText;
+    public TMP_Text vrInfoText, vrGameTimeText, vrCoinCounterText;
 
     private bool isGrabbingLeft, isGrabbingRight;
 

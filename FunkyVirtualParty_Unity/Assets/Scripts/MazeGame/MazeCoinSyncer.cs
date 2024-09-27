@@ -41,7 +41,7 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
         if (previousModel != null)
         {
             // Unregister from events
-            previousModel.isCollectedDidChange -= IsActiveChange;
+            previousModel.isCollectedDidChange -= IsCollectedDidChange;
         }
 
         if (currentModel != null)
@@ -55,17 +55,25 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
             //Update to match new data
 
             // Register for events
-            currentModel.isCollectedDidChange += IsActiveChange;
+            currentModel.isCollectedDidChange += IsCollectedDidChange;
         }
     }
 
 #region Variable Callbacks
-    void IsActiveChange(MazeCoinSyncModel previousModel, bool val)
+    void IsCollectedDidChange(MazeCoinSyncModel previousModel, bool val)
     {
         meshRenderer.enabled = !val;
 
-#if UNITY_ANDROID //Only VR host manages trigger enter
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN //Only VR host manages trigger enter and score
         col.enabled = !val;
+        if (val)
+        {
+            MazeGameSyncer.instance.CoinsToGo--;
+            if(MazeGameSyncer.instance.CoinsToGo <= 0)
+            {
+                MazeGameSyncer.instance.State = "vr player lost";
+            }
+        }
 #endif
     }
     #endregion

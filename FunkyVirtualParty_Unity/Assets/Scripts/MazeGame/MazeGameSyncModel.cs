@@ -18,6 +18,7 @@ public partial class MazeGameSyncModel
 
     [RealtimeProperty(4, true, true)]
     private Vector3 _marbleMazePos;
+
+    [RealtimeProperty(5, true, true)]
+    private int _coinsToGo;
 }
-
-

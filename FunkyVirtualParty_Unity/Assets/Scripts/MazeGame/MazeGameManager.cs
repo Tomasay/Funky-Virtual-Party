@@ -94,7 +94,7 @@ public class MazeGameManager : MonoBehaviour
                 }
                 if (timeRemaining <= 0) //Game end, VR player wins
                 {
-                    MazeGameSyncer.instance.State = "vr player lost";
+                    MazeGameSyncer.instance.State = "vr player won";
                     vrGameTimeText.GetComponent<Animator>().SetBool("Pulsate", false);
                 }
                 break;
@@ -140,13 +140,17 @@ public class MazeGameManager : MonoBehaviour
             case "tutorial":
                 break;
             case "countdown":
+                MazeGameSyncer.instance.CoinsToGo = MazeGameClientPlayer.clients.Count * 5;
+
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
 
                 //Setup client death events. Waiting till countdown to ensure all clients have been spawned in
+                /*
                 foreach (MazeGameClientPlayer cp in MazeGameClientPlayer.clients)
                 {
                     cp.syncer.OnDeath.AddListener(CheckPlayersLeft);
                 }
+                */
                 break;
             case "game loop":
                 marbleCollider.enabled = true;
@@ -155,10 +159,10 @@ public class MazeGameManager : MonoBehaviour
                 marbleConstraint.constraintActive = false;
                 break;
             case "vr player won":
-                StartCoroutine(GameOver(2, "YOU WIN!"));
+                StartCoroutine(GameOver(2, "TIME'S UP!\nYOU WIN!"));
                 break;
             case "vr player lost":
-                StartCoroutine(GameOver(2, "TIMES UP!\nYOU LOSE"));
+                StartCoroutine(GameOver(2, "CLIENTS WIN!"));
                 break;
             default:
                 break;
@@ -166,49 +170,6 @@ public class MazeGameManager : MonoBehaviour
     }
 
     /*
-    void SpawnCoins()
-    {
-        for (int i = 0; i < MAX_COINS; i++)
-        {
-            Transform t = GetValidCoinSpawnLocation();
-
-            if (t)
-            {
-                Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
-                options.ownedByClient = true;
-                Realtime.Instantiate("MazeGame/Coin", t.position, t.rotation, options);
-            }
-        }
-    }
-
-    Transform GetValidCoinSpawnLocation()
-    {
-        //Check if max amount of coins have been spawned
-        int coinsSpawned = 0;
-        List<Transform> validSpawnLocations = new List<Transform>();
-        foreach (KeyValuePair<Transform, MazeCoin> entry in spawnedCoins)
-        {
-            if(entry.Value)
-            {
-                coinsSpawned++;
-            }
-            else
-            {
-                validSpawnLocations.Add(entry.Key);
-            }
-        }
-
-        if (coinsSpawned == MAX_COINS) //If yes, return null
-        {
-            return null;
-        }
-        else //If not, get a random valid transform for a new spawn
-        {
-            return validSpawnLocations[Random.Range(0, validSpawnLocations.Count)];
-        }
-    }
-    */
-
     void CheckPlayersLeft()
     {
         int playersAlive = 0;
@@ -225,6 +186,7 @@ public class MazeGameManager : MonoBehaviour
             MazeGameSyncer.instance.State = "vr player won";
         }
     }
+    */
 
     IEnumerator StartCountdownTimer(int countdown)
     {
