@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class ChaseGameClientPlayer : ClientPlayer
 {
-    [SerializeField] private int tackleForce, tackleCooldown = 2, tacklePlayerRange = 10;
+    [SerializeField] private int tackleForce = 4, tackleCooldown = 2, tacklePlayerRange = 10;
 
     private bool tackling;
     private float timeTackled = 0;
