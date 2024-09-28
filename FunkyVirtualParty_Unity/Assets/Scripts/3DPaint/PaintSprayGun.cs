@@ -5,7 +5,7 @@ using PaintIn3D;
 using UnityEngine.Events;
 using UnityEngine.Animations;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
 using FMODUnity;
 #endif
 
@@ -61,7 +61,7 @@ public class PaintSprayGun : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.AddListener(IsPenEnabledChanged);
         VRtistrySyncer.instance.spraygunColorChanged.AddListener(ChangeColor);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -73,7 +73,7 @@ public class PaintSprayGun : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.RemoveListener(IsPenEnabledChanged);
         VRtistrySyncer.instance.spraygunColorChanged.RemoveListener(ChangeColor);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -88,7 +88,7 @@ public class PaintSprayGun : MonoBehaviour
         constraint.constraintActive = true;
     }
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
     public void OnSqueeze()
     {
         if (canPaint)
@@ -114,7 +114,7 @@ public class PaintSprayGun : MonoBehaviour
 
     public void ChangeColor(Color c)
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         if (IsInHand)
         {
             if (!(paintColorMat.color == c))
@@ -128,7 +128,7 @@ public class PaintSprayGun : MonoBehaviour
         }
 #endif
 #if UNITY_WEBGL
-            paintColorMat.color = c;
+        paintColorMat.color = c;
             ps.startColor = c;
             paintSphere.Color = c;
 #endif
@@ -141,7 +141,7 @@ public class PaintSprayGun : MonoBehaviour
 
     public void SetActive(bool active)
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         baseMesh.enabled = active;
         col.enabled = active;
         this.active = active;

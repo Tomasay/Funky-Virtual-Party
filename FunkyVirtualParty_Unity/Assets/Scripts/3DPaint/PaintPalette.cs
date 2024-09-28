@@ -23,7 +23,7 @@ public class PaintPalette : MonoBehaviour
 
     public UnityEvent OnColorChanged;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
     Color colorToSet;
 #endif
 
@@ -32,14 +32,14 @@ public class PaintPalette : MonoBehaviour
         VRtistrySyncer.instance.PaletteMirrored.AddListener(Mirror);
         VRtistrySyncer.instance.paletteEnabledChanged.AddListener(SetActive);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
 
         for (int i = 0; i < colorMeshes.Length; i++)
         {
             colorMeshes[i].material.color = colors[i];
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
             var i2 = i;
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(colors[i2]); });
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(ColorPressed);
@@ -55,7 +55,7 @@ public class PaintPalette : MonoBehaviour
         VRtistrySyncer.instance.PaletteMirrored.RemoveListener(Mirror);
         VRtistrySyncer.instance.paletteEnabledChanged.RemoveListener(SetActive);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -70,7 +70,7 @@ public class PaintPalette : MonoBehaviour
         constraint.constraintActive = true;
     }
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
     void SetColor(Color c)
     {
         colorToSet = c;

@@ -13,7 +13,7 @@ public class MazeCoin : MonoBehaviour
     void Awake()
     {
         //Only host needs to worry about pooling
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         if (pool == null)
         {
             pool = new List<MazeCoin>();

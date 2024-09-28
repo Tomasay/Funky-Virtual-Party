@@ -6,7 +6,7 @@ using Autohand;
 using UnityEngine.Events;
 using UnityEngine.Animations;
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
 using FMODUnity;
 #endif
 
@@ -75,7 +75,7 @@ public class ThreeDPen : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -87,7 +87,7 @@ public class ThreeDPen : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.RemoveListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.RemoveListener(ChangeColor);
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -104,7 +104,7 @@ public class ThreeDPen : MonoBehaviour
 
     void Update()
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         if (isPainting && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
@@ -121,7 +121,7 @@ public class ThreeDPen : MonoBehaviour
 #endif
     }
 
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
     public void OnTriggerPressed(Hand h, Grabbable g)
     {
         if (canPaint)
@@ -193,7 +193,7 @@ public class ThreeDPen : MonoBehaviour
 
     public void ChangeColor(Color c)
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         if (IsInHand)
         {
             if(!(currentColor == c))
@@ -206,14 +206,14 @@ public class ThreeDPen : MonoBehaviour
         }
 #endif
 #if UNITY_WEBGL
-            currentColor = c;
+        currentColor = c;
             tipMesh.material.color = c;
 #endif
     }
 
     public void SetActive(bool active)
     {
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         tipMesh.enabled = active;
         baseMesh.enabled = active;
         col.enabled = active;

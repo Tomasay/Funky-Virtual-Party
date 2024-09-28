@@ -42,7 +42,7 @@ public class ChaseGameSyncer : RealtimeComponent<ChaseGameSyncModel>
 #endif
     }
 
-#if UNITY_ANDROID //Only host has to worry about triggering allPlayersReady event
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN //Only host has to worry about triggering allPlayersReady event
     private void Start()
     {
         //Default states when entering scene

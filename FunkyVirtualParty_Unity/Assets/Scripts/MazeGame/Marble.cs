@@ -50,7 +50,7 @@ public class Marble : MonoBehaviour
     void CheckCollisionWithPlayers()
     {
         //Collision should be dictated by host
-#if UNITY_ANDROID
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
             MazeGameClientPlayer mcp = cp as MazeGameClientPlayer;
