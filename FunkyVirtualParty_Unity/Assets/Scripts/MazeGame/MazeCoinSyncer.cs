@@ -19,7 +19,7 @@ public class MazeCoinSyncer : RealtimeComponent<MazeCoinSyncModel>
 
     private void Update()
     {
-        transform.Rotate(0, 40 * Time.deltaTime, 0);
+        meshRenderer.transform.Rotate(0, 40 * Time.deltaTime, 0, Space.Self);
 
 #if UNITY_ANDROID //Only VR host manages coin collection check
         if (IsCollected == false)
