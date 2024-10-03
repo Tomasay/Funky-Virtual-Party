@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.Video;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using DG.Tweening;
 
 #if UNITY_EDITOR
 using UnityEngine.InputSystem;
@@ -22,6 +23,10 @@ public class VinylPlayer : MonoBehaviour
     [SerializeField] Image playButtonIcon;
 
     [SerializeField] GameObject trianglesParent;
+
+    [SerializeField] Image playButtonImage;
+    [SerializeField] Color playButtonHighlightedColor, playButtonUnhighlightedColor;
+    Tweener playButtonTweener;
 
     private Animator anim;
     private VinylInfo currentVinyl = null;
@@ -66,6 +71,8 @@ public class VinylPlayer : MonoBehaviour
         clientsPresent = ClientPlayer.clients != null && ClientPlayer.clients.Count > 0;
 
         SetPlayButtonAlpha((clientsPresent && currentVinyl) ? 1 : 0.25f);
+
+        if(clientsPresent && currentVinyl) playButtonTweener = playButtonImage.DOColor(playButtonHighlightedColor, 1).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
     }
 
     void SetPlayButtonAlpha(float a)
@@ -117,6 +124,9 @@ public class VinylPlayer : MonoBehaviour
                 currentVinyl = null;
 
                 anim.SetTrigger("Stop");
+
+                playButtonTweener.Kill();
+                playButtonImage.color = playButtonUnhighlightedColor;
             }
         }
     }
