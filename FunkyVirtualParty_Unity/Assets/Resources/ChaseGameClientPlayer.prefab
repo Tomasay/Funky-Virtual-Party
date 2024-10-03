@@ -7,6 +7,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1269928041217091059, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1269928041217091059, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1269928041217091059, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7095686512168902855, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_Drag
       value: 2
@@ -62,6 +74,22 @@ PrefabInstance:
     - target: {fileID: 8143653906893471124, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: m_Name
       value: ChaseGameClientPlayer
+      objectReference: {fileID: 0}
+    - target: {fileID: 8745307368580851738, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8745307368580851738, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8745307368580851738, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8745307368580851738, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4278190080
       objectReference: {fileID: 0}
     - target: {fileID: 8907446340524657188, guid: 6712af83648d9bc4aae4c6c7df7c557e, type: 3}
       propertyPath: cp
@@ -223,7 +251,7 @@ MonoBehaviour:
   - {x: -5, y: 1, z: -5}
   - {x: -5, y: 1, z: 5}
   - {x: 5, y: 1, z: -5}
-  isDebugPlayer: 0
+  canMove: 1
   tackleForce: 500
   tackleCooldown: 2
   tacklePlayerRange: 10
