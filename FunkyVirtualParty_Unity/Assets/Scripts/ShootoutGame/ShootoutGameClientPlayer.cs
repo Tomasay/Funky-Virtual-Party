@@ -24,7 +24,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     const float collisionTimerDefault = 0.5f;
     Vector2 collisionVector;
 
-    private SerializedVector3 splashPos;
+    private Vector3 splashPos;
 
     const float frictionCoefficient = 0.01f;
 
