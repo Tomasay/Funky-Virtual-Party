@@ -31,8 +31,14 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
                 
             }
 
-            //Update to match new data
-            //anim.SetTrigger(currentModel.trigger);
+            //For clients only, make sure dance animation plays if necessary
+            if (transform.root.TryGetComponent<ClientSync>(out ClientSync cs))
+            {
+                if (currentModel.trigger.Contains("Dance") && cs.AnimSpeed == 0)
+                {
+                    anim.SetTrigger(currentModel.trigger);
+                }
+            }
 
             // Register for events
             currentModel.triggerDidChange += OnTriggerChange;
