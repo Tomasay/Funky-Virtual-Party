@@ -417,10 +417,10 @@ public class ClientPlayer : MonoBehaviour
 
     public static ClientPlayer GetClientByCurrentOwnerID(int id)
     {
-        Debug.Log("GetClientByCurrentOwnerID");
+        //Debug.Log("GetClientByCurrentOwnerID");
         foreach (ClientPlayer cp in clients)
         {
-            Debug.Log("Testing for: " + id + " Current id: " + cp.realtimeView.ownerIDSelf);
+            //Debug.Log("Testing for: " + id + " Current id: " + cp.realtimeView.ownerIDSelf);
             if (cp.realtimeView.ownerIDSelf == id)
             {
                 return cp;
@@ -434,10 +434,10 @@ public class ClientPlayer : MonoBehaviour
     //It solves the issue of Owner ID changing on grab/release
     public static ClientPlayer GetClientByInitialOwnerID(int id)
     {
-        Debug.Log("GetClientByInitialOwnerID");
+        //Debug.Log("GetClientByInitialOwnerID");
         foreach (ClientPlayer cp in clients)
         {
-            Debug.Log("Testing for: " + id + " Current id: " + cp.initialOwnerID);
+            //Debug.Log("Testing for: " + id + " Current id: " + cp.initialOwnerID);
             if (cp.initialOwnerID == id)
             {
                 return cp;
