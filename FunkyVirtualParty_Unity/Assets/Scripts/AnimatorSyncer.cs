@@ -31,18 +31,22 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
                 
             }
 
-            //For clients only, make sure dance animation plays if necessary
-            if (transform.root.TryGetComponent<ClientSync>(out ClientSync cs))
-            {
-                Debug.Log("Trigger: " + model.trigger + "  AnimSpeed: " + cs.AnimSpeed);
-                if (model.trigger.Contains("Dance") && cs.AnimSpeed == 0)
-                {
-                    anim.SetTrigger(model.trigger);
-                }
-            }
+            Invoke("CheckDanceAnim", 1);
 
             // Register for events
             currentModel.triggerDidChange += OnTriggerChange;
+        }
+    }
+
+    void CheckDanceAnim()
+    {
+        //For clients only, make sure dance animation plays if necessary
+        if (transform.root.TryGetComponent<ClientSync>(out ClientSync cs))
+        {
+            if (model.trigger.Contains("Dance") && cs.AnimSpeed == 0)
+            {
+                anim.SetTrigger(model.trigger);
+            }
         }
     }
 
