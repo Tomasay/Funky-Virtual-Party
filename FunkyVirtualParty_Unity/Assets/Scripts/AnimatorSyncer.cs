@@ -43,9 +43,9 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
         //For clients only, make sure dance animation plays if necessary
         if (transform.root.TryGetComponent<ClientSync>(out ClientSync cs))
         {
-            if (model.trigger.Contains("Dance") && cs.AnimSpeed == 0)
+            if (cs.IsDancing != -1)
             {
-                anim.SetTrigger(model.trigger);
+                anim.SetTrigger("Dance" + cs.IsDancing);
             }
         }
     }

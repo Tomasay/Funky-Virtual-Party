@@ -29,6 +29,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public bool IsReady { get => model.isReady; set => model.isReady = value; }
     public bool OnDeathTrigger { get => model.onDeathTrigger; set => model.onDeathTrigger = value; }
     public bool IsDebugPlayer { get => model.isDebugPlayer; set => model.isDebugPlayer = value; }
+    public int IsDancing { get => model.isDancing; set => model.isDancing = value; }
 
     #endregion
 

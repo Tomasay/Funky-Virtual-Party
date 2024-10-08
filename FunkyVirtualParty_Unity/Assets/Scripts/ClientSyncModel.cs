@@ -36,6 +36,9 @@ public partial class ClientSyncModel
 
     [RealtimeProperty(10, true, true)]
     private bool _isDebugPlayer;
+
+    [RealtimeProperty(11, true, true)]
+    private int _isDancing; //Stores last dance anim. -1 if not dancing
 }
 
 

@@ -334,6 +334,11 @@ public class ClientPlayer : MonoBehaviour
             movement = new Vector3(input.x * speed, 0, input.y * speed);
             transform.Translate(movement * Time.deltaTime);
 
+            if(input.x > 0 || input.y > 0)
+            {
+                syncer.IsDancing = -1;
+            }
+
             //Magnitude of movement for animations
             if (animate)
             {
@@ -402,12 +407,16 @@ public class ClientPlayer : MonoBehaviour
     //Default action, dance of course
     public virtual void Action()
     {
-        animSyncer.Trigger = "Dance" + UnityEngine.Random.Range(1, 4);
+        int newDance = UnityEngine.Random.Range(1, 4);
+        animSyncer.Trigger = "Dance" + newDance;
+        syncer.IsDancing = newDance;
     }
 
     public virtual void Action(InputAction.CallbackContext obj)
     {
-        animSyncer.Trigger = "Dance" + UnityEngine.Random.Range(1, 4);
+        int newDance = UnityEngine.Random.Range(1, 4);
+        animSyncer.Trigger = "Dance" + newDance;
+        syncer.IsDancing = newDance;
     }
 
     protected virtual void OnCollisionEnter(Collision collision)
