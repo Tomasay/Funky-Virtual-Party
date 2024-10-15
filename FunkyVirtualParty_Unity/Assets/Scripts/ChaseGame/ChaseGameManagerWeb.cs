@@ -53,6 +53,7 @@ public class ChaseGameManagerWeb : MonoBehaviour
                 
                 break;
             case "countdown":
+                (RealtimeSingletonWeb.instance.LocalPlayer as ChaseGameClientPlayer).SetupIndicatorConstraint();
                 RealtimeSingletonWeb.instance.LocalPlayer.CanMove = false;
                 StartCoroutine("StartCountdownTimer", COUNTDOWN_AMOUNT);
                 break;

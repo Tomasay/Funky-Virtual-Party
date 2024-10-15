@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 
 public class ChaseGameClientPlayer : ClientPlayer
 {
     [SerializeField] private int tackleForce = 6, tackleCooldown = 2, tacklePlayerRange = 10;
+
+    [SerializeField] private LookAtConstraint indicatorConstraint;
+    private GameObject lookAtTarget;
 
     private bool tackling;
     private float timeTackled = 0;
@@ -46,12 +50,20 @@ public class ChaseGameClientPlayer : ClientPlayer
     protected override void Update()
     {
 #if UNITY_WEBGL
-        if(cam)
+        if (cam)
         {
             playerNameText.transform.LookAt(2 * transform.position - cam.transform.position);
         }
 
         CheckInput();
+
+        //LookAt constraint
+        if (lookAtTarget)
+        {
+            Vector3 headPos = RealtimeSingletonWeb.instance.VRAvatar.head.position;
+            headPos.y = indicatorConstraint.transform.position.y;
+            lookAtTarget.transform.position = headPos;
+        }
 #else
         if (Camera.main)
         {
@@ -61,6 +73,23 @@ public class ChaseGameClientPlayer : ClientPlayer
 #endif
     }
 
+    public void SetupIndicatorConstraint()
+    {
+        if (!isLocal)
+        {
+            Destroy(indicatorConstraint.gameObject);
+        }
+        else
+        {
+            lookAtTarget = new GameObject("LookAt");
+
+            ConstraintSource src = new();
+            src.sourceTransform = lookAtTarget.transform;
+            src.weight = 1;
+            indicatorConstraint.AddSource(src);
+            indicatorConstraint.constraintActive = true;
+        }
+    }
 
     protected override void OnCollisionEnter(Collision collision)
     {
