@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6160006218499753027}
   - component: {fileID: 6160006218499753030}
-  - component: {fileID: 6160006218499753025}
   - component: {fileID: 6160006218499753024}
   m_Layer: 3
   m_Name: ParticleCamera
@@ -29,6 +28,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: -87.034134, z: -619.1551}
   m_LocalScale: {x: 8.703413, y: 8.703413, z: 8.703413}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6160006219239285741}
   m_RootOrder: 0
@@ -76,14 +76,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &6160006218499753025
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6160006218499753026}
-  m_Enabled: 1
 --- !u!114 &6160006218499753024
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,6 +98,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
@@ -145,6 +138,7 @@ RectTransform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6160006218499753027}
   m_Father: {fileID: 0}
@@ -4964,6 +4958,7 @@ ParticleSystemRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_RenderMode: 5
+  m_MeshDistribution: 0
   m_SortMode: 0
   m_MinParticleSize: 0
   m_MaxParticleSize: 0.5
@@ -4987,6 +4982,10 @@ ParticleSystemRenderer:
   m_Mesh1: {fileID: 0}
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
+  m_MeshWeighting: 1
+  m_MeshWeighting1: 1
+  m_MeshWeighting2: 1
+  m_MeshWeighting3: 1
   m_MaskInteraction: 0
 --- !u!114 &773194581230043645
 MonoBehaviour:
