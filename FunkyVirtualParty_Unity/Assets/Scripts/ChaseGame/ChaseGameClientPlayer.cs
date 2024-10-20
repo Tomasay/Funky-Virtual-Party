@@ -75,20 +75,14 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     public void SetupIndicatorConstraint()
     {
-        if (!isLocal)
-        {
-            Destroy(indicatorConstraint.gameObject);
-        }
-        else
-        {
-            lookAtTarget = new GameObject("LookAt");
+        indicatorConstraint.gameObject.SetActive(true);
+        lookAtTarget = new GameObject("LookAt");
 
-            ConstraintSource src = new();
-            src.sourceTransform = lookAtTarget.transform;
-            src.weight = 1;
-            indicatorConstraint.AddSource(src);
-            indicatorConstraint.constraintActive = true;
-        }
+        ConstraintSource src = new();
+        src.sourceTransform = lookAtTarget.transform;
+        src.weight = 1;
+        indicatorConstraint.AddSource(src);
+        indicatorConstraint.constraintActive = true;
     }
 
     protected override void OnCollisionEnter(Collision collision)
