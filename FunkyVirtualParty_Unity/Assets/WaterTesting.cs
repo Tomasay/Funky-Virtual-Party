@@ -5,7 +5,7 @@ using UnityEngine;
 public class WaterTesting : MonoBehaviour
 {
     [SerializeField]
-    GameObject uiParent;
+    GameObject uiParent, waterBottom, water2;
 
     int index = 0;
 
@@ -19,6 +19,16 @@ public class WaterTesting : MonoBehaviour
         {
             case 1:
                 uiParent.SetActive(false);
+                break;
+            case 2:
+                water2.SetActive(false);
+                break;
+            case 3:
+                water2.SetActive(true);
+                waterBottom.SetActive(false);
+                break;
+            case 4:
+                water2.SetActive(false);
                 break;
             default:
                 break;
