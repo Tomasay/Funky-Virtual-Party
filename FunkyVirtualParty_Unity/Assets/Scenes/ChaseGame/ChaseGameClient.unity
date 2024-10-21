@@ -3402,7 +3402,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 048b046315df73f42a6afbd618d52c9f, type: 2}
     - target: {fileID: 2482263052569300907, guid: 626fb58d0cb97d0468f391228d13aa1e, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2482263052569300907, guid: 626fb58d0cb97d0468f391228d13aa1e, type: 3}
       propertyPath: m_TagString
@@ -4618,6 +4618,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiParent: {fileID: 1202918221}
+  waterBottom: {fileID: 1449734339}
+  water2: {fileID: 856775996}
   cam: {fileID: 214337151}
 --- !u!4 &994428414
 Transform:
@@ -6517,6 +6519,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   leftWall: {fileID: 856775997}
   rightWall: {fileID: 856775998}
+--- !u!1 &1449734339 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7779062402937393513, guid: 626fb58d0cb97d0468f391228d13aa1e, type: 3}
+  m_PrefabInstance: {fileID: 856775994}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1457707495
 GameObject:
   m_ObjectHideFlags: 0
