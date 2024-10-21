@@ -18,7 +18,7 @@ public class WaterTesting : MonoBehaviour
         switch (index)
         {
             case 1:
-                uiParent.SetActive(false);
+                //uiParent.SetActive(false);
                 break;
             case 2:
                 water2.SetActive(false);
