@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class PanoramaCapture : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class PanoramaCapture : MonoBehaviour
         StartCoroutine(DelayedCapture());
     }
 
+    [Button]
     public void Capture()
     {
         targetCamera.RenderToCubemap(cubeMapLeft);
