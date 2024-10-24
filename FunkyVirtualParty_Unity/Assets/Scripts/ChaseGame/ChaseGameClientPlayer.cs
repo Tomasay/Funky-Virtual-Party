@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 
@@ -9,6 +10,7 @@ public class ChaseGameClientPlayer : ClientPlayer
     [SerializeField] private int tackleForce = 6, tackleCooldown = 2, tacklePlayerRange = 10;
 
     [SerializeField] private LookAtConstraint indicatorConstraint;
+    [SerializeField] private Image indicatorImage;
     private GameObject lookAtTarget;
 
     private bool tackling;
@@ -83,6 +85,8 @@ public class ChaseGameClientPlayer : ClientPlayer
         src.weight = 1;
         indicatorConstraint.AddSource(src);
         indicatorConstraint.constraintActive = true;
+
+        indicatorImage.color = syncer.Color;
     }
 
     protected override void OnCollisionEnter(Collision collision)
