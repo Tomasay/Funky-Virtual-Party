@@ -16,5 +16,5 @@ public class VRtistryVRPlayerController : VRPlayerController
     public GameObject UIPointer;
 
     [SerializeField]
-    public XRControllerEvent YButtonEvent, BButtonEvent, AButtonEvent, XButtonEvent, RightTriggerEvent, LeftTriggerEvent, RightGripEvent, LeftGripEvent;
+    public OVRControllerEvent YButtonEvent, BButtonEvent, AButtonEvent, XButtonEvent, RightTriggerEvent, LeftTriggerEvent, RightGripEvent, LeftGripEvent;
 }

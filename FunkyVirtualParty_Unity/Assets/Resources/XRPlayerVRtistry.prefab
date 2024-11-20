@@ -847,7 +847,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1639125106728771988, guid: a5226a72c9553294abfe172a458b5805, type: 3}
   m_PrefabInstance: {fileID: 2513590125155843960}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &22047317
+--- !u!114 &8313650735673910573
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -856,18 +856,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250673998159596}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533662348568046}
-  button: 0
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &22047320
+  eventList:
+  - controller: 1
+    button: 16384
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &3918599779986645410
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -876,18 +877,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250673998159596}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533662348568046}
-  button: 4
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &22047321
+  eventList:
+  - controller: 1
+    button: 8192
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &882188019835264691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -896,18 +898,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250673998159596}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533662348568046}
-  button: 2
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &22047325
+  eventList:
+  - controller: 1
+    button: 4
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &4680845480307562407
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -916,23 +919,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250673998159596}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533662348568046}
-  button: 3
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
+  eventList:
+  - controller: 1
+    button: 8
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &3773250674731580095 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1639125108242449863, guid: a5226a72c9553294abfe172a458b5805, type: 3}
   m_PrefabInstance: {fileID: 2513590125155843960}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1388279578
+--- !u!114 &2607111177915069295
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -941,18 +945,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250674731580095}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533663242404285}
-  button: 3
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1388279588
+  eventList:
+  - controller: 2
+    button: 16384
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &3687078775813423501
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -961,18 +966,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250674731580095}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533663242404285}
-  button: 0
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1388279589
+  eventList:
+  - controller: 2
+    button: 8192
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &4993166106651640147
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -981,18 +987,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250674731580095}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533663242404285}
-  button: 4
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &1388279591
+  eventList:
+  - controller: 2
+    button: 1
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
+--- !u!114 &1236294595531549027
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1001,17 +1008,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 3773250674731580095}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fbab967b03b78f4093d38ef2637575f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  link: {fileID: 5536533663242404285}
-  button: 2
-  Pressed:
-    m_PersistentCalls:
-      m_Calls: []
-  Released:
-    m_PersistentCalls:
-      m_Calls: []
+  eventList:
+  - controller: 2
+    button: 2
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!136 &4156221147938579943 stripped
 CapsuleCollider:
   m_CorrespondingSourceObject: {fileID: 1968018043092048543, guid: a5226a72c9553294abfe172a458b5805, type: 3}
@@ -1097,25 +1105,14 @@ MonoBehaviour:
   leftHandRef: {fileID: 453443648}
   rightHandRef: {fileID: 26928665}
   UIPointer: {fileID: 3092150495975368881}
-  YButtonEvent: {fileID: 22047325}
-  BButtonEvent: {fileID: 1388279578}
-  AButtonEvent: {fileID: 1388279591}
-  XButtonEvent: {fileID: 22047321}
-  RightTriggerEvent: {fileID: 1388279589}
-  LeftTriggerEvent: {fileID: 22047320}
-  RightGripEvent: {fileID: 1388279588}
-  LeftGripEvent: {fileID: 22047317}
---- !u!114 &5536533662348568046 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7942002210455460502, guid: a5226a72c9553294abfe172a458b5805, type: 3}
-  m_PrefabInstance: {fileID: 2513590125155843960}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3773250673998159596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 245bee9b113e7144cb3549484bae2a0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  YButtonEvent: {fileID: 4680845480307562407}
+  BButtonEvent: {fileID: 1236294595531549027}
+  AButtonEvent: {fileID: 1236294595531549027}
+  XButtonEvent: {fileID: 882188019835264691}
+  RightTriggerEvent: {fileID: 3687078775813423501}
+  LeftTriggerEvent: {fileID: 3918599779986645410}
+  RightGripEvent: {fileID: 2607111177915069295}
+  LeftGripEvent: {fileID: 8313650735673910573}
 --- !u!4 &5536533662602044908 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7942002212320107156, guid: a5226a72c9553294abfe172a458b5805, type: 3}
@@ -1131,17 +1128,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7942002211881670212, guid: a5226a72c9553294abfe172a458b5805, type: 3}
   m_PrefabInstance: {fileID: 2513590125155843960}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5536533663242404285 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7942002211609493189, guid: a5226a72c9553294abfe172a458b5805, type: 3}
-  m_PrefabInstance: {fileID: 2513590125155843960}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3773250674731580095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 245bee9b113e7144cb3549484bae2a0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &5536533663477742032 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7942002211305997992, guid: a5226a72c9553294abfe172a458b5805, type: 3}

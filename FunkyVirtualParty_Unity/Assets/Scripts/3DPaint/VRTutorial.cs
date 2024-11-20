@@ -78,7 +78,7 @@ public class VRTutorial : MonoBehaviour
         vrPlayer.BButtonEvent.enabled = false;
         vrPlayer.YButtonEvent.enabled = false;
 
-        vrPlayer.BButtonEvent.Pressed.AddListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
+        vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
 
         //vrPlayer.YButtonEvent.Pressed.AddListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
         vrPlayer.Ahp.OnMove.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
@@ -166,7 +166,7 @@ public class VRTutorial : MonoBehaviour
         sprayGun.OnSpray.RemoveListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
         pen.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
         palette.OnColorChanged.RemoveListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
-        vrPlayer.BButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
+        vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
         //YButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
         vrPlayer.Ahp.OnMove.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
         vrPlayer.Ahp.OnRotate.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });

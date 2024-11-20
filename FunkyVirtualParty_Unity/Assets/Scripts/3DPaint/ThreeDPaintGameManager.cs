@@ -140,8 +140,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         GrabTool(true);
         GrabPalette();
 
-        vrPlayer.YButtonEvent.Pressed.AddListener(ToggleToolHand);
-        vrPlayer.BButtonEvent.Pressed.AddListener(ToggleTool);
+        vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(ToggleToolHand);
+        vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(ToggleTool);
     }
 
     private void Update()
@@ -256,8 +256,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 paintTexture.Clear();
 
                 //Inputs for setting pose
-                vrPlayer.YButtonEvent.Pressed.RemoveAllListeners();
-                vrPlayer.BButtonEvent.Pressed.RemoveAllListeners();
+                vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveAllListeners();
+                vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveAllListeners();
 
                 //Give a 2 second buffer for players to realize what's happening so they don't accidentally press a button too soon
                 Invoke("EnablePoseCallbacks", 2);
@@ -266,14 +266,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
             case "vr painting":
 
                 //Inputs
-                vrPlayer.YButtonEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.BButtonEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.AButtonEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.XButtonEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.RightTriggerEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.LeftTriggerEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.RightGripEvent.Pressed.RemoveListener(SetPose);
-                vrPlayer.LeftGripEvent.Pressed.RemoveListener(SetPose);
+                vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.AButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.XButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.RightTriggerEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.LeftTriggerEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.RightGripEvent.eventList[0].OnPress.RemoveListener(SetPose);
+                vrPlayer.LeftGripEvent.eventList[0].OnPress.RemoveListener(SetPose);
 
                 //Enable VR tools
                 pen.CanPaint = true;
@@ -360,14 +360,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     void EnablePoseCallbacks()
     {
-        vrPlayer.YButtonEvent.Pressed.AddListener(SetPose);
-        vrPlayer.BButtonEvent.Pressed.AddListener(SetPose);
-        vrPlayer.AButtonEvent.Pressed.AddListener(SetPose);
-        vrPlayer.XButtonEvent.Pressed.AddListener(SetPose);
-        vrPlayer.RightTriggerEvent.Pressed.AddListener(SetPose);
-        vrPlayer.LeftTriggerEvent.Pressed.AddListener(SetPose);
-        vrPlayer.RightGripEvent.Pressed.AddListener(SetPose);
-        vrPlayer.LeftGripEvent.Pressed.AddListener(SetPose);
+        vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.AButtonEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.XButtonEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.RightTriggerEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.LeftTriggerEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.RightGripEvent.eventList[0].OnPress.AddListener(SetPose);
+        vrPlayer.LeftGripEvent.eventList[0].OnPress.AddListener(SetPose);
     }
 
     string GetAnswerByOwnerID(int ID)
@@ -725,22 +725,22 @@ public class ThreeDPaintGameManager : MonoBehaviour
         if (toolHand == HandType.left)
         {
             //Remove previous listener
-            vrPlayer.YButtonEvent.Pressed.RemoveListener(ToggleToolHand);
-            vrPlayer.BButtonEvent.Pressed.RemoveListener(ToggleTool);
+            vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveListener(ToggleToolHand);
+            vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(ToggleTool);
 
             //Apply to opposite hands
-            vrPlayer.YButtonEvent.Pressed.AddListener(ToggleTool);
-            vrPlayer.BButtonEvent.Pressed.AddListener(ToggleToolHand);
+            vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(ToggleTool);
+            vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(ToggleToolHand);
         }
         else
         {
             //Remove previous listener
-            vrPlayer.YButtonEvent.Pressed.RemoveListener(ToggleTool);
-            vrPlayer.BButtonEvent.Pressed.RemoveListener(ToggleToolHand);
+            vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveListener(ToggleTool);
+            vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(ToggleToolHand);
 
             //Apply to opposite hands
-            vrPlayer.YButtonEvent.Pressed.AddListener(ToggleToolHand);
-            vrPlayer.BButtonEvent.Pressed.AddListener(ToggleTool);
+            vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(ToggleToolHand);
+            vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(ToggleTool);
         }
     }
 
