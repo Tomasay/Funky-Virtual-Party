@@ -37,6 +37,8 @@ public class VRTutorial : MonoBehaviour
 
     private VRtistryVRPlayerController vrPlayer;
 
+    public bool bButtonEnabled, yButtonEnabled;
+
     public enum TutorialStage
     {
         Intro,
@@ -75,12 +77,6 @@ public class VRTutorial : MonoBehaviour
 
         vrPlayer.Ahp.maxMoveSpeed = 0;
 
-        vrPlayer.BButtonEvent.enabled = false;
-        vrPlayer.YButtonEvent.enabled = false;
-
-        vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
-
-        //vrPlayer.YButtonEvent.Pressed.AddListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
         vrPlayer.Ahp.OnMove.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
         vrPlayer.Ahp.OnRotate.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
     }
@@ -93,12 +89,25 @@ public class VRTutorial : MonoBehaviour
     public void SkipButtonPressed()
     {
         vrPlayer.Ahp.maxMoveSpeed = 3;
-        vrPlayer.BButtonEvent.enabled = true;
-        vrPlayer.YButtonEvent.enabled = true;
 
         RemoveListeners();
 
         gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        //B button
+        if(currentStage == TutorialStage.SwapTools || currentStage == TutorialStage.SwapColors)
+        {
+            if (OVRInput.GetDown(OVRInput.Button.Two))
+            {
+                if (CurrentStage == TutorialStage.SwapTools)
+                {
+                    CurrentStage = TutorialStage.Draw;
+                }
+            }
+        }
     }
 
     void OnStateChange()
@@ -114,21 +123,21 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "Use the trigger button to spray paint";
                 break;
             case TutorialStage.SwapTools:
-                vrPlayer.BButtonEvent.enabled = true;
+                bButtonEnabled = true;
 
                 sprayInstructions.SetActive(false);
                 swapToolsInstructions.SetActive(true);
                 headerText.text = "Press the primary button to swap between your spray gun and 3D pen";
                 break;
             case TutorialStage.Draw:
-                vrPlayer.BButtonEvent.enabled = false;
+                bButtonEnabled = false;
 
                 swapToolsInstructions.SetActive(false);
                 drawInstructions.SetActive(true);
                 headerText.text = "Use the trigger button to draw in 3D space";
                 break;
             case TutorialStage.SwapColors:
-                vrPlayer.BButtonEvent.enabled = true;
+                bButtonEnabled = true;
 
                 drawInstructions.SetActive(false);
                 headerText.text = "Tap your tool on the color palette to change colors";
@@ -145,8 +154,6 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "Use the left joystick to move around, and the right joystick to rotate";
                 break;
             case TutorialStage.Done:
-                vrPlayer.YButtonEvent.enabled = true;
-
                 headerText.text = "You're ready to show off your skills!";
 
                 controllerImagesParent.SetActive(false);
@@ -166,10 +173,11 @@ public class VRTutorial : MonoBehaviour
         sprayGun.OnSpray.RemoveListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
         pen.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
         palette.OnColorChanged.RemoveListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
-        vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwapTools) CurrentStage = TutorialStage.Draw; });
-        //YButtonEvent.Pressed.RemoveListener(delegate { if (CurrentStage == TutorialStage.SwitchHands) CurrentStage = TutorialStage.Movement; });
         vrPlayer.Ahp.OnMove.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
         vrPlayer.Ahp.OnRotate.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
+
+        yButtonEnabled = true;
+        bButtonEnabled = true;
     }
 
     IEnumerator CloseTutorial()

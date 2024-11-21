@@ -54,6 +54,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     P3dPaintableTexture mannequinUVs;
 
+    [SerializeField]
+    VRTutorial tutorial;
+
 #if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
@@ -139,9 +142,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         GrabTool(true);
         GrabPalette();
-
-        vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(ToggleToolHand);
-        vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(ToggleTool);
     }
 
     private void Update()
@@ -155,6 +155,19 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 {
                     VRtistrySyncer.instance.State = "vr posing";
                 }
+
+                break;
+            case "vr posing":
+
+                //Set pose if any button is pressed
+                if(OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two) ||
+                   OVRInput.GetDown(OVRInput.Button.Three) || OVRInput.GetDown(OVRInput.Button.Four) ||
+                   OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || OVRInput.Get(OVRInput.RawButton.RIndexTrigger) ||
+                   OVRInput.Get(OVRInput.RawButton.LHandTrigger) || OVRInput.Get(OVRInput.RawButton.RHandTrigger))
+                {
+                    SetPose();
+                }
+
                 break;
             case "vr painting":
                 //Draw timer
@@ -183,6 +196,35 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+
+        if(!VRtistrySyncer.instance.State.Equals("vr posing"))
+        {
+            //Y button
+            if (tutorial.yButtonEnabled && OVRInput.GetDown(OVRInput.Button.Four))
+            {
+                if (toolHand == HandType.left)
+                {
+                    ToggleTool();
+                }
+                else
+                {
+                    ToggleToolHand();
+                }
+            }
+
+            //B button
+            if (tutorial.bButtonEnabled && OVRInput.GetDown(OVRInput.Button.Two))
+            {
+                if (toolHand == HandType.left)
+                {
+                    ToggleToolHand();
+                }
+                else
+                {
+                    ToggleTool();
+                }
+            }
         }
     }
 
@@ -255,25 +297,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 pen.EraseAllLines();
                 paintTexture.Clear();
 
-                //Inputs for setting pose
-                vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveAllListeners();
-                vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveAllListeners();
-
                 //Give a 2 second buffer for players to realize what's happening so they don't accidentally press a button too soon
                 Invoke("EnablePoseCallbacks", 2);
 
                 break;
             case "vr painting":
-
-                //Inputs
-                vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.AButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.XButtonEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.RightTriggerEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.LeftTriggerEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.RightGripEvent.eventList[0].OnPress.RemoveListener(SetPose);
-                vrPlayer.LeftGripEvent.eventList[0].OnPress.RemoveListener(SetPose);
 
                 //Enable VR tools
                 pen.CanPaint = true;
@@ -356,18 +384,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
             default:
                 break;
         }
-    }
-
-    void EnablePoseCallbacks()
-    {
-        vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.AButtonEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.XButtonEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.RightTriggerEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.LeftTriggerEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.RightGripEvent.eventList[0].OnPress.AddListener(SetPose);
-        vrPlayer.LeftGripEvent.eventList[0].OnPress.AddListener(SetPose);
     }
 
     string GetAnswerByOwnerID(int ID)
@@ -721,27 +737,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
         //GrabTool(sprayGun.active);
         StartCoroutine(GrabDelayed(toolHand == HandType.left, 0.1f));
         needToGrabPalette = true;
-
-        if (toolHand == HandType.left)
-        {
-            //Remove previous listener
-            vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveListener(ToggleToolHand);
-            vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(ToggleTool);
-
-            //Apply to opposite hands
-            vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(ToggleTool);
-            vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(ToggleToolHand);
-        }
-        else
-        {
-            //Remove previous listener
-            vrPlayer.YButtonEvent.eventList[0].OnPress.RemoveListener(ToggleTool);
-            vrPlayer.BButtonEvent.eventList[0].OnPress.RemoveListener(ToggleToolHand);
-
-            //Apply to opposite hands
-            vrPlayer.YButtonEvent.eventList[0].OnPress.AddListener(ToggleToolHand);
-            vrPlayer.BButtonEvent.eventList[0].OnPress.AddListener(ToggleTool);
-        }
     }
 
     void GrabPalette()

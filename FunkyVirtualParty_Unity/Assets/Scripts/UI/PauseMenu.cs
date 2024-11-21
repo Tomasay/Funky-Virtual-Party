@@ -11,7 +11,7 @@ public class PauseMenu : MonoBehaviour
 
     private VRPlayerController vrPlayer;
     private PositionConstraint posContraint;
-    private XRControllerEvent leftMenuEvent;
+    private OVRControllerEvent leftMenuEvent;
     private Canvas can;
 
     void Start()
@@ -31,6 +31,14 @@ public class PauseMenu : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
     }
 
+    private void Update()
+    {
+        if(OVRInput.GetDown(OVRInput.Button.Start))
+        {
+            ToggleMenu();
+        }
+    }
+
     private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         vrPlayer = avatar.GetComponent<VRPlayerController>();
@@ -45,15 +53,20 @@ public class PauseMenu : MonoBehaviour
         posContraint.translationOffset = new Vector3(0, 0, positionOffset);
 
         //Setup event for left menu button to toggle pause menu
-        leftMenuEvent = gameObject.AddComponent<XRControllerEvent>();
-        leftMenuEvent.link = vrPlayer.Ahp.handLeft.GetComponent<XRHandControllerLink>();
-        leftMenuEvent.button = CommonButton.menuButton;
-        leftMenuEvent.Pressed = new UnityEngine.Events.UnityEvent();
-        leftMenuEvent.Pressed.AddListener(this.ToggleMenu);
+        /*
+        leftMenuEvent = gameObject.AddComponent<OVRControllerEvent>();
+        OVRControllerEventData newEventData = new OVRControllerEventData();
+        newEventData.controller = OVRInput.Controller.LHand;
+        newEventData.button = OVRInput.Button.Start;
+        leftMenuEvent.eventList.Initialize();
+        leftMenuEvent.eventList.SetValue(newEventData, 0);
+        leftMenuEvent.eventList[0].OnPress.AddListener(this.ToggleMenu);
+        */
     }
 
     public void ToggleMenu()
     {
+        Debug.Log("ToggleMenu");
         can.enabled = !can.enabled;
     }
 
