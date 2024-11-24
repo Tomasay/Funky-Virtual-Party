@@ -13,6 +13,7 @@ using FMOD.Studio;
 using FMODUnity;
 #endif
 using Normal.Realtime;
+using NaughtyAttributes;
 
 public class ThreeDPaintGameManager : MonoBehaviour
 {
@@ -127,7 +128,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
     }
 
-    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();
 
@@ -144,6 +145,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         GrabPalette();
     }
 
+    float timeVRPosingStarted;
     private void Update()
     {
         switch (VRtistrySyncer.instance.State)
@@ -159,13 +161,18 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 break;
             case "vr posing":
 
-                //Set pose if any button is pressed
-                if(OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two) ||
-                   OVRInput.GetDown(OVRInput.Button.Three) || OVRInput.GetDown(OVRInput.Button.Four) ||
-                   OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || OVRInput.Get(OVRInput.RawButton.RIndexTrigger) ||
-                   OVRInput.Get(OVRInput.RawButton.LHandTrigger) || OVRInput.Get(OVRInput.RawButton.RHandTrigger))
+                //Give a 2 second buffer for players to realize what's happening so they don't accidentally press a button too soon
+                if (Time.time > timeVRPosingStarted + 2)
                 {
-                    SetPose();
+                    //Set pose if any button is pressed
+                    if (OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two) ||
+                       OVRInput.GetDown(OVRInput.Button.Three) || OVRInput.GetDown(OVRInput.Button.Four) ||
+                       OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || OVRInput.Get(OVRInput.RawButton.RIndexTrigger) ||
+                       OVRInput.Get(OVRInput.RawButton.LHandTrigger) || OVRInput.Get(OVRInput.RawButton.RHandTrigger))
+                    {
+                        Debug.Log("Setting Pose");
+                        SetPose();
+                    }
                 }
 
                 break;
@@ -250,6 +257,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.State = "clients guessing";
     }
 
+    [Button]
     void SetPose()
     {
         solver.SetPose();
@@ -297,8 +305,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 pen.EraseAllLines();
                 paintTexture.Clear();
 
-                //Give a 2 second buffer for players to realize what's happening so they don't accidentally press a button too soon
-                Invoke("EnablePoseCallbacks", 2);
+                timeVRPosingStarted = Time.time;
 
                 break;
             case "vr painting":

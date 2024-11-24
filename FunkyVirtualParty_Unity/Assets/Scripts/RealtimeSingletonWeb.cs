@@ -17,7 +17,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     ClientPlayer localPlayer;
 
-    RealtimeAvatarManager realtimeAvatarManager;
+    CustomAvatars.RealtimeAvatarManager realtimeAvatarManager;
 
     [SerializeField]
     Realtime realtime;
@@ -64,9 +64,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public Realtime Realtime { get => realtime; }
 
-    public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager; }
+    public CustomAvatars.RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager; }
 
-    public RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
+    public CustomAvatars.RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
     public bool isVRAvatarSpawned { get => realtimeAvatarManager.avatars.Count > 0; }
 
 #if UNITY_WEBGL
@@ -91,7 +91,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         if (LocalPlayerSpawned == null)
             LocalPlayerSpawned = new UnityEvent();
 
-        realtimeAvatarManager = GetComponent<RealtimeAvatarManager>();
+        realtimeAvatarManager = GetComponent<CustomAvatars.RealtimeAvatarManager>();
 
         realtime.didConnectToRoom += ConnectedToRoom;
         realtime.didDisconnectFromRoom += CheckDisconnectedReason;
@@ -103,7 +103,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void AvatarManager_avatarDestroyed(RealtimeAvatarManager avatarManager, RealtimeAvatar avatar, bool isLocalAvatar)
+    private void AvatarManager_avatarDestroyed(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         if(!avatar.isOwnedRemotelyInHierarchy) //Check to make sure avatar isn't just being destroyed to switch scenes
         {
@@ -202,7 +202,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     //Temporary fix
     void CheckForDuplicateAvatars()
     {
-        RealtimeAvatar[] avatars = GameObject.FindObjectsOfType<RealtimeAvatar>();
+        CustomAvatars.RealtimeAvatar[] avatars = GameObject.FindObjectsOfType<CustomAvatars.RealtimeAvatar>();
         for (int i = 0; i < avatars.Length-1; i++)
         {
             Destroy(avatars[i].gameObject);

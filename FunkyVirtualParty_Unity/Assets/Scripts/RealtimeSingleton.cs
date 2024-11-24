@@ -10,7 +10,7 @@ public class RealtimeSingleton : MonoBehaviour
     public static RealtimeSingleton instance;
 
     Realtime realtime;
-    public RealtimeAvatarManager realtimeAvatarManager;
+    public CustomAvatars.RealtimeAvatarManager realtimeAvatarManager;
 
     public string[] vinylDiscNames;
 
@@ -19,8 +19,8 @@ public class RealtimeSingleton : MonoBehaviour
     public List<GameObject> discs;
 
     public Realtime Realtime { get => realtime; }
-    public RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager;}
-    public RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
+    public CustomAvatars.RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager;}
+    public CustomAvatars.RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
 
     private void Awake()
     {
@@ -35,7 +35,7 @@ public class RealtimeSingleton : MonoBehaviour
         }
 
         realtime = GetComponent<Realtime>();
-        realtimeAvatarManager = GetComponent<RealtimeAvatarManager>();
+        realtimeAvatarManager = GetComponent<CustomAvatars.RealtimeAvatarManager>();
 
         DontDestroyOnLoad(gameObject);
 
@@ -60,10 +60,7 @@ public class RealtimeSingleton : MonoBehaviour
     {
         if (realtime.connected)
         {
-            realtimeAvatarManager.localAvatarPrefab = Resources.Load("XRPlayer" + scene.name) as GameObject;
             realtimeAvatarManager.CreateAvatarIfNeeded();
-
-
             if (scene.name.Equals("MainMenu"))
             {
                 SpawnDiscs();
@@ -94,7 +91,7 @@ public class RealtimeSingleton : MonoBehaviour
 
         foreach (string s in vinylDiscNames)
         {
-            discs.Add(Realtime.Instantiate("Vinyls/Vinyl_" + s, options));
+            discs.Add(Realtime.Instantiate(s, options));
         }
     }
 

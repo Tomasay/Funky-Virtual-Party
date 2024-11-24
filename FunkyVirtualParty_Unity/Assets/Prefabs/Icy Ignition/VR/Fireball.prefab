@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 6321415648123952820}
   - component: {fileID: 1517035223848305831}
   - component: {fileID: 1979159911180545296}
-  - component: {fileID: 1266130700794316117}
   m_Layer: 0
   m_Name: Fireball
   m_TagString: Untagged
@@ -121,20 +120,26 @@ MonoBehaviour:
   isGrabbable: 1
   CopySettings: {fileID: 0}
   grabType: 0
+  grabPoseType: 0
   handType: 0
   singleHandOnly: 1
-  allowHeldSwapping: 0
   instantGrab: 1
   useGentleGrab: 0
   maintainGrabOffset: 0
-  ignoreWeight: 0
   parentOnGrab: 1
+  heldNoFriction: 1
+  ignoreWeight: 0
+  allowHeldSwapping: 0
   throwPower: 3
   jointBreakForce: Infinity
   showAdvancedSettings: 1
   makeChildrenGrabbable: 0
   grabPriorityWeight: 1
   ignoreReleaseTime: 0.25
+  minHeldDrag: 1.5
+  minHeldAngleDrag: 3
+  minHeldMass: 0.1
+  maxHeldVelocity: 10
   heldPositionOffset: {x: 0, y: 0, z: 0}
   heldRotationOffset: {x: 0, y: 0, z: 0}
   customGrabJoint: {fileID: 0}
@@ -334,22 +339,6 @@ MonoBehaviour:
     m_NumColorKeys: 3
     m_NumAlphaKeys: 4
   scaleForBoosted: 0.9
---- !u!114 &1266130700794316117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 566606611587223288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d594320129f41364f8e6e89f03df4758, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectsToDisable:
-  - {fileID: 3294322318788967274}
-  - {fileID: 3466704360205798773}
-  - {fileID: 719313112521586798}
 --- !u!1 &719313112521586798
 GameObject:
   m_ObjectHideFlags: 0

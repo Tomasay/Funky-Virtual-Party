@@ -32,7 +32,7 @@ public class ShootoutGameManager : MonoBehaviour
         {
             Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
             options.ownedByClient = true;
-            Realtime.Instantiate("IcyIgnition/Fireball", Vector3.zero, Quaternion.identity, options);
+            Realtime.Instantiate("Fireball", Vector3.zero, Quaternion.identity, options);
         }
 
         Invoke("InitializeWaypoints", 3); //Give debug client players a second to spawn
@@ -51,7 +51,7 @@ public class ShootoutGameManager : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
     }
 
-    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         vrInfoText = avatar.GetComponent<ShootoutGameVRPlayerController>().vrInfoText;
 

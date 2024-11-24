@@ -14,7 +14,8 @@ GameObject:
   - component: {fileID: 7100068724088094895}
   - component: {fileID: 2610926496916381200}
   - component: {fileID: 5670100616275628469}
-  - component: {fileID: 2267175823894248722}
+  - component: {fileID: 913975642317102756}
+  - component: {fileID: 5501218916529174275}
   m_Layer: 29
   m_Name: VinylClient
   m_TagString: Untagged
@@ -32,6 +33,7 @@ Transform:
   m_LocalRotation: {x: 0.000000021855694, y: 0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.81586, y: 0.81586, z: 0.81586}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 718560536581161934}
   - {fileID: 718560535834290467}
@@ -144,7 +146,7 @@ ParentConstraint:
   m_IsContraintActive: 0
   m_IsLocked: 0
   m_Sources: []
---- !u!114 &2267175823894248722
+--- !u!114 &913975642317102756
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -153,16 +155,38 @@ MonoBehaviour:
   m_GameObject: {fileID: 376541852131382824}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1be1be7224854124fb2fb8d391f3d634, type: 3}
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectID: 0
-  UpdatesPerSecond: 0
-  constraint: {fileID: 5670100616275628469}
-  handAnchorLeft: {fileID: 0}
-  handAnchorRight: {fileID: 0}
-  rb: {fileID: 7100068724088094895}
-  vinylParent: {fileID: 0}
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 5501218916529174275}
+  _childViews: []
+--- !u!114 &5501218916529174275
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 376541852131382824}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1029778088, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolate: 1
+  _syncPosition: 1
+  _syncRotation: 1
+  _syncScale: 0
+  _syncVelocity: 1
+  _maintainOwnershipWhileSleeping: 0
 --- !u!1 &718560535834290466
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,6 +214,7 @@ Transform:
   m_LocalRotation: {x: -0.7064209, y: 0.031137178, z: -0.031137178, w: -0.7064209}
   m_LocalPosition: {x: 0.56504786, y: 0.025739625, z: 0.6103979}
   m_LocalScale: {x: 0.22154537, y: 0.22154537, z: 0.22154537}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1041015948400364690}
   m_RootOrder: 1
@@ -273,6 +298,7 @@ Transform:
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0.7071068, w: 0}
   m_LocalPosition: {x: -0.568725, y: 0.025739575, z: -0.5405339}
   m_LocalScale: {x: 0.22154538, y: 0.22154534, z: 0.22154534}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1041015948400364690}
   m_RootOrder: 0
@@ -356,6 +382,7 @@ Transform:
   m_LocalRotation: {x: -0.7064209, y: 0.031137178, z: -0.031137178, w: -0.7064209}
   m_LocalPosition: {x: 0.56504786, y: -0.019, z: 0.61}
   m_LocalScale: {x: 0.22154537, y: 0.22154537, z: 0.22154537}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1041015948400364690}
   m_RootOrder: 3
@@ -439,6 +466,7 @@ Transform:
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0.7071068, w: 0}
   m_LocalPosition: {x: -0.568725, y: -0.019, z: -0.541}
   m_LocalScale: {x: 0.22154538, y: 0.22154534, z: 0.22154534}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1041015948400364690}
   m_RootOrder: 2
@@ -523,6 +551,7 @@ Transform:
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1041015948400364690}
   m_RootOrder: 4

@@ -77,7 +77,7 @@ public class VinylInfo : MonoBehaviour
         }
     }
 
-    private void RealtimeAvatarManager_avatarCreated(Normal.Realtime.RealtimeAvatarManager avatarManager, Normal.Realtime.RealtimeAvatar avatar, bool isLocalAvatar)
+    private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         vrPlayer = avatar.GetComponentInChildren<AutoHandPlayer>();
 

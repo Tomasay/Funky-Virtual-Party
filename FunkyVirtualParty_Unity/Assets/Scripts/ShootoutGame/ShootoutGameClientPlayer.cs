@@ -190,7 +190,7 @@ public class ShootoutGameClientPlayer : ClientPlayer
     {
         Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
         options.ownedByClient = true;
-        GameObject splash = Realtime.Instantiate("IcyIgnition/Water Splash", collisionPoint, Quaternion.identity, options);
+        GameObject splash = Realtime.Instantiate("Water Splash", collisionPoint, Quaternion.identity, options);
         splash.GetComponent<ParticleSystemStoppedEvent>().ParticleSystemStopped.AddListener(delegate { Realtime.Destroy(splash.gameObject); });
 
 #if UNITY_WEBGL && !UNITY_EDITOR
