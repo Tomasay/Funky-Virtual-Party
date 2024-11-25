@@ -55,7 +55,9 @@ namespace CustomAvatars
                 return;
 
             // Create avatar
+#if !UNITY_WEBGL
             CreateAvatarIfNeeded();
+#endif
         }
 
         public static RealtimeAvatar.DeviceType GetRealtimeAvatarDeviceTypeForLocalPlayer() {
