@@ -1,0 +1,171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 895e7728df9d38f41b4e17e5849711c0, type: 3}
+  m_Name: ExcludeFromBuildData
+  m_EditorClassIdentifier: 
+  PreProcessedPrefabPaths: 
+  DisabledSceneIndices: 
+  Groups:
+  - Id: 0
+    Name: VR
+    BuildTargets: 0d00000005000000
+    ExcludedObjects: []
+    BuildConfiguration: 0
+    StandaloneSubTarget: 2
+    Defines: 
+  - Id: 1
+    Name: WebGL
+    BuildTargets: 14000000
+    ExcludedObjects:
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 812952c0e5186734baf620ffc747cde2
+      AssetPath: Assets/AutoHand
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 1132b5196fddf8c4a946abd1f7577ae5
+      AssetPath: Assets/Scripts/3DPaint/MannequinSolver.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: c6c60c4b368411b4ba3bc4c5a45b7dc5
+      AssetPath: Assets/Scripts/3DPaint/ThreeDPaintGameManager.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 5faf2293752152d4f9890f84c0a0e284
+      AssetPath: Assets/Scripts/3DPaint/VRtistryVRPlayerController.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: a7513bfe43e2ccd4eb684e305517087c
+      AssetPath: Assets/Scripts/3DPaint/VRTutorial.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: eea11407decd1bb4b9b68f973be2b433
+      AssetPath: Assets/Scripts/ChaseGame/ChaseGameManager.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: d9cb056324afa3f4392cfd0e8207ce42
+      AssetPath: Assets/Scripts/ChaseGame/ChaseGameVRPlayerController.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: e19be5f6a7522b94986549327781cbe4
+      AssetPath: Assets/Scripts/ChaseGame/Drawbridge.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: aa609e302628c75458ed6ca5cce215b0
+      AssetPath: Assets/Scripts/ChaseGame/WallTrap.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: d4f315f16b556d441b1df0c09e7b8976
+      AssetPath: Assets/Scripts/Kaiju/KaijuGameManager.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: c7f8c5277a93d7d4cbf4454f815c954e
+      AssetPath: Assets/Scripts/Kaiju/KaijuGameVRPlayerController.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: d9fb343ce6d22134487106770cf2b113
+      AssetPath: Assets/Scripts/Main Menu/HalftoneEffect.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: a1e763bccfc8b334683f999c2aa11379
+      AssetPath: Assets/Scripts/Main Menu/MainMenu.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: e5f003ea24a20c1488c29543feb564cf
+      AssetPath: Assets/Scripts/Main Menu/VinylInfo.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 9e916f71aa4ee504b9fe3d52c4633ca6
+      AssetPath: Assets/Scripts/Main Menu/VinylPlayer.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 2261730cfab44b243b22550641594b59
+      AssetPath: Assets/Scripts/MazeGame/Marble.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 23d959948de83594cad17917dace135c
+      AssetPath: Assets/Scripts/MazeGame/MazeGameManager.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: d1f751544e1e1d5429f0f16fca479d81
+      AssetPath: Assets/Scripts/MazeGame/MazeGameVRPlayerController.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 1305609a9dfe2934eb25b79c09f98b6b
+      AssetPath: Assets/Scripts/ShootoutGame/Fireball.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 024525f027db2394ea24697b586fe19e
+      AssetPath: Assets/Scripts/ShootoutGame/ShootoutGameManager.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 4f2cc73d287d19644b639bcef93686ba
+      AssetPath: Assets/Scripts/ShootoutGame/ShootoutGameVRPlayerController.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: 39a76d409d486894ebe0d75fd7602bfe
+      AssetPath: Assets/Scripts/UI/PauseMenu.cs
+    - ComponentSceneGUID: 
+      ComponentSceneName: 
+      ComponentGUID: 
+      ComponentPath: 
+      AssetGUID: adba2da96c0f0a64e862299ad1483815
+      AssetPath: Assets/Scripts/VRPlayerController.cs
+    BuildConfiguration: 0
+    StandaloneSubTarget: 2
+    Defines: 
+  lastGroupId: 2
+  currentGroupId: 1

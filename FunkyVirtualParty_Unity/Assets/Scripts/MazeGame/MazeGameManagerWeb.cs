@@ -68,9 +68,9 @@ public class MazeGameManagerWeb : MonoBehaviour
     {
         if(RealtimeSingletonWeb.instance.isVRAvatarSpawned)
         {
-            RealtimeSingletonWeb.instance.VRAvatar.gameObject.GetComponent<MazeGameVRPlayerController>().headMesh.gameObject.layer = LayerMask.NameToLayer(isVisible ? "ClientOnly" : "VROnly");
-            RealtimeSingletonWeb.instance.VRAvatar.gameObject.GetComponent<MazeGameVRPlayerController>().Ahp.handLeft.gameObject.layer = LayerMask.NameToLayer(isVisible ? "ClientOnly" : "VROnly");
-            RealtimeSingletonWeb.instance.VRAvatar.gameObject.GetComponent<MazeGameVRPlayerController>().Ahp.handRight.gameObject.layer = LayerMask.NameToLayer(isVisible ? "ClientOnly" : "VROnly");
+            RealtimeSingletonWeb.instance.VRAvatar.gameObject.GetComponent<VRPlayerWebGLReferences>().headMesh.gameObject.layer = LayerMask.NameToLayer(isVisible ? "ClientOnly" : "VROnly");
+            RealtimeSingletonWeb.instance.VRAvatar.gameObject.GetComponent<VRPlayerWebGLReferences>().handLeft.layer = LayerMask.NameToLayer(isVisible ? "ClientOnly" : "VROnly");
+            RealtimeSingletonWeb.instance.VRAvatar.gameObject.GetComponent<VRPlayerWebGLReferences>().handRight.layer = LayerMask.NameToLayer(isVisible ? "ClientOnly" : "VROnly");
         }
     }
 

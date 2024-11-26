@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Cinemachine;
-using Autohand;
 
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
+#elif !UNITY_WEBGL
+using Autohand;
 #endif
+
 #if UNITY_EDITOR
 using UnityEngine.InputSystem;
 #endif
@@ -157,6 +159,7 @@ public class KaijuGameClientPlayer : ClientPlayer
         }
     }
 
+#if !UNITY_WEBGL
     /// <summary>
     /// Grab event triggered on vr host side only
     /// </summary>
@@ -166,6 +169,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     {
         KaijuGameSyncer.instance.PlayerGrabbedEvent = initialOwnerID;
     }
+#endif
 
     /// <summary>
     /// Logic for when the player has been grabbed. Called for every user
@@ -184,6 +188,7 @@ public class KaijuGameClientPlayer : ClientPlayer
         CanMove = false;
     }
 
+#if !UNITY_WEBGL
     /// <summary>
     /// Drop event triggered on vr host side only
     /// </summary>
@@ -193,6 +198,7 @@ public class KaijuGameClientPlayer : ClientPlayer
     {
         KaijuGameSyncer.instance.PlayerDroppedEvent = initialOwnerID;
     }
+#endif
 
     /// <summary>
     /// Logic for when the player has been dropped. Called for every user

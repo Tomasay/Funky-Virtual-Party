@@ -23,7 +23,7 @@ public class PaintPalette : MonoBehaviour
 
     public UnityEvent OnColorChanged;
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
     Color colorToSet;
 #endif
 
@@ -32,14 +32,14 @@ public class PaintPalette : MonoBehaviour
         VRtistrySyncer.instance.PaletteMirrored.AddListener(Mirror);
         VRtistrySyncer.instance.paletteEnabledChanged.AddListener(SetActive);
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
 
         for (int i = 0; i < colorMeshes.Length; i++)
         {
             colorMeshes[i].material.color = colors[i];
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
             var i2 = i;
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(delegate { SetColor(colors[i2]); });
             colorMeshes[i].GetComponent<TriggerEvents>().OnTriggerEntered.AddListener(ColorPressed);
@@ -55,11 +55,12 @@ public class PaintPalette : MonoBehaviour
         VRtistrySyncer.instance.PaletteMirrored.RemoveListener(Mirror);
         VRtistrySyncer.instance.paletteEnabledChanged.RemoveListener(SetActive);
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
     }
 
+#if !UNITY_WEBGL
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         //Setup default constraint
@@ -69,8 +70,9 @@ public class PaintPalette : MonoBehaviour
         constraint.AddSource(newSource);
         constraint.constraintActive = true;
     }
+#endif
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
     void SetColor(Color c)
     {
         colorToSet = c;

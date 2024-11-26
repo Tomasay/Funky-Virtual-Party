@@ -6,7 +6,7 @@ using Autohand;
 using UnityEngine.Events;
 using UnityEngine.Animations;
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
 using FMODUnity;
 #endif
 
@@ -37,8 +37,10 @@ public class ThreeDPen : MonoBehaviour
     [SerializeField]
     Rigidbody rb;
 
+#if !UNITY_WEBGL
     [SerializeField]
     ThreeDPaintGameManager gm;
+#endif
 
     bool isPainting;
 
@@ -75,7 +77,7 @@ public class ThreeDPen : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -87,11 +89,12 @@ public class ThreeDPen : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.RemoveListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.RemoveListener(ChangeColor);
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
     }
 
+#if !UNITY_WEBGL
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         //Setup default constraint
@@ -101,10 +104,11 @@ public class ThreeDPen : MonoBehaviour
         constraint.AddSource(newSource);
         constraint.constraintActive = true;
     }
+#endif
 
     void Update()
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         if (isPainting && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
@@ -121,7 +125,7 @@ public class ThreeDPen : MonoBehaviour
 #endif
     }
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
     public void OnTriggerPressed(Hand h, Grabbable g)
     {
         if (canPaint)
@@ -193,7 +197,7 @@ public class ThreeDPen : MonoBehaviour
 
     public void ChangeColor(Color c)
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         if (IsInHand)
         {
             if(!(currentColor == c))
@@ -213,7 +217,7 @@ public class ThreeDPen : MonoBehaviour
 
     public void SetActive(bool active)
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         tipMesh.enabled = active;
         baseMesh.enabled = active;
         col.enabled = active;

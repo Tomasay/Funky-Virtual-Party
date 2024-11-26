@@ -5,7 +5,7 @@ using PaintIn3D;
 using UnityEngine.Events;
 using UnityEngine.Animations;
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
 using FMODUnity;
 #endif
 
@@ -61,7 +61,7 @@ public class PaintSprayGun : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.AddListener(IsPenEnabledChanged);
         VRtistrySyncer.instance.spraygunColorChanged.AddListener(ChangeColor);
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
     }
@@ -73,11 +73,12 @@ public class PaintSprayGun : MonoBehaviour
         VRtistrySyncer.instance.penEnabledChanged.RemoveListener(IsPenEnabledChanged);
         VRtistrySyncer.instance.spraygunColorChanged.RemoveListener(ChangeColor);
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
     }
 
+#if !UNITY_WEBGL
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         //Setup default constraint
@@ -87,8 +88,9 @@ public class PaintSprayGun : MonoBehaviour
         constraint.AddSource(newSource);
         constraint.constraintActive = true;
     }
+#endif
 
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
     public void OnSqueeze()
     {
         if (canPaint)
@@ -114,7 +116,7 @@ public class PaintSprayGun : MonoBehaviour
 
     public void ChangeColor(Color c)
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         if (IsInHand)
         {
             if (!(paintColorMat.color == c))
@@ -141,7 +143,7 @@ public class PaintSprayGun : MonoBehaviour
 
     public void SetActive(bool active)
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if !UNITY_WEBGL
         baseMesh.enabled = active;
         col.enabled = active;
         this.active = active;
