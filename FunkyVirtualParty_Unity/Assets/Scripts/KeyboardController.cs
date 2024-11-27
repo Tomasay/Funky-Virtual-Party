@@ -25,9 +25,6 @@ public class KeyboardController : MonoBehaviour
         private static extern void SetPointerDownOnButton(bool isDown);
 
         [DllImport("__Internal")]
-        private static extern void StoreNameData(string name);
-
-        [DllImport("__Internal")]
         private static extern string GetNameData();
 
         [DllImport("__Internal")]
@@ -138,12 +135,5 @@ public class KeyboardController : MonoBehaviour
         currentField = f;
         UpdateInputFieldText(f.text);
     }
-
-    public void SubmitButtonPressed()
-    {
-        CloseKeyboard();
-        StoreNameData(nameField.text);
-    }
 #endif
-
 }

@@ -72,6 +72,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
 #if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void ReloadPage();
+
+    [DllImport("__Internal")]
+    private static extern void StoreNameData(string name);
 #endif
 
     private void Awake()
@@ -140,6 +143,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SubmitButtonPressed()
     {
+        StoreNameData(nameInput.text);
+
         submitButton.interactable = false;
 
         realtime.Connect(partyCodeInput.text);
