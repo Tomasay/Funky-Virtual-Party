@@ -18,6 +18,8 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
     private float fadeIncrementDistance;
 
+    bool firstTimeMainMenu = true;
+
     public string CurrentScene { get => model.currentScene; set => model.currentScene = value; }
 
     private void Awake()
@@ -131,7 +133,18 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
     private void FadeInScene(Scene arg0, LoadSceneMode arg1)
     {
-        StartCoroutine("FadeIn");
+        //Don't play fade in animation the first time we open main menu, as there is a different intro anim
+        if (!firstTimeMainMenu)
+        {
+            StartCoroutine("FadeIn");
+        }
+
+        if (arg0.name.Equals("MainMenuClient") && firstTimeMainMenu)
+        {
+            float val = Screen.width + (Screen.width / 2);
+            fadeRect.position = new Vector2(val - (((val * 2) / fadeIncrementDistance) * fadeIncrementDistance), fadeRect.position.y);
+            firstTimeMainMenu = false;
+        }
     }
 
     IEnumerator FadeIn()
