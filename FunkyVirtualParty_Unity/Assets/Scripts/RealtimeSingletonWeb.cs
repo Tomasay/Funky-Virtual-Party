@@ -143,7 +143,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SubmitButtonPressed()
     {
+#if UNITY_WEBGL
         StoreNameData(nameInput.text);
+#endif
 
         submitButton.interactable = false;
 
