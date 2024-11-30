@@ -143,7 +143,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SubmitButtonPressed()
     {
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
         StoreNameData(nameInput.text);
 #endif
 

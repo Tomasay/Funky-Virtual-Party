@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using RootMotion.FinalIK;
 using Autohand;
+using NaughtyAttributes;
 
 public class MannequinSolver : MonoBehaviour
 {
@@ -84,11 +85,44 @@ public class MannequinSolver : MonoBehaviour
 
     public void SetPose()
     {
+        StartCoroutine("TrySettingPose");
+    }
+
+    /// <summary>
+    /// For some reason, when baking the mesh it will not set properly and the mannequin will get stuck.
+    /// The only way I found I was able to relieve this issue is to check if it is stuck,
+    /// and continually rebake if so. This issue was introduced when updating to Autohand v4 despite
+    /// none of this code being touched in that refactor. No idea why this is necessary but it works :D
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator TrySettingPose()
+    {
+        int maxAttempts = 10;
+
+        BakeMesh();
+
+        Vector3 compareVector = new Vector3(Mathf.Round(colliderMesh.bounds.center.x * 1000f) / 1000f, Mathf.Round(colliderMesh.bounds.center.y * 100f) / 100f, Mathf.Round(colliderMesh.bounds.center.z * 100f) / 100f);
+        Debug.Log("compareVector: " + compareVector);
+
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            if(compareVector == Vector3.zero)
+            {
+                BakeMesh();
+                compareVector = new Vector3(Mathf.Round(colliderMesh.bounds.center.x * 1000f) / 1000f, Mathf.Round(colliderMesh.bounds.center.y * 100f) / 100f, Mathf.Round(colliderMesh.bounds.center.z * 100f) / 100f);
+                //Debug.Log("compareVector: " + compareVector);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
         mannequinIK.enabled = false;
         updatePose = false;
+    }
 
+    public void BakeMesh()
+    {
         colliderMesh = new Mesh();
-        skinnedMeshRenderer.BakeMesh(colliderMesh, true); ;
+        skinnedMeshRenderer.BakeMesh(colliderMesh, true);
         meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = colliderMesh;
     }

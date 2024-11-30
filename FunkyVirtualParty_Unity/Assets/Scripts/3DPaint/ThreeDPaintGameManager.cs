@@ -58,6 +58,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     VRTutorial tutorial;
 
+    [SerializeField]
+    GameObject armature;
+
 #if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
@@ -170,7 +173,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                        OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || OVRInput.Get(OVRInput.RawButton.RIndexTrigger) ||
                        OVRInput.Get(OVRInput.RawButton.LHandTrigger) || OVRInput.Get(OVRInput.RawButton.RHandTrigger))
                     {
-                        Debug.Log("Setting Pose");
+                        //Invoke("SetPose", 0.1f);
                         SetPose();
                     }
                 }
@@ -260,7 +263,17 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [Button]
     void SetPose()
     {
+        Debug.Log("Setting Pose");
         solver.SetPose();
+
+        /*
+        while (armature.transform.localPosition != Vector3.zero)
+        {
+            Debug.Log("Setting Pose");
+            solver.SetPose();
+        }
+        */
+
         GrabToolsStart();
         VRtistrySyncer.instance.State = "vr painting";
     }

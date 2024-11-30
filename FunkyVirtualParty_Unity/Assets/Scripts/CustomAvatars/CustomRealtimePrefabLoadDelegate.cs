@@ -11,7 +11,6 @@ public class CustomRealtimePrefabLoadDelegate : MonoBehaviour, IRealtimePrefabLo
     {
         GameObject realtimePrefab = null;
 
-        Debug.Log("Trying to load: " + prefabMetadata.prefabName);
         foreach (GameObject g in gameObjectsToLoad)
         {
             if(g.name.Equals(prefabMetadata.prefabName))

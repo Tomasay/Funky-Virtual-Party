@@ -3392,6 +3392,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc9f122b21b2bf4fba754d3d786c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input_field: {fileID: 0}
+  raw_image_qr_code: {fileID: 0}
 --- !u!4 &1311646741
 Transform:
   m_ObjectHideFlags: 0
@@ -5199,8 +5201,6 @@ GameObject:
   - component: {fileID: 1803588106}
   - component: {fileID: 1803588105}
   - component: {fileID: 1803588104}
-  - component: {fileID: 1803588103}
-  - component: {fileID: 1803588102}
   m_Layer: 5
   m_Name: PartyCrashersLogo
   m_TagString: Untagged
@@ -5208,44 +5208,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!95 &1803588102
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1803588101}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ea30d8914f6dbe64eb00085d93cfb3d0, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1803588103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1803588101}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 1
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &1803588104
 MonoBehaviour:
   m_ObjectHideFlags: 0
