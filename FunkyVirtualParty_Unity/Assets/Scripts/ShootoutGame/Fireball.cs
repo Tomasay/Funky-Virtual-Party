@@ -51,11 +51,13 @@ public class Fireball : MonoBehaviour
     {
         Reset();
 
+#if !UNITY_WEBGL
         if(!allFireballsInitialized && pool != null && pool.Count == ShootoutGameSyncer.instance.gameManager.GetFireballsSpawnAmount())
         {
             allFireballsInitialized = true;
             OnAllFireballsInitialized.Invoke();
         }
+#endif
     }
 
     void Update()

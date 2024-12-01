@@ -180,9 +180,10 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 #endif
     }
 
+#if !UNITY_WEBGL
     IEnumerator FadeOut()
     {
-#if !UNITY_WEBGL
+
         if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
         {
             for (int i = 0; i <= 60; i++)
@@ -192,6 +193,6 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
                 yield return new WaitForSeconds(1 / 60);
             }
         }
-#endif
     }
+#endif
 }
