@@ -449,7 +449,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5547821301393106445}
   m_LocalRotation: {x: -0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.16000001, y: -0.17574999, z: 0}
+  m_LocalPosition: {x: 0.16000001, y: 0.0135, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -558,6 +558,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: XRPlayerShootout
       objectReference: {fileID: 0}
+    - target: {fileID: 8473006065074544969, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: m_RootOrder
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a5226a72c9553294abfe172a458b5805, type: 3}
 --- !u!114 &5939107653538668650 stripped
@@ -593,8 +597,6 @@ MonoBehaviour:
   fireballPrefab: {fileID: 566606611587223288, guid: 2dac339323a1ae441bde76b19defac5b, type: 3}
   fireballHandAnchorLeft: {fileID: 7866738199862197681}
   fireballHandAnchorRight: {fileID: 5547821301393106445}
-  handFireEffectLeft: {fileID: 0}
-  handFireEffectRight: {fileID: 0}
   vrInfoText: {fileID: 4807845988539790151}
   vrGameTimeText: {fileID: 2779771792855823487}
   fireballThrowPower: 10

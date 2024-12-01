@@ -25,9 +25,11 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         ahp.handRight.OnTriggerRelease += OnRelease;
         ahp.handLeft.OnTriggerGrab += OnGrabbed;
         ahp.handLeft.OnTriggerRelease += OnRelease;
+
+        Fireball.OnAllFireballsInitialized.AddListener(PreloadInitialFireballs);
     }
 
-    private void Start()
+    void PreloadInitialFireballs()
     {
         PreloadFireball(true);
         PreloadFireball(false);

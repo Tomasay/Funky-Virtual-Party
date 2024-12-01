@@ -8,6 +8,10 @@ using Autohand;
 
 public class ShootoutGameSyncer : RealtimeComponent<ShootoutGameSyncModel>
 {
+#if !UNITY_WEBGL
+    public ShootoutGameManager gameManager;
+#endif
+
     public static ShootoutGameSyncer instance;
 
     public MyStringEvent OnStateChangeEvent;

@@ -19,6 +19,11 @@ public class ShootoutGameManager : MonoBehaviour
     private Vector3[] currentWaypoints;
     private float[] currentWaypointDistances;
 
+    public int GetFireballsSpawnAmount()
+    {
+        return FIREBALLS_AMOUNT;
+    }
+
     void Start()
     {
         timeRemaining = GAME_TIME_AMOUNT;

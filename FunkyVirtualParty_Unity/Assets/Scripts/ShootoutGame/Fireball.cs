@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Animations;
 using Normal.Realtime;
@@ -11,6 +12,8 @@ public class Fireball : MonoBehaviour
 {
     public static List<Fireball> pool;
     public static List<GameObject> holes;
+
+    public static UnityEvent OnAllFireballsInitialized = new UnityEvent();
 
     [SerializeField] public FireballSyncer syncer;
     [SerializeField] public Rigidbody rb;
@@ -43,9 +46,16 @@ public class Fireball : MonoBehaviour
         chargeCanvas.transform.SetParent(null);
     }
 
+    static bool allFireballsInitialized = false;
     private void Start()
     {
         Reset();
+
+        if(!allFireballsInitialized && pool != null && pool.Count == ShootoutGameSyncer.instance.gameManager.GetFireballsSpawnAmount())
+        {
+            allFireballsInitialized = true;
+            OnAllFireballsInitialized.Invoke();
+        }
     }
 
     void Update()
@@ -156,24 +166,6 @@ public class Fireball : MonoBehaviour
                 }
             }
         }
-
-        /*
-        if (ClientManager.instance)
-        {
-            //ClientManager.instance.Manager.Socket.Emit("MethodCallToServerByte", "FireballExplosionEvent", objectSyncer.objectID);
-
-#if UNITY_EDITOR
-            foreach (ClientPlayer cp in ClientManager.instance.Players)
-            {
-                if (cp.isDebugPlayer)
-                {
-                    ShootoutGameClientPlayer sp = (ShootoutGameClientPlayer)cp;
-                    sp.CheckCollisionWithFireball(transform.position, Mathf.Max(2, syncer.CurrentScale));
-                }
-            }
-#endif
-        }
-        */
     }
 
     void TriggerIcebergHole(Vector3 pos)
