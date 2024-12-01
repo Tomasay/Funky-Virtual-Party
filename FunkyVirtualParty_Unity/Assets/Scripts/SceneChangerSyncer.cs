@@ -85,7 +85,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
             DestroyDiscs();
             SceneManager.LoadScene(val);
         }
-#elif UNITY_ANDROID || UNITY_STANDALONE_WIN
+#else
         //Unregister current avatar as it will be destroyed on scene change
         if (RealtimeSingleton.instance.Realtime.connected)
         {
@@ -101,6 +101,10 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
     IEnumerator LoadSceneDelayed(string scene)
     {
+#if !UNITY_WEBGL
+        StartCoroutine("FadeOut");
+#endif
+
         yield return new WaitForSeconds(1);
 
         DestroyDiscs();
@@ -110,7 +114,13 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
     void DestroyDiscs()
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+#if UNITY_WEBGL
+        foreach (GameObject d in GameObject.FindGameObjectsWithTag("Vinyl"))
+        {
+            if(d)
+                Realtime.Destroy(d);
+        }
+#else
         //Destroy discs
         foreach (GameObject d in RealtimeSingleton.instance.discs)
         {
@@ -120,12 +130,6 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
             }
         }
         RealtimeSingleton.instance.discs.Clear();
-#elif UNITY_WEBGL
-        foreach (GameObject d in GameObject.FindGameObjectsWithTag("Vinyl"))
-        {
-            if(d)
-                Realtime.Destroy(d);
-        }
 #endif
     }
 
@@ -133,6 +137,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 
     private void FadeInScene(Scene arg0, LoadSceneMode arg1)
     {
+#if UNITY_WEBGL
         //Don't play fade in animation the first time we open main menu, as there is a different intro anim
         if (!firstTimeMainMenu)
         {
@@ -145,21 +150,14 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
             fadeRect.position = new Vector2(val - (((val * 2) / fadeIncrementDistance) * fadeIncrementDistance), fadeRect.position.y);
             firstTimeMainMenu = false;
         }
+#else
+    StartCoroutine("FadeIn");
+#endif
     }
 
     IEnumerator FadeIn()
     {
-#if UNITY_ANDROID || UNITY_STANDALONE_WIN
-        if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
-        {
-            for (int i = 0; i < 60; i++)
-            {
-                float t = (float)i / (float)60;
-                ca.postExposure.value = Mathf.Lerp(-10, 0, t);
-                yield return new WaitForSeconds(1 / 60);
-            }
-        }
-#elif UNITY_WEBGL
+#if UNITY_WEBGL
         float val = Screen.width + (Screen.width / 2);
         fadeRect.position = new Vector2(val, fadeRect.position.y);
 
@@ -168,6 +166,31 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
         {
             fadeRect.position = new Vector2(val - (i * fadeIncrementDistance), fadeRect.position.y);
             yield return new WaitForSeconds(0.05f);
+        }
+#else
+        if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
+        {
+            for (int i = 0; i <= 60; i++)
+            {
+                float t = (float)i / (float)60;
+                ca.postExposure.value = Mathf.Lerp(-20, 0, t);
+                yield return new WaitForSeconds(1 / 60);
+            }
+        }
+#endif
+    }
+
+    IEnumerator FadeOut()
+    {
+#if !UNITY_WEBGL
+        if (postProcessingProfile.TryGet<ColorAdjustments>(out ColorAdjustments ca))
+        {
+            for (int i = 0; i <= 60; i++)
+            {
+                float t = (float)i / (float)60;
+                ca.postExposure.value = Mathf.Lerp(0, -20, t);
+                yield return new WaitForSeconds(1 / 60);
+            }
         }
 #endif
     }
