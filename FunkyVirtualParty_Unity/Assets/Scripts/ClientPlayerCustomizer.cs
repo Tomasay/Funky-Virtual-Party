@@ -8,7 +8,6 @@ public class ClientPlayerCustomizer : MonoBehaviour
     [SerializeField] Button toggleHatLeftButton, toggleHatRightButton, toggleColorLeftButton, toggleColorRightButton;
     [SerializeField] Button enableCustomizationButton, closeCustomizationButton;
     [SerializeField] Canvas controllerCanvas;
-    [SerializeField] GameObject backgroundDots;
     [SerializeField] Camera cam;
 
     void Start()
@@ -37,6 +36,9 @@ public class ClientPlayerCustomizer : MonoBehaviour
         cam.transform.parent = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
         cam.transform.localPosition = new Vector3(0, 5, 10);
         cam.transform.localRotation = Quaternion.Euler(new Vector3(15, 180, 0));
+        cam.nearClipPlane = 3;
+
+        SetNonLocalClientPlayerVisibility(false);
 
         //Enable UI components
         controllerCanvas.enabled = false;
@@ -46,7 +48,6 @@ public class ClientPlayerCustomizer : MonoBehaviour
         toggleColorRightButton.gameObject.SetActive(true);
         closeCustomizationButton.gameObject.SetActive(true);
         enableCustomizationButton.gameObject.SetActive(false);
-        backgroundDots.SetActive(false);
 
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(false);
     }
@@ -57,6 +58,9 @@ public class ClientPlayerCustomizer : MonoBehaviour
         cam.transform.parent = null;
         cam.transform.position = new Vector3(0, 24, -20);
         cam.transform.rotation = Quaternion.Euler(new Vector3(45, 0, 0));
+        cam.nearClipPlane = 0.3f;
+
+        SetNonLocalClientPlayerVisibility(true);
 
         //Disable UI components
         controllerCanvas.enabled = true;
@@ -66,9 +70,22 @@ public class ClientPlayerCustomizer : MonoBehaviour
         toggleColorRightButton.gameObject.SetActive(false);
         closeCustomizationButton.gameObject.SetActive(false);
         enableCustomizationButton.gameObject.SetActive(true);
-        backgroundDots.SetActive(true);
 
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(true);
+    }
+
+    void SetNonLocalClientPlayerVisibility(bool visible)
+    {
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            if(!cp.IsLocal)
+            {
+                foreach (Transform t in cp.gameObject.GetComponentsInChildren<Transform>())
+                {
+                    t.gameObject.layer = visible ? LayerMask.NameToLayer("ClientPlayer") : LayerMask.NameToLayer("VROnly");
+                }
+            }
+        }
     }
 
     private void NextHatCustomization()
