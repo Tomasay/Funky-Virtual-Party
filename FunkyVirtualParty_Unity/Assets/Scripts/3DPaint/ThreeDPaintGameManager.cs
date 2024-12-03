@@ -626,7 +626,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
 
         //Temporarily disable palette so it doesn't get in the way of grabbing
-        foreach (Collider c in paintPalette.GetComponent<MeshCollider>().GetComponentsInChildren<Collider>())
+        foreach (Collider c in paintPalette.gameObject.GetComponentsInChildren<Collider>())
         {
             c.enabled = false;
         }
@@ -676,10 +676,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     public void OnGrabbed(Hand h, Grabbable g)
     {
+        //Debug.Log("Successfully grabbed: " + g.gameObject.name);
+
         if(g.gameObject.name.Equals("3DPen") || g.gameObject.name.Equals("Paint Spray Gun"))
         {
             //Re-enable palette colliders
-            foreach (Collider c in paintPalette.GetComponent<MeshCollider>().GetComponentsInChildren<Collider>())
+            foreach (Collider c in paintPalette.gameObject.GetComponentsInChildren<Collider>())
             {
                 c.enabled = true;
             }
@@ -735,8 +737,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
         GrabTool(!sprayGun.active);
     }
 
+    int toggleToolHandCooldown = 1;
+    float timeLastToggled;
     public void ToggleToolHand()
     {
+        //Short cooldown for toggling tool hand to help prevent grabbables from getting stuck
+        if (Time.time < (timeLastToggled + toggleToolHandCooldown))
+            return;
+
         vrPlayer.leftHand.ForceReleaseGrab();
         vrPlayer.rightHand.ForceReleaseGrab();
 
@@ -754,9 +762,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
         pc.AddSource(src);
         pc.constraintActive = true;
 
-        //GrabTool(sprayGun.active);
-        StartCoroutine(GrabDelayed(toolHand == HandType.left, 0.1f));
         needToGrabPalette = true;
+        GrabTool(sprayGun.active);
+
+        timeLastToggled = Time.time;
     }
 
     void GrabPalette()
