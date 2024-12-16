@@ -56,6 +56,8 @@ namespace CustomAvatars {
         public Transform leftHand  => _leftHand;
         public Transform rightHand => _rightHand;
 
+        public GameObject leftRobotHand, rightRobotHand;
+
 #pragma warning disable 0649 // Disable variable is never assigned to warning.
         [SerializeField] private Transform _head;
         [SerializeField] private Transform _leftHand;
@@ -131,8 +133,33 @@ namespace CustomAvatars {
 
         void ActiveStateChanged(RealtimeAvatarModel model, bool nodeIsActive) {
             // Leave the head active so RealtimeAvatarVoice runs even when the head isn't tracking.
-            if (_leftHand != null)  _leftHand.gameObject.SetActive(model.leftHandActive);
-            if (_rightHand != null) _rightHand.gameObject.SetActive(model.rightHandActive);
+            if (_leftHand != null)
+            {
+                _leftHand.gameObject.SetActive(model.leftHandActive);
+                SetHandMeshVisibility(true, model.leftHandActive);
+            }
+            if (_rightHand != null)
+            {
+                _rightHand.gameObject.SetActive(model.rightHandActive);
+                SetHandMeshVisibility(false, model.leftHandActive);
+            }
+        }
+
+        void SetHandMeshVisibility(bool left, bool enabled)
+        {
+            //Inner & Outer meshes
+            SkinnedMeshRenderer[] meshes = left ? leftRobotHand.GetComponentsInChildren<SkinnedMeshRenderer>(true) : rightRobotHand.GetComponentsInChildren<SkinnedMeshRenderer>(true);
+            foreach (SkinnedMeshRenderer smr in meshes)
+            {
+                smr.enabled = enabled;
+            }
+
+            //Grab/UI pointers
+            LineRenderer[] lineRenderers = left ? leftRobotHand.GetComponentsInChildren<LineRenderer>(true) : rightRobotHand.GetComponentsInChildren<LineRenderer>(true);
+            foreach (LineRenderer lr in lineRenderers)
+            {
+                lr.gameObject.SetActive(enabled);
+            }
         }
 
         void UpdateAvatarTransformsForLocalPlayer() {
