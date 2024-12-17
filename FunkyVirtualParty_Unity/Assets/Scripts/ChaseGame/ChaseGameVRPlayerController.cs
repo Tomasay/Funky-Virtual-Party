@@ -4,13 +4,17 @@ using UnityEngine;
 using Autohand;
 using UnityEngine.UI;
 using TMPro;
+using CustomAvatars;
+using NaughtyAttributes;
 
 public class ChaseGameVRPlayerController : VRPlayerController
 {
     [SerializeField] private float handMovementSpeed = 20, maxSprintSeconds = 2f, handMovementThreshold = 0;
     private float currentHandMovementSpeed;
     [SerializeField] private Image sprintMeter;
-    [SerializeField] public ParticleSystem capturedParticles;
+    [SerializeField] public ParticleSystemSyncer capturedParticles;
+
+    private RealtimeAvatar realtimeAvatar;
 
     public TMP_Text vrInfoText, vrGameTimeText;
 
@@ -21,8 +25,9 @@ public class ChaseGameVRPlayerController : VRPlayerController
     private float movementCooldown;
     private float walkSpeed;
     
-
     private bool inWater;
+
+    private bool handsActive;
 
     public bool HandMovement { get => handMovement; set => handMovement = value; }
 
@@ -33,6 +38,8 @@ public class ChaseGameVRPlayerController : VRPlayerController
 
         walkSpeed = ahp.maxMoveSpeed;
         currentHandMovementSpeed = handMovementSpeed;
+
+        realtimeAvatar = GetComponent<RealtimeAvatar>();
     }
 
     void Update()
@@ -40,7 +47,9 @@ public class ChaseGameVRPlayerController : VRPlayerController
         Vector3 forward = ahp.headCamera.transform.forward;
         forward.y = 0;
 
-        if (handMovement)
+        CheckHandsActive();
+
+        if (handMovement && handsActive)
         {
             handDistance = Vector3.Distance(leftHandPos, ahp.handLeft.transform.localPosition) + Vector3.Distance(rightHandPos, ahp.handRight.transform.localPosition);
 
@@ -48,7 +57,7 @@ public class ChaseGameVRPlayerController : VRPlayerController
             rightHandPos = ahp.handRight.transform.localPosition;
         }
 
-        if (handMovement && !inWater && !sprintCooldown && /*ahp.handLeft.IsSqueezing() && ahp.handRight.IsSqueezing()*/ handDistance > handMovementThreshold)
+        if (handMovement && handsActive && !inWater && !sprintCooldown && /*ahp.handLeft.IsSqueezing() && ahp.handRight.IsSqueezing()*/ handDistance > handMovementThreshold)
         {
             movementCooldown = 0;
 
@@ -94,6 +103,31 @@ public class ChaseGameVRPlayerController : VRPlayerController
         //Update movement from hands
         movement = Vector3.Lerp(movement, newMovement, 5 * Time.deltaTime);
         ahp.transform.Translate(movement);
+    }
+
+    float timeHandsBecameActive = -1;
+    void CheckHandsActive()
+    {
+        bool bothHandsActive = (realtimeAvatar.LeftHandActive && realtimeAvatar.RightHandActive); //Local parameter for if hands are both active
+
+        if(handsActive && !bothHandsActive)
+        {
+            handsActive = false;
+            timeHandsBecameActive = -1;
+        }
+        //If hands are active, mark time they became active
+        else if (!handsActive && timeHandsBecameActive == -1 && (realtimeAvatar.LeftHandActive && realtimeAvatar.RightHandActive))
+        {
+            timeHandsBecameActive = Time.time;
+            return;
+        }
+
+        //If time has marked for when hands became active, set bool to true with a 0.5 second delay
+        if(!handsActive && timeHandsBecameActive != -1 && Time.time - timeHandsBecameActive > 0.5f)
+        {
+            handsActive = true;
+            timeHandsBecameActive = -1;
+        }
     }
 
     public void EnteredWater()

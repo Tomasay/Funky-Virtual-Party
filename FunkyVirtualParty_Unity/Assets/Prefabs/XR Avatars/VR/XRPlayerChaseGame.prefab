@@ -758,11 +758,75 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 11400018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
---- !u!198 &843649228000598923 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 19800018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
+--- !u!1 &843649228020220651 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100018, guid: a40b64bf23366dc42a892af2c6ff6140, type: 3}
   m_PrefabInstance: {fileID: 843649228020122713}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6626035720584879343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843649228020220651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 8304929356768040942}
+  _childViews: []
+--- !u!114 &8304929356768040942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 843649228020220651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eace17b5c4156294fa2b72cf638eb943, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialColorOverLifetime:
+    serializedVersion: 2
+    key0: {r: 1, g: 1, b: 1, a: 1}
+    key1: {r: 1, g: 1, b: 1, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 0}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 0
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
 --- !u!1001 &8103367799175913152
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -910,6 +974,18 @@ PrefabInstance:
       propertyPath: objectsToDisable.Array.data[34]
       value: 
       objectReference: {fileID: 8637045242962245981}
+    - target: {fileID: 6135473751188432324, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: _childViews.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6135473751188432324, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: _childViews.Array.data[3].component
+      value: 
+      objectReference: {fileID: 6626035720584879343}
+    - target: {fileID: 6135473751188432324, guid: a5226a72c9553294abfe172a458b5805, type: 3}
+      propertyPath: _childViews.Array.data[3].componentID
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6463198709430915501, guid: a5226a72c9553294abfe172a458b5805, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -1110,7 +1186,7 @@ MonoBehaviour:
   maxSprintSeconds: 2
   handMovementThreshold: 0.025
   sprintMeter: {fileID: 3368231206423510503}
-  capturedParticles: {fileID: 843649228000598923}
+  capturedParticles: {fileID: 8304929356768040942}
   vrInfoText: {fileID: 1182260051978800489}
   vrGameTimeText: {fileID: 456229598387389329}
 --- !u!114 &2664842414099001226 stripped

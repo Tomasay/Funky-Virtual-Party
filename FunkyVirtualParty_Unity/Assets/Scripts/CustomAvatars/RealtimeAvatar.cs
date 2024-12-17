@@ -51,6 +51,16 @@ namespace CustomAvatars {
             set => model.deviceModel = value;
         }
 
+        public bool LeftHandActive
+        {
+            get => model.leftHandActive;
+        }
+
+        public bool RightHandActive
+        {
+            get => model.rightHandActive;
+        }
+
         // Prefab
         public Transform head      => _head;
         public Transform leftHand  => _leftHand;
@@ -147,6 +157,11 @@ namespace CustomAvatars {
 
         void SetHandMeshVisibility(bool left, bool enabled)
         {
+            if (leftRobotHand == null || rightRobotHand == null)
+            {
+                return;
+            }
+
             //Inner & Outer meshes
             SkinnedMeshRenderer[] meshes = left ? leftRobotHand.GetComponentsInChildren<SkinnedMeshRenderer>(true) : rightRobotHand.GetComponentsInChildren<SkinnedMeshRenderer>(true);
             foreach (SkinnedMeshRenderer smr in meshes)

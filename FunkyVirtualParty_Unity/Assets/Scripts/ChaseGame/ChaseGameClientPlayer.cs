@@ -91,15 +91,14 @@ public class ChaseGameClientPlayer : ClientPlayer
 
     protected override void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("On collision");
-
         base.OnCollisionEnter(collision);
 
-#if UNITY_WEBGL
+#if UNITY_ANDROID
         if (ChaseGameSyncer.instance.State.Equals("game loop") && collision.gameObject.transform.root.tag.Equals("Player"))
         {
             Debug.Log("VR PLAYER LOST");
             ChaseGameSyncer.instance.State = "vr player lost";
+            collision.gameObject.GetComponent<ChaseGameVRPlayerController>().capturedParticles.Play();
             //gm.DisplayVRCapture(syncer.Name);
         }
 #endif
