@@ -10,6 +10,7 @@ using DG.Tweening;
 
 #if UNITY_EDITOR
 using UnityEngine.InputSystem;
+using NaughtyAttributes;
 #endif
 
 [RequireComponent(typeof(Animator))]
@@ -131,37 +132,40 @@ public class VinylPlayer : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
 #if UNITY_EDITOR
-        if (!isSceneLoading)
-        {
-            if (Keyboard.current.vKey.wasPressedThisFrame)
-            {
-                isSceneLoading = true;
-                SceneChangerSyncer.instance.CurrentScene = "ChaseGame";
-            }
-            else if (Keyboard.current.iKey.wasPressedThisFrame)
-            {
-                isSceneLoading = true;
-                SceneChangerSyncer.instance.CurrentScene = "Shootout";
-            }
-            else if (Keyboard.current.mKey.wasPressedThisFrame)
-            {
-                isSceneLoading = true;
-                SceneChangerSyncer.instance.CurrentScene = "MazeGame";
-            }
-            else if (Keyboard.current.kKey.wasPressedThisFrame)
-            {
-                isSceneLoading = true;
-                SceneChangerSyncer.instance.CurrentScene = "Kaiju";
-            }
-            else if (Keyboard.current.pKey.wasPressedThisFrame)
-            {
-                isSceneLoading = true;
-                SceneChangerSyncer.instance.CurrentScene = "3DPaintGame";
-            }
-        }
-#endif
+    [Button]
+    public void StartVirtualPursuit()
+    {
+        isSceneLoading = true;
+        SceneChangerSyncer.instance.CurrentScene = "ChaseGame";
     }
+
+    [Button]
+    public void StartIcyIgntition()
+    {
+        isSceneLoading = true;
+        SceneChangerSyncer.instance.CurrentScene = "Shootout";
+    }
+
+    [Button]
+    public void StartVRtistry()
+    {
+        isSceneLoading = true;
+        SceneChangerSyncer.instance.CurrentScene = "VRtistry";
+    }
+
+    [Button]
+    public void StartMazeGame()
+    {
+        isSceneLoading = true;
+        SceneChangerSyncer.instance.CurrentScene = "MazeGame";
+    }
+
+    [Button]
+    public void StartKaiju()
+    {
+        isSceneLoading = true;
+        SceneChangerSyncer.instance.CurrentScene = "Kaiju";
+    }
+#endif
 }
