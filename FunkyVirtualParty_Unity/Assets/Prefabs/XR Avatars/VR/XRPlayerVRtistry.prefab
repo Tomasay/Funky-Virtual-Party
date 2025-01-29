@@ -847,7 +847,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1639125106728771988, guid: a5226a72c9553294abfe172a458b5805, type: 3}
   m_PrefabInstance: {fileID: 2513590125155843960}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &8313650735673910573
+--- !u!114 &882188019835264691
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -861,7 +861,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   eventList:
   - controller: 1
-    button: 16384
+    button: 4
     OnPress:
       m_PersistentCalls:
         m_Calls: []
@@ -889,27 +889,6 @@ MonoBehaviour:
     OnRelease:
       m_PersistentCalls:
         m_Calls: []
---- !u!114 &882188019835264691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3773250673998159596}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventList:
-  - controller: 1
-    button: 4
-    OnPress:
-      m_PersistentCalls:
-        m_Calls: []
-    OnRelease:
-      m_PersistentCalls:
-        m_Calls: []
 --- !u!114 &4680845480307562407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -931,11 +910,53 @@ MonoBehaviour:
     OnRelease:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &8313650735673910573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3773250673998159596}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventList:
+  - controller: 1
+    button: 16384
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &3773250674731580095 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1639125108242449863, guid: a5226a72c9553294abfe172a458b5805, type: 3}
   m_PrefabInstance: {fileID: 2513590125155843960}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1236294595531549027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3773250674731580095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  eventList:
+  - controller: 2
+    button: 2
+    OnPress:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRelease:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!114 &2607111177915069295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -993,27 +1014,6 @@ MonoBehaviour:
   eventList:
   - controller: 2
     button: 1
-    OnPress:
-      m_PersistentCalls:
-        m_Calls: []
-    OnRelease:
-      m_PersistentCalls:
-        m_Calls: []
---- !u!114 &1236294595531549027
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3773250674731580095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f93187da60a3524293f5892cac8bec4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  eventList:
-  - controller: 2
-    button: 2
     OnPress:
       m_PersistentCalls:
         m_Calls: []
@@ -1105,14 +1105,6 @@ MonoBehaviour:
   leftHandRef: {fileID: 453443648}
   rightHandRef: {fileID: 26928665}
   UIPointer: {fileID: 3092150495975368881}
-  YButtonEvent: {fileID: 4680845480307562407}
-  BButtonEvent: {fileID: 1236294595531549027}
-  AButtonEvent: {fileID: 1236294595531549027}
-  XButtonEvent: {fileID: 882188019835264691}
-  RightTriggerEvent: {fileID: 3687078775813423501}
-  LeftTriggerEvent: {fileID: 3918599779986645410}
-  RightGripEvent: {fileID: 2607111177915069295}
-  LeftGripEvent: {fileID: 8313650735673910573}
 --- !u!4 &5536533662602044908 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7942002212320107156, guid: a5226a72c9553294abfe172a458b5805, type: 3}

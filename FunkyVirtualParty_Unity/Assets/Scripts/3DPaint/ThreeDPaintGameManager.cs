@@ -8,6 +8,7 @@ using Autohand;
 using Autohand.Demo;
 using System.Linq;
 using UnityEngine.Animations;
+using UnityEngine.EventSystems;
 #if !UNITY_WEBGL
 using FMOD.Studio;
 using FMODUnity;
@@ -19,6 +20,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 {
     [SerializeField]
     TextAsset promptList;
+
+    [SerializeField]
+    Canvas uiCanvas;
 
     [SerializeField]
     TMP_Text headerText, playerResultsHeaderText, timerText;
@@ -34,9 +38,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     [SerializeField]
     GameObject paintPalette;
-
-    [SerializeField]
-    GameObject UIPointer;
 
     [SerializeField]
     GameObject leaderboardParent, leaderboardPlayerCardPrefab;
@@ -61,6 +62,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     GameObject armature;
 
+    [SerializeField]
+    Material clientMat, clientHighlightedMat;
+
 #if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
@@ -77,6 +81,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
     bool needToGrabPalette;
 
     private VRtistryVRPlayerController vrPlayer;
+
+    
 
     private void Awake()
     {
@@ -97,6 +103,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
             playerPoints.Add(cp.realtimeView.ownerIDSelf, 0);
         }
 
+        Invoke("CreateClientPlayerButtons", 1);
+
         StartCoroutine("StartGame");
 
 #if !UNITY_WEBGL
@@ -114,6 +122,48 @@ public class ThreeDPaintGameManager : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 
         InvokeRepeating("Test", 1, 1);
+    }
+
+    public void CreateClientPlayerButtons()
+    {
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            //Create a new button object
+            GameObject newButton = new GameObject("GeneratedButton", typeof(RectTransform), typeof(Button), typeof(Image));
+            Button b = newButton.GetComponent<Button>();
+            b.interactable = false;
+            (cp as VRtistryClientPlayer).playerButton = b;
+            newButton.GetComponent<Image>().color = Color.clear;
+            FaceCamera faceCamera = newButton.AddComponent<FaceCamera>();
+            faceCamera.transformIsRect = true;
+
+            //Set it as a child of the canvas
+            newButton.transform.SetParent(uiCanvas.transform, false);
+
+            //Configure RectTransform
+            RectTransform buttonRect = newButton.GetComponent<RectTransform>();
+            buttonRect.sizeDelta = new Vector2(1, 2); // Default size for a button
+            buttonRect.position = cp.transform.position;
+
+            //Callbacks
+            EventTrigger eventTrigger = newButton.AddComponent<EventTrigger>();
+
+            EventTrigger.Entry entry = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerEnter
+            };
+
+            EventTrigger.Entry exit = new EventTrigger.Entry
+            {
+                eventID = EventTriggerType.PointerExit
+            };
+
+            entry.callback.AddListener(delegate { cp.smr.material = clientHighlightedMat; });
+            exit.callback.AddListener(delegate { cp.smr.material = clientMat; });
+
+            eventTrigger.triggers.Add(entry);
+            eventTrigger.triggers.Add(exit);
+        }
     }
 
     //Temporary solution because ownership seems to randomly get taken by VR player, preventing clients from changing any values
@@ -236,6 +286,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    [Button]
+    public void PressSkipButton()
+    {
+        OnTutorialCompleted();
+        tutorial.SkipButtonPressed();
     }
 
     public void OnTutorialCompleted()
@@ -362,7 +419,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     {
                         if (int.TryParse(ownerAndGuess[0], out int j))
                         {
-                            AddPlayerToResults(j, true);
+                            //AddPlayerToResults(j, true);
+
+                            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
+                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); });
 
                             VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
 
@@ -373,26 +433,41 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     {
                         if (int.TryParse(ownerAndGuess[0], out int j))
                         {
-                            AddPlayerToResults(j, false);
+                            //AddPlayerToResults(j, false);
+
+                            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
+                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); });
                         }
                     }
                 }
 
                 //Header
                 headerText.text = "";
-                playerResultsHeaderText.text = "The prompt was: <i>" + VRtistrySyncer.instance.CurrentPrompt + "</i>\nWhich player do you think wrote the given answer?";
+                playerResultsHeaderText.text = "The prompt was: <i>" + VRtistrySyncer.instance.CurrentPrompt + "</i>\nClick on the player you think wrote the given answer";
                 foreach (GameObject g in playerNameIcons)
                 {
                     g.GetComponentInChildren<Button>().interactable = true;
                 }
 
                 //UX
-                UIPointer.SetActive(true);
+                vrPlayer.UIPointer.SetActive(true);
                 vrPlayer.leftHand.Release();
                 vrPlayer.rightHand.Release();
 
+                foreach (ClientPlayer cp in ClientPlayer.clients)
+                {
+                    (cp as VRtistryClientPlayer).SetButtonInteractable(true);
+                }
+
                 break;
             case "leaderboard":
+                foreach (ClientPlayer cp in ClientPlayer.clients)
+                {
+                    VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
+                    vcp.SetButtonInteractable(false);
+                    vcp.playerButton.onClick.RemoveAllListeners();
+                }
+
                 StartCoroutine("ShowLeaderboard");
 
                 VRtistrySyncer.instance.Guesses = "";

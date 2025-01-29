@@ -10,7 +10,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
 
     public string Trigger { get => model.trigger; set => model.trigger = value; }
 
-    void Start()
+    void Awake()
     {
         anim = GetComponent<Animator>();
     }

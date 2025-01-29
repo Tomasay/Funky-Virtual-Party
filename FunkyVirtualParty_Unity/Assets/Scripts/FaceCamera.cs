@@ -5,7 +5,7 @@ using UnityEngine;
 public class FaceCamera : MonoBehaviour
 {
     [SerializeField] Camera cameraToLookAt;
-    [SerializeField] bool transformIsRect = false;
+    [SerializeField] public bool transformIsRect = false;
 
     void Start()
     {
