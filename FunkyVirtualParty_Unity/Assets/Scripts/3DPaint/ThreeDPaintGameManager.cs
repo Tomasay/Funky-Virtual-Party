@@ -9,6 +9,7 @@ using Autohand.Demo;
 using System.Linq;
 using UnityEngine.Animations;
 using UnityEngine.EventSystems;
+using DG.Tweening;
 #if !UNITY_WEBGL
 using FMOD.Studio;
 using FMODUnity;
@@ -25,7 +26,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     Canvas uiCanvas;
 
     [SerializeField]
-    TMP_Text headerText, playerResultsHeaderText, timerText;
+    TMP_Text headerText, playerResultsHeaderText, timerText, poseCountdownText;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -320,7 +321,25 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [Button]
     void SetPose()
     {
-        Debug.Log("Setting Pose");
+        StartCoroutine("StartPoseCountdownTimer", 3);
+    }
+
+    IEnumerator StartPoseCountdownTimer(int countdown)
+    {
+        headerText.text = "Locking in your pose. Hold still!\n\n";
+        poseCountdownText.enabled = true;
+
+        for (int i = countdown; i > 0; i--)
+        {
+            poseCountdownText.text = "" + i;
+            poseCountdownText.transform.localScale = new Vector3(1, 1, 1);
+            poseCountdownText.transform.DOScale(2, 0.25f);
+            yield return new WaitForSeconds(1);
+        }
+
+        yield return new WaitForSeconds(1);
+        poseCountdownText.enabled = false;
+
         solver.SetPose();
 
         /*
@@ -369,7 +388,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.ownerIDSelf;
 
                 //UI
-                headerText.text = "Paint: <i>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</i>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
+                headerText.text = "Your prompt is:\n <i>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</i>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 //Clear practice painting
                 pen.EraseAllLines();
@@ -385,7 +404,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 sprayGun.CanPaint = true;
 
                 //UI
-                headerText.text = "Paint: <i>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</i>";
+                headerText.text = "Your prompt is: <i>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</i>\n\n";
                 timerText.enabled = true;
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
