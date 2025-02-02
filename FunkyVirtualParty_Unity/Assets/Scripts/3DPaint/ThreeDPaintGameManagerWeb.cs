@@ -7,6 +7,7 @@ using TMPro;
 using PaintIn3D;
 using System.Runtime.InteropServices;
 using System.Linq;
+using Lean.Touch;
 
 public class ThreeDPaintGameManagerWeb : MonoBehaviour
 {
@@ -75,6 +76,13 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     GameObject leaderboardPlayerCardPrefab, leaderboardParent;
     List<GameObject> currentLeaderboardCards;
 
+    [SerializeField]
+    LeanTouch leanTouch;
+
+    [SerializeField]
+    GameObject tapAndHoldRotateTutorial;
+    bool tapAndHoldRotateLearned;
+
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
     bool guessing = false; //Are players guessing?
@@ -104,6 +112,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         inputCanvas.enabled = true;
         guessingCanvas.enabled = false;
         resultsCanvas.enabled = false;
+
+        LeanTouch.OnFingerDown += LeanTouch_OnFingerDown;
+    }
+
+    private void LeanTouch_OnFingerDown(LeanFinger obj)
+    {
+        tapAndHoldRotateLearned = true;
+        tapAndHoldRotateTutorial.SetActive(false);
     }
 
     private void Start()
@@ -130,8 +146,15 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         if(guessing)
         {
-            drawingModel.transform.Rotate(0, 0, Time.deltaTime * 20);
-            linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
+            if(tapAndHoldRotateLearned)
+            {
+                linesParent.transform.rotation = drawingModel.transform.rotation;
+            }
+            else
+            {
+                drawingModel.transform.Rotate(0, 0, Time.deltaTime * 20);
+                linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
+            }
         }
 
         if(VRtistrySyncer.instance.DrawingTimer >= 0)
@@ -216,6 +239,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 playersAnswering = false;
                 guessing = true;
 
+                leanTouch.gameObject.SetActive(true);
+                tapAndHoldRotateTutorial.SetActive(!tapAndHoldRotateLearned);
+
                 guessingCanvas.enabled = true;
 
                 drawingPhaseCamera.gameObject.SetActive(false);
@@ -256,6 +282,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 }
                 break;
             case "vr guessing":
+                leanTouch.gameObject.SetActive(false);
+                tapAndHoldRotateTutorial.SetActive(false);
+
                 //All players have guessed, so add guesses to results
                 string[] guessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
                 foreach (string g in guessesSeparated)

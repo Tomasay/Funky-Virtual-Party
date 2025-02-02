@@ -313,6 +313,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         headerText.enabled = true;
     }
 
+    [Button]
     public void FinishedPaintingEarly()
     {
         VRtistrySyncer.instance.State = "clients guessing";
