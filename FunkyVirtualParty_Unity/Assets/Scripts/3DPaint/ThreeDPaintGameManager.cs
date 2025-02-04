@@ -132,7 +132,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
             //Create a new button object
             GameObject newButton = new GameObject("GeneratedButton", typeof(RectTransform), typeof(Button), typeof(Image));
             Button b = newButton.GetComponent<Button>();
-            b.interactable = false;
             (cp as VRtistryClientPlayer).playerButton = b;
             newButton.GetComponent<Image>().color = Color.clear;
             FaceCamera faceCamera = newButton.AddComponent<FaceCamera>();
@@ -164,6 +163,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
             eventTrigger.triggers.Add(entry);
             eventTrigger.triggers.Add(exit);
+
+            newButton.SetActive(false);
         }
     }
 
