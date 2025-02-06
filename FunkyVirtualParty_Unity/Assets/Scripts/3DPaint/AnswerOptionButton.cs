@@ -13,6 +13,9 @@ public class AnswerOptionButton : MonoBehaviour
     Image answerBG;
 
     [SerializeField]
+    Image[] borders;
+
+    [SerializeField]
     Image[] playerIcons;
 
     //The player who wrote this answer
@@ -28,6 +31,14 @@ public class AnswerOptionButton : MonoBehaviour
     public void SetColor(Color col)
     {
         answerBG.color = col;
+    }
+
+    public void SetBorderColor(Color col)
+    {
+        foreach (Image i in borders)
+        {
+            i.color = col;
+        }
     }
 
     public void AddPlayerIcon(string name, Color col)

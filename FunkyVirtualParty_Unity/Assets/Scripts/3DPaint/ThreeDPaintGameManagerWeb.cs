@@ -41,7 +41,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     PaintSprayGun sprayGun;
 
     [SerializeField]
-    Canvas inputCanvas, guessingCanvas, resultsCanvas, leaderboardCanvas;
+    Canvas inputCanvas, guessingCanvas, leaderboardCanvas;
 
     [SerializeField]
     GameObject playerInputParent;
@@ -111,7 +111,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         inputCanvas.enabled = true;
         guessingCanvas.enabled = false;
-        resultsCanvas.enabled = false;
 
         LeanTouch.OnFingerDown += LeanTouch_OnFingerDown;
     }
@@ -226,12 +225,15 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 //Show blurred view
                 inputCanvas.enabled = false;
 
+                timerText.enabled = true;
                 timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
 
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
             case "clients guessing":
+                timerText.enabled = false;
+
                 //Make sure there's no lingering drawings
                 pen.CanPaint = false;
                 sprayGun.CanPaint = false;
@@ -247,7 +249,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);
 
-                
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
 
                 //Answer buttons
@@ -270,15 +271,19 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 {
                     string[] ownerAndAnswer = a.Split(':');
 
-                    GameObject ab = Instantiate(answerButtonPrefab, answerResultsParent.transform);
-                    AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                    aob.SetText(ownerAndAnswer[1]);
-                    aob.playerID = ownerAndAnswer[0];
-                    if (int.TryParse(ownerAndAnswer[0], out int i))
+                    if (int.TryParse(ownerAndAnswer[0], out int id))
                     {
-                        aob.SetColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.red);
+                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
+                        aob.gameObject.SetActive(true);
+
+                        aob.SetText(ownerAndAnswer[1]);
+                        aob.playerID = ownerAndAnswer[0];
+                        if (int.TryParse(ownerAndAnswer[0], out int i))
+                        {
+                            aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
+                        }
+                        answerResults.Add(aob);
                     }
-                    answerResults.Add(aob);
                 }
                 break;
             case "vr guessing":
@@ -302,13 +307,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                     }
                 }
 
-                //Display results
-                foreach (AnswerOptionButton aob in answerResults)
-                {
-                    //aob.SetColor(aob.playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.red);
-                }
+                drawingPhaseCamera.gameObject.SetActive(true);
+                guessingPhaseCamera.gameObject.SetActive(false);
 
-                resultsCanvas.enabled = true;
                 break;
             case "leaderboard":
                 /*
@@ -462,8 +463,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     IEnumerator DisplayLeaderboard()
     {
-        resultsCanvas.enabled = false;
-
         //Clear previous leaderboard
         foreach (GameObject g in currentLeaderboardCards)
         {

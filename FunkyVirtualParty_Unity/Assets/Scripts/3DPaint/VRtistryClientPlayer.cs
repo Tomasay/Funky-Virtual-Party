@@ -9,6 +9,8 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public Button playerButton;
 
+    [SerializeField] public AnswerOptionButton playerAnswer;
+
     protected override void LocalStart()
     {
         base.LocalStart();
