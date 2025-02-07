@@ -17,6 +17,76 @@ public class VRtistryClientPlayer : ClientPlayer
 
         SetSpawnRotation();
         Invoke("SetSitAnim", 3);
+        Invoke("SetupTextBubbleTransforms", 3);
+    }
+
+    void SetupTextBubbleTransforms()
+    {
+        foreach (ClientPlayer cp in clients)
+        {
+            VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
+            RectTransform rt = (vcp.playerAnswer.transform as RectTransform);
+            Vector3 pos = rt.localPosition;
+            float scale = rt.localScale.x;
+
+            if (clients.Count > 4)
+            {
+                switch ((vcp.realtimeView.ownerIDSelf - 1))
+                {
+                    case 0: //Back Right
+                        scale = 0.14f;
+                        break;
+                    case 1: //Front Right
+                        break;
+                    case 2: //Back Left
+                        pos.y = 75;
+                        scale = 0.14f;
+                        break;
+                    case 3: //Front Left
+                        pos.y = 80;
+                        break;
+                    case 4: //Back Middle Right
+                        pos.y = 75;
+                        scale = 0.14f;
+                        break;
+                    case 5: //Front Middle Right
+                        pos.y = 80;
+                        break;
+                    case 6: //Back Left
+                        scale = 0.14f;
+                        break;
+                    case 7: //Front Left
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch ((vcp.realtimeView.ownerIDSelf - 1))
+                {
+                    case 0: //Back Right
+                        scale = 0.2f;
+                        break;
+                    case 1: //Front Right
+                        pos.x = -15;
+                        scale = 0.15f;
+                        break;
+                    case 2: //Back Left
+                        scale = 0.2f;
+                        break;
+                    case 3: //Front Left
+                        pos.x = 15;
+                        scale = 0.15f;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            rt.localPosition = pos;
+            rt.localScale = new Vector3(scale, scale, scale);
+        }
     }
 
     void SetSitAnim()

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using NaughtyAttributes;
 
 public class FaceCamera : MonoBehaviour
 {
@@ -17,6 +18,16 @@ public class FaceCamera : MonoBehaviour
 
     void LateUpdate()
     {
+        var t = transformIsRect ? GetComponent<RectTransform>() : transform;
+
+        t.LookAt(cameraToLookAt.transform);
+        t.rotation = Quaternion.LookRotation(cameraToLookAt.transform.forward);
+    }
+
+    [Button]
+    public void UpdateAngle()
+    {
+        cameraToLookAt = Camera.main;
         var t = transformIsRect ? GetComponent<RectTransform>() : transform;
 
         t.LookAt(cameraToLookAt.transform);
