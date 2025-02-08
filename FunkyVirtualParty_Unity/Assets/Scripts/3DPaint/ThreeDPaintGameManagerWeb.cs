@@ -147,7 +147,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         {
             if(tapAndHoldRotateLearned)
             {
-                linesParent.transform.rotation = drawingModel.transform.rotation;
+                linesParent.transform.rotation = Quaternion.Euler(0, drawingModel.transform.localRotation.eulerAngles.z, 0);
             }
             else
             {
