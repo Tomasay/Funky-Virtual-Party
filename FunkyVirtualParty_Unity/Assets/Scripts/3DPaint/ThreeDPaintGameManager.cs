@@ -66,6 +66,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     Material clientMat, clientHighlightedMat;
 
+    List<AnswerOptionButton> answerResults;
+
 #if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
@@ -88,6 +90,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
     private void Awake()
     {
         playerPoints = new Dictionary<int, int>();
+
+        answerResults = new List<AnswerOptionButton>();
 
         playerNameIcons = new List<GameObject>();
         currentLeaderboardCards = new List<GameObject>();
@@ -464,7 +468,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Header
                 playerResultsHeaderText.text = "";
-                headerText.text = "The prompt was:\n<b>" + VRtistrySyncer.instance.CurrentPrompt + "</b>\nClick on the player you think wrote the given answer";
+                headerText.text = "The prompt was:\n<b>" + VRtistrySyncer.instance.CurrentPrompt + "</b>\nClick on the player you think wrote:\n<b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
                 foreach (GameObject g in playerNameIcons)
                 {
                     g.GetComponentInChildren<Button>().interactable = true;
@@ -489,6 +493,42 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     vcp.playerButton.onClick.RemoveAllListeners();
                 }
 
+                //Answer results
+                string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+                foreach (string a in answersSeparated)
+                {
+                    string[] ownerAndAnswer = a.Split(':');
+
+                    if (int.TryParse(ownerAndAnswer[0], out int id))
+                    {
+                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
+                        aob.gameObject.SetActive(true);
+                        aob.ResetPlayerIcons();
+
+                        aob.SetText(ownerAndAnswer[1]);
+                        aob.playerID = ownerAndAnswer[0];
+                        if (int.TryParse(ownerAndAnswer[0], out int i))
+                        {
+                            //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
+                            aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
+                            aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
+                        }
+                        answerResults.Add(aob);
+                    }
+                }
+
+                //All players have guessed, so add guesses to results
+                string[] leaderboardGuessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
+                foreach (string g in leaderboardGuessesSeparated)
+                {
+                    string[] ownerAndGuess = g.Split(':');
+
+                    if (int.TryParse(ownerAndGuess[0], out int i))
+                    {
+                        AddPlayerToResults(i, ownerAndGuess[1]);
+                    }
+                }
+
                 StartCoroutine("ShowLeaderboard");
 
                 VRtistrySyncer.instance.Guesses = "";
@@ -500,6 +540,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void ClearPlayerAnswers()
+    {
+        foreach (AnswerOptionButton aob in answerResults)
+        {
+            aob.gameObject.SetActive(false);
+        }
+        answerResults = new List<AnswerOptionButton>();
     }
 
     string GetAnswerByOwnerID(int ID)
@@ -576,29 +625,30 @@ public class ThreeDPaintGameManager : MonoBehaviour
         foreach (KeyValuePair<int, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
+            newCard.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Color;
             newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Name;
-            newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
-            newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
+            //newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
+            newCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + entry.Value;
             
             currentLeaderboardCards.Add(newCard);
 
             if (VRtistrySyncer.instance.VRPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
-                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 1);
+                newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (newCard.transform.GetSiblingIndex() + 1);
             }
             else
             {
-                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 2);
+                newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (newCard.transform.GetSiblingIndex() + 2);
             }
         }
 
         //Add VR Card
         GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
-        vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
-        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
-        vrCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (vrPlayerPos + 1);
+        //vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
+        vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
+        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (vrPlayerPos + 1);
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);
@@ -607,8 +657,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         //Disable leaderboard
         leaderboardParent.SetActive(false);
+        ClearPlayerAnswers();
 
-        if(currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
+        if (currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
         {
             VRtistrySyncer.instance.State = "game over";
         }
@@ -671,6 +722,21 @@ public class ThreeDPaintGameManager : MonoBehaviour
         pi.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(playerID).syncer.Color;
 
         playerNameIcons.Add(pi);
+    }
+
+    void AddPlayerToResults(int playerID, string answerPlayerID)
+    {
+        //Check each answer
+        foreach (AnswerOptionButton aob in answerResults)
+        {
+            //Find the answer that the player chose
+            if (aob.playerID.Equals(answerPlayerID))
+            {
+                ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(playerID);
+                aob.AddPlayerIcon(cp.syncer.Name, cp.syncer.Color);
+                return;
+            }
+        }
     }
 
     /// <summary>

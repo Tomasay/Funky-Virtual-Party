@@ -18,6 +18,8 @@ public class AnswerOptionButton : MonoBehaviour
     [SerializeField]
     Image[] playerIcons;
 
+    public GameObject correctAnswerBanner;
+
     //The player who wrote this answer
     public string playerID;
 
@@ -38,6 +40,14 @@ public class AnswerOptionButton : MonoBehaviour
         foreach (Image i in borders)
         {
             i.color = col;
+        }
+    }
+
+    public void ResetPlayerIcons()
+    {
+        foreach (Image i in playerIcons)
+        {
+            i.gameObject.SetActive(false);
         }
     }
 
