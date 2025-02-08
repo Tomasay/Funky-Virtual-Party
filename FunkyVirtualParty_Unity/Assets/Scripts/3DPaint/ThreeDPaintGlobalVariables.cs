@@ -23,5 +23,5 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
     public const int DRAW_TIME_AMOUNT = 120;
 
     //The amount of time clients get to answer the prompt
-    public const int CLIENT_ANSWER_TIME_AMOUNT = 30;
+    public const int CLIENT_ANSWER_TIME_AMOUNT = 60;
 }

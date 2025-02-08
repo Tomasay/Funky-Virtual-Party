@@ -483,29 +483,30 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         foreach (KeyValuePair<int, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
+            newCard.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Color;
             newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Name;
-            newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
-            newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + entry.Value;
+            //newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
+            newCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + entry.Value;
 
             currentLeaderboardCards.Add(newCard);
 
             if (VRtistrySyncer.instance.VRPlayerPoints < entry.Value)
             {
                 vrPlayerPos++;
-                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 1);
+                newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (newCard.transform.GetSiblingIndex() + 1);
             }
             else
             {
-                newCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (newCard.transform.GetSiblingIndex() + 2);
+                newCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (newCard.transform.GetSiblingIndex() + 2);
             }
         }
 
         //Add VR Card
         GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
-        vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
-        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
-        vrCard.GetComponentsInChildren<TMP_Text>()[3].text = "" + (vrPlayerPos + 1);
+        //vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
+        vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
+        vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (vrPlayerPos + 1);
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);

@@ -447,7 +447,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             //AddPlayerToResults(j, true);
 
                             VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); });
+                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); vcp.smr.material = clientMat; });
 
                             VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
 
@@ -461,7 +461,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             //AddPlayerToResults(j, false);
 
                             VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); });
+                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); vcp.smr.material = clientMat; });
                         }
                     }
                 }
