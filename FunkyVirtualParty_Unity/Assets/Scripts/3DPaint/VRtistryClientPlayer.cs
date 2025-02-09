@@ -16,7 +16,7 @@ public class VRtistryClientPlayer : ClientPlayer
         base.LocalStart();
 
         SetSpawnRotation();
-        Invoke("SetSitAnim", 3);
+        Invoke("SetSitAnim", 1);
         Invoke("SetupTextBubbleTransforms", 3);
     }
 

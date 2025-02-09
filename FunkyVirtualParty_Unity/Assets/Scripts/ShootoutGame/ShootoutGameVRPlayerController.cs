@@ -4,10 +4,11 @@ using UnityEngine;
 using Autohand;
 using UnityEngine.UI;
 using TMPro;
+using NaughtyAttributes;
 
 public class ShootoutGameVRPlayerController : VRPlayerController
 {
-    [SerializeField] GameObject fireballPrefab, fireballHandAnchorLeft, fireballHandAnchorRight;
+    [SerializeField] GameObject fireballHandAnchorLeft, fireballHandAnchorRight;
 
     public TMP_Text vrInfoText, vrGameTimeText;
 
@@ -27,6 +28,23 @@ public class ShootoutGameVRPlayerController : VRPlayerController
         ahp.handLeft.OnTriggerRelease += OnRelease;
 
         Fireball.OnAllFireballsInitialized.AddListener(PreloadInitialFireballs);
+    }
+
+    private void OnDestroy()
+    {
+        ahp.handRight.OnTriggerGrab -= OnGrabbed;
+        ahp.handRight.OnTriggerRelease -= OnRelease;
+        ahp.handLeft.OnTriggerGrab -= OnGrabbed;
+        ahp.handLeft.OnTriggerRelease -= OnRelease;
+
+        Fireball.OnAllFireballsInitialized.RemoveListener(PreloadInitialFireballs);
+    }
+
+    [Button]
+    public void DebugTest()
+    {
+        Debug.Log("currentFireballLeft: " + currentFireballLeft.name);
+        Debug.Log("currentFireballRight: " + currentFireballRight.name);
     }
 
     void PreloadInitialFireballs()

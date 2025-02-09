@@ -46,7 +46,7 @@ public class Fireball : MonoBehaviour
         chargeCanvas.transform.SetParent(null);
     }
 
-    static bool allFireballsInitialized = false;
+    public static bool allFireballsInitialized = false;
     private void Start()
     {
         Reset();

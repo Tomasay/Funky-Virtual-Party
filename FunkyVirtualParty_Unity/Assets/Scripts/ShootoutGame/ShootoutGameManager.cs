@@ -181,6 +181,7 @@ public class ShootoutGameManager : MonoBehaviour
             }
             Fireball.pool.Clear();
             Fireball.pool = null;
+            Fireball.allFireballsInitialized = false;
         }
 
         //Destroy holes
