@@ -9,6 +9,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
     Animator anim;
 
     public string Trigger { get => model.trigger; set => model.trigger = value; }
+    public string ToggleBool { get => model.toggleBool; set => model.toggleBool = value; }
 
     void Awake()
     {
@@ -21,6 +22,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
         {
             // Unregister from events
             previousModel.triggerDidChange -= OnTriggerChange;
+            previousModel.toggleBoolDidChange -= OnToggleBool;
         }
 
         if (currentModel != null)
@@ -35,6 +37,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
 
             // Register for events
             currentModel.triggerDidChange += OnTriggerChange;
+            currentModel.toggleBoolDidChange += OnToggleBool;
         }
     }
 
@@ -57,6 +60,20 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
         {
             anim.SetTrigger(val);
         }
+    }
+
+    void OnToggleBool(AnimatorSyncModel previousModel, string val)
+    {
+        if (!val.Equals(""))
+        {
+            anim.SetBool(ToggleBool, !anim.GetBool(ToggleBool));
+            Invoke("ResetToggleBool", 1);
+        }
+    }
+
+    void ResetToggleBool()
+    {
+        ToggleBool = "";
     }
     #endregion
 }

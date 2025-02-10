@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Normal.Realtime;
 
 public class VRtistryClientPlayer : ClientPlayer
 {
@@ -11,12 +12,17 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public AnswerOptionButton playerAnswer;
 
+    [SerializeField] public MeshSyncer phone;
+
     protected override void LocalStart()
     {
         base.LocalStart();
 
+        phone.GetComponent<RealtimeView>().RequestOwnership();
+
         SetSpawnRotation();
         Invoke("SetSitAnim", 1);
+        Invoke("TogglePhone", 1);
         Invoke("SetupTextBubbleTransforms", 3);
     }
 
@@ -92,6 +98,12 @@ public class VRtistryClientPlayer : ClientPlayer
     void SetSitAnim()
     {
         animSyncer.Trigger = "Sit1";
+    }
+
+    public void TogglePhone()
+    {
+        animSyncer.ToggleBool = "UsingPhone";
+        phone.Enabled = !phone.Enabled;
     }
 
     protected void SetSpawnRotation()

@@ -4,13 +4,8 @@ using Normal.Realtime;
 using Normal.Realtime.Serialization;
 
 [RealtimeModel]
-public partial class AnimatorSyncModel
+public partial class MeshSyncModel
 {
     [RealtimeProperty(1, true, true)]
-    private string _trigger;
-
-    [RealtimeProperty(2, true, true)]
-    private string _toggleBool;
+    private bool _enabled;
 }
-
-

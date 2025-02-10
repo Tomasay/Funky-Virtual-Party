@@ -213,7 +213,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         switch (s)
         {
             case "clients answering":
-                
+                VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
+                if (!vcp.phone.Enabled)
+                {
+                    vcp.TogglePhone();
+                }
                 break;
             case "vr posing":
                 headerText.text = "Waiting for VR player to set a pose...";
@@ -385,6 +389,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         }
 
         typingAnswer = false;
+        (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
 #if UNITY_WEBGL && !UNITY_EDITOR
         CloseInputKeyboard();
 #endif
