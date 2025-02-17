@@ -315,6 +315,18 @@ public class ThreeDPaintGameManager : MonoBehaviour
             }
         }
 
+        if (VRtistrySyncer.instance.State == "clients answering")
+        {
+            //Enable VR tools
+            pen.CanPaint = true;
+            sprayGun.CanPaint = true;
+
+            GrabToolsStart();
+
+            //Display text that players are answering
+            headerText.text = "Players are typing their answers \nUse this time to practice painting!";
+        }
+
         headerText.enabled = true;
     }
 
@@ -373,8 +385,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Display text that players are answering
                 headerText.text = "Players are typing their answers \nUse this time to practice painting!";
-
-                //Animate client players to look like they are on their phones
 
                 break;
             case "vr posing":

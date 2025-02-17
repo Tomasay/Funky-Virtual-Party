@@ -67,7 +67,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     private void Start()
     {
         //Default states when entering scene
-        State = "clients answering";
+        State = "";
         Answers = "";
         Guesses = "";
         CurrentPrompt = "";
