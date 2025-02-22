@@ -278,7 +278,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                     if (int.TryParse(ownerAndAnswer[0], out int id))
                     {
                         AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
-                        aob.gameObject.SetActive(true);
+                        aob.canvasGroup.alpha = 0;
                         aob.ResetPlayerIcons();
 
                         aob.SetText(ownerAndAnswer[1]);
@@ -288,6 +288,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                             //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
                             aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
                             aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
+                            (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
                         }
                         answerResults.Add(aob);
                     }
@@ -446,7 +447,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         foreach (AnswerOptionButton aob in answerResults)
         {
-            aob.gameObject.SetActive(false);
+            aob.canvasGroup.alpha = 0;
         }
         answerResults = new List<AnswerOptionButton>();
     }

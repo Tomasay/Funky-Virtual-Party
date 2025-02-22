@@ -495,7 +495,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 }
 
                 break;
-            case "leaderboard":
+            case "results":
+                headerText.text = "Displaying results";
+
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
                     VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
@@ -512,8 +514,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     if (int.TryParse(ownerAndAnswer[0], out int id))
                     {
                         AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
-                        aob.gameObject.SetActive(true);
                         aob.ResetPlayerIcons();
+                        aob.canvasGroup.alpha = 0;
 
                         aob.SetText(ownerAndAnswer[1]);
                         aob.playerID = ownerAndAnswer[0];
@@ -522,6 +524,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
                             aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
                             aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
+                            (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
                         }
                         answerResults.Add(aob);
                     }
@@ -539,6 +542,33 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     }
                 }
 
+                //Create duplicate list of answers, sorted by amount of players chose that answer
+                List<AnswerOptionButton> answerResultsSorted = answerResults.OrderBy(o => o.GetNumberOfPlayers()).ToList();
+
+                //Animate players that chose each answer, ignoring answers that no players chose
+                AnswerOptionButton correctAnswer = null;
+                int correctAnswerDelay = ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
+                for (int i = 0; i < answerResultsSorted.Count; i++)
+                {
+                    //Save correct answer for last
+                    if (!answerResultsSorted[i].correctAnswerBanner.activeSelf)
+                    {
+                        if (answerResultsSorted[i].GetNumberOfPlayers() > 0)
+                        {
+                            answerResultsSorted[i].AnimateAnswers(i * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
+                            correctAnswerDelay += ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
+                        }
+                    }
+                    else
+                    {
+                        correctAnswer = answerResultsSorted[i];
+                    }
+                }
+                correctAnswer.AnimateAnswers(correctAnswerDelay);
+                Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2)));
+
+                break;
+            case "leaderboard":
                 StartCoroutine("ShowLeaderboard");
 
                 VRtistrySyncer.instance.Guesses = "";
@@ -552,11 +582,16 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
     }
 
+    void SetLeaderboardState()
+    {
+        VRtistrySyncer.instance.State = "leaderboard";
+    }
+
     void ClearPlayerAnswers()
     {
         foreach (AnswerOptionButton aob in answerResults)
         {
-            aob.gameObject.SetActive(false);
+            aob.canvasGroup.alpha = 0;
         }
         answerResults = new List<AnswerOptionButton>();
     }
@@ -756,6 +791,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.VRPlayerGuess = playerID;
 
+        /*
         if (playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner))
         {
             VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_PLAYER;
@@ -765,8 +801,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
         {
             headerText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote the answer";
         }
+        */
 
-        VRtistrySyncer.instance.State = "leaderboard";
+        VRtistrySyncer.instance.State = "results";
+    }
+
+    [Button]
+    public void GuessFirstPlayer()
+    {
+        GuessPlayerVR(0);
     }
 
     void GrabTool(bool isSprayGun)
