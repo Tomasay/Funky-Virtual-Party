@@ -547,7 +547,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Animate players that chose each answer, ignoring answers that no players chose
                 AnswerOptionButton correctAnswer = null;
-                int correctAnswerDelay = ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
+                int k = 0;
                 for (int i = 0; i < answerResultsSorted.Count; i++)
                 {
                     //Save correct answer for last
@@ -555,8 +555,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     {
                         if (answerResultsSorted[i].GetNumberOfPlayers() > 0)
                         {
-                            answerResultsSorted[i].AnimateAnswers(i * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
-                            correctAnswerDelay += ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
+                            answerResultsSorted[i].AnimateAnswers(k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
+                            k++;
                         }
                     }
                     else
@@ -564,8 +564,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                         correctAnswer = answerResultsSorted[i];
                     }
                 }
+                int correctAnswerDelay = (k + 1) * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
                 correctAnswer.AnimateAnswers(correctAnswerDelay);
-                Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2)));
+                Invoke("SetLeaderboardState", (correctAnswerDelay + ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME));
 
                 break;
             case "leaderboard":

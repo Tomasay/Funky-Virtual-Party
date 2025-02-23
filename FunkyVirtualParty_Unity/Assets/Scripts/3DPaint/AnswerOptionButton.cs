@@ -32,7 +32,10 @@ public class AnswerOptionButton : MonoBehaviour
 
     private void Awake()
     {
-        correctAnswerBannerInitialScale = (correctAnswerBanner.transform as RectTransform).localScale.x;
+        if (correctAnswerBanner)
+        {
+            correctAnswerBannerInitialScale = (correctAnswerBanner.transform as RectTransform).localScale.x;
+        }
     }
 
     public void SetText(string txt)

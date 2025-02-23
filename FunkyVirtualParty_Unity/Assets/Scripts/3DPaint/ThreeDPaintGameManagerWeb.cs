@@ -319,6 +319,31 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 guessingPhaseCamera.gameObject.SetActive(false);
 
                 break;
+            case "results":
+                //Create duplicate list of answers, sorted by amount of players chose that answer
+                List<AnswerOptionButton> answerResultsSorted = answerResults.OrderBy(o => o.GetNumberOfPlayers()).ToList();
+
+                //Animate players that chose each answer, ignoring answers that no players chose
+                AnswerOptionButton correctAnswer = null;
+                int k = 0;
+                for (int i = 0; i < answerResultsSorted.Count; i++)
+                {
+                    //Save correct answer for last
+                    if (!answerResultsSorted[i].correctAnswerBanner.activeSelf)
+                    {
+                        if (answerResultsSorted[i].GetNumberOfPlayers() > 0)
+                        {
+                            answerResultsSorted[i].AnimateAnswers(k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
+                            k++;
+                        }
+                    }
+                    else
+                    {
+                        correctAnswer = answerResultsSorted[i];
+                    }
+                }
+                correctAnswer.AnimateAnswers((k + 1) * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
+                break;
             case "leaderboard":
                 /*
                 if (int.TryParse(data, out int newPoints))
