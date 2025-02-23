@@ -11,6 +11,9 @@ public partial class AnimatorSyncModel
 
     [RealtimeProperty(2, true, true)]
     private string _toggleBool;
+
+    [RealtimeProperty(3, true, true)]
+    private float _animOffset;
 }
 
 

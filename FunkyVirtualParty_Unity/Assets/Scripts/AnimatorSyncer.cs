@@ -10,6 +10,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
 
     public string Trigger { get => model.trigger; set => model.trigger = value; }
     public string ToggleBool { get => model.toggleBool; set => model.toggleBool = value; }
+    public float AnimOffset { get => model.animOffset; set => model.animOffset = value; }
 
     void Awake()
     {
@@ -23,6 +24,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
             // Unregister from events
             previousModel.triggerDidChange -= OnTriggerChange;
             previousModel.toggleBoolDidChange -= OnToggleBool;
+            previousModel.animOffsetDidChange -= OnAnimOffsetChange;
         }
 
         if (currentModel != null)
@@ -38,6 +40,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
             // Register for events
             currentModel.triggerDidChange += OnTriggerChange;
             currentModel.toggleBoolDidChange += OnToggleBool;
+            currentModel.animOffsetDidChange += OnAnimOffsetChange;
         }
     }
 
@@ -60,6 +63,11 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
         {
             anim.SetTrigger(val);
         }
+    }
+
+    void OnAnimOffsetChange(AnimatorSyncModel previousModel, float val)
+    {
+        anim.SetFloat("AnimOffset", val);
     }
 
     void OnToggleBool(AnimatorSyncModel previousModel, string val)

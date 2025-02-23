@@ -213,8 +213,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         switch (s)
         {
             case "clients answering":
+                //Enable phone anim for local player, which will then be synced for everyone else
                 VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
-                if (!vcp.phone.Enabled)
+                if (vcp.usingPhone == 0)
                 {
                     vcp.TogglePhone();
                 }

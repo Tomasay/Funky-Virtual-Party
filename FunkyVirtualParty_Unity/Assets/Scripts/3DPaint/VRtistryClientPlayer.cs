@@ -12,13 +12,16 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public AnswerOptionButton playerAnswer;
 
-    [SerializeField] public MeshSyncer phone;
+    [SerializeField] public MeshSyncer[] phones; //Phone meshes corresponding to each phone anim
 
     protected override void LocalStart()
     {
         base.LocalStart();
 
-        phone.GetComponent<RealtimeView>().RequestOwnership();
+        foreach (MeshSyncer ms in phones)
+        {
+            ms.GetComponent<RealtimeView>().RequestOwnership();
+        }
 
         SetSpawnRotation();
         Invoke("SetSitAnim", 1);
@@ -100,10 +103,23 @@ public class VRtistryClientPlayer : ClientPlayer
         animSyncer.Trigger = "Sit1";
     }
 
+    [HideInInspector]
+    public int usingPhone;
     public void TogglePhone()
     {
-        animSyncer.ToggleBool = "UsingPhone";
-        phone.Enabled = !phone.Enabled;
+        if(usingPhone == 0)
+        {
+            usingPhone = Random.Range(1, 4);
+            animSyncer.ToggleBool = "UsingPhone" + usingPhone;
+            animSyncer.AnimOffset = Random.Range(0.0f, 1.0f);
+            phones[usingPhone - 1].Enabled = true;
+        }
+        else
+        {
+            animSyncer.ToggleBool = "UsingPhone" + usingPhone;
+            phones[usingPhone - 1].Enabled = false;
+            usingPhone = 0;
+        }
     }
 
     protected void SetSpawnRotation()
