@@ -564,7 +564,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                         correctAnswer = answerResultsSorted[i];
                     }
                 }
-                int correctAnswerDelay = (k + 1) * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
+                int correctAnswerDelay = k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
                 correctAnswer.AnimateAnswers(correctAnswerDelay);
                 Invoke("SetLeaderboardState", (correctAnswerDelay + ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME));
 
@@ -778,8 +778,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             //Find the answer that the player chose
             if (aob.playerID.Equals(answerPlayerID))
             {
-                ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(playerID);
-                aob.AddPlayerIcon(cp.syncer.Name, cp.syncer.Color);
+                aob.AddPlayerIcon(playerID);
                 return;
             }
         }

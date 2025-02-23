@@ -76,13 +76,18 @@ public class AnswerOptionButton : MonoBehaviour
     {
         foreach (Image i in playerIcons)
         {
-            i.gameObject.SetActive(false);
             (i.transform as RectTransform).localScale = Vector3.zero;
+            i.GetComponentsInChildren<Image>()[1].color = Color.white;
+            i.GetComponentInChildren<TMP_Text>().color = Color.black;
+            i.GetComponent<LayoutElement>().ignoreLayout = false;
+            i.gameObject.SetActive(false);
         }
     }
 
-    public void AddPlayerIcon(string name, Color col)
+    public void AddPlayerIcon(int id)
     {
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(id);
+
         //Find next player icon available
         foreach (Image i in playerIcons)
         {
@@ -90,11 +95,13 @@ public class AnswerOptionButton : MonoBehaviour
             {
                 i.gameObject.SetActive(true);
 
+                i.gameObject.name = "" + id;
+
                 //Set color
-                i.color = col;
+                i.color = cp.syncer.Color;
 
                 //Set player name text
-                i.GetComponentInChildren<TMP_Text>().text = name;
+                i.GetComponentInChildren<TMP_Text>().text = cp.syncer.Name;
 
                 return;
             }
@@ -128,11 +135,86 @@ public class AnswerOptionButton : MonoBehaviour
         if(correctAnswerBanner.activeSelf)
         {
             (correctAnswerBanner.transform as RectTransform).DOScale(correctAnswerBannerInitialScale, 1).SetEase(Ease.OutElastic, 1.25f);
+            yield return new WaitForSeconds(2);
+            AnimateScores();
         }
     }
 
     public void AnimateScores()
     {
+        StartCoroutine("AnimateScoresCoroutine");
+    }
 
+    IEnumerator AnimateScoresCoroutine()
+    {
+        //Scale player icon down
+        foreach (Image i in playerIcons)
+        {
+            if (i.gameObject.activeSelf)
+            {
+                (playerIcons[0].transform as RectTransform).DOScale(0, 0.25f);
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
+
+        //Convert to score and scale back up
+        foreach (Image i in playerIcons)
+        {
+            if (i.gameObject.activeSelf)
+            {
+                SetImageAlpha(i.GetComponentsInChildren<Image>()[0], 0);
+                SetImageAlpha(i.GetComponentsInChildren<Image>()[1], 0);
+                i.GetComponentInChildren<TMP_Text>().text = "500";
+                i.GetComponentInChildren<TMP_Text>().color = Color.green;
+                i.GetComponent<LayoutElement>().ignoreLayout = true;
+
+                (playerIcons[0].transform as RectTransform).DOScale(1, 0.25f);
+
+                yield return new WaitForSeconds(0.25f);
+            }
+        }
+
+        yield return new WaitForSeconds(2);
+
+        //Translate to corresponding player
+        foreach (Image i in playerIcons)
+        {
+            if (i.gameObject.activeSelf)
+            {
+                ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(int.Parse(i.gameObject.name));
+                (playerIcons[0].transform as RectTransform).DOMove(cp.transform.position, 1);
+                i.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 1);
+            }
+        }
+    }
+
+    /*
+     IEnumerator AnimateScoresCoroutine()
+    {
+        Image i = playerIcons[0];
+        (playerIcons[0].transform as RectTransform).DOScale(0, 0.25f);
+
+        yield return new WaitForSeconds(0.25f);
+
+        SetImageAlpha(i.GetComponentsInChildren<Image>()[0], 0);
+        SetImageAlpha(i.GetComponentsInChildren<Image>()[1], 0);
+        i.GetComponentInChildren<TMP_Text>().text = "500";
+        i.GetComponentInChildren<TMP_Text>().color = Color.green;
+        i.GetComponent<LayoutElement>().ignoreLayout = true;
+
+        (playerIcons[0].transform as RectTransform).DOScale(1, 0.25f);
+
+        yield return new WaitForSeconds(2);
+
+        (playerIcons[0].transform as RectTransform).DOMove(testPos.position, 1);
+        i.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 1);
+    }
+     * */
+
+    void SetImageAlpha(Image i, float a)
+    {
+        Color col = i.color;
+        col.a = a;
+        i.color = col;
     }
 }

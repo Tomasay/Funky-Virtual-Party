@@ -342,7 +342,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                         correctAnswer = answerResultsSorted[i];
                     }
                 }
-                correctAnswer.AnimateAnswers((k + 1) * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
+                correctAnswer.AnimateAnswers(k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
                 break;
             case "leaderboard":
                 /*
@@ -447,8 +447,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             //Find the answer that the player chose
             if (aob.playerID.Equals(answerPlayerID))
             {
-                ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(playerID);
-                aob.AddPlayerIcon(cp.syncer.Name, cp.syncer.Color);
+                aob.AddPlayerIcon(playerID);
                 return;
             }
         }
