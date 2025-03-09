@@ -26,10 +26,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 #endif
 
     [SerializeField]
-    TMP_Text headerText;
+    TMP_Text inputHeaderText, blurHeaderText;
 
     [SerializeField]
-    TMP_Text timerText, inputTimerText;
+    TMP_Text blurTimerText, inputTimerText;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -156,14 +156,20 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             }
         }
 
-        if(VRtistrySyncer.instance.DrawingTimer >= 0)
+        if (VRtistrySyncer.instance.State.Equals("vr painting"))
         {
-            timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
+            if (VRtistrySyncer.instance.DrawingTimer >= 0)
+            {
+                if (blurTimerText.enabled) blurTimerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
+            }
         }
-
-        if (VRtistrySyncer.instance.ClientAnswerTimer >= 0)
+        else
         {
-            inputTimerText.text = FormatTime(VRtistrySyncer.instance.ClientAnswerTimer);
+            if (VRtistrySyncer.instance.ClientAnswerTimer >= 0)
+            {
+                if (inputTimerText.enabled) inputTimerText.text = FormatTime(VRtistrySyncer.instance.ClientAnswerTimer);
+                if (blurTimerText.enabled) blurTimerText.text = FormatTime(VRtistrySyncer.instance.ClientAnswerTimer);
+            }
         }
     }
 
@@ -174,7 +180,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
         {
-            headerText.text = "Waiting for VR player to complete tutorial...";
+            inputTimerText.enabled = false;
+            blurTimerText.enabled = false;
+            blurHeaderText.text = "Waiting for VR player to complete tutorial...";
         }
     }
 
@@ -187,7 +195,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         inputCanvas.enabled = true;
         answerInputField.text = "";
-        headerText.text = p; //Set prompt text
+        blurHeaderText.text = "";
+        inputHeaderText.text = p; //Set prompt text
         playerInputParent.SetActive(true); //Enable input
         playersAnswering = true;
 
@@ -208,11 +217,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     protected void OnStateChange(string s)
     {
-        Debug.Log("State changed to: " + s);
-
         switch (s)
         {
             case "clients answering":
+                inputTimerText.enabled = true;
+
                 //Enable phone anim for local player, which will then be synced for everyone else
                 VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
                 if (vcp.usingPhone == 0)
@@ -221,23 +230,25 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 }
                 break;
             case "vr posing":
-                headerText.text = "Waiting for VR player to set a pose...";
+                //Show blurred view
+                inputCanvas.enabled = false;
+
+                blurHeaderText.text = "Waiting for VR player to set a pose...";
                 break;
             case "vr painting":
                 //Bake mannequin IK
                 mannequinSolver.SetPoseColliders();
 
-                //Show blurred view
-                inputCanvas.enabled = false;
-
-                timerText.enabled = true;
-                timerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
+                blurTimerText.enabled = true;
+                blurTimerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
+                blurHeaderText.text = "VR Player is creating a masterpiece...";
 
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
             case "clients guessing":
-                timerText.enabled = false;
+                blurTimerText.enabled = false;
+                inputTimerText.enabled = false;
 
                 //Make sure there's no lingering drawings
                 pen.CanPaint = false;
@@ -296,6 +307,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 }
                 break;
             case "vr guessing":
+                blurHeaderText.text = "VR player is guessing who wrote the selected answer";
+
                 leanTouch.gameObject.SetActive(false);
                 tapAndHoldRotateTutorial.SetActive(false);
 
@@ -321,6 +334,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 break;
             case "results":
+                blurHeaderText.text = "";
+
                 //Create duplicate list of answers, sorted by amount of players chose that answer
                 List<AnswerOptionButton> answerResultsSorted = answerResults.OrderBy(o => o.GetNumberOfPlayers()).ToList();
 
@@ -422,7 +437,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 #endif
         answerInputField.DeactivateInputField();
 
-        headerText.text = "Waiting for all players to submit their answer...";
+        inputCanvas.enabled = false;
+        blurHeaderText.text = "Waiting for all players to submit their answer...";
         playerInputParent.SetActive(false);
     }
 
