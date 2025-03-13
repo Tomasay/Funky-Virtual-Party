@@ -341,7 +341,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Animate players that chose each answer, ignoring answers that no players chose
                 AnswerOptionButton correctAnswer = null;
-                int k = 0;
+                int k = 1;
                 for (int i = 0; i < answerResultsSorted.Count; i++)
                 {
                     //Save correct answer for last
@@ -558,7 +558,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         currentLeaderboardCards.Add(vrCard);
 
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
 
         //Disable leaderboard
         leaderboardCanvas.enabled = false;

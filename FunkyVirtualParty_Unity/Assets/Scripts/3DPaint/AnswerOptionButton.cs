@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using NaughtyAttributes;
 
 public class AnswerOptionButton : MonoBehaviour
 {
@@ -77,8 +78,10 @@ public class AnswerOptionButton : MonoBehaviour
         foreach (Image i in playerIcons)
         {
             (i.transform as RectTransform).localScale = Vector3.zero;
+            (i.transform as RectTransform).localPosition = Vector3.zero;
             i.GetComponentsInChildren<Image>()[1].color = Color.white;
             i.GetComponentInChildren<TMP_Text>().color = Color.black;
+            i.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Normal;
             i.GetComponent<LayoutElement>().ignoreLayout = false;
             i.gameObject.SetActive(false);
         }
@@ -140,6 +143,19 @@ public class AnswerOptionButton : MonoBehaviour
         }
     }
 
+    public void TestPositioning()
+    {
+        foreach (Image i in playerIcons)
+        {
+            if (i.gameObject.activeSelf)
+            {
+                Vector3 localPos = (i.transform as RectTransform).localPosition;
+                i.GetComponent<LayoutElement>().ignoreLayout = true;
+                (i.transform as RectTransform).localPosition = localPos;
+            }
+        }
+    }
+
     public void AnimateScores()
     {
         StartCoroutine("AnimateScoresCoroutine");
@@ -157,16 +173,26 @@ public class AnswerOptionButton : MonoBehaviour
             }
         }
 
-        //Convert to score and scale back up
+        //Get intial positions for names
+        List<Vector3> initialPositions = new List<Vector3>();
         foreach (Image i in playerIcons)
         {
-            if (i.gameObject.activeSelf)
+            initialPositions.Add((i.transform as RectTransform).localPosition);
+        }
+
+        //Convert to score and scale back up
+        for (int i = 0; i < playerIcons.Length; i++)
+        {
+            if (playerIcons[i].gameObject.activeSelf)
             {
-                SetImageAlpha(i.GetComponentsInChildren<Image>()[0], 0);
-                SetImageAlpha(i.GetComponentsInChildren<Image>()[1], 0);
-                i.GetComponentInChildren<TMP_Text>().text = "500";
-                i.GetComponentInChildren<TMP_Text>().color = Color.green;
-                i.GetComponent<LayoutElement>().ignoreLayout = true;
+                SetImageAlpha(playerIcons[i].GetComponentsInChildren<Image>()[0], 0);
+                SetImageAlpha(playerIcons[i].GetComponentsInChildren<Image>()[1], 0);
+                playerIcons[i].GetComponentInChildren<TMP_Text>().text = "500";
+                playerIcons[i].GetComponentInChildren<TMP_Text>().color = Color.green;
+                playerIcons[i].GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Bold;
+
+                playerIcons[i].GetComponent<LayoutElement>().ignoreLayout = true;
+                (playerIcons[i].transform as RectTransform).localPosition = initialPositions[i];
 
                 (playerIcons[0].transform as RectTransform).DOScale(1, 0.25f);
 
@@ -174,7 +200,7 @@ public class AnswerOptionButton : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(1);
 
         //Translate to corresponding player
         foreach (Image i in playerIcons)

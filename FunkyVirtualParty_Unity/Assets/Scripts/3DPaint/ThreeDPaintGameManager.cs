@@ -545,9 +545,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 //Create duplicate list of answers, sorted by amount of players chose that answer
                 List<AnswerOptionButton> answerResultsSorted = answerResults.OrderBy(o => o.GetNumberOfPlayers()).ToList();
 
+                //Answers that no players chose, save these to show briefly at the end
+                List<AnswerOptionButton> answersWithNoGuesses = new List<AnswerOptionButton>();
+
                 //Animate players that chose each answer, ignoring answers that no players chose
                 AnswerOptionButton correctAnswer = null;
-                int k = 0;
+                int k = 1;
                 for (int i = 0; i < answerResultsSorted.Count; i++)
                 {
                     //Save correct answer for last
@@ -558,15 +561,28 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             answerResultsSorted[i].AnimateAnswers(k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
                             k++;
                         }
+                        else
+                        {
+                            answersWithNoGuesses.Add(answerResultsSorted[i]);
+                        }
                     }
                     else
                     {
                         correctAnswer = answerResultsSorted[i];
                     }
                 }
+
+                //Animate correct answer
                 int correctAnswerDelay = k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
                 correctAnswer.AnimateAnswers(correctAnswerDelay);
-                Invoke("SetLeaderboardState", (correctAnswerDelay + ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME));
+
+                //Display answers that got no guesses
+                foreach (AnswerOptionButton aob in answersWithNoGuesses)
+                {
+                    aob.AnimateAnswers(correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2));
+                }
+
+                Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2)));
 
                 break;
             case "leaderboard":
@@ -699,7 +715,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         currentLeaderboardCards.Add(vrCard);
 
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
 
         //Disable leaderboard
         leaderboardParent.SetActive(false);
