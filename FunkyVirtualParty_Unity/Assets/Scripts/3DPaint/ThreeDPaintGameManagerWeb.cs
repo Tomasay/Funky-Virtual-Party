@@ -247,6 +247,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
             case "clients guessing":
+                (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
+
                 blurTimerText.enabled = false;
                 inputTimerText.enabled = false;
 
@@ -454,6 +456,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         }
 
         guessingCanvas.enabled = false;
+
+        (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
     }
 
     void AddPlayerToResults(int playerID, string answerPlayerID)
