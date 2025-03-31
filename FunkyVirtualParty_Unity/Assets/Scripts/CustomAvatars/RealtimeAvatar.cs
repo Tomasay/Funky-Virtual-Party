@@ -151,7 +151,7 @@ namespace CustomAvatars {
             if (_rightHand != null)
             {
                 _rightHand.gameObject.SetActive(model.rightHandActive);
-                SetHandMeshVisibility(false, model.leftHandActive);
+                SetHandMeshVisibility(false, model.rightHandActive);
             }
         }
 
