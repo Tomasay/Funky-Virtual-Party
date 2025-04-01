@@ -889,6 +889,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
             c.enabled = false;
         }
 
+        //Setup constraint
+        ParentConstraint pc = (isSprayGun) ? sprayGun.GetComponent<ParentConstraint>() : pen.GetComponent<ParentConstraint>();
+        if (pc.sourceCount > 0) pc.RemoveSource(0);
+        ConstraintSource src = new ConstraintSource();
+        src.sourceTransform = isToolHandLeft ? vrPlayer.leftHandGrabPoint : vrPlayer.rightHandGrabPoint;
+        src.weight = 1;
+        pc.AddSource(src);
+        pc.constraintActive = true;
+
         //Grab proper tool
         if (isToolHandLeft)
         {
@@ -961,7 +970,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             //Handle constraints
             ParentConstraint pc;
 
-            if (sprayGun.active)
+            if (!VRtistrySyncer.instance.IsPenEnabled)
             {
                 sprayGun.GetComponent<ParentConstraint>().constraintActive = false;
                 pc = pen.GetComponent<ParentConstraint>();
@@ -978,10 +987,20 @@ public class ThreeDPaintGameManager : MonoBehaviour
             src.weight = 1;
             pc.AddSource(src);
             pc.constraintActive = true;
+
+            //Ensure mesh visibility
+            if (VRtistrySyncer.instance.IsPenEnabled)
+            {
+                pen.SetMeshVisibility(true);
+            }
+            else
+            {
+                sprayGun.SetMeshVisibility(true);
+            }
         }
         else if(g.gameObject.name.Equals("PaintPalette"))
         {
-            if(sprayGun.active)
+            if(!VRtistrySyncer.instance.IsPenEnabled)
             {
                 sprayGun.GetComponent<Collider>().enabled = true;
             }
@@ -996,7 +1015,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     public void ToggleTool()
     {
-        GrabTool(!sprayGun.active);
+        GrabTool(VRtistrySyncer.instance.IsPenEnabled);
     }
 
     int toggleToolHandCooldown = 1;
@@ -1016,16 +1035,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         sprayGun.GetComponent<Grabbable>().handType = toolHand;
         paintPalette.GetComponent<Grabbable>().handType = (toolHand == HandType.left) ? HandType.right : HandType.left;
 
-        ParentConstraint pc = (sprayGun.active) ? sprayGun.GetComponent<ParentConstraint>() : pen.GetComponent<ParentConstraint>();
-        pc.RemoveSource(0);
-        ConstraintSource src = new ConstraintSource();
-        src.sourceTransform = (toolHand == HandType.left) ? vrPlayer.leftHandGrabPoint : vrPlayer.rightHandGrabPoint;
-        src.weight = 1;
-        pc.AddSource(src);
-        pc.constraintActive = true;
-
         needToGrabPalette = true;
-        GrabTool(sprayGun.active);
+        GrabTool(!VRtistrySyncer.instance.IsPenEnabled);
 
         timeLastToggled = Time.time;
     }
@@ -1063,7 +1074,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             vrPlayer.rightHand.ForceReleaseGrab();
         }
 
-        if (sprayGun.active)
+        if (!VRtistrySyncer.instance.IsPenEnabled)
         {
             sprayGun.GetComponent<Collider>().enabled = false;
         }
