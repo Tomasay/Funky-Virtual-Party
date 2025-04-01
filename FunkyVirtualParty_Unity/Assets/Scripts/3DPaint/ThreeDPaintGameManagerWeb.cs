@@ -234,6 +234,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 inputCanvas.enabled = false;
 
                 blurHeaderText.text = "Waiting for VR player to set a pose...";
+
+                //Reset any painting from practicing
+                paintTexture.Clear();
+                pen.EraseAllLines();
                 break;
             case "vr painting":
                 //Bake mannequin IK
