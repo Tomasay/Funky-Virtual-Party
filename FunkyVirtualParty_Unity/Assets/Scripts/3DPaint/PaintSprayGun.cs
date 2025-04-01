@@ -153,4 +153,9 @@ public class PaintSprayGun : MonoBehaviour
         this.active = active;
 #endif
     }
+
+    public void SetMeshVisibility(bool visible)
+    {
+        baseMesh.enabled = visible;
+    }
 }

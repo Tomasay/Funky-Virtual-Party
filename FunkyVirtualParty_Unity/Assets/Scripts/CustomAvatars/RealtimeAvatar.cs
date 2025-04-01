@@ -1,9 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR;
 using Normal.Utility;
 using Normal.Realtime;
+
+#if UNITY_EDITOR
+using NaughtyAttributes;
+#endif
 
 namespace CustomAvatars {
     [DefaultExecutionOrder(RealtimeAvatar.ExecutionOrder)] // Make sure our Update() runs before the default to so that the avatar positions are as up to date as possible when everyone else's Update() runs.
@@ -78,6 +83,13 @@ namespace CustomAvatars {
 
         private static List<XRNodeState> _nodeStates = new List<XRNodeState>();
 
+        public UnityEvent<bool, bool> OnHandMeshVisibilityChanged;
+
+        private void Awake()
+        {
+            OnHandMeshVisibilityChanged = new UnityEvent<bool, bool>();
+        }
+
         void Start() {
             // Register with RealtimeAvatarManager
             try {
@@ -141,22 +153,41 @@ namespace CustomAvatars {
             }
         }
 
+#if UNITY_EDITOR
+        [Button]
+        public void SimulateRightHandDisconnect()
+        {
+            _rightHand.gameObject.SetActive(false);
+            SetHandMeshVisibility(false, false);
+        }
+
+        [Button]
+        public void SimulateRightHandReconnect()
+        {
+            _rightHand.gameObject.SetActive(true);
+            SetHandMeshVisibility(false, true);
+        }
+#endif
+
         void ActiveStateChanged(RealtimeAvatarModel model, bool nodeIsActive) {
             // Leave the head active so RealtimeAvatarVoice runs even when the head isn't tracking.
+            // NOTE: Only disabling meshes of hands, as disabling hand gameobjects in VRtistry breaks tool grabbables
             if (_leftHand != null)
             {
-                _leftHand.gameObject.SetActive(model.leftHandActive);
+                //_leftHand.gameObject.SetActive(model.leftHandActive);
                 SetHandMeshVisibility(true, model.leftHandActive);
             }
             if (_rightHand != null)
             {
-                _rightHand.gameObject.SetActive(model.rightHandActive);
+                //_rightHand.gameObject.SetActive(model.rightHandActive);
                 SetHandMeshVisibility(false, model.rightHandActive);
             }
         }
 
         void SetHandMeshVisibility(bool left, bool enabled)
         {
+            OnHandMeshVisibilityChanged.Invoke(left, enabled);
+
             if (leftRobotHand == null || rightRobotHand == null)
             {
                 return;

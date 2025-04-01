@@ -189,6 +189,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
+        avatar.OnHandMeshVisibilityChanged.AddListener(OnHandVisibilityChanged);
+
         vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();
 
         vrPlayer.leftHand.GetComponent<HandPublicEvents>().OnGrab.AddListener(OnGrabbed);
@@ -196,6 +198,31 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         vrPlayer.leftHand.GetComponent<HandAdvancedOptions>().ignoreHandCollider.Add(mannequinUVs.GetComponent<MeshCollider>());
         vrPlayer.rightHand.GetComponent<HandAdvancedOptions>().ignoreHandCollider.Add(mannequinUVs.GetComponent<MeshCollider>());
+    }
+
+    bool shouldToolsBeVisible = false; //Should tools be marked visible when hands reconnect?
+    void OnHandVisibilityChanged(bool left, bool visible)
+    {
+        if (!shouldToolsBeVisible)
+        {
+            return;
+        }
+
+        if((toolHand == HandType.left && left) || (toolHand == HandType.right && !left))
+        {
+            if(VRtistrySyncer.instance.IsPenEnabled)
+            {
+                pen.SetMeshVisibility(visible);
+            }
+            else
+            {
+                sprayGun.SetMeshVisibility(visible);
+            }
+        }
+        else
+        {
+            paintPalette.GetComponent<PaintPalette>().SetActive(visible);
+        }
     }
 
     public void GrabToolsStart()
@@ -871,6 +898,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         {
             vrPlayer.rightHand.Grab(GrabType.InstantGrab);
         }
+
+        shouldToolsBeVisible = true;
     }
 
     void DropTool()
@@ -889,6 +918,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         sprayGun.SetActive(false);
         pen.SetActive(false);
+
+        shouldToolsBeVisible = false;
     }
 
     IEnumerator GrabDelayed(bool isToolHandLeft, float delay)

@@ -230,4 +230,10 @@ public class ThreeDPen : MonoBehaviour
         this.active = active;
 #endif
     }
+
+    public void SetMeshVisibility(bool visible)
+    {
+        tipMesh.enabled = visible;
+        baseMesh.enabled = visible;
+    }
 }
