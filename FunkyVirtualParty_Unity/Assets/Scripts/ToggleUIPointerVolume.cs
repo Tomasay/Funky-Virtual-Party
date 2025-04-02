@@ -1,0 +1,23 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using Autohand;
+
+public class ToggleUIPointerVolume : MonoBehaviour
+{
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.layer == LayerMask.NameToLayer("Hand"))
+        {
+            other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(false);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Hand"))
+        {
+            other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(true);
+        }
+    }
+}
