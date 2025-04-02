@@ -52,6 +52,7 @@ GameObject:
   - component: {fileID: 8164021777672993061}
   - component: {fileID: 1964613435646494720}
   - component: {fileID: 6562981292038903040}
+  - component: {fileID: 8272064927683547111}
   m_Layer: 29
   m_Name: 3DPen
   m_TagString: Untagged
@@ -324,12 +325,13 @@ MonoBehaviour:
   tip: {fileID: 7458268347831345583}
   tipMesh: {fileID: 2020831445175293482}
   baseMesh: {fileID: 8088608048997232918}
+  tipMeshSyncer: {fileID: 3439077255721469996}
+  baseMeshSyncer: {fileID: 8272064927683547111}
   constraint: {fileID: 4189939568797337253}
   palette: {fileID: 0}
   col: {fileID: 7458268346312224142}
   tipCol: {fileID: 7957478968766357229}
   rb: {fileID: 7458268346312224145}
-  gm: {fileID: 0}
   active: 0
   OnDraw:
     m_PersistentCalls:
@@ -1219,7 +1221,11 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 1964613435646494720}
-  _childViews: []
+  - componentID: 2
+    component: {fileID: 8272064927683547111}
+  _childViews:
+  - componentID: 1
+    component: {fileID: 1566523209847632854}
 --- !u!114 &1964613435646494720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1255,6 +1261,18 @@ MonoBehaviour:
   - {fileID: 2750476897794741687}
   - {fileID: 7458268346312224144}
   - {fileID: 1114771459}
+--- !u!114 &8272064927683547111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7728315887617822915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8069402188390524747
 GameObject:
   m_ObjectHideFlags: 0
@@ -1267,6 +1285,8 @@ GameObject:
   - component: {fileID: 4776626174916609886}
   - component: {fileID: 2020831445175293482}
   - component: {fileID: 7957478968766357229}
+  - component: {fileID: 1566523209847632854}
+  - component: {fileID: 3439077255721469996}
   m_Layer: 29
   m_Name: Tip
   m_TagString: Untagged
@@ -1352,3 +1372,38 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.020889338, y: 0.020889338, z: 0.028004557}
   m_Center: {x: 4.656613e-10, y: 0, z: 0.12283039}
+--- !u!114 &1566523209847632854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8069402188390524747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 3439077255721469996}
+  _childViews: []
+--- !u!114 &3439077255721469996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8069402188390524747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

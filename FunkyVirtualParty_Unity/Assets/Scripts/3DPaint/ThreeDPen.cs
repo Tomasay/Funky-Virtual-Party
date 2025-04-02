@@ -26,6 +26,9 @@ public class ThreeDPen : MonoBehaviour
     MeshRenderer tipMesh, baseMesh;
 
     [SerializeField]
+    MeshSyncer tipMeshSyncer, baseMeshSyncer;
+
+    [SerializeField]
     ParentConstraint constraint;
 
     [SerializeField]
@@ -218,22 +221,20 @@ public class ThreeDPen : MonoBehaviour
     public void SetActive(bool active)
     {
 #if !UNITY_WEBGL
-        tipMesh.enabled = active;
-        baseMesh.enabled = active;
+        tipMeshSyncer.Enabled = active;
+        baseMeshSyncer.Enabled = active;
         col.enabled = active;
         tipCol.enabled = active;
         this.active = active;
 #endif
 #if UNITY_WEBGL
-        tipMesh.enabled = active;
-        baseMesh.enabled = active;
         this.active = active;
 #endif
     }
 
     public void SetMeshVisibility(bool visible)
     {
-        tipMesh.enabled = visible;
-        baseMesh.enabled = visible;
+        tipMeshSyncer.Enabled = visible;
+        baseMeshSyncer.Enabled = visible;
     }
 }

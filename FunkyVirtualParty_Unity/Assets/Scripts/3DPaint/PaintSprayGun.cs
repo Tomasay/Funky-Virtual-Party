@@ -28,6 +28,9 @@ public class PaintSprayGun : MonoBehaviour
     MeshRenderer baseMesh;
 
     [SerializeField]
+    MeshSyncer baseMeshSyncer;
+
+    [SerializeField]
     PaintPalette palette;
 
     [SerializeField]
@@ -144,18 +147,17 @@ public class PaintSprayGun : MonoBehaviour
     public void SetActive(bool active)
     {
 #if !UNITY_WEBGL
-        baseMesh.enabled = active;
+        baseMeshSyncer.Enabled = active;
         col.enabled = active;
         this.active = active;
 #endif
 #if UNITY_WEBGL
-        baseMesh.enabled = active;
         this.active = active;
 #endif
     }
 
     public void SetMeshVisibility(bool visible)
     {
-        baseMesh.enabled = visible;
+        baseMeshSyncer.Enabled = visible;
     }
 }

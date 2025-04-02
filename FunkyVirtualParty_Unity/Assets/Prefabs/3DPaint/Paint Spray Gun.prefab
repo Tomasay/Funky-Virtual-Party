@@ -5086,6 +5086,7 @@ GameObject:
   - component: {fileID: 1490745514258016597}
   - component: {fileID: 3787740351373264215}
   - component: {fileID: 6740574520016005874}
+  - component: {fileID: 4103776082456404950}
   m_Layer: 29
   m_Name: Paint Spray Gun
   m_TagString: Untagged
@@ -6227,6 +6228,7 @@ MonoBehaviour:
   ps: {fileID: 4590413093452200514}
   paintSphere: {fileID: 4590413093452200516}
   baseMesh: {fileID: 4590413094623354104}
+  baseMeshSyncer: {fileID: 4103776082456404950}
   palette: {fileID: 0}
   col: {fileID: 4590413094623354108}
   constraint: {fileID: 6361721950504437107}
@@ -6293,6 +6295,8 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 3787740351373264215}
+  - componentID: 2
+    component: {fileID: 4103776082456404950}
   _childViews: []
 --- !u!114 &3787740351373264215
 MonoBehaviour:
@@ -6329,3 +6333,15 @@ MonoBehaviour:
   - {fileID: 707748359044679317}
   - {fileID: 4590413094623354107}
   - {fileID: 1320623855}
+--- !u!114 &4103776082456404950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4590413094623354086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

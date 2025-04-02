@@ -12,6 +12,9 @@ public class PaintPalette : MonoBehaviour
     MeshRenderer[] colorMeshes;
 
     [SerializeField]
+    MeshSyncer[] meshSyncers;
+
+    [SerializeField]
     Mesh leftHandMesh, rightHandMesh;
     public bool currentMeshLeft = true;
 
@@ -113,9 +116,11 @@ public class PaintPalette : MonoBehaviour
 
     public void SetActive(bool active)
     {
-        foreach (MeshRenderer mr in GetComponentsInChildren<MeshRenderer>())
+#if UNITY_ANDROID
+        foreach (MeshSyncer ms in meshSyncers)
         {
-            mr.enabled = active;
+            ms.Enabled = active;
         }
+#endif
     }
 }

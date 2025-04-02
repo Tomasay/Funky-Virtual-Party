@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 7920089448787893937}
   - component: {fileID: 4384904530440127852}
   - component: {fileID: 8568230136948613798}
+  - component: {fileID: 4275724529972626923}
   m_Layer: 29
   m_Name: PaintPalette
   m_TagString: Untagged
@@ -80,7 +81,6 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 8d61d0ce0ec6aa64dbfd2988f5eb3119, type: 2}
   - {fileID: 2100000, guid: 8d61d0ce0ec6aa64dbfd2988f5eb3119, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1132,6 +1132,17 @@ MonoBehaviour:
   - {fileID: 3672947868740087444}
   - {fileID: 1605336849003150167}
   - {fileID: 2555064047264706438}
+  meshSyncers:
+  - {fileID: 4275724529972626923}
+  - {fileID: 4124278790216889700}
+  - {fileID: 8946367783275781612}
+  - {fileID: 7331113674542297581}
+  - {fileID: 4393564624251181204}
+  - {fileID: 7967557867952731284}
+  - {fileID: 5005750708735752145}
+  - {fileID: 1798901307067282373}
+  - {fileID: 1945394093482987551}
+  - {fileID: 5505756600838288207}
   leftHandMesh: {fileID: 7874570928281092517, guid: ffb81f63716a20648b954a7c9f9aaefd, type: 3}
   rightHandMesh: {fileID: 7874570928281092517, guid: d39fe7e8aa334df48b398b4b236ea5ce, type: 3}
   currentMeshLeft: 1
@@ -1161,7 +1172,27 @@ MonoBehaviour:
   _components:
   - componentID: 1
     component: {fileID: 4384904530440127852}
-  _childViews: []
+  - componentID: 2
+    component: {fileID: 4275724529972626923}
+  _childViews:
+  - componentID: 1
+    component: {fileID: 6433151380701338439}
+  - componentID: 2
+    component: {fileID: 3819533143032733356}
+  - componentID: 3
+    component: {fileID: 6932881738931196129}
+  - componentID: 4
+    component: {fileID: 6854879508789682629}
+  - componentID: 5
+    component: {fileID: 3649953533886918590}
+  - componentID: 6
+    component: {fileID: 3852726306311881766}
+  - componentID: 7
+    component: {fileID: 8409404237595179741}
+  - componentID: 8
+    component: {fileID: 7277493291346499399}
+  - componentID: 9
+    component: {fileID: 6958657014601513941}
 --- !u!114 &4384904530440127852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1197,6 +1228,18 @@ MonoBehaviour:
   - {fileID: 6624454180844753420}
   - {fileID: 5559262786836256587}
   - {fileID: 7895919491142778780}
+--- !u!114 &4275724529972626923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 594011468458317952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &799079142282651424
 GameObject:
   m_ObjectHideFlags: 0
@@ -1210,6 +1253,8 @@ GameObject:
   - component: {fileID: 4434168986151838763}
   - component: {fileID: 292714745125150579}
   - component: {fileID: 1770996545019285850}
+  - component: {fileID: 3819533143032733356}
+  - component: {fileID: 8946367783275781612}
   m_Layer: 0
   m_Name: PaintPalette.002
   m_TagString: Untagged
@@ -1313,6 +1358,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3819533143032733356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799079142282651424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 8946367783275781612}
+  _childViews: []
+--- !u!114 &8946367783275781612
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 799079142282651424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1983380329821111491
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,6 +1406,8 @@ GameObject:
   - component: {fileID: 9216176807976823033}
   - component: {fileID: 6057402991864771995}
   - component: {fileID: 8553683264246598993}
+  - component: {fileID: 6854879508789682629}
+  - component: {fileID: 4393564624251181204}
   m_Layer: 0
   m_Name: PaintPalette.004
   m_TagString: Untagged
@@ -1429,6 +1511,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6854879508789682629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983380329821111491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 4393564624251181204}
+  _childViews: []
+--- !u!114 &4393564624251181204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983380329821111491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3797991471545840152
 GameObject:
   m_ObjectHideFlags: 0
@@ -1442,6 +1559,8 @@ GameObject:
   - component: {fileID: 2555064047264706438}
   - component: {fileID: 4476818669841842893}
   - component: {fileID: 7167032796039413805}
+  - component: {fileID: 6958657014601513941}
+  - component: {fileID: 5505756600838288207}
   m_Layer: 0
   m_Name: PaintPalette.009
   m_TagString: Untagged
@@ -1545,6 +1664,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6958657014601513941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3797991471545840152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 5505756600838288207}
+  _childViews: []
+--- !u!114 &5505756600838288207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3797991471545840152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4669535459808229059
 GameObject:
   m_ObjectHideFlags: 0
@@ -1558,6 +1712,8 @@ GameObject:
   - component: {fileID: 3672947868740087444}
   - component: {fileID: 8209109103492248366}
   - component: {fileID: 4907996510486762755}
+  - component: {fileID: 8409404237595179741}
+  - component: {fileID: 1798901307067282373}
   m_Layer: 0
   m_Name: PaintPalette.007
   m_TagString: Untagged
@@ -1661,6 +1817,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8409404237595179741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4669535459808229059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 1798901307067282373}
+  _childViews: []
+--- !u!114 &1798901307067282373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4669535459808229059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5393120452526474414
 GameObject:
   m_ObjectHideFlags: 0
@@ -1674,6 +1865,8 @@ GameObject:
   - component: {fileID: 3873973262618254648}
   - component: {fileID: 7572511319888275299}
   - component: {fileID: 4752775287960171641}
+  - component: {fileID: 6932881738931196129}
+  - component: {fileID: 7331113674542297581}
   m_Layer: 0
   m_Name: PaintPalette.003
   m_TagString: Untagged
@@ -1777,6 +1970,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6932881738931196129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5393120452526474414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 7331113674542297581}
+  _childViews: []
+--- !u!114 &7331113674542297581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5393120452526474414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6296096110251369075
 GameObject:
   m_ObjectHideFlags: 0
@@ -1790,6 +2018,8 @@ GameObject:
   - component: {fileID: 1259690979910478467}
   - component: {fileID: 2991458938056269282}
   - component: {fileID: 7961784442631449678}
+  - component: {fileID: 3649953533886918590}
+  - component: {fileID: 7967557867952731284}
   m_Layer: 0
   m_Name: PaintPalette.005
   m_TagString: Untagged
@@ -1893,6 +2123,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3649953533886918590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6296096110251369075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 7967557867952731284}
+  _childViews: []
+--- !u!114 &7967557867952731284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6296096110251369075}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7597404909549737517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1906,6 +2171,8 @@ GameObject:
   - component: {fileID: 1621094994062530338}
   - component: {fileID: 6721325405168567329}
   - component: {fileID: 8221866587235770799}
+  - component: {fileID: 6433151380701338439}
+  - component: {fileID: 4124278790216889700}
   m_Layer: 0
   m_Name: PaintPalette.001
   m_TagString: Untagged
@@ -2009,6 +2276,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6433151380701338439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7597404909549737517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 4124278790216889700}
+  _childViews: []
+--- !u!114 &4124278790216889700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7597404909549737517}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8508840882036982907
 GameObject:
   m_ObjectHideFlags: 0
@@ -2022,6 +2324,8 @@ GameObject:
   - component: {fileID: 1605336849003150167}
   - component: {fileID: 5105114531726154128}
   - component: {fileID: 575995958345067822}
+  - component: {fileID: 7277493291346499399}
+  - component: {fileID: 1945394093482987551}
   m_Layer: 0
   m_Name: PaintPalette.008
   m_TagString: Untagged
@@ -2125,6 +2429,41 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7277493291346499399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8508840882036982907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 1945394093482987551}
+  _childViews: []
+--- !u!114 &1945394093482987551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8508840882036982907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &9153007799170304338
 GameObject:
   m_ObjectHideFlags: 0
@@ -2138,6 +2477,8 @@ GameObject:
   - component: {fileID: 8574198656819952278}
   - component: {fileID: 6230779769826888265}
   - component: {fileID: 4174749803200546682}
+  - component: {fileID: 3852726306311881766}
+  - component: {fileID: 5005750708735752145}
   m_Layer: 0
   m_Name: PaintPalette.006
   m_TagString: Untagged
@@ -2241,3 +2582,38 @@ MonoBehaviour:
   OnTriggerExited:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &3852726306311881766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9153007799170304338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
+  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 5005750708735752145}
+  _childViews: []
+--- !u!114 &5005750708735752145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9153007799170304338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5dabca6d9a28f544bb649cb4cf98acb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

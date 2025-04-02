@@ -3,16 +3,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using Normal.Realtime;
 
-[RequireComponent(typeof(MeshRenderer))]
 public class MeshSyncer : RealtimeComponent<MeshSyncModel>
 {
     MeshRenderer mr;
+    SkinnedMeshRenderer smr;
+
+    bool isSMR = false;
 
     public bool Enabled { get => model.enabled; set => model.enabled = value; }
 
     void Awake()
     {
-        mr = GetComponent<MeshRenderer>();
+        if(TryGetComponent(out MeshRenderer m))
+        {
+            mr = m;
+        }
+        else if(TryGetComponent(out SkinnedMeshRenderer s))
+        {
+            smr = s;
+            isSMR = true;
+        }
+        else
+        {
+            Debug.LogError("No MeshRenderer or SkinnedMeshRenderer was found");
+        }
     }
 
     protected override void OnRealtimeModelReplaced(MeshSyncModel previousModel, MeshSyncModel currentModel)
@@ -28,7 +42,15 @@ public class MeshSyncer : RealtimeComponent<MeshSyncModel>
             // If this is a model that has no data set on it
             if (currentModel.isFreshModel)
             {
-                currentModel.enabled = mr.enabled;
+                if(isSMR)
+                {
+                    currentModel.enabled = smr.enabled;
+                }
+                else
+                {
+                    currentModel.enabled = mr.enabled;
+                }
+                
             }
 
             // Register for events
@@ -39,7 +61,14 @@ public class MeshSyncer : RealtimeComponent<MeshSyncModel>
     #region Variable Callbacks
     void OnEnabledChange(MeshSyncModel previousModel, bool val)
     {
-        mr.enabled = val;
+        if (isSMR)
+        {
+            smr.enabled = val;
+        }
+        else
+        {
+            mr.enabled = val;
+        }
     }
     #endregion
 }
