@@ -5,6 +5,7 @@ using Autohand;
 
 public class ToggleUIPointerVolume : MonoBehaviour
 {
+#if !UNITY_WEBGL
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.layer == LayerMask.NameToLayer("Hand"))
@@ -20,4 +21,5 @@ public class ToggleUIPointerVolume : MonoBehaviour
             other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(true);
         }
     }
+#endif
 }
