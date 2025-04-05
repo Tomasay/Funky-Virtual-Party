@@ -14,4 +14,12 @@ public class VRtistryVRPlayerController : VRPlayerController
 
     [SerializeField]
     public GameObject UIPointer;
+
+    [HideInInspector]
+    public Vector3 spawnPos;
+
+    private void Awake()
+    {
+        spawnPos = ahp.gameObject.transform.position;
+    }
 }

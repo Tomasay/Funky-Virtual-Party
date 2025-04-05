@@ -10,7 +10,8 @@ public class ToggleUIPointerVolume : MonoBehaviour
     {
         if(other.gameObject.layer == LayerMask.NameToLayer("Hand"))
         {
-            other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(false);
+            if(other.gameObject.GetComponentInChildren<HandCanvasPointer>(true))
+                other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(false);
         }
     }
 
@@ -18,7 +19,8 @@ public class ToggleUIPointerVolume : MonoBehaviour
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Hand"))
         {
-            other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(true);
+            if(other.gameObject.GetComponentInChildren<HandCanvasPointer>(true))
+                other.gameObject.GetComponentInChildren<HandCanvasPointer>(true).gameObject.SetActive(true);
         }
     }
 #endif

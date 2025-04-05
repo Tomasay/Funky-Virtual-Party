@@ -157,6 +157,16 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
 #endif
     }
 
+    public void FadeInManual()
+    {
+        StartCoroutine("FadeIn");
+    }
+
+    public void FadeOutManual()
+    {
+        StartCoroutine("FadeOut");
+    }
+
     IEnumerator FadeIn()
     {
 #if UNITY_WEBGL

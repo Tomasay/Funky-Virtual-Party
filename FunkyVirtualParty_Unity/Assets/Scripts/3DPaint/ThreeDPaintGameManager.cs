@@ -413,6 +413,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 //Display text that players are answering
                 headerText.text = "Players are typing their answers \nUse this time to practice painting!";
 
+                vrPlayer.Ahp.useMovement = true;
+
                 break;
             case "vr posing":
 #if !UNITY_WEBGL
@@ -469,6 +471,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 playerNamesIconParent.SetActive(true);
 
                 finishedPaintingEarlyButton.gameObject.SetActive(false);
+
+                SceneChangerSyncer.instance.FadeOutManual();
+                vrPlayer.Ahp.useMovement = false;
+                Invoke("ResetVRPlayerPos", 1);
                 break;
             case "vr guessing":
                 //Show guesses
@@ -624,6 +630,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void ResetVRPlayerPos()
+    {
+        vrPlayer.Ahp.SetPosition(vrPlayer.spawnPos);
+        vrPlayer.trackerOffsetsParent.localRotation = Quaternion.Euler(0, 0, 0);
+        SceneChangerSyncer.instance.FadeInManual();
     }
 
     void SetLeaderboardState()
