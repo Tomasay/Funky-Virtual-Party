@@ -342,7 +342,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             }
         }
 
-        if (VRtistrySyncer.instance.State == "clients answering")
+        if (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering")
         {
             //Enable VR tools
             pen.CanPaint = true;
