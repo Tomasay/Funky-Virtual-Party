@@ -93,6 +93,7 @@ public class KeyboardController : MonoBehaviour
 #endif
     }
 
+
 #if !UNITY_EDITOR && UNITY_WEBGL
     public void ButtonPointerDown()
     {
@@ -134,6 +135,11 @@ public class KeyboardController : MonoBehaviour
     {
         currentField = f;
         UpdateInputFieldText(f.text);
+    }
+
+    public void UpdateDummyInputText()
+    {
+        UpdateInputFieldText(currentField.text);
     }
 #endif
 }

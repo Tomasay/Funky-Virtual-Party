@@ -2526,7 +2526,19 @@ MonoBehaviour:
       m_Calls: []
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1408861836}
+        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
+        m_MethodName: UpdateDummyInputText
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_OnTouchScreenKeyboardStatusChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -5867,7 +5879,6 @@ MonoBehaviour:
   enableCustomizationButton: {fileID: 1788419342}
   closeCustomizationButton: {fileID: 796276646}
   controllerCanvas: {fileID: 1888857726}
-  backgroundDots: {fileID: 0}
   cam: {fileID: 1578151817}
 --- !u!114 &1519649831
 MonoBehaviour:
@@ -8449,6 +8460,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: RealtimeSingletonWeb, Assembly-CSharp
         m_MethodName: CheckValidPartyCode
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1408861836}
+        m_TargetAssemblyTypeName: KeyboardController, Assembly-CSharp
+        m_MethodName: UpdateDummyInputText
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
