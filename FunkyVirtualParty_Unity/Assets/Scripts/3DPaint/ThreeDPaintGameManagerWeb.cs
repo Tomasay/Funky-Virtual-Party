@@ -418,10 +418,30 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         submitButton.interactable = (input.Length > 0);
     }
 
+    TMP_InputField currentField;
     public void SetField(TMP_InputField f)
     {
+        currentField = f;
 #if UNITY_WEBGL && !UNITY_EDITOR
-        UpdateInputFieldText(f.text);
+        UpdateInputFieldText(currentField.text);
+#endif
+    }
+
+    public void UpdateDummyInputText()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        UpdateInputFieldText(currentField.text);
+#endif
+    }
+
+    public void UpdateDummyInputTextWithCharacterLimit(int limit)
+    {
+        if (currentField.text.Length > limit)
+        {
+            currentField.text = currentField.text.Substring(0, limit);
+        }
+#if UNITY_WEBGL && !UNITY_EDITOR
+        UpdateInputFieldText(currentField.text);
 #endif
     }
 
