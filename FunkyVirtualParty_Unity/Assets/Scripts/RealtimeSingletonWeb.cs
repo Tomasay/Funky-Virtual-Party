@@ -171,22 +171,22 @@ public class RealtimeSingletonWeb : MonoBehaviour
         Debug.Log("Avatars: " + realtimeAvatarManager.avatars.Count);
         if (!(realtimeAvatarManager.avatars.Count > 0))
         {
-            realtime.Disconnect();
             disconnectingDueToNoHost = true;
+            realtime.Disconnect();
             return;
         }
 
         if (ClientPlayer.clients != null && ClientPlayer.clients.Count >= ClientPlayer.maxClients)
         {
-            realtime.Disconnect();
             disconnectingMaxPlayers = true;
+            realtime.Disconnect();
             return;
         }
 
         if (!SceneChangerSyncer.instance.CurrentScene.Equals("MainMenu") && !SceneChangerSyncer.instance.CurrentScene.Equals(""))
         {
-            realtime.Disconnect();
             disconnectingMinigameInProgress = true;
+            realtime.Disconnect();
             return;
         }
 
@@ -195,7 +195,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         SetJoinedUI(true);
 
 #if !UNITY_EDITOR && UNITY_WEBGL
-            if(keyboardController) keyboardController.CloseKeyboard();
+        if(keyboardController) keyboardController.CloseKeyboard();
 #endif
 
         SpawnPlayer();
