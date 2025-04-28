@@ -198,6 +198,20 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         vrPlayer.leftHand.GetComponent<HandAdvancedOptions>().ignoreHandCollider.Add(mannequinUVs.GetComponent<MeshCollider>());
         vrPlayer.rightHand.GetComponent<HandAdvancedOptions>().ignoreHandCollider.Add(mannequinUVs.GetComponent<MeshCollider>());
+
+        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.AddListener(OnStartPoint);
+        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.AddListener(OnStopPoint);
+    }
+
+    void OnStartPoint(Vector3 vec, GameObject g)
+    {
+        sprayGun.CanPaint = false;
+        pen.CanPaint = false;
+    }
+
+    void OnStopPoint(Vector3 vec, GameObject g)
+    {
+        sprayGun.CanPaint = pen.CanPaint = (VRtistrySyncer.instance.State.Equals("clients answering") || VRtistrySyncer.instance.State.Equals("vr painting"));
     }
 
     bool shouldToolsBeVisible = false; //Should tools be marked visible when hands reconnect?

@@ -22,4 +22,10 @@ public class VRtistryVRPlayerController : VRPlayerController
     {
         spawnPos = ahp.gameObject.transform.position;
     }
+
+    private void OnDestroy()
+    {
+        UIPointer.GetComponent<HandCanvasPointer>().StartSelect.RemoveAllListeners();
+        UIPointer.GetComponent<HandCanvasPointer>().StopSelect.RemoveAllListeners();
+    }
 }
