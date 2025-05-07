@@ -126,6 +126,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerSubmittedAnswer);
+        VRtistrySyncer.instance.OnDecoyAnswersChanged.AddListener(SetDecoyAnswers);
     }
 
     private void OnDestroy()
@@ -326,7 +327,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                     if (int.TryParse(ownerAndGuess[0], out int i))
                     {
-                        AddPlayerToResults(i, ownerAndGuess[1]);
+                        if (ownerAndGuess[1] != "decoy")
+                        {
+                            AddPlayerToResults(i, ownerAndGuess[1]);
+                        }
 
                         if (int.TryParse(ownerAndGuess[1], out int j) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                         {
@@ -380,6 +384,22 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    void SetDecoyAnswers(string decoyAnswers)
+    {
+        if (decoyAnswers.Equals("")) return;
+
+        //TODO: Mix up indices of answers and decoy answers, so decoy answers are not always the last ones
+        foreach (string d in decoyAnswers.Split(','))
+        {
+            GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+            ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
+            AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+            aob.SetText(d);
+            aob.playerID = "decoy";
+            answerButtons.Add(aob);
         }
     }
 

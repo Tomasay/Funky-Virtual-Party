@@ -150,7 +150,7 @@ namespace Autohand {
                 lastInstantPull = useInstantPull;
             }
 
-            Debug.Log("pointing: " + pointing + " isAlwaysPointing: " + isAlwaysPointing + " primaryHand.holdingObj == null " + (primaryHand.holdingObj == null));
+            //Debug.Log("pointing: " + pointing + " isAlwaysPointing: " + isAlwaysPointing + " primaryHand.holdingObj == null " + (primaryHand.holdingObj == null));
             if(!pointing && isAlwaysPointing && primaryHand.holdingObj == null)
             {
                 StartPointing();

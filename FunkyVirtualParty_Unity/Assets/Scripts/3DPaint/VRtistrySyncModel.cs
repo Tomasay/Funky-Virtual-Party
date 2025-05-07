@@ -66,6 +66,9 @@ public partial class VRtistrySyncModel
 
     [RealtimeProperty(20, true, true)]
     private bool _isPaletteEnabled; //Is the palette enabled and visible. Set when vr player grabs/drops
+
+    [RealtimeProperty(21, true, true)]
+    private string _decoyAnswers; //list of decoy answers separated by commas
 }
 
 

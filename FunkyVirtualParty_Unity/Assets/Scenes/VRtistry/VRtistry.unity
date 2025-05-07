@@ -164,6 +164,61 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &17381915
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 17381917}
+  - component: {fileID: 17381916}
+  m_Layer: 0
+  m_Name: DecoyAnswersManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &17381916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17381915}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec299a8414adb43499867771c43b4e97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parameters:
+    apiKey: 
+    apiKeyEncryption: 0
+    apiKeyRemoteConfigKey: gemini_api_key
+    apiKeyEncryptionPassword: 69197bfc-ef08-471f-b7a9-c2bef616d3fc
+    model: 2
+    temperature: 1
+    role: 
+    timeout: 0
+    throttle: 0
+    _serialized: 1
+--- !u!4 &17381917
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 17381915}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.06488736, y: -0.4169608, z: 1.975328}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 22
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &26806921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4273,6 +4328,7 @@ MonoBehaviour:
   armature: {fileID: 749618738}
   clientMat: {fileID: 2100000, guid: 7e8947bdd23f6834bb85ae93e47ad469, type: 2}
   clientHighlightedMat: {fileID: 2100000, guid: bbc79e4f9fd60214a9dd8cf4aab2c9de, type: 2}
+  decoyAnswersGenerator: {fileID: 17381916}
   musicEvent:
     Guid:
       Data1: -1433382967
@@ -6744,6 +6800,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnPlayerGuessed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnDecoyAnswersChanged:
     m_PersistentCalls:
       m_Calls: []
   StartedPainting:

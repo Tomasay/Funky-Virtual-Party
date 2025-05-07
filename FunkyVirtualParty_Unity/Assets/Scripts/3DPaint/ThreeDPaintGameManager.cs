@@ -66,6 +66,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     Material clientMat, clientHighlightedMat;
 
+    [SerializeField]
+    GeminiFakeAnswersGenerator decoyAnswersGenerator;
+
     List<AnswerOptionButton> answerResults;
 
 #if !UNITY_WEBGL
@@ -335,6 +338,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
     }
 
+    void OnDecoyAnswersGenerated(string decoyAnswers)
+    {
+        VRtistrySyncer.instance.DecoyAnswers = decoyAnswers;
+    }
+
     [Button]
     public void PressSkipButton()
     {
@@ -473,6 +481,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 fmodInstance.setParameterByName("VRtistryClock", 0);
 #endif
 
+                decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), 3, OnDecoyAnswersGenerated);
+
                 VRtistrySyncer.instance.Guesses = "";
 
                 //Disable VR tools
@@ -585,7 +595,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                     if (int.TryParse(ownerAndGuess[0], out int i))
                     {
-                        AddPlayerToResults(i, ownerAndGuess[1]);
+                        if (ownerAndGuess[1] != "decoy")
+                        {
+                            AddPlayerToResults(i, ownerAndGuess[1]);
+                        }
                     }
                 }
 

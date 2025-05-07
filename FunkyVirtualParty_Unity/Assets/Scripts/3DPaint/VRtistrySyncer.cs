@@ -8,7 +8,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 {
     public static VRtistrySyncer instance;
 
-    public MyStringEvent OnStateChangeEvent, OnPromptChangedEvent, OnPlayerAnswered, OnPlayerGuessed;
+    public MyStringEvent OnStateChangeEvent, OnPromptChangedEvent, OnPlayerAnswered, OnPlayerGuessed, OnDecoyAnswersChanged;
 
     public UnityEvent StartedPainting, StoppedPainting, StartedDrawing, StoppedDrawing, PaletteMirrored;
     public UnityEvent<bool> penEnabledChanged, paletteEnabledChanged;
@@ -16,6 +16,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 
     public string State { get => model.state; set => model.state = value; }
     public string Answers { get => model.answers; set => model.answers = value; }
+    public string DecoyAnswers { get => model.decoyAnswers; set => model.decoyAnswers = value; }
     public string Guesses { get => model.guesses; set => model.guesses = value; }
     public string CurrentPrompt { get => model.currentPrompt; set => model.currentPrompt = value; }
     public int VRPlayerPoints { get => model.vrPlayerPoints; set => model.vrPlayerPoints = value; }
@@ -69,6 +70,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         //Default states when entering scene
         State = "";
         Answers = "";
+        DecoyAnswers = "";
         Guesses = "";
         CurrentPrompt = "";
         VRPlayerPoints = 0;
@@ -99,6 +101,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             // Unregister from events
             previousModel.stateDidChange -= OnStateChange;
             previousModel.answersDidChange -= OnAnswersDidChange;
+            currentModel.decoyAnswersDidChange -= OnDecoyAnswersDidChange;
             previousModel.guessesDidChange -= OnGuessesDidChange;
             previousModel.isPaintingDidChange -= OnIsPaintingDidChange;
             previousModel.isDrawingDidChange -= OnIsDrawingDidChange;
@@ -122,6 +125,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             // Register for events
             currentModel.stateDidChange += OnStateChange;
             currentModel.answersDidChange += OnAnswersDidChange;
+            currentModel.decoyAnswersDidChange += OnDecoyAnswersDidChange;
             currentModel.guessesDidChange += OnGuessesDidChange;
             currentModel.isPaintingDidChange += OnIsPaintingDidChange;
             currentModel.isDrawingDidChange += OnIsDrawingDidChange;
@@ -146,6 +150,11 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         {
             OnPlayerAnswered.Invoke(val);
         }
+    }
+
+    void OnDecoyAnswersDidChange(VRtistrySyncModel previousModel, string val)
+    {
+        OnDecoyAnswersChanged.Invoke(val);
     }
 
     void OnGuessesDidChange(VRtistrySyncModel previousModel, string val)
