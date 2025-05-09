@@ -8,13 +8,16 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
     public const int NUMBER_OF_ROUNDS = 3;
 
     //Every player that correctly guesses what the VR player's drawing is
-    public const int POINTS_VR_CORRECT_GUESSES = 50;
+    public const int POINTS_VR_CORRECT_GUESSES = 25;
 
     //Correctly guessing which player wrote the chosen answer
-    public const int POINTS_VR_CORRECT_PLAYER = 50;
+    public const int POINTS_VR_CORRECT_PLAYER = 75;
 
     //Correctly guessing what the VR player drew
     public const int POINTS_CLIENT_CORRECT_GUESS = 100;
+
+    //Client Correctly guessing what player wrote an answer
+    public const int POINTS_CLIENT_CORRECT_PLAYER = 25;
 
     //The amount of time the VR player gets to draw
     public const int DRAW_TIME_AMOUNT = 120;
