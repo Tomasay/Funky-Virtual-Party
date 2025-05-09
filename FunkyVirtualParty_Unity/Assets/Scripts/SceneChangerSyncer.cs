@@ -89,6 +89,8 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
         //Unregister current avatar as it will be destroyed on scene change
         if (RealtimeSingleton.instance.Realtime.connected)
         {
+            if (!RealtimeSingleton.instance.VRAvatar) return;
+
             RealtimeSingleton.instance.RealtimeAvatarManager._UnregisterAvatar(RealtimeSingleton.instance.VRAvatar);
         }
 

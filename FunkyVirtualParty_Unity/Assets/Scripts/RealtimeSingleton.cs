@@ -20,10 +20,21 @@ public class RealtimeSingleton : MonoBehaviour
 
     public Realtime Realtime { get => realtime; }
     public CustomAvatars.RealtimeAvatarManager RealtimeAvatarManager { get => realtimeAvatarManager;}
-    public CustomAvatars.RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
+    public CustomAvatars.RealtimeAvatar VRAvatar { get { 
+            if (realtimeAvatarManager.avatars.ContainsKey(0))
+            {
+                return realtimeAvatarManager.avatars[0];
+            }
+            else
+            {
+                return null;
+            }
+    } }
 
     private void Awake()
     {
+
+        
         //Singleton instantiation
         if (!instance)
         {
