@@ -21,6 +21,9 @@ public class VRTutorial : MonoBehaviour
     GameObject sprayInstructions, swapToolsInstructions, drawInstructions, swapHandsInstructions, movementInstructions;
 
     [SerializeField]
+    Animator controllerInstructionsAnim;
+
+    [SerializeField]
     GameObject controllerImagesParent;
 
     [SerializeField]
@@ -120,6 +123,7 @@ public class VRTutorial : MonoBehaviour
                 raycaster.enabled = false;
                 introButtons.SetActive(false);
                 sprayInstructions.SetActive(true);
+                controllerInstructionsAnim.SetTrigger("Next");
                 headerText.text = "Use the trigger button to spray paint";
                 break;
             case TutorialStage.SwapTools:
@@ -127,6 +131,7 @@ public class VRTutorial : MonoBehaviour
 
                 sprayInstructions.SetActive(false);
                 swapToolsInstructions.SetActive(true);
+                controllerInstructionsAnim.SetTrigger("Next");
                 headerText.text = "Press the primary button to swap between your spray gun and 3D pen";
                 break;
             case TutorialStage.Draw:
@@ -134,16 +139,19 @@ public class VRTutorial : MonoBehaviour
 
                 swapToolsInstructions.SetActive(false);
                 drawInstructions.SetActive(true);
+                controllerInstructionsAnim.SetTrigger("Next");
                 headerText.text = "Use the trigger button to draw in 3D space";
                 break;
             case TutorialStage.SwapColors:
                 bButtonEnabled = true;
 
                 drawInstructions.SetActive(false);
+                controllerInstructionsAnim.SetTrigger("Next");
                 headerText.text = "Tap your tool on the color palette to change colors";
                 break;
             case TutorialStage.SwitchHands:
                 swapHandsInstructions.SetActive(true);
+                controllerInstructionsAnim.SetTrigger("Next");
                 headerText.text = "To switch handedness, press the primary button in the hand holding your color palette";
                 break;
             case TutorialStage.Movement:
@@ -151,6 +159,7 @@ public class VRTutorial : MonoBehaviour
 
                 swapHandsInstructions.SetActive(false);
                 movementInstructions.SetActive(true);
+                controllerInstructionsAnim.SetTrigger("Next");
                 headerText.text = "Use the left joystick to move around, and the right joystick to rotate";
                 break;
             case TutorialStage.Done:
