@@ -56,7 +56,7 @@ public partial class VRtistrySyncModel
     private bool _vrCompletedTutorial;
 
     [RealtimeProperty(17, true, true)]
-    private string _guesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_ANSWERID"
+    private string _artGuesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_ANSWERID"
 
     [RealtimeProperty(18, true, true)]
     private float _clientAnswerTimer; //Time left for clients to submit an answer to the prompt
@@ -69,6 +69,9 @@ public partial class VRtistrySyncModel
 
     [RealtimeProperty(21, true, true)]
     private string _decoyAnswers; //list of decoy answers separated by commas
+
+    [RealtimeProperty(22, true, true)]
+    private string _playerGuesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_WHO_THEY_GUESSED_ANSWERID"
 }
 
 

@@ -125,7 +125,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
-        VRtistrySyncer.instance.OnPlayerGuessed.AddListener(PlayerGuessed);
+        VRtistrySyncer.instance.OnPlayerGuessedArt.AddListener(PlayerGuessedArt);
+        VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 
@@ -185,7 +186,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerAnswered);
-        VRtistrySyncer.instance.OnPlayerGuessed.RemoveListener(PlayerGuessed);
+        VRtistrySyncer.instance.OnPlayerGuessedArt.RemoveListener(PlayerGuessedArt);
+        VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
     }
@@ -426,6 +428,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
         switch (state)
         {
             case "clients answering":
+                VRtistrySyncer.instance.VRPlayerGuess = -1;
+                VRtistrySyncer.instance.PlayerGuesses = "";
+
                 VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
 
                 //Enable VR tools
@@ -483,7 +488,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), 3, OnDecoyAnswersGenerated);
 
-                VRtistrySyncer.instance.Guesses = "";
+                VRtistrySyncer.instance.ArtGuesses = "";
 
                 //Disable VR tools
                 pen.CanPaint = false;
@@ -502,7 +507,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 break;
             case "vr guessing":
                 //Show guesses
-                string[] guessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
+                string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 foreach (string g in guessesSeparated)
                 {
                     string[] ownerAndGuess = g.Split(':');
@@ -588,7 +593,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 }
 
                 //All players have guessed, so add guesses to results
-                string[] leaderboardGuessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
+                string[] leaderboardGuessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 foreach (string g in leaderboardGuessesSeparated)
                 {
                     string[] ownerAndGuess = g.Split(':');
@@ -642,13 +647,21 @@ public class ThreeDPaintGameManager : MonoBehaviour
                     aob.AnimateAnswers(correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2));
                 }
 
-                Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2)));
+                //3 Seconds are added to view answers to view answers that no one chose
+                if (answersWithNoGuesses.Count > 0)
+                {
+                    Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2) + 3));
+                }
+                else
+                {
+                    Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2)));
+                }
 
                 break;
             case "leaderboard":
                 StartCoroutine("ShowLeaderboard");
 
-                VRtistrySyncer.instance.Guesses = "";
+                VRtistrySyncer.instance.ArtGuesses = "";
 
                 break;
             case "game over":
@@ -814,7 +827,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
     }
 
-    void PlayerGuessed(string guesses)
+    void PlayerGuessedArt(string guesses)
     {
         //Check to see if all players have guessed, if so move to next state
         string[] guessesSeparated = guesses.Split('\n');
@@ -822,6 +835,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
         if (guessesSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("clients guessing"))
         {
             VRtistrySyncer.instance.State = "vr guessing";
+        }
+    }
+
+    void PlayerGuessedPlayer(string guesses)
+    {
+        //Check to see if all players have guessed, if so move to next state
+        if (guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        {
+            VRtistrySyncer.instance.State = "results";
         }
     }
 
@@ -886,7 +908,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
         */
 
-        VRtistrySyncer.instance.State = "results";
+        if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length == ClientPlayer.clients.Count)
+        {
+            VRtistrySyncer.instance.State = "results";
+        }
     }
 
     [Button]

@@ -8,7 +8,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 {
     public static VRtistrySyncer instance;
 
-    public MyStringEvent OnStateChangeEvent, OnPromptChangedEvent, OnPlayerAnswered, OnPlayerGuessed, OnDecoyAnswersChanged;
+    public MyStringEvent OnStateChangeEvent, OnPromptChangedEvent, OnPlayerAnswered, OnPlayerGuessedArt, OnPlayerGuessedPlayer, OnDecoyAnswersChanged;
 
     public UnityEvent StartedPainting, StoppedPainting, StartedDrawing, StoppedDrawing, PaletteMirrored;
     public UnityEvent<bool> penEnabledChanged, paletteEnabledChanged;
@@ -17,7 +17,8 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public string State { get => model.state; set => model.state = value; }
     public string Answers { get => model.answers; set => model.answers = value; }
     public string DecoyAnswers { get => model.decoyAnswers; set => model.decoyAnswers = value; }
-    public string Guesses { get => model.guesses; set => model.guesses = value; }
+    public string ArtGuesses { get => model.artGuesses; set => model.artGuesses = value; }
+    public string PlayerGuesses { get => model.playerGuesses; set => model.playerGuesses = value; }
     public string CurrentPrompt { get => model.currentPrompt; set => model.currentPrompt = value; }
     public int VRPlayerPoints { get => model.vrPlayerPoints; set => model.vrPlayerPoints = value; }
     public int ChosenAnswerOwner { get => model.chosenAnswerOwner; set => model.chosenAnswerOwner = value; }
@@ -71,8 +72,10 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         State = "";
         Answers = "";
         DecoyAnswers = "";
-        Guesses = "";
+        ArtGuesses = "";
+        PlayerGuesses = "";
         CurrentPrompt = "";
+        VRPlayerGuess = -1;
         VRPlayerPoints = 0;
         DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
         ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
@@ -102,7 +105,8 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             previousModel.stateDidChange -= OnStateChange;
             previousModel.answersDidChange -= OnAnswersDidChange;
             currentModel.decoyAnswersDidChange -= OnDecoyAnswersDidChange;
-            previousModel.guessesDidChange -= OnGuessesDidChange;
+            previousModel.artGuessesDidChange -= OnArtGuessesDidChange;
+            currentModel.playerGuessesDidChange -= OnPlayerGuessesDidChange;
             previousModel.isPaintingDidChange -= OnIsPaintingDidChange;
             previousModel.isDrawingDidChange -= OnIsDrawingDidChange;
             previousModel.isPenEnabledDidChange -= OnIsPenEnabledChanged;
@@ -126,7 +130,8 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             currentModel.stateDidChange += OnStateChange;
             currentModel.answersDidChange += OnAnswersDidChange;
             currentModel.decoyAnswersDidChange += OnDecoyAnswersDidChange;
-            currentModel.guessesDidChange += OnGuessesDidChange;
+            currentModel.artGuessesDidChange += OnArtGuessesDidChange;
+            currentModel.playerGuessesDidChange += OnPlayerGuessesDidChange;
             currentModel.isPaintingDidChange += OnIsPaintingDidChange;
             currentModel.isDrawingDidChange += OnIsDrawingDidChange;
             currentModel.isPenEnabledDidChange += OnIsPenEnabledChanged;
@@ -157,11 +162,19 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         OnDecoyAnswersChanged.Invoke(val);
     }
 
-    void OnGuessesDidChange(VRtistrySyncModel previousModel, string val)
+    void OnArtGuessesDidChange(VRtistrySyncModel previousModel, string val)
     {
         if (!val.Equals(""))
         {
-            OnPlayerGuessed.Invoke(val);
+            OnPlayerGuessedArt.Invoke(val);
+        }
+    }
+
+    void OnPlayerGuessesDidChange(VRtistrySyncModel previousModel, string val)
+    {
+        if (!val.Equals(""))
+        {
+            OnPlayerGuessedPlayer.Invoke(val);
         }
     }
 

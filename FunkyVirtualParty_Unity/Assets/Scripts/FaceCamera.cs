@@ -5,7 +5,7 @@ using NaughtyAttributes;
 
 public class FaceCamera : MonoBehaviour
 {
-    [SerializeField] Camera cameraToLookAt;
+    [SerializeField] public Camera cameraToLookAt;
     [SerializeField] public bool transformIsRect = false;
 
     void Start()

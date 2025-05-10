@@ -24,9 +24,6 @@ public class VRTutorial : MonoBehaviour
     Animator controllerInstructionsAnim;
 
     [SerializeField]
-    GameObject controllerImagesParent;
-
-    [SerializeField]
     GameObject introButtons;
 
     [SerializeField]
@@ -165,7 +162,6 @@ public class VRTutorial : MonoBehaviour
             case TutorialStage.Done:
                 headerText.text = "You're ready to show off your skills!";
 
-                controllerImagesParent.SetActive(false);
                 movementInstructions.SetActive(false);
 
                 RemoveListeners();

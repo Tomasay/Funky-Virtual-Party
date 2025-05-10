@@ -26,7 +26,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 #endif
 
     [SerializeField]
-    TMP_Text inputHeaderText, blurHeaderText;
+    TMP_Text inputHeaderText, blurHeaderText, guessingHeaderText;
 
     [SerializeField]
     TMP_Text blurTimerText, inputTimerText;
@@ -90,6 +90,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     List<AnswerOptionButton> answerButtons, answerResults;
 
     Dictionary<int, int> playerPoints;
+
+    string answerOwnerIDPlayerIsGuessing;
 
     private void Awake()
     {
@@ -221,6 +223,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         switch (s)
         {
             case "clients answering":
+                ResetAnswerResultsBubbles();
+
                 inputTimerText.enabled = true;
 
                 //Enable phone anim for local player, which will then be synced for everyone else
@@ -252,6 +256,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
             case "clients guessing":
+                guessingHeaderText.text = "What is it?";
+
                 (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
 
                 blurTimerText.enabled = false;
@@ -282,7 +288,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                     GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
                     string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
                     Debug.Log(guessGuessOwner);
-                    ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                    ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
                     AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                     aob.SetText(ownerAndAnswer[1]);
                     aob.playerID = ownerAndAnswer[0];
@@ -314,13 +320,62 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 }
                 break;
             case "vr guessing":
+                string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
+
+                //If local player is the one who wrote the picked answer, show them someone else's answer
+                if (VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+                {
+                    foreach (string a in answersSeparated2)
+                    {
+                        string[] ownerAndAnswer = a.Split(':');
+
+                        if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+                        {
+                            guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
+                            answerOwnerIDPlayerIsGuessing = ownerAndAnswer[0];
+                            break;
+                        }
+                    }
+                }
+                //Else, show them the owner of the picked answer
+                else
+                {
+                    foreach (string a in answersSeparated2)
+                    {
+                        string[] ownerAndAnswer = a.Split(':');
+
+                        if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID == VRtistrySyncer.instance.ChosenAnswerOwner)
+                        {
+                            guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
+                            answerOwnerIDPlayerIsGuessing = ownerAndAnswer[0];
+                            break;
+                        }
+                    }
+                }
+
+                //Player Answer buttons, show everyone but self
+                foreach (string a in answersSeparated2)
+                {
+                    string[] ownerAndAnswer = a.Split(':');
+
+                    if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID  != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+                    {
+                        GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                        ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                        AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                        aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
+                        aob.playerID = ownerAndAnswer[0];
+                        answerButtons.Add(aob);
+                    }
+                }
+
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
 
                 leanTouch.gameObject.SetActive(false);
                 tapAndHoldRotateTutorial.SetActive(false);
 
                 //All players have guessed, so add guesses to results
-                string[] guessesSeparated = VRtistrySyncer.instance.Guesses.Split('\n');
+                string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 foreach (string g in guessesSeparated)
                 {
                     string[] ownerAndGuess = g.Split(':');
@@ -338,16 +393,18 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                         }
                     }
                 }
-
+                break;
+            case "results":
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
 
-                break;
-            case "results":
                 blurHeaderText.text = "";
 
                 //Create duplicate list of answers, sorted by amount of players chose that answer
                 List<AnswerOptionButton> answerResultsSorted = answerResults.OrderBy(o => o.GetNumberOfPlayers()).ToList();
+
+                //Answers that no players chose, save these to show briefly at the end
+                List<AnswerOptionButton> answersWithNoGuesses = new List<AnswerOptionButton>();
 
                 //Animate players that chose each answer, ignoring answers that no players chose
                 AnswerOptionButton correctAnswer = null;
@@ -362,13 +419,26 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                             answerResultsSorted[i].AnimateAnswers(k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
                             k++;
                         }
+                        else
+                        {
+                            answersWithNoGuesses.Add(answerResultsSorted[i]);
+                        }
                     }
                     else
                     {
                         correctAnswer = answerResultsSorted[i];
                     }
                 }
-                correctAnswer.AnimateAnswers(k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME);
+
+                int correctAnswerDelay = k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
+                correctAnswer.AnimateAnswers(correctAnswerDelay);
+
+                //Display answers that got no guesses
+                foreach (AnswerOptionButton aob in answersWithNoGuesses)
+                {
+                    aob.AnimateAnswers(correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2));
+                }
+
                 break;
             case "leaderboard":
                 /*
@@ -391,11 +461,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     {
         if (decoyAnswers.Equals("")) return;
 
-        //TODO: Mix up indices of answers and decoy answers, so decoy answers are not always the last ones
         foreach (string d in decoyAnswers.Split(','))
         {
             GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-            ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
+            ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize dibling index so decoy answers are not always the last ones
+            ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
             AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
             aob.SetText(d);
             aob.playerID = "decoy";
@@ -488,15 +558,36 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         playerInputParent.SetActive(false);
     }
 
-    void SubmitGuess(int clientID, string clientGuessID)
+    void SubmitArtGuess(int clientID, string clientGuessID)
     {
-        if(VRtistrySyncer.instance.Guesses.Equals(""))
+        if(VRtistrySyncer.instance.ArtGuesses.Equals(""))
         {
-            VRtistrySyncer.instance.Guesses = clientID + ":" + clientGuessID;
+            VRtistrySyncer.instance.ArtGuesses = clientID + ":" + clientGuessID;
         }
         else
         {
-            VRtistrySyncer.instance.Guesses += "\n" + clientID + ":" + clientGuessID;
+            VRtistrySyncer.instance.ArtGuesses += "\n" + clientID + ":" + clientGuessID;
+        }
+
+        guessingHeaderText.text = "Waiting for other players to answer";
+
+        ClearPlayerAnswers();
+    }
+
+    void SubmitPlayerGuess(int clientID, string clientGuessID)
+    {
+        if (VRtistrySyncer.instance.PlayerGuesses.Equals(""))
+        {
+            VRtistrySyncer.instance.PlayerGuesses = clientID + ":" + clientGuessID;
+        }
+        else
+        {
+            VRtistrySyncer.instance.PlayerGuesses += "\n" + clientID + ":" + clientGuessID;
+        }
+
+        if (clientGuessID.Equals(answerOwnerIDPlayerIsGuessing))
+        {
+            playerPoints[RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_PLAYER;
         }
 
         guessingCanvas.enabled = false;
@@ -533,7 +624,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             Destroy(aob.gameObject);
         }
         answerButtons = new List<AnswerOptionButton>();
+    }
 
+    void ResetAnswerResultsBubbles()
+    {
         foreach (AnswerOptionButton aob in answerResults)
         {
             aob.canvasGroup.alpha = 0;

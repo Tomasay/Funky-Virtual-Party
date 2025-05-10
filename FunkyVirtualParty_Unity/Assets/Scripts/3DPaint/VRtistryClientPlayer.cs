@@ -14,6 +14,8 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public MeshSyncer[] phones; //Phone meshes corresponding to each phone anim
 
+    [SerializeField] FaceCamera faceCamera;
+
     protected override void LocalStart()
     {
         base.LocalStart();
@@ -27,6 +29,24 @@ public class VRtistryClientPlayer : ClientPlayer
         Invoke("SetSitAnim", 1);
         Invoke("TogglePhone", 1);
         Invoke("SetupTextBubbleTransforms", 3);
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+
+        //Was having an occasional bug where player canvases would billboard to the wrong camera (mostly on IOS?)
+        //Not entirely sure why that was happening, but this should prevent that
+        Invoke("SetBubbleBillboardCamera", 1);
+    }
+
+    void SetBubbleBillboardCamera()
+    {
+        GameObject tryCamera = GameObject.Find("DrawingPhaseCamera");
+        if (tryCamera && tryCamera.TryGetComponent(out Camera cam))
+        {
+            faceCamera.cameraToLookAt = cam;
+        }
     }
 
     void SetupTextBubbleTransforms()
