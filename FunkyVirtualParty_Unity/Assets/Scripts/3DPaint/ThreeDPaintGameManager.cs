@@ -560,13 +560,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
             case "results":
                 headerText.text = "Displaying results";
 
-                foreach (ClientPlayer cp in ClientPlayer.clients)
-                {
-                    VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
-                    vcp.SetButtonInteractable(false);
-                    vcp.playerButton.onClick.RemoveAllListeners();
-                }
-
                 //Answer results
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
                 foreach (string a in answersSeparated)
@@ -841,7 +834,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     void PlayerGuessedPlayer(string guesses)
     {
         //Check to see if all players have guessed, if so move to next state
-        if (guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        if (VRtistrySyncer.instance.VRPlayerGuess != -1 && guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
         {
             VRtistrySyncer.instance.State = "results";
         }
@@ -908,7 +901,18 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
         */
 
-        if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length == ClientPlayer.clients.Count)
+        headerText.text = "Waiting for clients to submit guesses";
+
+        //Remove client buttons
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
+            vcp.SetButtonInteractable(false);
+            vcp.playerButton.onClick.RemoveAllListeners();
+        }
+
+        //If all clients have also guessed, move to results phase
+        if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
         {
             VRtistrySyncer.instance.State = "results";
         }
