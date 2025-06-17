@@ -8,6 +8,7 @@ using PaintIn3D;
 using System.Runtime.InteropServices;
 using System.Linq;
 using Lean.Touch;
+using Shapes;
 
 public class ThreeDPaintGameManagerWeb : MonoBehaviour
 {
@@ -115,6 +116,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         guessingCanvas.enabled = false;
 
         LeanTouch.OnFingerDown += LeanTouch_OnFingerDown;
+
+        Draw.Position = linesParent.transform.position;
     }
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
@@ -150,12 +153,12 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         {
             if(tapAndHoldRotateLearned)
             {
-                linesParent.transform.rotation = Quaternion.Euler(0, drawingModel.transform.localRotation.eulerAngles.z, 0);
+                Draw.Rotation = Quaternion.Euler(0, drawingModel.transform.localRotation.eulerAngles.z, 0);
             }
             else
             {
                 drawingModel.transform.Rotate(0, 0, Time.deltaTime * 20);
-                linesParent.transform.Rotate(0, Time.deltaTime * 20, 0);
+                Draw.Rotate(0, Mathf.Deg2Rad * (Time.deltaTime * 20), 0);
             }
         }
 
@@ -205,14 +208,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         guessing = false;
         drawingModel.transform.rotation = drawingModelStartingRot;
-        linesParent.transform.rotation = Quaternion.identity;
+        Draw.Rotation = Quaternion.identity;
 
         //Clear answers from previous round
         ClearPlayerAnswers();
 
         //Reset any painting from previous round
         paintTexture.Clear();
-        pen.EraseAllLines();
+        pen.EraseAllCurrentLines();
 
         //Reset results from previous round
         ClearPlayerResults();
@@ -242,7 +245,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Reset any painting from practicing
                 paintTexture.Clear();
-                pen.EraseAllLines();
+                pen.EraseAllCurrentLines();
                 break;
             case "vr painting":
                 //Bake mannequin IK

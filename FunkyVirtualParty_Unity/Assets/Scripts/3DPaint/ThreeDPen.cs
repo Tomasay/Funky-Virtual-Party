@@ -10,9 +10,13 @@ using UnityEngine.Animations;
 using FMODUnity;
 #endif
 
-public class ThreeDPen : MonoBehaviour
+public class ThreeDPen : ImmediateModeShapeDrawer
 {
-    Polyline currentLine;
+    List<List<PolylinePath>> drawingLines;
+
+    List<PolylinePath> currentDrawingLines;
+
+    PolylinePath currentLine;
 
     Color currentColor = Color.black;
 
@@ -71,6 +75,18 @@ public class ThreeDPen : MonoBehaviour
     private void Awake()
     {
         tipMesh.material.color = currentColor;
+
+        //Set Draw defaults for Polylines
+        Draw.BlendMode = ShapesBlendMode.Opaque;
+        Draw.Thickness = 0.01f;
+        Draw.PolylineGeometry = PolylineGeometry.Billboard;
+        Draw.DetailLevel = DetailLevel.Minimal;
+        Draw.PolylineJoins = PolylineJoins.Round;
+
+        Draw.Position = linesParent.transform.position;
+
+        drawingLines = new List<List<PolylinePath>>();
+        currentDrawingLines = new List<PolylinePath>();
     }
 
     private void Start()
@@ -95,6 +111,19 @@ public class ThreeDPen : MonoBehaviour
 #if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
+
+        //Dispose of all polylines
+        //Dispose current lines
+        foreach (List<PolylinePath> ppl in drawingLines)
+        {
+            foreach (PolylinePath pp in ppl)
+            {
+                pp.ClearAllPoints();
+                pp.Dispose();
+            }
+        }
+        currentLine.ClearAllPoints();
+        currentLine.Dispose();
     }
 
 #if !UNITY_WEBGL
@@ -151,51 +180,66 @@ public class ThreeDPen : MonoBehaviour
     }
 #endif
 
+    public override void DrawShapes(Camera cam)
+    {
+        using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
+        {
+            //Draw any previous lines in the drawing
+            if (currentDrawingLines != null && currentDrawingLines.Count > 0)
+            {
+                foreach (PolylinePath pp in currentDrawingLines)
+                {
+                    if (pp.Count > 1)
+                    {
+                        Draw.Polyline(pp, closed: false, thickness: 0.01f); // Drawing happens here
+                    }
+                }
+            }
+            //Draw current line being drawn
+            if (currentLine != null && currentLine.Count > 1)
+            {
+                Draw.Polyline(currentLine, closed: false, thickness: 0.01f); // Drawing happens here
+            }
+        }
+    }
+
     private void CreateNewLine()
     {
-        GameObject newLine = new GameObject("line");
-        newLine.transform.parent = linesParent;
+        //If previous line had points in it, it needs to be added to the list for current drawing
+        if(currentLine != null && currentLine.Count > 0)
+        {
+            currentDrawingLines.Add(currentLine);
+        }
 
-        Polyline pl = newLine.AddComponent<Polyline>();
-        pl.BlendMode = ShapesBlendMode.Opaque;
-        pl.Thickness = 0.01f;
-        pl.Color = currentColor;
-        pl.Geometry = PolylineGeometry.Billboard;
-        pl.DetailLevel = DetailLevel.Minimal;
-        pl.Joins = PolylineJoins.Round;
-        pl.Closed = false;
-        pl.SetPoints(new List<PolylinePoint>());
-
-        currentLine = pl;
-
-        lastPenPos = transform.position;
-
-        newLine.SetActive(false);
+        //Instantiate new line
+        currentLine = new PolylinePath();
     }
 
     private void AddNewLinePoint()
     {
-        Vector3 pos = currentLine.transform.InverseTransformPoint(tip.position);
-        if (currentLine.Count == 0 || Vector3.Distance(currentLine.points[currentLine.points.Count-1].point, pos) > 0.01f)
+        Vector3 pos = tip.position - linesParent.position;
+        if (currentLine.Count == 0 || Vector3.Distance(currentLine.LastPoint.point, pos) > 0.001f)
         {
-            currentLine.AddPoint(pos);
-            currentPointCount++;
+            currentLine.AddPoint(pos, currentColor);
             lastPointTime = Time.time;
-        }
-
-        //Seems to be a bug with Shapes where polylines with less than 2 points render as incorrectly as a triangle...
-        if(currentLine.Count > 1)
-        {
-            currentLine.gameObject.SetActive(true);
         }
     }
 
-    public void EraseAllLines()
+    public void SaveCurrentDrawingLines()
     {
-        foreach (Polyline pl in linesParent.GetComponentsInChildren<Polyline>())
+        drawingLines.Add(currentDrawingLines);
+    }
+
+    public void EraseAllCurrentLines()
+    {
+        //Dispose current lines
+        foreach (PolylinePath pp in currentDrawingLines)
         {
-            Destroy(pl.gameObject);
+            pp.ClearAllPoints();
+            pp.Dispose();
         }
+        currentLine.ClearAllPoints();
+        currentLine.Dispose();
     }
 
     public void ChangeColor(Color c)

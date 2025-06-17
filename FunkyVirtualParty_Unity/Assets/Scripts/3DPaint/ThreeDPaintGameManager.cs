@@ -463,7 +463,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 headerText.text = dontSayWarning + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 //Clear practice painting
-                pen.EraseAllLines();
+                pen.EraseAllCurrentLines();
                 paintTexture.Clear();
 
                 timeVRPosingStarted = Time.time;
@@ -485,6 +485,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 fmodInstance.setParameterByName("VRtistryPhase", 0);
                 fmodInstance.setParameterByName("VRtistryClock", 0);
 #endif
+                pen.SaveCurrentDrawingLines();
 
                 decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), 3, OnDecoyAnswersGenerated);
 
