@@ -157,6 +157,11 @@ public class ThreeDPen : ImmediateModeShapeDrawer
             lastPenPos = transform.position;
         }
 #endif
+
+        if(Draw.Position != linesParent.transform.position)
+        {
+            Draw.Position = linesParent.transform.position;
+        }
     }
 
 #if !UNITY_WEBGL
