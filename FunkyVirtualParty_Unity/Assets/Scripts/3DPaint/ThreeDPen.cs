@@ -87,6 +87,8 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
         drawingLines = new List<List<PolylinePath>>();
         currentDrawingLines = new List<PolylinePath>();
+
+        ShapesMaterialUtils.Prewarm();
     }
 
     private void Start()
