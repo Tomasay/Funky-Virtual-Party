@@ -1,0 +1,58 @@
+.chat-area {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* ListView였으나 너무 애로사항이 많아 ScrollView로 변경 */
+.chat-scroll-view {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: 0;
+    align-items: flex-start;
+    background-color: var(--unity-colors-app_toolbar-background);
+}
+
+/* 세션에 에러가 있을시 chat-list-view 대신에 표시 */
+.chat-error-view {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    flex-shrink: 1;
+    flex-basis: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--unity-colors-default-border);
+}
+
+.scroll-to-bottom-button {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin: 0px;
+    padding: 0px;
+    border-radius: 0px;
+    /* Only Show The Top Border */
+    border-top-width: 1px;
+    border-top-color: var(--unity-colors-slider_thumb_halo-background);
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-right-width: 0px;
+    background-color: var(--unity-colors-object_field_button-background-hover);
+    opacity: 0.8;
+    transition: scale 0.15s ease-in-out, opacity 0.15s ease-in-out;
+}
+
+.scroll-to-bottom-button:hover {
+    scale: 1.1;
+    opacity: 1;
+}
+
+.scroll-to-bottom-icon {
+    width: 18px;
+    height: 16px;
+    margin: 0px;
+    padding: 0px;
+}

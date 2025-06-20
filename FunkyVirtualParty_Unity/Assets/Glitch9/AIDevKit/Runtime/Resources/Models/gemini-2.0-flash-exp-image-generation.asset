@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac13ed38019e57d4f9153a7c2ea8a015, type: 3}
+  m_Name: gemini-2.0-flash-exp-image-generation
+  m_EditorClassIdentifier: 
+  id: models/gemini-2.0-flash-exp-image-generation
+  displayName: Gemini 2.0 Flash (Image Generation) Experimental
+  api: 2
+  deprecated: 0
+  custom: 0
+  locked: 0
+  family: Gemini
+  familyVersion: 2.0 Flash
+  modelVersion: 2.0
+  legacy: 0
+  inputModality: 27
+  outputModality: 3
+  feature: 173
+  maxInputTokens: 1048576
+  maxOutputTokens: 8192
+  prices:
+  - rid: 5414323272517419086
+  - rid: 5414323272517419087
+  - rid: 5414323272517419088
+  endpoint: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 5414323272517419086
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 1
+        cost: 0.0000001
+        isEstimated: 0
+    - rid: 5414323272517419087
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 2
+        cost: 0.0000004
+        isEstimated: 0
+    - rid: 5414323272517419088
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 4
+        cost: 0.000000025
+        isEstimated: 0

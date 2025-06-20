@@ -1,0 +1,10 @@
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.OpenAI")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Google")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.ElevenLabs")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Mubert")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Ollama")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.OpenRouter")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Pro")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Localization")]

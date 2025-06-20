@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac13ed38019e57d4f9153a7c2ea8a015, type: 3}
+  m_Name: claude-3-sonnet
+  m_EditorClassIdentifier: 
+  id: anthropic/claude-3-sonnet
+  displayName: Claude 3 Sonnet
+  api: 6
+  deprecated: 0
+  custom: 0
+  locked: 0
+  family: Claude
+  familyVersion: 
+  modelVersion: 
+  legacy: 0
+  inputModality: 3
+  outputModality: 1
+  feature: 5
+  maxInputTokens: 200000
+  maxOutputTokens: 4096
+  prices:
+  - rid: 5414323272517419111
+  - rid: 5414323272517419112
+  - rid: 5414323272517419113
+  - rid: 5414323272517419114
+  - rid: 5414323272517419115
+  endpoint: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 5414323272517419111
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 5
+        cost: 0.0048
+        isEstimated: 0
+    - rid: 5414323272517419112
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 21
+        cost: 0.0000003
+        isEstimated: 0
+    - rid: 5414323272517419113
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 22
+        cost: 0.00000375
+        isEstimated: 0
+    - rid: 5414323272517419114
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 1
+        cost: 0.000003
+        isEstimated: 0
+    - rid: 5414323272517419115
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 2
+        cost: 0.000015
+        isEstimated: 0

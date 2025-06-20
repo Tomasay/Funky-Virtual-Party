@@ -1,0 +1,20 @@
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("Glitch9.CoreLib.IO")]
+[assembly: InternalsVisibleTo("Glitch9.CoreLib.UI")]
+[assembly: InternalsVisibleTo("Glitch9.CoreLib.UI.MaterialDesign")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Client")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.OpenAI")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Google")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.ElevenLabs")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Mubert")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Ollama")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Pro")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Localization")]
+#if UNITY_EDITOR 
+[assembly: InternalsVisibleTo("Glitch9.CoreLib.Editor")]
+[assembly: InternalsVisibleTo("Glitch9.CoreLib.Editor.PackageBuilder")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Editor")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Editor.Pro")]
+[assembly: InternalsVisibleTo("Glitch9.AIDevKit.Localization.Editor")]
+#endif

@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac13ed38019e57d4f9153a7c2ea8a015, type: 3}
+  m_Name: gpt-4o-realtime-preview
+  m_EditorClassIdentifier: 
+  id: gpt-4o-realtime-preview
+  displayName: GPT-4o Realtime Preview
+  api: 1
+  deprecated: 0
+  custom: 0
+  locked: 0
+  family: GPT
+  familyVersion: 
+  modelVersion: 
+  legacy: 0
+  inputModality: 9
+  outputModality: 9
+  feature: 131104
+  maxInputTokens: 0
+  maxOutputTokens: 0
+  prices:
+  - rid: 5414323250697601128
+  - rid: 5414323250697601129
+  - rid: 5414323250697601130
+  endpoint: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 5414323250697601128
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 1
+        cost: 0.000005
+        isEstimated: 0
+    - rid: 5414323250697601129
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 4
+        cost: 0.0000025
+        isEstimated: 0
+    - rid: 5414323250697601130
+      type: {class: ModelPrice, ns: Glitch9.AIDevKit, asm: Glitch9.AIDevKit}
+      data:
+        type: 2
+        cost: 0.00002
+        isEstimated: 0
