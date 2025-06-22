@@ -39,7 +39,16 @@ namespace Glitch9.IO.Files
         /// or if the file is not found.
         /// </summary>
         [JsonIgnore] public string Url => url;
-        [JsonIgnore] public MIMEType MimeType => mimeType;
+        [JsonIgnore]
+        public MIMEType MimeType
+        {
+            get
+            {
+                if (mimeType == MIMEType.Unknown && !string.IsNullOrEmpty(fullPath))
+                    mimeType = MIMETypeUtil.ParseFromPath(fullPath);
+                return mimeType;
+            }
+        }
         [JsonIgnore] public string Note { get => note; set => note = value; }
         [JsonIgnore] public float MediaLength => mediaLength;
 

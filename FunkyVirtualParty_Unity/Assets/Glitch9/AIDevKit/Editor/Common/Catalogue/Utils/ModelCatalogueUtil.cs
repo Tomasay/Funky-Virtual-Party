@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Glitch9.AIDevKit.GENTasks;
+using Glitch9.Editor;
 using Glitch9.ScriptableObjects;
 using UnityEditor;
 using UnityEngine;
@@ -76,6 +77,8 @@ namespace Glitch9.AIDevKit.Editor
                 fineTuned: serverData.IsFineTuned,
                 prices: serverData.GetPrices()
             );
+
+            model.SaveAsset();
         }
 
         internal static void AddToLibrary(string id)
@@ -99,7 +102,7 @@ namespace Glitch9.AIDevKit.Editor
             UpdateData(obj, serverData);
 
             string scriptableObjectName = ModelMetadataUtil.RemoveSlashPrefix(id);
-            scriptableObjectName = ScriptableObjectUtil.FixSOName(scriptableObjectName);
+            scriptableObjectName = ScriptableObjectLoader.FixSOName(scriptableObjectName);
 
             string filePath = $"{targetDir}/{scriptableObjectName}.asset";
             Debug.Log($"Creating [{typeof(Model).Name}] Scriptable Object: " + filePath);

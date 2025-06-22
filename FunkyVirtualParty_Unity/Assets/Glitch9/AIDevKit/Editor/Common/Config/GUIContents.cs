@@ -102,7 +102,7 @@ namespace Glitch9.AIDevKit.Editor
             "Model used for utility tasks such as conversation summary, auto-naming, and metadata generation. " +
             "Selected model must support 'Structured Outputs(JsonSchema)' feature.");
 
-        internal static readonly GUIContent UseProjectContext = new("Use Project Context",
+        internal static readonly GUIContent UseProjectContext = new("Use My Project Context",
             "Apply the project context set in AIDevKit settings to the prompt.");
 
         internal static readonly GUIContent PromptInfluence = new("Influence",
@@ -189,7 +189,7 @@ namespace Glitch9.AIDevKit.Editor
         internal static readonly GUIContent MaxContextMessages = new("Max Context Messages",
             "The maximum number of messages to keep in the chat context. This helps manage memory usage and performance by limiting the amount of historical data retained for generating responses.");
 
-        internal static readonly GUIContent AutoTitle = new("Auto Title",
+        internal static readonly GUIContent AutoTitle = new("Auto Title Chat Session",
             "If checked, the chat session will automatically generate a title based on the conversation context. This can help in organizing and identifying chat sessions without manually setting titles.");
 
         internal static readonly GUIContent ChatTitle = new("Chat Title",

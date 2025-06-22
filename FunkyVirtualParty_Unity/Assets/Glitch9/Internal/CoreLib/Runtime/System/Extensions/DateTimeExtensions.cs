@@ -56,9 +56,9 @@ namespace Glitch9
                 return "None";
             }
 
-            //cultureInfo ??= CultureInfo.CurrentCulture;
+            cultureInfo ??= CultureInfo.CurrentCulture;
             // 영상 촬영을 위해 무조건 US 문화권으로 표시
-            cultureInfo = new CultureInfo("en-US");
+            //cultureInfo = new CultureInfo("en-US");
 
             // 오늘이면 "오늘 HH:mm tt"로 표시
             if (dateTime.Date == DateTime.Today)

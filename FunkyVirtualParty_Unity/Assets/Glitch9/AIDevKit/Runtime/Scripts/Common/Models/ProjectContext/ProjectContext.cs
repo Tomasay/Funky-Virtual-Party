@@ -136,15 +136,41 @@ namespace Glitch9.AIDevKit
             }
         }
 
+        // private static void AppendEnumFlagsDescription<T>(StringBuilder sb, T flags, string label) where T : Enum
+        // {
+        //     var values = Enum.GetValues(typeof(T));
+        //     var selected = new List<string>();
+
+        //     foreach (T val in values)
+        //     {
+        //         if (Convert.ToInt32(val) == 0) continue;
+        //         if (((Enum)(object)flags).HasFlag(val))
+        //         {
+        //             selected.Add(val.ToString().ToLower());
+        //         }
+        //     }
+
+        //     if (selected.Count == 0) return;
+
+        //     if (label == "genre")
+        //         sb.Append(string.Join(" and ", selected)).Append(" ");
+        //     else if (label == "style")
+        //         sb.Append("with a ").Append(string.Join(" and ", selected)).Append(" art style");
+        // }
+
         private static void AppendEnumFlagsDescription<T>(StringBuilder sb, T flags, string label) where T : Enum
         {
             var values = Enum.GetValues(typeof(T));
             var selected = new List<string>();
 
+            var flagsValue = Convert.ToInt32(flags);
+
             foreach (T val in values)
             {
-                if (Convert.ToInt32(val) == 0) continue;
-                if (((Enum)(object)flags).HasFlag(val))
+                var intVal = Convert.ToInt32(val);
+                if (intVal == 0) continue;
+
+                if ((flagsValue & intVal) == intVal)
                 {
                     selected.Add(val.ToString().ToLower());
                 }

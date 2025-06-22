@@ -1,3 +1,6 @@
+using System;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace Glitch9.AIDevKit
@@ -54,16 +57,47 @@ namespace Glitch9.AIDevKit
             Debug.LogError(message);
         }
 
-        internal static string FormatErrorMessage(string error)
+        internal static string FormatErrorMessage(string rawErrorMessage)
         {
-            if (string.IsNullOrWhiteSpace(error)) return "Unknown error has occurred.";
+            if (string.IsNullOrWhiteSpace(rawErrorMessage)) return "Unknown error has occurred.";
 
-            if (error.Contains("Unrecognized request argument supplied: reasoning_effort"))
+            if (rawErrorMessage.Contains("Unrecognized request argument supplied: reasoning_effort"))
             {
                 return "This model does not support the reasoning_effort parameter. Please use reasoning models (e.g. o-series), or do not set the reasoning_effort parameter.";
             }
 
-            return error;
+            return rawErrorMessage;
+        }
+
+        internal static string ExtractErrorMessage(Exception exception)
+        {
+            string message = exception?.Message;
+            if (string.IsNullOrWhiteSpace(message))
+                return "Unknown error has occurred.";
+
+            try
+            {
+                // if (message.Contains("HTTP/1.1 403 Forbidden")) // remove 'HTTP/1.1 403 Forbidden'
+                //     message = message.Replace("HTTP/1.1 403 Forbidden", "").Trim();
+
+                // HTTP/1.1 403 Forbidden 뿐만 아니라 다른 HTTP 상태 코드도 포함될 수 있으므로, 일반적인 HTTP 상태 코드 패턴을 제거
+                message = Regex.Replace(message, @"HTTP/\d\.\d \d{3}(?: [^\r\n]*)?", "").Trim();
+
+                ErrorResponseWrapper errorResponse = JsonConvert.DeserializeObject<ErrorResponseWrapper>(message);
+
+                if (errorResponse != null && errorResponse.Error != null)
+                {
+                    return errorResponse.Error.GetMessage();
+                }
+                else
+                {
+                    return message;
+                }
+            }
+            catch
+            {
+                return message;
+            }
         }
     }
 }

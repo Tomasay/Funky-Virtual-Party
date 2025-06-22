@@ -1,5 +1,5 @@
 using Glitch9.AIDevKit.Mubert;
-using Glitch9.ScriptableObjects;
+using Glitch9.Editor;
 using UnityEditor;
 
 namespace Glitch9.AIDevKit.Editor.Mubert
@@ -17,19 +17,9 @@ namespace Glitch9.AIDevKit.Editor.Mubert
             return provider;
         }
 
-        private static void DeactivateHandler()
-        {
-            MubertSettings.Instance.SaveAsset();
-        }
-
-        public MubertSettingsProvider(string path) : base(Api.Mubert, true, path)
-        {
-        }
-
-        protected override void InitializeSettings()
-        {
-            base.InitializeSettings();
-        }
+        private static void DeactivateHandler() => MubertSettings.Instance.SaveAsset();
+        public MubertSettingsProvider(string path) : base(Api.Mubert, true, path) { }
+        protected override void InitializeSettings() => base.InitializeSettings();
 
         protected override void DrawOptionalSettings()
         {

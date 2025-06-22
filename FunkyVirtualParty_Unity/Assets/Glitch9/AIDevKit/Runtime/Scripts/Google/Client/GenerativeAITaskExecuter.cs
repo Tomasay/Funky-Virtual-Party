@@ -156,7 +156,7 @@ namespace Glitch9.AIDevKit.Google
                 .SetModel(task.model.Id)
                 .SetModelOptions(task.modelSettings)
                 .SetInstruction(task.instruction)
-                .SetPrompt(task.prompt)
+                .SetPrompt(task.prompt, task.attachedFiles)
                 .SetJsonSchema(jsonSchemaType)
                 .SetCancellationToken(task.token);
 

@@ -54,7 +54,18 @@ namespace Glitch9.AIDevKit
         {
             if (!string.IsNullOrEmpty(Message)) return Message;
             // If the message is empty, return the type and code
-            return $"{Type} ({Code})";
+            // return $"{Type} ({Code})";
+
+            using (StringBuilderPool.Get(out StringBuilder sb))
+            {
+                if (!string.IsNullOrEmpty(Type)) sb.Append(Type);
+                if (!string.IsNullOrEmpty(Code))
+                {
+                    if (sb.Length > 0) sb.Append(" ");
+                    sb.Append($"({Code})");
+                }
+                return sb.ToString();
+            }
         }
 
         public ErrorResponse() { }

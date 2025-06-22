@@ -1,4 +1,5 @@
 using System.Linq;
+using Glitch9.Editor;
 using Glitch9.ScriptableObjects;
 using UnityEditor;
 using UnityEngine;
@@ -47,9 +48,7 @@ namespace Glitch9.AIDevKit.Editor
                 language: serverData.Language
             );
 
-            EditorUtility.SetDirty(voice);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            voice.SaveAsset();
         }
 
         internal static void AddToLibrary(string id)
@@ -87,7 +86,7 @@ namespace Glitch9.AIDevKit.Editor
             Voice obj = ScriptableObject.CreateInstance<Voice>();
             UpdateData(obj, serverData);
 
-            scriptableObjectName = ScriptableObjectUtil.FixSOName(scriptableObjectName);
+            scriptableObjectName = ScriptableObjectLoader.FixSOName(scriptableObjectName);
 
             string filePath = $"{targetDir}/{scriptableObjectName}.asset";
             Debug.Log($"Creating [{typeof(Voice).Name}] Scriptable Object: " + filePath);

@@ -26,6 +26,11 @@ namespace Glitch9.AIDevKit
 
         #endregion Default AIDevKit Settings
 
+        #region Default Chat Settings
+
+        internal const string DefaultChatTitle = "New Chat";
+
+        #endregion Default Chat Settings
 
         #region Default AI Models & Voices (for AIDevKit default settings and fallbacks) 
 

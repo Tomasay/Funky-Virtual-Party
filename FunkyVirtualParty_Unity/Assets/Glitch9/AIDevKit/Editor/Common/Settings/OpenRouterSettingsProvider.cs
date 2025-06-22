@@ -1,5 +1,5 @@
 using Glitch9.AIDevKit.OpenRouter;
-using Glitch9.ScriptableObjects;
+using Glitch9.Editor;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,12 +18,7 @@ namespace Glitch9.AIDevKit.Editor.OpenRouter
             return provider;
         }
 
-        private static void DeactivateHandler()
-        {
-            OpenRouterSettings.Instance.SaveAsset();
-        }
-
-
+        private static void DeactivateHandler() => OpenRouterSettings.Instance.SaveAsset();
         private readonly static GUIContent kHttpRefererLabel = new("HTTP-Referer (Optional)", "Site URL for rankings on openrouter.ai.");
         private readonly static GUIContent kXTitleLabel = new("X-Title (Optional)", "Site title for rankings on openrouter.ai.");
 

@@ -179,6 +179,9 @@ namespace Glitch9.Editor
         //VideoPlayer Icon
         public static Texture VideoPlayer => GetBuiltInIcon("VideoPlayer Icon");
 
+        //EditorGUIUtility.IconContent("PackageBadgeNew")
+        public static Texture PackageBadgeNew => GetBuiltInIcon("PackageBadgeNew", true);
+
         public static Texture StatusLight(StatusColor color)
         {
             return color switch

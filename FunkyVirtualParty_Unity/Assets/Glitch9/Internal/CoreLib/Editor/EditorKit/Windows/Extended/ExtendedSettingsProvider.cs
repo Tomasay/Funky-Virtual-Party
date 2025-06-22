@@ -60,7 +60,7 @@ namespace Glitch9.Editor
         protected SerializedObject LoadSettingsSO<T>() where T : ScriptableObject
         {
             string objectName = typeof(T).Name;
-            T settingsInstance = ScriptableObjectUtil.LoadSingleton<T>(objectName, true);
+            T settingsInstance = ScriptableObjectLoader.LoadSingleton<T>(objectName, true);
 
             if (settingsInstance == null)
             {

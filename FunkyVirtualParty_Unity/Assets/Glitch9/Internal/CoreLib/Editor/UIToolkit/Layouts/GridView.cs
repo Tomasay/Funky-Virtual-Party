@@ -7,7 +7,7 @@ namespace Glitch9.Editor.UIToolkit
 {
     public class GridView<T> : VisualElement
     {
-        private static readonly float[] kImageSizesPerRow =
+        private static readonly float[] kItemSizesPerRow =
         {
             80f, 120f, 160f, 200f, 240f, 280f,
             320f, 360f, 400f, 440f, 480f, 520f,
@@ -16,15 +16,20 @@ namespace Glitch9.Editor.UIToolkit
 
         private readonly Func<int, VisualElement> _makeItem;
         private readonly Action<VisualElement, int> _bindItem;
+        private int _sizeLevel = 3; // Default size level for items
         private int _itemsPerRow = 3; // Default number of items per row
         private float _aspectRatio;
         private readonly float _spacing;
-        private List<T> _items = new();
+        private readonly List<T> _items = new();
+        private bool _isRebuilding = false;
+        private float _containerWidth;
 
-        public GridView(Func<int, VisualElement> makeItem, Action<VisualElement, int> bindItem, float spacing = 8f, float aspectRatio = 1f)
+        public GridView(Func<int, VisualElement> makeItem, Action<VisualElement, int> bindItem, int sizeLevel = 3, float spacing = 8f, float aspectRatio = 1f)
         {
             _makeItem = makeItem ?? throw new ArgumentNullException(nameof(makeItem));
             _bindItem = bindItem ?? throw new ArgumentNullException(nameof(bindItem));
+
+            _sizeLevel = sizeLevel;
             _spacing = spacing;
             _aspectRatio = aspectRatio;
 
@@ -58,6 +63,13 @@ namespace Glitch9.Editor.UIToolkit
             Rebuild();
         }
 
+        public void SetSizeLevel(int sizeLevel)
+        {
+            // Debug.Log($"GridView SetSizeLevel called with {sizeLevel}.");
+            _sizeLevel = sizeLevel;
+            Rebuild();
+        }
+
         private void OnGeometryChanged(GeometryChangedEvent evt)
         {
             //Debug.Log($"GridView GeometryChangedEvent triggered. New width: {resolvedStyle.width}");
@@ -66,16 +78,32 @@ namespace Glitch9.Editor.UIToolkit
 
         private void Rebuild()
         {
-            //Debug.LogWarning("GridView Rebuild called.");
+            if (_isRebuilding) return;
+
+            _isRebuilding = true;
+            _containerWidth = resolvedStyle.width;
+
+            try
+            {
+                RebuildINTERNAL();
+                // schedule.Execute(RebuildINTERNAL).ExecuteLater(1);
+            }
+            finally
+            {
+                _isRebuilding = false;
+            }
+        }
+
+        private void RebuildINTERNAL()
+        {
             Clear();
 
             if (_items == null || _items.Count == 0)
                 return;
 
-            float containerWidth = resolvedStyle.width;
 
             // 🚫 아직 스타일이 반영되지 않아 너비가 0인 경우
-            if (containerWidth <= 0 || float.IsNaN(containerWidth))
+            if (_containerWidth <= 0 || float.IsNaN(_containerWidth))
             {
                 //Debug.LogWarning("GridView Rebuild skipped due to invalid container width.");
                 return;
@@ -84,7 +112,7 @@ namespace Glitch9.Editor.UIToolkit
             if (_itemsPerRow == 0) _itemsPerRow = 3;
 
             int newImagesInRow = _itemsPerRow;
-            float imageWidth = (containerWidth - _spacing * (_itemsPerRow - 1)) / _itemsPerRow;
+            float imageWidth = (_containerWidth - _spacing * (_itemsPerRow - 1)) / _itemsPerRow;
 
             // 🚫 NaN 방지
             if (float.IsNaN(imageWidth) || imageWidth <= 0)
@@ -93,23 +121,31 @@ namespace Glitch9.Editor.UIToolkit
                 return;
             }
 
-            float minSize = kImageSizesPerRow[Mathf.Max(0, _itemsPerRow - 1)];
-            float maxSize = kImageSizesPerRow[Mathf.Min(_itemsPerRow, kImageSizesPerRow.Length - 1)];
+            float minSize = kItemSizesPerRow[Mathf.Max(0, _itemsPerRow - 1)];
+            float maxSize = kItemSizesPerRow[Mathf.Min(_itemsPerRow, kItemSizesPerRow.Length - 1)];
+
+            if (_sizeLevel >= 0)
+            {
+                int adjSizeLevel = _sizeLevel + 1;
+                float scale = adjSizeLevel / 3f;
+                minSize *= scale;
+                maxSize *= scale;
+            }
 
             if (imageWidth > maxSize)
             {
-                newImagesInRow = Mathf.Max(1, Mathf.FloorToInt((containerWidth + _spacing) / (maxSize + _spacing)));
+                newImagesInRow = Mathf.Max(1, Mathf.FloorToInt((_containerWidth + _spacing) / (maxSize + _spacing)));
             }
             else if (imageWidth < minSize)
             {
-                newImagesInRow = Mathf.Min(kImageSizesPerRow.Length - 1, Mathf.FloorToInt((containerWidth + _spacing) / (minSize + _spacing)));
+                newImagesInRow = Mathf.Min(kItemSizesPerRow.Length - 1, Mathf.FloorToInt((_containerWidth + _spacing) / (minSize + _spacing)));
             }
 
             if (newImagesInRow != _itemsPerRow)
             {
                 _itemsPerRow = newImagesInRow;
-                imageWidth = (containerWidth - _spacing * (_itemsPerRow - 1)) / _itemsPerRow;
-                if (imageWidth <= 0) return;
+                imageWidth = (_containerWidth - _spacing * (_itemsPerRow - 1)) / _itemsPerRow;
+                if (_itemsPerRow <= 0 || imageWidth <= 0) return;
             }
 
             float imageHeight = imageWidth / _aspectRatio;

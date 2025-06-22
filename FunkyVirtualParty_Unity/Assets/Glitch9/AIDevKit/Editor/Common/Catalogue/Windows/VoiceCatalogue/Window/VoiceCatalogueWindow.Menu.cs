@@ -46,7 +46,7 @@ namespace Glitch9.AIDevKit.Editor
 
             menu.AddSeparator(string.Empty);
 
-            menu.AddItem(new GUIContent("Scriptable Objects/Reload Assets"), false, VoiceLibrary.FindAssets);
+            menu.AddItem(new GUIContent("Scriptable Objects/Reload Assets"), false, () => ScriptableObjectUtil.FindAssets(VoiceLibrary.DB));
             menu.AddItem(new GUIContent("Scriptable Objects/Update Assets"), false, UpdateAssets);
             menu.AddItem(new GUIContent("Scriptable Objects/Remove Invalid Assets"), false, VoiceLibrary.RemoveInvalidEntries);
 
@@ -126,6 +126,8 @@ namespace Glitch9.AIDevKit.Editor
                     age: serverData.Age,
                     language: serverData.Language
                 );
+
+                voice.SaveAsset();
 
                 Debug.Log($"Updated {voice.Id} voice asset.");
             }

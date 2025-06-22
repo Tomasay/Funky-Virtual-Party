@@ -75,7 +75,19 @@ namespace Glitch9.AIDevKit.Client
 
     public abstract partial class AIClient<TSelf> : CRUDClient<TSelf> where TSelf : AIClient<TSelf>
     {
-        protected AIClient(AIClientSettingsFactory settingsFactory) : base(clientSettings: settingsFactory.Create()) { }
+        public Api Api { get; }
+
+        protected AIClient(Api Api, AIClientSettingsFactory settingsFactory) : base(clientSettings: settingsFactory.Create())
+        {
+            this.Api = Api;
+            OnException = DefaultExceptionHandler;
+
+            void DefaultExceptionHandler(string endpoint, Exception exception)
+            {
+                throw new ApiException(this.Api, endpoint, exception);
+            }
+        }
+
         protected override string FormatErrorMessage(string errorMessage) => AIDevKitDebug.FormatErrorMessage(errorMessage);
         protected override bool IsDeletedPredicate(RESTResponse res) => res.HasBody;
     }

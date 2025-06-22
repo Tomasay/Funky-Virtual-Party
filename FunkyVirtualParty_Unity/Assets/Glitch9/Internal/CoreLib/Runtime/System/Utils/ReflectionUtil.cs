@@ -125,12 +125,7 @@ namespace Glitch9.Reflection
             }
 
             if (enumType == null)
-            {
-                Debug.LogError($"ApiEnumDE {enumName} not found");
-#if UNITY_EDITOR
-                UnityEditor.EditorUtility.DisplayDialog("Error", $"ApiEnumDE {enumName} not found", "OK");
-#endif
-            }
+                Debug.LogError($"ApiEnum '{enumName}' not found");
 
             return enumType;
         }
@@ -142,12 +137,10 @@ namespace Glitch9.Reflection
 
             // find the enum values
             string[] enumValues = Enum.GetNames(enumType);
+
             if (enumValues.Length == 0)
             {
-                Debug.LogError($"ApiEnumDE {enumName} has no values");
-#if UNITY_EDITOR
-                UnityEditor.EditorUtility.DisplayDialog("Error", $"ApiEnumDE {enumName} has no values", "OK");
-#endif
+                Debug.LogError($"ApiEnum '{enumName}' has no values");
                 return null;
             }
 

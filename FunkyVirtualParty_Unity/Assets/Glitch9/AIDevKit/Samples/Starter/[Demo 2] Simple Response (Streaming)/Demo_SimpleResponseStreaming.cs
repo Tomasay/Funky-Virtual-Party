@@ -1,6 +1,4 @@
 using Glitch9.AIDevKit;
-using Glitch9.AIDevKit.Google;
-using Glitch9.AIDevKit.OpenAI;
 using UnityEngine;
 using UnityEngine.UI;
 

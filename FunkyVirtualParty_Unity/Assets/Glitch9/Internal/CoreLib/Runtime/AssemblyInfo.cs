@@ -2,6 +2,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Glitch9.CoreLib.IO")]
 [assembly: InternalsVisibleTo("Glitch9.CoreLib.UI")]
 [assembly: InternalsVisibleTo("Glitch9.CoreLib.UI.MaterialDesign")]
+[assembly: InternalsVisibleTo("Glitch9.NativeMediaPlayer")]
 [assembly: InternalsVisibleTo("Glitch9.AIDevKit")]
 [assembly: InternalsVisibleTo("Glitch9.AIDevKit.Client")]
 [assembly: InternalsVisibleTo("Glitch9.AIDevKit.OpenAI")]
@@ -14,6 +15,7 @@ using System.Runtime.CompilerServices;
 #if UNITY_EDITOR 
 [assembly: InternalsVisibleTo("Glitch9.CoreLib.Editor")]
 [assembly: InternalsVisibleTo("Glitch9.CoreLib.Editor.PackageBuilder")]
+[assembly: InternalsVisibleTo("Glitch9.NativeMediaPlayer.Editor")]
 [assembly: InternalsVisibleTo("Glitch9.AIDevKit.Editor")]
 [assembly: InternalsVisibleTo("Glitch9.AIDevKit.Editor.Pro")]
 [assembly: InternalsVisibleTo("Glitch9.AIDevKit.Localization.Editor")]

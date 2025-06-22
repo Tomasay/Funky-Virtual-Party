@@ -14,7 +14,7 @@ namespace Glitch9.ScriptableObjects
             {
                 AssetPathAttribute att = AttributeCache<AssetPathAttribute>.Get<TSelf>();
                 string path = att == null ? "Resources" : att.Path;
-                _instance = ScriptableObjectUtil.LoadSingleton<TSelf>(dirPath: path, create: true);
+                _instance = ScriptableObjectLoader.LoadSingleton<TSelf>(dirPath: path, create: true);
             }
             return _instance;
         }

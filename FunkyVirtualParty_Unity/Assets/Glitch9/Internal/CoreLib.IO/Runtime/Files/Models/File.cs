@@ -33,6 +33,7 @@ namespace Glitch9.IO.Files
         bool IsLoaded => State == FileState.Loaded;
         bool IsError => State == FileState.Error;
         UniTask<byte[]> ReadAllBytesAsync();
+        string EncodeToBase64();
         FileInfo CopyTo(string destinationPath);
         FileInfo CopyTo(string destinationPath, bool overwrite);
         void Delete();

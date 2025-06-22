@@ -46,7 +46,7 @@ namespace Glitch9.AIDevKit.Editor
 
             if (GUILayout.Button(Texts.kReloadEntries, ExStyles.bigButton))
             {
-                ModelLibrary.FindAssets();
+                ScriptableObjectUtil.FindAssets(ModelLibrary.DB);
             }
 
             if (GUILayout.Button(Texts.kRemoveInvalidEntries, ExStyles.bigButton))
@@ -65,7 +65,7 @@ namespace Glitch9.AIDevKit.Editor
 
             if (GUILayout.Button(Texts.kReloadEntries, ExStyles.bigButton))
             {
-                VoiceLibrary.FindAssets();
+                ScriptableObjectUtil.FindAssets(VoiceLibrary.DB);
             }
 
             if (GUILayout.Button(Texts.kRemoveInvalidEntries, ExStyles.bigButton))

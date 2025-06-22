@@ -72,11 +72,7 @@ namespace Glitch9
             {
                 string senderAsString = ParseSender(sender, callerFilePath);
 
-#if UNITY_EDITOR
-                sb.Append(UnityEditor.EditorGUIUtility.isProSkin ? "<color=yellow>[" : "<color=blue>[");
-#else
-                sb.Append("[");
-#endif
+                sb.Append("<color=yellow>[");
                 sb.Append(senderAsString);
 
                 if (ShowCallerMemberName && !string.IsNullOrEmpty(callerMemberName))
@@ -84,11 +80,8 @@ namespace Glitch9
                     sb.Append(callerMemberName);
                 }
 
-#if UNITY_EDITOR
                 sb.Append("]</color> ");
-#else
-                sb.Append("] ");
-#endif
+
                 bool isColored = IsColored;
 
                 if (isColored) sb.Append($"<color={GetColorHex(logType)}>");

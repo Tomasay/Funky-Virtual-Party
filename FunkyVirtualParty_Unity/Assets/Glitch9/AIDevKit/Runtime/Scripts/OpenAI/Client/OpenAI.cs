@@ -82,7 +82,7 @@ namespace Glitch9.AIDevKit.OpenAI
         /// <summary>
         /// The default instance of the OpenAI client.
         /// </summary>
-        public static OpenAI DefaultInstance => _defaultInstance ??= CreateDefault();
+        public static OpenAI DefaultInstance => _defaultInstance ??= new();
         private static OpenAI _defaultInstance;
 
         public static RESTHeader AssistantsApiHeader = new(OpenAIConfig.BetaHeaderName, OpenAIConfig.BetaHeader_Assistants);
@@ -142,20 +142,21 @@ namespace Glitch9.AIDevKit.OpenAI
         public BetaService Beta { get; }
 
 
-        private static OpenAI CreateDefault()
-        {
-            return new OpenAI
-            {
-                OnException = DefaultExceptionHandler,
-            };
+        // private static OpenAI CreateDefault()
+        // {
+        //     return new OpenAI
+        //     {
+        //         OnException = DefaultExceptionHandler,
+        //     };
 
-            static void DefaultExceptionHandler(string endpoint, Exception exception)
-            {
-                LogService.Error($"{endpoint}: {exception}");
-            }
-        }
+        //     static void DefaultExceptionHandler(string endpoint, Exception exception)
+        //     {
+        //         //LogService.Error($"{endpoint}: {exception}");
 
-        public OpenAI() : base(new OpenAIClientSettingsFactory())
+        //     }
+        // }
+
+        public OpenAI() : base(Api.OpenAI, new OpenAIClientSettingsFactory())
         {
             // Initialize services
             Audio = new AudioService(this);

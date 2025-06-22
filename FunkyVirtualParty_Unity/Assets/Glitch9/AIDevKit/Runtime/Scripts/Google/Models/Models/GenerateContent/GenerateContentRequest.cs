@@ -205,9 +205,23 @@ namespace Glitch9.AIDevKit.Google
                 return this;
             }
 
-            public Builder SetPrompt(string prompt)
+            public Builder SetPrompt(string prompt, List<IFile> attachedFiles = null)
             {
-                _req.Contents.Add(new Content(ChatRole.User, prompt));
+                if (attachedFiles.IsNullOrEmpty())
+                {
+                    _req.Contents.Add(new Content(ChatRole.User, prompt));
+                    return this;
+                }
+
+                List<ContentPart> parts = new() { ContentPart.FromText(prompt) };
+
+                foreach (IFile file in attachedFiles)
+                {
+                    if (file == null) continue;
+                    parts.Add(ContentPart.FromBase64(file.EncodeToBase64(), file.MimeType));
+                }
+
+                _req.Contents.Add(new Content(ChatRole.User, parts.ToArray()));
                 return this;
             }
 
@@ -338,7 +352,6 @@ namespace Glitch9.AIDevKit.Google
                 if (options == null) return this;
 
                 _req.Config ??= new GenerationConfig();
-
                 if (options.MaxTokens != null) _req.Config.MaxTokens = options.MaxTokens;
                 if (options.Temperature != null) _req.Config.Temperature = options.Temperature;
                 if (options.TopP != null) _req.Config.TopP = options.TopP;
@@ -354,6 +367,7 @@ namespace Glitch9.AIDevKit.Google
             public Builder SetVoice(string voiceId)
             {
                 if (string.IsNullOrEmpty(voiceId)) return this;
+
                 _req.Config ??= new GenerationConfig();
                 _req.Config.SpeechConfig ??= new SpeechConfig();
                 _req.Config.SpeechConfig.VoiceConfig ??= new VoiceConfig();

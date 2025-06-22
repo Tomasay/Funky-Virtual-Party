@@ -42,7 +42,7 @@ namespace Glitch9.AIDevKit.Editor
 
             menu.AddSeparator(string.Empty);
 
-            menu.AddItem($"{GUILabels.ScriptableObjects}/Reload Assets", ModelLibrary.FindAssets);
+            menu.AddItem($"{GUILabels.ScriptableObjects}/Reload Assets", () => ScriptableObjectUtil.FindAssets(ModelLibrary.DB));
             menu.AddItem($"{GUILabels.ScriptableObjects}/Update Assets", UpdateAssets);
             menu.AddItem($"{GUILabels.ScriptableObjects}/Remove Invalid Assets", ModelLibrary.RemoveInvalidEntries);
 
@@ -135,6 +135,8 @@ namespace Glitch9.AIDevKit.Editor
                     fineTuned: serverData.IsFineTuned,
                     prices: serverData.GetPrices()
                 );
+
+                model.SaveAsset();
 
                 Debug.Log($"Updated {model.Id} model asset.");
             }

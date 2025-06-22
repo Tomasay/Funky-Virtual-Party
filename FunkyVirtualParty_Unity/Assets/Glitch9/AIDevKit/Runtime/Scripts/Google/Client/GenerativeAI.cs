@@ -59,24 +59,12 @@ namespace Glitch9.AIDevKit.Google
         /// <summary>
         /// The default instance of the GenerativeAI client.
         /// </summary>
-        public static GenerativeAI DefaultInstance => _defaultInstance ??= CreateDefault();
+        public static GenerativeAI DefaultInstance => _defaultInstance ??= new();
         private static GenerativeAI _defaultInstance;
         private GoogleJsonArrayStreamBuffer<GenerateContentResponse> _streamBuffer;
 
-        private static GenerativeAI CreateDefault()
-        {
-            return new GenerativeAI
-            {
-                OnException = DefaultExceptionHandler,
-            };
 
-            void DefaultExceptionHandler(string endpoint, Exception exception)
-            {
-                LogService.Error($"{endpoint}: {exception}");
-            }
-        }
-
-        public GenerativeAI() : base(new GenerativeAIClientSettingsFactory())
+        public GenerativeAI() : base(Api.Google, new GenerativeAIClientSettingsFactory())
         {
             // Initialize services
             CachedContents = new CachedContentService(this);

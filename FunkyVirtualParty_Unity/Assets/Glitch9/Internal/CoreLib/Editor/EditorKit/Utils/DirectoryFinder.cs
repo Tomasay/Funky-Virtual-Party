@@ -3,10 +3,10 @@ using UnityEngine;
 
 namespace Glitch9.Editor
 {
-    internal static class DirectoryFinder
+    public static class DirectoryFinder
     {
         // marker files are '.txt' files that are used to identify the directory
-        internal static string FindDirectory(string markerFileName)
+        public static string FindDirectory(string markerFileName)
         {
             // find using AssetDatabase
             string[] guids = UnityEditor.AssetDatabase.FindAssets(markerFileName);

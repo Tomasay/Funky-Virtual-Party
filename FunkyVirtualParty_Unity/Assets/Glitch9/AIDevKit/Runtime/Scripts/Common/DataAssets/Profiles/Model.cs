@@ -170,7 +170,7 @@ namespace Glitch9.AIDevKit
             if (prices != null) this.prices = prices;
             if (endpoint != null) this.endpoint = endpoint.Value;
 
-            this.SaveAsset();
+            //this.SaveAsset(); // TODO: save in the editor code, not here
         }
 
         // internal void SetData(IModelData modelData, bool? isLegacy = null, ModelPrice[] prices = null)

@@ -89,8 +89,6 @@ namespace Glitch9.AIDevKit
             if (language != null) this.language = language.Value;
             if (gender != null) this.gender = gender.Value;
             if (age != null) this.age = age.Value;
-
-            this.SaveAsset();
         }
 
         #endregion

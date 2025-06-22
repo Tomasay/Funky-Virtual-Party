@@ -91,8 +91,8 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            Type reqType = req.GetType();
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Create(reqType);
+            // Type reqType = req.GetType();
+            //            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Create(reqType);
 
             RESTResponse<TResBody> res = await POSTAsync<TReqBody, TResBody>(req);
             ThrowIf.ResultIsNull(res);
@@ -106,8 +106,8 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            Type reqType = req.GetType();
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Create(reqType);
+            // Type reqType = req.GetType();
+            //  if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Create(reqType);
 
             RESTResponse res = await POSTAsync(req);
             ThrowIf.ResultIsNull(res);
@@ -121,8 +121,8 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            Type reqType = req.GetType();
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Create(reqType);
+            // Type reqType = req.GetType();
+            // if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Create(reqType);
 
             RESTResponse<TResBody> res = await POSTAsync<TResBody>(req);
             ThrowIf.ResultIsNull(res);
@@ -136,7 +136,7 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Update(req.GetType());
+            // if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Update(req.GetType());
             RESTResponse<TResBody> res = await POSTAsync<TReqBody, TResBody>(req);
             ThrowIf.ResultIsNull(res);
 
@@ -149,7 +149,7 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Update(typeof(TResBody));
+            // if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Update(typeof(TResBody));
             RESTResponse<TResBody> res = await POSTAsync<TResBody>(req);
             ThrowIf.ResultIsNull(res);
 
@@ -162,7 +162,7 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Update(typeof(TResBody));
+            //  if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Update(typeof(TResBody));
             RESTResponse<TResBody> res = await PATCHAsync<TResBody>(req);
             ThrowIf.ResultIsNull(res);
 
@@ -175,7 +175,7 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Retrieve(typeof(TResBody));
+            //  if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Retrieve(typeof(TResBody));
             RESTResponse<TResBody> res = await GETAsync<TResBody>(req);
             ThrowIf.ResultIsNull(res);
 
@@ -188,7 +188,7 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Delete(typeof(TResBody));
+            //  if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Delete(typeof(TResBody));
             RESTResponse<TResBody> res = await DELETEAsync<TResBody>(req);
             ThrowIf.ResultIsNull(res);
 
@@ -202,7 +202,7 @@ namespace Glitch9.IO.Networking.RESTApi
             ThrowIf.EndpointIsNull(endpoint);
             req.Endpoint = endpoint;
 
-            if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Query(typeof(TResBody));
+            //  if (!req.IgnoreLogs && LogLevel.RequestDetails()) CRUDLogger.Query(typeof(TResBody));
             RESTResponse<QueryResponse<TResBody>> res = await GETAsync<QueryResponse<TResBody>>(req);
             ThrowIf.ResultIsNull(res);
 

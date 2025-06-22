@@ -12,6 +12,8 @@ namespace Glitch9.ScriptableObjects
         where TSelf : ScriptableDatabase<TDb, TData, TSelf>
     {
         [SerializeField, SerializeReference] private TDb data = new();
+        public TDb Data => data;
+
         public static TDb DB => Instance.data ??= new TDb();
         public static int Count => DB.Count;
         public static bool IsEmpty => DB.IsNullOrEmpty();
@@ -42,14 +44,12 @@ namespace Glitch9.ScriptableObjects
         {
             if (LogIfNull()) return;
             DB.Add(data.Id, data);
-            Instance.SaveAsset();
         }
 
         public static bool Remove(TData data)
         {
             if (LogIfNull()) return false;
             DB.Remove(data.Id);
-            Instance.SaveAsset();
             return true;
         }
 
@@ -57,7 +57,6 @@ namespace Glitch9.ScriptableObjects
         {
             if (LogIfNull()) return false;
             DB.Remove(id);
-            Instance.SaveAsset();
             return true;
         }
 
@@ -66,7 +65,6 @@ namespace Glitch9.ScriptableObjects
             if (LogIfNull() || index < 0 || index >= DB.Count) return false;
             var key = DB.Keys.ElementAt(index);
             DB.Remove(key);
-            Instance.SaveAsset();
             return true;
         }
 
@@ -74,7 +72,6 @@ namespace Glitch9.ScriptableObjects
         {
             if (LogIfNull()) return;
             DB.Clear();
-            Instance.SaveAsset();
         }
 
         public static List<TData> ToList() => DB.Values.ToList();
@@ -125,53 +122,5 @@ namespace Glitch9.ScriptableObjects
             }
             return false;
         }
-
-        internal static bool InitialLoad()
-        {
-#if UNITY_EDITOR
-            // if db is empty, run FindAssets to load assets
-            // if assets are not found, throw an error
-            if (DB.IsNullOrEmpty())
-            {
-                Debug.LogWarning($"The {typeof(TDb).Name} is empty. Finding assets...");
-                FindAssets();
-            }
-            return !DB.IsNullOrEmpty();
-#else
-            return false;
-#endif
-        }
-
-        internal static void FindAssets()
-        {
-#if UNITY_EDITOR
-            if (!typeof(ScriptableObject).IsAssignableFrom(typeof(TData)))
-            {
-                Debug.LogError($"The type {typeof(TData).Name} is not a ScriptableObject. Cannot reload assets.");
-                return;
-            }
-
-            string typeName = typeof(TData).Name;
-            Debug.Log($"Reloading {typeName} to {typeof(TDb).Name}...");
-
-            DB.Clear();
-
-            string[] guids = UnityEditor.AssetDatabase.FindAssets("t:ScriptableObject");
-            foreach (string guid in guids)
-            {
-                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                var obj = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
-
-                if (obj is TData model)
-                {
-                    Debug.Log($"Found and adding {typeof(TData).Name}: {model.Id}");
-                    Add(model);
-                }
-            }
-
-            Instance.SaveAsset();
-#endif
-        }
-
     }
 }

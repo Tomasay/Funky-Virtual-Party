@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Glitch9.Collections;
 using Glitch9.ScriptableObjects;
 
@@ -12,38 +11,7 @@ namespace Glitch9.AIDevKit
     public class VoiceLibrary : ScriptableDatabase<VoiceLibrary.Repo, Voice, VoiceLibrary>
     {
         /// <summary>Database for storing voice data.</summary>
-        public class Repo : Database<Voice>
-        {
-#if UNITY_EDITOR
-            /// <summary>Initializes the database.</summary>
-            public Repo()
-            {
-                UnityEditor.EditorApplication.delayCall += () =>
-                {
-                    if (this == null) return;
-
-                    if (Count == 0)
-                    {
-                        if (!InitialLoad())
-                        {
-                            Debug.LogError("There is no voice in your library. Please add voices to the library.");
-                        }
-                    }
-
-                    // const string kPrefsKey = "AIDevKit.VoiceLibrary.Setup";
-
-                    // bool initialSetup = UnityEditor.EditorPrefs.GetBool(kPrefsKey, false);
-                    // if (!initialSetup)
-                    // {
-                    //     if (InitialLoad())
-                    //     {
-                    //         UnityEditor.EditorPrefs.SetBool(kPrefsKey, true);
-                    //     }
-                    // }
-                };
-            }
-#endif
-        }
+        public class Repo : Database<Voice> { }
 
         internal static Dictionary<Api, List<Voice>> GetFilteredRefs(VoiceFilter filter)
         {
