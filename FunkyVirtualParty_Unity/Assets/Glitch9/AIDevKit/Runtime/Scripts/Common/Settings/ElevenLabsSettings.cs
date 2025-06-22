@@ -19,12 +19,12 @@ namespace Glitch9.AIDevKit.ElevenLabs
         public static string DefaultSTT => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultSTT, AIDevKitConfig.kDefault_ElevenLabs_STT);
         public static string DefaultVoice => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVoice, AIDevKitConfig.kDefault_ElevenLabs_Voice);
 
-        public static bool IsDefaultModel(string id, ModelFeature cap)
+        public static bool IsDefaultModel(string id, ModelFeature feature)
         {
             if (string.IsNullOrWhiteSpace(id)) return false;
 
-            if (cap.HasFlag(ModelFeature.SpeechGeneration) && id == DefaultTTS) return true;
-            if (cap.HasFlag(ModelFeature.VoiceChanger) && id == DefaultVCM) return true;
+            if (feature.HasFlag(ModelFeature.SpeechGeneration) && id == DefaultTTS) return true;
+            if (feature.HasFlag(ModelFeature.VoiceChanger) && id == DefaultVCM) return true;
 
             return false;
         }

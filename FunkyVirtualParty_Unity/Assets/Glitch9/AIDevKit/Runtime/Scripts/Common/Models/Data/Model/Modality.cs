@@ -36,7 +36,7 @@ namespace Glitch9.AIDevKit
         internal static List<string> ToStringList(this Modality? flags)
         {
             List<string> result = new();
-            if (flags == null) return result;
+            if (!flags.HasValue) return result;
 
             foreach (Modality modality in Enum.GetValues(typeof(Modality)))
             {

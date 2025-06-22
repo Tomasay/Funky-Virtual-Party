@@ -25,15 +25,15 @@ namespace Glitch9.AIDevKit.Google
         public static string DefaultTTS => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultTTS, AIDevKitConfig.kDefault_Google_TTS);
         public static string DefaultVoice => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVoice, AIDevKitConfig.kDefault_Google_Voice);
 
-        public static bool IsDefaultModel(string id, ModelFeature cap)
+        public static bool IsDefaultModel(string id, ModelFeature feature)
         {
             if (string.IsNullOrWhiteSpace(id)) return false;
 
-            if (cap.HasFlag(ModelFeature.TextGeneration) && id == DefaultLLM) return true;
-            if (cap.HasFlag(ModelFeature.ImageGeneration) && id == DefaultIMG) return true;
-            if (cap.HasFlag(ModelFeature.TextEmbedding) && id == DefaultEMB) return true;
-            if (cap.HasFlag(ModelFeature.VideoGeneration) && id == DefaultVID) return true;
-            if (cap.HasFlag(ModelFeature.SpeechGeneration) && id == DefaultTTS) return true;
+            if (feature.HasFlag(ModelFeature.TextGeneration) && id == DefaultLLM) return true;
+            if (feature.HasFlag(ModelFeature.ImageGeneration) && id == DefaultIMG) return true;
+            if (feature.HasFlag(ModelFeature.TextEmbedding) && id == DefaultEMB) return true;
+            if (feature.HasFlag(ModelFeature.VideoGeneration) && id == DefaultVID) return true;
+            if (feature.HasFlag(ModelFeature.SpeechGeneration) && id == DefaultTTS) return true;
 
             return false;
         }

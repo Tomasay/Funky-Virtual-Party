@@ -112,8 +112,6 @@ namespace Glitch9.Editor
 
             undoBtnRect = new Rect(currentX, row1ValueRect.y, kButtonWidth, row1ValueRect.height);
 
-
-
             if (_isInitialized) return;
             _isInitialized = true;
 

@@ -49,18 +49,18 @@ namespace Glitch9.AIDevKit.OpenAI
         public static string DefaultVoice => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVoice, AIDevKitConfig.kDefault_OpenAI_Voice);
         public static string GetAdminApiKey() => Instance.adminKey?.GetKey();
 
-        public static bool IsDefaultModel(string id, ModelFeature cap)
+        public static bool IsDefaultModel(string id, ModelFeature feature)
         {
             if (string.IsNullOrWhiteSpace(id)) return false;
 
-            if (cap.HasFlag(ModelFeature.SpeechGeneration) && id == DefaultTTS) return true;
-            if (cap.HasFlag(ModelFeature.VoiceChanger) && id == DefaultVoice) return true;
-            if (cap.HasFlag(ModelFeature.TextGeneration) && id == DefaultLLM) return true;
-            if (cap.HasFlag(ModelFeature.ImageGeneration) && id == DefaultIMG) return true;
-            if (cap.HasFlag(ModelFeature.TextEmbedding) && id == DefaultEMB) return true;
-            if (cap.HasFlag(ModelFeature.Moderation) && id == DefaultMOD) return true;
-            if (cap.HasFlag(ModelFeature.Realtime) && id == DefaultRTM) return true;
-            if (cap.HasFlag(ModelFeature.SpeechRecognition) && id == DefaultSTT) return true;
+            if (feature.HasFlag(ModelFeature.SpeechGeneration) && id == DefaultTTS) return true;
+            if (feature.HasFlag(ModelFeature.VoiceChanger) && id == DefaultVoice) return true;
+            if (feature.HasFlag(ModelFeature.TextGeneration) && id == DefaultLLM) return true;
+            if (feature.HasFlag(ModelFeature.ImageGeneration) && id == DefaultIMG) return true;
+            if (feature.HasFlag(ModelFeature.TextEmbedding) && id == DefaultEMB) return true;
+            if (feature.HasFlag(ModelFeature.Moderation) && id == DefaultMOD) return true;
+            if (feature.HasFlag(ModelFeature.Realtime) && id == DefaultRTM) return true;
+            if (feature.HasFlag(ModelFeature.SpeechRecognition) && id == DefaultSTT) return true;
 
             return false;
         }

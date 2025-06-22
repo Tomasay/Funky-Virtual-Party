@@ -38,11 +38,11 @@ namespace Glitch9.AIDevKit.Ollama
 
         public static bool IsEnabled => Instance.enableOllama;
 
-        public static bool IsDefaultModel(string id, ModelFeature cap)
+        public static bool IsDefaultModel(string id, ModelFeature feature)
         {
             if (string.IsNullOrWhiteSpace(id)) return false;
 
-            if (cap.HasFlag(ModelFeature.TextGeneration) && id == DefaultModel) return true;
+            if (feature.HasFlag(ModelFeature.TextGeneration) && id == DefaultModel) return true;
 
             return false;
         }

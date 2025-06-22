@@ -17,11 +17,11 @@ namespace Glitch9.AIDevKit.OpenRouter
         public static string XTitle => Instance.xTitle;
         public static string DefaultLLM => Instance.defaultLLM;
 
-        public static bool IsDefaultModel(string id, ModelFeature cap)
+        public static bool IsDefaultModel(string id, ModelFeature feature)
         {
             if (string.IsNullOrWhiteSpace(id)) return false;
 
-            if (cap.HasFlag(ModelFeature.TextGeneration) && id == DefaultLLM) return true;
+            if (feature.HasFlag(ModelFeature.TextGeneration) && id == DefaultLLM) return true;
 
             return false;
         }
