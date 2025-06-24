@@ -28,7 +28,7 @@ namespace Glitch9.IO.Networking.RESTApi
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public virtual void ValidateBody() { }
+        public virtual void ValidateRequestBody() { }
 
         public abstract class RequestBodyBuilder<TBuilder, TReqBody>
             where TBuilder : RequestBodyBuilder<TBuilder, TReqBody>

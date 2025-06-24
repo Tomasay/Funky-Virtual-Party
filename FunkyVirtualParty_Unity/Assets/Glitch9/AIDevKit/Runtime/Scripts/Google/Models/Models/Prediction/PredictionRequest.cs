@@ -15,7 +15,7 @@ namespace Glitch9.AIDevKit.Google
         [JsonProperty("prompt")] public string Prompt { get; set; }
         [JsonProperty("config")] public GenerateMediaConfig Config { get; set; } = new();
 
-        public override void ValidateBody()
+        public override void ValidateRequestBody()
         {
             if (string.IsNullOrEmpty(Prompt))
                 throw new ArgumentNullException(nameof(Prompt), "Prompt cannot be null or empty.");

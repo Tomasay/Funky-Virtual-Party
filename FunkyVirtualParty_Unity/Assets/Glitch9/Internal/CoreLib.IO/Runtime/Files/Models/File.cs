@@ -120,6 +120,27 @@ namespace Glitch9.IO.Files
     [Serializable]
     public class File<T> : RawFile where T : UnityEngine.Object
     {
+        [JsonIgnore]
+        public override MIMEType MimeType
+        {
+            get
+            {
+                if (mimeType == MIMEType.Unknown)
+                {
+                    if (!string.IsNullOrEmpty(fullPath))
+                    {
+                        mimeType = MIMETypeUtil.ParseFromPath(fullPath);
+                    }
+                    else
+                    {
+                        mimeType = MIMETypeUtil.GetUnityObjectDefaultMimeType<T>();
+                    }
+                }
+
+                return mimeType;
+            }
+        }
+
         public override string FileType => typeof(T).Name;
         [JsonIgnore] public override bool HasData => _asset != null;
         [JsonIgnore] public T Asset => _asset; // Loaded asset 

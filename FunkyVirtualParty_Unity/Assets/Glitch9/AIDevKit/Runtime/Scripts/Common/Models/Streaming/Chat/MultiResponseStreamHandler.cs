@@ -10,6 +10,7 @@ namespace Glitch9.AIDevKit
         private readonly List<StringBuilder> _sbList = new();
         private readonly List<ToolCall[]> _toolCalls = new();
 
+        public MultiResponseStreamHandler() { }
         public MultiResponseStreamHandler(
             Action onStart = null,
             Action<ChatDelta[]> onDeltaChunk = null,
@@ -22,7 +23,7 @@ namespace Glitch9.AIDevKit
             if (onDone != null) this.onDone += onDone;
         }
 
-        protected override void OnReceiveChunk(ChatCompletionChunk chunk)
+        internal override void ProcessChunk(ChatCompletionChunk chunk)
         {
             ChatDelta[] deltaChunks = chunk.Value?.GetDeltaChunks();
             if (deltaChunks.IsNullOrEmpty()) return;
@@ -43,18 +44,27 @@ namespace Glitch9.AIDevKit
                     sb.Append(delta);
                 }
 
-                _toolCalls.Add(delta.ToolCalls);
+                if (delta.ToolCalls.IsNotNullOrEmpty())
+                {
+                    _toolCalls.Add(delta.ToolCalls);
+                    _funtionManagerCallback?.Invoke(delta.ToolCalls);
+                }
             }
         }
 
-        protected override ChatCompletion CreateResult()
+        internal override ChatCompletion BuildFinalResult()
         {
             List<string> streamedTexts = new();
 
             for (int i = 0; i < _sbList.Count; i++)
             {
                 StringBuilder sb = _sbList[i];
-                streamedTexts.Add(sb.ToString());
+                string content = sb.ToString();
+
+                if (_task.textProcessor != null)
+                    content = _task.textProcessor(content);
+
+                streamedTexts.Add(content);
                 sb.Clear();
             }
 
@@ -64,7 +74,5 @@ namespace Glitch9.AIDevKit
                 _lastChunk?.Usage
             );
         }
-
-
     }
 }

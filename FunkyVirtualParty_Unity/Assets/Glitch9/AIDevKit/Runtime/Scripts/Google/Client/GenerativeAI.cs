@@ -61,7 +61,7 @@ namespace Glitch9.AIDevKit.Google
         /// </summary>
         public static GenerativeAI DefaultInstance => _defaultInstance ??= new();
         private static GenerativeAI _defaultInstance;
-        private GoogleJsonArrayStreamBuffer<GenerateContentResponse> _streamBuffer;
+        private readonly GoogleJsonArrayStreamBuffer<GenerateContentResponse> _streamBuffer;
 
 
         public GenerativeAI() : base(Api.Google, new GenerativeAIClientSettingsFactory())
@@ -116,73 +116,8 @@ namespace Glitch9.AIDevKit.Google
                     response.Usage
                 );
 
-                yield return new ChatCompletionChunk
-                {
-                    isDone = isDone,
-                    Value = delta,
-                };
+                yield return ChatCompletionChunk.Done(delta);
             }
-
-            // string trimmedLine = raw.Trim().TrimStart(',').TrimEnd(',');
-
-            // bool isDone = false;
-
-            // if (!trimmedLine.StartsWith('['))
-            // {
-            //     trimmedLine = $"[{raw}";
-            // }
-
-            // if (trimmedLine.EndsWith(']'))
-            // {
-            //     isDone = true;
-            // }
-            // else
-            // {
-            //     trimmedLine = $"{trimmedLine}]";
-            // }
-
-            // if (string.IsNullOrWhiteSpace(trimmedLine) || trimmedLine == "[]") yield break;
-
-            // if (!JsonUtil.IsJsonComplete(trimmedLine))
-            // {
-            //     Logger.Error($"Incomplete JSON response: {trimmedLine}");
-            //     yield break;
-            // }
-
-            // var list = JsonConvert.DeserializeObject<List<GenerateContentResponse>>(trimmedLine, JsonSettings);
-
-            // if (list.IsNullOrEmpty())
-            // {
-            //     Logger.Error($"Failed to parse response: {trimmedLine}");
-            //     yield break;
-            // }
-
-            // if (list.Count > 1)
-            // {
-            //     // 1개 이상일때 로그 남겨서 디버깅
-            //     Logger.Warning($"Received multiple items in response: {list.Count}. Only the first item will be processed.");
-
-            // }
-
-            // for (int i = 0; i < list.Count; i++)
-            // {
-            //     var item = list[i];
-            //     if (item == null) continue;
-
-            //     bool isLast = i == list.Count - 1;
-
-            //     ChatCompletion delta = ChatCompletionFactory.CreateDelta(
-            //         item.FirstContent(),
-            //         item.GetToolCalls(),
-            //         item.Usage
-            //     );
-
-            //     yield return new ChatCompletionChunk
-            //     {
-            //         isDone = isLast && isDone,
-            //         Value = delta,
-            //     };
-            // }
         }
     }
 }

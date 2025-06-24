@@ -31,7 +31,7 @@ namespace Glitch9.AIDevKit.Editor
 
             string className = AssetSnippetUtil.ResolveModelClassName(api);
             string namespaceName = AssetSnippetUtil.ResolveNamespace(api);
-            string targetDir = AIDevKitEditorPath.FindConfigFilePath(api);
+            string targetDir = AIDevKitEditorPath.FindSnippetsDirectory(api);
             string writePath = System.IO.Path.Combine(targetDir, $"{className}.cs");
 
             CodeGenBuilder builder = new();

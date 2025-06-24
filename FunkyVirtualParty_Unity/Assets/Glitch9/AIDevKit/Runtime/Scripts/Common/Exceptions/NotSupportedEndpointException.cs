@@ -5,7 +5,7 @@ namespace Glitch9.AIDevKit
     /// <summary>
     /// Thrown when a GenAI provider does not support a specific feature.
     /// </summary>
-    public class InvalidEndpointException : NotSupportedException
+    public class NotSupportedEndpointException : NotSupportedException
     {
         /// <summary>
         /// The name of the api provider that does not support the feature.
@@ -14,14 +14,14 @@ namespace Glitch9.AIDevKit
 
         /// <summary>
         /// The name of the unsupported endpoint.
-        /// Refer to the <see cref="GENTasks.EndpointType"/> for the list of supported endpoints.
+        /// Refer to the <see cref="GENTasks.RequestType"/> for the list of supported endpoints.
         /// </summary>
-        public int EndpointType { get; }
+        public string RequestType { get; }
 
-        public InvalidEndpointException(Api api, int endpointType) : base($"{api} does not support {GENTasks.EndpointType.GetName(endpointType)} endpoint.")
+        public NotSupportedEndpointException(Api api, string requestType) : base($"{api} does not support {GENTasks.RequestType.GetDisplayName(requestType)} endpoint.")
         {
             Api = api;
-            EndpointType = endpointType;
+            RequestType = requestType;
         }
     }
 }

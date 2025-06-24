@@ -8,7 +8,7 @@ namespace Glitch9.IO.Networking.RESTApi
 
         protected override bool ProcessData(byte[] streamedData, int dataLength)
         {
-            _streamHandler.OnReceiveStreamedData(streamedData);
+            _streamHandler.OnReceiveData(streamedData);
             return true;
         }
     }

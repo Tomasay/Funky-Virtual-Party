@@ -141,21 +141,6 @@ namespace Glitch9.AIDevKit.OpenAI
         /// </summary>
         public BetaService Beta { get; }
 
-
-        // private static OpenAI CreateDefault()
-        // {
-        //     return new OpenAI
-        //     {
-        //         OnException = DefaultExceptionHandler,
-        //     };
-
-        //     static void DefaultExceptionHandler(string endpoint, Exception exception)
-        //     {
-        //         //LogService.Error($"{endpoint}: {exception}");
-
-        //     }
-        // }
-
         public OpenAI() : base(Api.OpenAI, new OpenAIClientSettingsFactory())
         {
             // Initialize services
@@ -183,69 +168,6 @@ namespace Glitch9.AIDevKit.OpenAI
         private class DeletionStatus : AIResponse
         {
             [JsonProperty("deleted")] public bool Deleted { get; set; }
-        }
-
-        internal IEnumerable<ChatCompletionChunk> CreateChunk(string sseString)
-        {
-            if (string.IsNullOrEmpty(sseString)) yield break;
-
-            const string error = "\"error\":";
-
-            if (sseString.Contains(error))
-            {
-                ErrorResponseWrapper errorResponse = null;
-
-                try
-                {
-                    errorResponse = JsonConvert.DeserializeObject<ErrorResponseWrapper>(sseString, JsonSettings);
-                }
-                catch (JsonException e)
-                {
-                    // If the error response cannot be parsed, log the error and return a generic error message
-                    AIDevKitDebug.Red($"Failed to parse error response: {e.Message}\n{sseString}", "Parsing Chunk");
-                }
-
-                string errorMessage;
-
-                if (errorResponse == null)
-                {
-                    errorMessage = $"Failed to parse error response: {sseString}";
-                }
-                else
-                {
-                    errorMessage = errorResponse.Error?.Message;
-                }
-
-                yield return ChatCompletionChunk.Error(errorMessage);
-                yield break;
-            }
-
-            var data = SSEParser.Parse(sseString);
-
-            if (data.IsNullOrEmpty()) yield break;
-
-            foreach (var (field, result) in data)
-            {
-                if (field == SSEField.Error)
-                {
-                    yield return ChatCompletionChunk.Error(result);
-                    yield break;
-                }
-
-                if (field != SSEField.Data || string.IsNullOrEmpty(result))
-                {
-                    yield return null;
-                }
-
-                if (SSEParser.IsDone(result))
-                {
-                    yield return ChatCompletionChunk.Done();
-                    yield break;
-                }
-
-                ChatCompletion c = JsonConvert.DeserializeObject<ChatCompletion>(result, JsonSettings);
-                yield return ChatCompletionChunk.Chunk(c);
-            }
         }
     }
 }

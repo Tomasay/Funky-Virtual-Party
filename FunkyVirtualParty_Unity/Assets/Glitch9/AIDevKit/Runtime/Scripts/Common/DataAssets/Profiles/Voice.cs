@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
-using Glitch9.ScriptableObjects;
 
 namespace Glitch9.AIDevKit
 {

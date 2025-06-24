@@ -44,8 +44,6 @@ namespace Glitch9.AIDevKit
         internal const string kDefault_OpenAI_ASS = "gpt-4o";
         internal const string kDefault_OpenAI_RTM = "gpt-4o-realtime-preview";
 
-
-
         internal const string ID_DallE2 = "dall-e-2";
         internal const string ID_DallE3 = "dall-e-3";
         internal const string ID_GPT_Image_1 = "gpt-image-1";
@@ -97,14 +95,14 @@ namespace Glitch9.AIDevKit
             kDefault_Google_Voice
         };
 
-        internal static readonly Dictionary<string, ImageSize[]> ImageSizeOptions = new()
+        internal static readonly Dictionary<string, ImageSize[]> SupportedImageSizes = new()
         {
             { AIDevKitConfig.ID_DallE2, new[] { ImageSize._1024x1024, ImageSize._256x256, ImageSize._512x512 } },
             { AIDevKitConfig.ID_DallE3, new[] { ImageSize._1024x1024, ImageSize._1024x1792, ImageSize._1792x1024 } },
             { AIDevKitConfig.ID_GPT_Image_1, new[] { ImageSize._1024x1024, ImageSize._1024x1536, ImageSize._1536x1024 } },
         };
 
-        internal static readonly Dictionary<string, ImageQuality[]> ImageQualityOptions = new()
+        internal static readonly Dictionary<string, ImageQuality[]> SupportedImageQualities = new()
         {
             { AIDevKitConfig.ID_DallE2, new[] { ImageQuality.Standard } },
             { AIDevKitConfig.ID_DallE3, new[] { ImageQuality.Standard, ImageQuality.High } },
@@ -112,40 +110,6 @@ namespace Glitch9.AIDevKit
         };
 
         internal static readonly List<AudioEncoding> AudioEncodingOptions = new() { AudioEncoding.MP3, AudioEncoding.PCM };
-
-        internal static ImageSize GetDefaultImageSizeForModel(string modelId)
-        {
-            if (ImageSizeOptions.TryGetValue(modelId, out ImageSize[] sizes))
-            {
-                return sizes[0]; // Return the first size as default
-            }
-            return ImageSize._1024x1024; // Fallback default size
-        }
-
-        internal static ImageQuality GetDefaultImageQualityForModel(string modelId)
-        {
-            if (ImageQualityOptions.TryGetValue(modelId, out ImageQuality[] qualities))
-            {
-                return qualities[0]; // Return the first quality as default
-            }
-            return ImageQuality.Standard; // Fallback default quality
-        }
-
-        internal static int ResolveMaxN(Model model)
-        {
-            const int defaultMaxN = 1;
-
-            if (model == null) return defaultMaxN;
-            if (string.IsNullOrEmpty(model.Id)) return defaultMaxN;
-            if (model.IsDallE2()) return 10; // DALL-E 2 has a max N of 10
-            if (model.IsDallE3()) return 1; // DALL-E 3 has a max N of 1
-            if (model.IsGptImage1()) return 1; // GPT Image 1 has a max N of 1
-            if (model.IsGemini()) return 1; // Gemini models typically have a max N of 1
-            if (model.IsImagen()) return 4; // Imagen models typically have a max N of 4
-            if (model.IsLLM()) return 20;
-
-            return defaultMaxN;
-        }
 
 
         #endregion Default AI Models   

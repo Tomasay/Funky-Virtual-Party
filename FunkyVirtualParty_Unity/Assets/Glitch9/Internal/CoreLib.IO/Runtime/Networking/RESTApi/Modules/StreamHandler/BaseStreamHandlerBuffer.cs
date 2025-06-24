@@ -45,7 +45,7 @@ namespace Glitch9.IO.Networking.RESTApi
             if (_isFirstStream)
             {
                 // This is the first chunk of data received, so we can initialize the stream handler
-                _streamHandler.StartStreaming();
+                _streamHandler.OnStart();
                 _isFirstStream = false;
             }
 
@@ -57,6 +57,6 @@ namespace Glitch9.IO.Networking.RESTApi
         /// <summary>
         /// Called when all data has been received
         /// </summary>
-        protected override void CompleteContent() => _streamHandler.FinishStreaming();
+        protected override void CompleteContent() => _streamHandler.OnDone();
     }
 }

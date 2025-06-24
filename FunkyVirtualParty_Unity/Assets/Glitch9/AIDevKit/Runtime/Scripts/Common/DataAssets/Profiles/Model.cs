@@ -62,7 +62,7 @@ namespace Glitch9.AIDevKit
         /// The maximum number of images that this model can generate in a single request.
         /// This information is only relevant for image generation models.
         /// </summary>
-        public int MaxN => AIDevKitConfig.ResolveMaxN(this);
+        public int MaxN => ModelPolicy.GetMaxN(this);
 
         /// <summary>
         /// The specific version identifier of the model.

@@ -70,7 +70,7 @@ namespace Glitch9.AIDevKit.Google
         [JsonProperty("cachedContent")] public string CachedContent { get; set; }
 
 
-        public override void ValidateBody()
+        public override void ValidateRequestBody()
         {
             ThrowIf.ArgumentIsNull(Config);
             ThrowIf.ListIsNullOrEmpty(Contents);

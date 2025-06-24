@@ -87,7 +87,7 @@ namespace Glitch9.AIDevKit.Editor
                     .ExecuteAsync();
 
                 if (previewClip == null)
-                    throw new EmptyResponseException(EndpointType.Speech);
+                    throw new EmptyResponseException(RequestType.Speech);
 
                 Debug.Log($"Preview clip created successfully at: {absolutePreviewPath}");
                 AssetDatabase.Refresh();

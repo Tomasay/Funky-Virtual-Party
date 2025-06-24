@@ -1,12 +1,31 @@
 
 namespace Glitch9.AIDevKit
 {
-    internal class ImageOptionUtil
+    internal class ImageOptionPolicy
     {
+        internal static ImageSize GetDefaultImageSize(Model model)
+        {
+            // all same size for now
+            return ImageSize._1024x1024;
+        }
+
+        internal static ImageQuality GetDefaultImageQuality(Model model)
+        {
+            if (model == null) return ImageQuality.Standard;
+
+            if (model.Id.Contains("dall-e-3"))
+                return ImageQuality.Standard;
+
+            if (model.Id.Contains("gpt"))
+                return ImageQuality.High;
+
+            return ImageQuality.Standard;
+        }
+
         internal static bool IsImageSizeSupported(ImageSize size, Model model)
         {
             if (model == null) return true; // If no model is selected, enable all sizes
-            AIDevKitConfig.ImageSizeOptions.TryGetValue(model.Id, out ImageSize[] supportedSizes);
+            AIDevKitConfig.SupportedImageSizes.TryGetValue(model.Id, out ImageSize[] supportedSizes);
 
             if (supportedSizes == null || supportedSizes.Length == 0)
             {
@@ -27,7 +46,7 @@ namespace Glitch9.AIDevKit
         internal static bool IsImageQualitySupported(ImageQuality quality, Model model)
         {
             if (model == null) return true; // If no model is selected, enable all qualities
-            AIDevKitConfig.ImageQualityOptions.TryGetValue(model.Id, out ImageQuality[] supportedQualities);
+            AIDevKitConfig.SupportedImageQualities.TryGetValue(model.Id, out ImageQuality[] supportedQualities);
 
             if (supportedQualities == null || supportedQualities.Length == 0)
             {

@@ -127,7 +127,7 @@ namespace Glitch9.IO.Networking.RESTApi
             {
                 ITextStreamHandler text => new TextStreamHandlerBuffer(client, text, req.IgnoreLogs),
                 BinaryStreamHandler binary => new BinaryStreamHandlerBuffer(client, binary, req.IgnoreLogs),
-                PcmAudioStreamHandler audio => new AudioStreamHandlerBuffer(client, audio, req.IgnoreLogs),
+                AudioStreamHandler audio => new AudioStreamHandlerBuffer(client, audio, req.IgnoreLogs),
                 _ => new DownloadHandlerBuffer()
             };
         }

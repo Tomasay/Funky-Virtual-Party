@@ -14,6 +14,13 @@ namespace Glitch9.CoreLib.IO.Audio
         [ApiEnum("160kbps", "160")] Kbps160 = 160,
         [ApiEnum("192kbps", "192")] Kbps192 = 192,
         [ApiEnum("256kbps", "256")] Kbps256 = 256,
-        [ApiEnum("320kbps", "320")] Kbps320 = 320
+        [ApiEnum("320kbps", "320")] Kbps320 = 320,
+        [ApiEnum("441kbps", "441")] Kbps441 = 441,
+        [ApiEnum("512kbps", "512")] Kbps512 = 512,
+        [ApiEnum("768kbps", "768")] Kbps768 = 768,
+        [ApiEnum("1024kbps", "1024")] Kbps1024 = 1024,
+        [ApiEnum("1411kbps", "1411")] Kbps1411 = 1411, // CD quality
+        [ApiEnum("2048kbps", "2048")] Kbps2048 = 2048, // High quality 
+        [ApiEnum("4096kbps", "4096")] Kbps4096 = 4096, // Lossless quality 
     }
 }

@@ -164,6 +164,12 @@ namespace Glitch9.AIDevKit
             return this as TSelf;
         }
 
+        public TSelf SetOutputMimeType(MIMEType mimeType)
+        {
+            outputMimeType = mimeType;
+            return this as TSelf;
+        }
+
         public TSelf SetCancellationToken(CancellationToken token)
         {
             _cts = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -523,7 +529,7 @@ namespace Glitch9.AIDevKit
     /// </summary>
     public class GENResponseTask : GENCompletionTask<GENResponseTask, ChatCompletion>
     {
-        private ChatCompletionStreamHandlerBuilder streamHandlerBuilder;
+        private ChatCompletionStreamHandler.Builder streamHandlerBuilder;
         public GENResponseTask(Prompt prompt) : base(prompt) { }
 
         // Execution Method --------------------------------------------------------------------------------------------------
@@ -566,14 +572,12 @@ namespace Glitch9.AIDevKit
             return this;
         }
 
-        protected IChatCompletionStreamHandler ResolveStreamHandler(IChatCompletionStreamHandler streamHandler)
+        protected ChatCompletionStreamHandler ResolveStreamHandler(ChatCompletionStreamHandler streamHandler)
         {
-            if (streamHandler != null) return streamHandler.SetTask(this);
             if (streamHandlerBuilder == null)
                 throw new ArgumentNullException(nameof(streamHandlerBuilder),
                 "Stream handler builder is null. Use OnStreamText, OnStreamToolCalls, OnStreamError, or OnStreamDone to set the stream handler.");
             streamHandler = streamHandlerBuilder.Build();
-            streamHandler.SetTask(this);
             return streamHandler;
         }
 
@@ -582,12 +586,12 @@ namespace Glitch9.AIDevKit
         /// <summary>
         /// Executes the text generation and returns the full response as a string.
         /// </summary>
-        protected override async UniTask<ChatCompletion> ExecuteAsyncINTERNAL() => await GENTaskManager.GenerateContentAsync(this, jsonSchemaType);
+        protected override async UniTask<ChatCompletion> ExecuteAsyncINTERNAL() => await GENTaskManager.GenerateResponseAsync(this, jsonSchemaType);
 
         /// <summary>
         /// Streams text generation output in real time as it's received from the model.
         /// </summary> 
-        public UniTask StreamAsync(IChatCompletionStreamHandler streamHandler = null) => GENTaskManager.StreamContentAsync(this, jsonSchemaType, ResolveStreamHandler(streamHandler));
+        public UniTask StreamAsync(ChatCompletionStreamHandler streamHandler = null) => GENTaskManager.StreamResponseAsync(this, jsonSchemaType, ResolveStreamHandler(streamHandler));
     }
 
     /// <summary> 
@@ -611,7 +615,7 @@ namespace Glitch9.AIDevKit
                 instruction = instruction,
             };
 
-            ChatCompletion response = await GENTaskManager.GenerateContentAsync(contentTask, typeof(T));
+            ChatCompletion response = await GENTaskManager.GenerateResponseAsync(contentTask, typeof(T));
             string[] jsons = response.ToStringArray();
             if (jsons == null || jsons.Length == 0) throw new InvalidOperationException("Failed to generate content.");
 
@@ -788,7 +792,7 @@ namespace Glitch9.AIDevKit
 
         // Execution Method -------------------------------------------------------------------------------------------------- 
         protected override UniTask<GeneratedAudio> ExecuteAsyncINTERNAL() => GENTaskManager.GenerateSpeechAsync(this);
-        public UniTask StreamAsync(RealtimeAudioPlayer streamAudioPlayer) => GENTaskManager.StreamSpeechAsync(this, streamAudioPlayer);
+        public UniTask StreamAsync(StreamingAudioPlayer streamAudioPlayer) => GENTaskManager.StreamSpeechAsync(this, streamAudioPlayer);
     }
 
     /// <summary>
@@ -813,6 +817,7 @@ namespace Glitch9.AIDevKit
 
         // Execution Method -------------------------------------------------------------------------------------------------- 
         protected override UniTask<Transcript> ExecuteAsyncINTERNAL() => GENTaskManager.GenerateTranscriptAsync(this);
+        public UniTask StreamAsync(TranscriptStreamHandler streamHandler) => GENTaskManager.StreamTranscriptAsync(this, streamHandler);
     }
 
     /// <summary>

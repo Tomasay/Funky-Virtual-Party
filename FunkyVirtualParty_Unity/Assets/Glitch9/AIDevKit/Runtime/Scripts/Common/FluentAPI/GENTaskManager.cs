@@ -46,7 +46,7 @@ namespace Glitch9.AIDevKit.GENTasks
 
         #endregion
 
-        internal static async UniTask<ChatCompletion> GenerateContentAsync(GENResponseTask task, Type jsonSchemaType)
+        internal static async UniTask<ChatCompletion> GenerateResponseAsync(GENResponseTask task, Type jsonSchemaType)
         {
             await task.LoadAllAttachedFilesAsync();
             await GENTaskUtil.ThrowIfBlockedAsync(task);
@@ -58,7 +58,7 @@ namespace Glitch9.AIDevKit.GENTasks
             return result;
         }
 
-        internal static async UniTask StreamContentAsync(GENResponseTask task, Type jsonSchemaType, IChatCompletionStreamHandler streamHandler)
+        internal static async UniTask StreamResponseAsync(GENResponseTask task, Type jsonSchemaType, ChatCompletionStreamHandler streamHandler)
         {
             await task.LoadAllAttachedFilesAsync();
             await GENTaskUtil.ThrowIfBlockedAsync(task);
@@ -107,7 +107,7 @@ namespace Glitch9.AIDevKit.GENTasks
             return result;
         }
 
-        internal static async UniTask StreamSpeechAsync(GENSpeechTask task, RealtimeAudioPlayer streamAudioPlayer)
+        internal static async UniTask StreamSpeechAsync(GENSpeechTask task, StreamingAudioPlayer streamAudioPlayer)
         {
             Api api = task.api ?? GENTaskUtil.ResolveTTSApi(task);
             GENTaskExecuter executer = GetTaskExecuter(api);
@@ -120,6 +120,13 @@ namespace Glitch9.AIDevKit.GENTasks
             GENTaskExecuter executer = GetTaskExecuter(api);
             Transcript result = await executer.GenerateTranscriptAsync(task);
             return result;
+        }
+
+        internal static async UniTask StreamTranscriptAsync(GENTranscriptTask task, TranscriptStreamHandler streamHandler)
+        {
+            Api api = GENTaskUtil.ResolveSTTApi(task);
+            GENTaskExecuter executer = GetTaskExecuter(api);
+            await executer.StreamTranscriptAsync(task, streamHandler);
         }
 
         internal static async UniTask<GeneratedText> GenerateTranslationAsync(GENTranslationTask task)

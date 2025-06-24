@@ -18,12 +18,12 @@ namespace Glitch9.AIDevKit.Google
 
         public static string ProjectId => Instance.projectId;
 
-        public static string DefaultLLM => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultLLM, AIDevKitConfig.kDefault_OpenAI_LLM);
-        public static string DefaultEMB => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultEMB, AIDevKitConfig.kDefault_OpenAI_EMB);
-        public static string DefaultIMG => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultIMG, AIDevKitConfig.kDefault_OpenAI_IMG);
-        public static string DefaultVID => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVID, AIDevKitConfig.kDefault_Google_VID);
-        public static string DefaultTTS => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultTTS, AIDevKitConfig.kDefault_Google_TTS);
-        public static string DefaultVoice => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVoice, AIDevKitConfig.kDefault_Google_Voice);
+        public static string DefaultLLM => Instance.defaultLLM.OrDefault(AIDevKitConfig.kDefault_OpenAI_LLM);
+        public static string DefaultEMB => Instance.defaultEMB.OrDefault(AIDevKitConfig.kDefault_OpenAI_EMB);
+        public static string DefaultIMG => Instance.defaultIMG.OrDefault(AIDevKitConfig.kDefault_OpenAI_IMG);
+        public static string DefaultVID => Instance.defaultVID.OrDefault(AIDevKitConfig.kDefault_Google_VID);
+        public static string DefaultTTS => Instance.defaultTTS.OrDefault(AIDevKitConfig.kDefault_Google_TTS);
+        public static string DefaultVoice => Instance.defaultVoice.OrDefault(AIDevKitConfig.kDefault_Google_Voice);
 
         public static bool IsDefaultModel(string id, ModelFeature feature)
         {

@@ -17,7 +17,7 @@ namespace Glitch9.AIDevKit
     public class EmptyResponseException : Exception
     {
         public EmptyResponseException(Model model) : base($"Model {model.Id} returned null or empty result.") { }
-        public EmptyResponseException(int endpointType) : base($"{EndpointType.GetName(endpointType)} task returned null or empty result.") { }
+        public EmptyResponseException(string requestType) : base($"{RequestType.GetDisplayName(requestType)} task returned null or empty result.") { }
     }
 
     public class BrokenVoiceException : Exception
@@ -50,22 +50,22 @@ namespace Glitch9.AIDevKit
         public RateLimitExceededException(string message = "Request rate limit exceeded.") : base(message) { }
     }
 
-    public class NotSupportedFeatureException : NotSupportedException
+    public class NotSupportedModelFeatureException : NotSupportedException
     {
-        public ModelFeature Capability { get; }
+        public ModelFeature Feature { get; }
         public Model Model { get; }
-        public NotSupportedFeatureException(Model model, ModelFeature cap) : base($"Model {model.Id} does not support {cap} feature. Please use a different model.")
+        public NotSupportedModelFeatureException(Model model, ModelFeature feature) : base($"Model {model.Id} does not support {feature} feature. Please use a different model.")
         {
             Model = model;
-            Capability = cap;
+            Feature = feature;
         }
     }
 
-    public class ModelNotFoundOnApiException : Exception
+    public class ModelNotFoundOnServerException : Exception
     {
         public Api Api { get; }
         public string ModelId { get; }
-        public ModelNotFoundOnApiException(Api api, string modelId)
+        public ModelNotFoundOnServerException(Api api, string modelId)
             : base($"Model with ID '{modelId}' not found on {api} API.")
         {
             Api = api;

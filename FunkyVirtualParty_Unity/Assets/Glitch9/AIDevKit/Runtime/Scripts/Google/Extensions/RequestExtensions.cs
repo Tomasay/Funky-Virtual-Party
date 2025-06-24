@@ -20,7 +20,7 @@ namespace Glitch9.AIDevKit.Google
 
         public static async UniTask<GenerateContentResponse> ExecuteAsync(this GenerateContentRequest request)
         => await GenerativeAI.DefaultInstance.Models.GenerateContentAsync(request);
-        public static async UniTask StreamAsync(this GenerateContentRequest request, IChatCompletionStreamHandler streamHandler)
+        public static async UniTask StreamAsync(this GenerateContentRequest request, ChatCompletionStreamHandler streamHandler)
         => await GenerativeAI.DefaultInstance.Models.StreamGenerateContentAsync(request, streamHandler);
         public static async UniTask<PredictionResponse> GenerateImageAsync(this PredictionRequest request)
         => await GenerativeAI.DefaultInstance.Models.GenerateImageAsync(request);

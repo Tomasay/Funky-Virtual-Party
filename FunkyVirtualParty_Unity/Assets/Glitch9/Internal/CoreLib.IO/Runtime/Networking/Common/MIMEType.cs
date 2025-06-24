@@ -1,5 +1,7 @@
 using Glitch9.IO.Networking.RESTApi;
 using System.IO;
+using UnityEngine;
+using UnityEngine.Video;
 
 namespace Glitch9.IO.Files
 {
@@ -59,6 +61,16 @@ namespace Glitch9.IO.Files
         public static bool IsImage(this MIMEType mimeType) => StartsWith(mimeType, "image/");
         public static bool IsVideo(this MIMEType mimeType) => StartsWith(mimeType, "video/");
         public static bool IsAudio(this MIMEType mimeType) => StartsWith(mimeType, "audio/");
+        public static MIMEType GetUnityObjectDefaultMimeType<T>() where T : UnityEngine.Object
+        {
+            if (typeof(T) == typeof(Texture2D)) return MIMEType.PNG;
+            if (typeof(T) == typeof(AudioClip)) return MIMEType.MPEG;
+            if (typeof(T) == typeof(VideoClip)) return MIMEType.MP4;
+            if (typeof(T) == typeof(Sprite)) return MIMEType.PNG;
+            if (typeof(T) == typeof(TextAsset)) return MIMEType.PlainText;
+            if (typeof(T) == typeof(Mesh)) return MIMEType.OctetStream; // Meshes are binary data
+            return MIMEType.Unknown;
+        }
 
         private static bool StartsWith(this MIMEType mimeType, string keyword)
         {

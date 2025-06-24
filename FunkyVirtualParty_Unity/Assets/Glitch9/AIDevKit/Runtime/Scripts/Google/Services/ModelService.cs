@@ -44,10 +44,10 @@ namespace Glitch9.AIDevKit.Google.Services
             if (req.Model == null) req.Model = GenerativeAISettings.DefaultLLM;
             return await client.POSTCreateAsync<GenerateContentRequest, GenerateContentResponse>(kEndpointWithId, this, req, PathParam.Method(Methods.GenerateContent), PathParam.ID(req.GetModelName()));
         }
-        public async UniTask StreamGenerateContentAsync(GenerateContentRequest req, IChatCompletionStreamHandler streamhandler)
+        public async UniTask StreamGenerateContentAsync(GenerateContentRequest req, ChatCompletionStreamHandler streamhandler)
         {
             if (req.Model == null) req.Model = GenerativeAISettings.DefaultLLM;
-            req.StreamHandler = streamhandler.SetFactory(client.CreateChunk);
+            req.StreamHandler = streamhandler.Initialize(client.CreateChunk);
             await client.POSTCreateAsync<GenerateContentRequest, GenerateContentResponse>(kEndpointWithId, this, req, PathParam.Method(Methods.StreamGenerateContent), PathParam.ID(req.GetModelName()));
         }
 

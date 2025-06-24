@@ -1,4 +1,6 @@
 
+using Glitch9.CoreLib.IO.Audio;
+
 namespace Glitch9.AIDevKit.OpenAI
 {
     internal class OpenAIConfig
@@ -18,6 +20,8 @@ namespace Glitch9.AIDevKit.OpenAI
         internal const string BetaHeader_Realtime = "realtime=" + RealtimeVersion;
 
         internal const int MaxQuery = 100;
+
+        internal const SampleRate TTSInputSampleRate = SampleRate.Hz12000;
 
         internal static string[] AllVoices => new[]
         {

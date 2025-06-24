@@ -199,6 +199,7 @@ namespace Glitch9.CoreLib.IO.Audio
             return G711aLawToFloatArray(g711aLawData);
         }
 
+
         // PCM16 byte array를 float array로 변환
         public static float[] PCM16ToFloatArray(byte[] pcm16Bytes)
         {
@@ -212,6 +213,30 @@ namespace Glitch9.CoreLib.IO.Audio
             }
 
             return floatArray;
+        }
+
+        public static float[] ResamplePCM16Linear(float[] input, int fromRate, int toRate)
+        {
+            if (fromRate == toRate) return input;
+
+            int inputLength = input.Length;
+            int outputLength = (int)((long)inputLength * toRate / fromRate);
+            float[] output = new float[outputLength];
+
+            for (int i = 0; i < outputLength; i++)
+            {
+                float srcIndex = (float)i * fromRate / toRate;
+                int index = (int)srcIndex;
+                float frac = srcIndex - index;
+
+                float sample1 = input[Mathf.Clamp(index, 0, inputLength - 1)];
+                int index2 = (index + 1 < inputLength) ? index + 1 : index;
+                float sample2 = input[index2];
+
+                output[i] = Mathf.Clamp(Mathf.Lerp(sample1, sample2, frac), -1f, 1f);
+            }
+
+            return output;
         }
 
         // G.711 μ-law byte array를 float array로 변환

@@ -14,10 +14,10 @@ namespace Glitch9.AIDevKit.ElevenLabs
         // default voice
         [SerializeField] private string defaultVoice = AIDevKitConfig.kDefault_ElevenLabs_Voice;
 
-        public static string DefaultTTS => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultTTS, AIDevKitConfig.kDefault_ElevenLabs_TTS);
-        public static string DefaultVCM => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVCM, AIDevKitConfig.kDefault_ElevenLabs_VCM);
-        public static string DefaultSTT => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultSTT, AIDevKitConfig.kDefault_ElevenLabs_STT);
-        public static string DefaultVoice => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVoice, AIDevKitConfig.kDefault_ElevenLabs_Voice);
+        public static string DefaultTTS => Instance.defaultTTS.OrDefault(AIDevKitConfig.kDefault_ElevenLabs_TTS);
+        public static string DefaultVCM => Instance.defaultVCM.OrDefault(AIDevKitConfig.kDefault_ElevenLabs_VCM);
+        public static string DefaultSTT => Instance.defaultSTT.OrDefault(AIDevKitConfig.kDefault_ElevenLabs_STT);
+        public static string DefaultVoice => Instance.defaultVoice.OrDefault(AIDevKitConfig.kDefault_ElevenLabs_Voice);
 
         public static bool IsDefaultModel(string id, ModelFeature feature)
         {

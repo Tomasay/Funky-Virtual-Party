@@ -1,9 +1,16 @@
 using Glitch9.CoreLib.IO.Audio;
 using Glitch9.IO.Files;
+using Glitch9.IO.Networking.RESTApi;
 using Newtonsoft.Json;
 
 namespace Glitch9.AIDevKit.OpenAI
 {
+    public enum AudioStreamFormat
+    {
+        [ApiEnum("Server-Sent Events (SSE)", "sse")] SSE,
+        [ApiEnum("Audio Data", "audio")] Audio
+    }
+
     /// <summary>
     /// Generates audio from the input text.
     /// </summary>
@@ -36,6 +43,39 @@ namespace Glitch9.AIDevKit.OpenAI
         /// The format of the response. 
         /// </summary>
         [JsonProperty("response_format")] public AudioEncoding? ResponseFormat { get; set; }
+
+        /// <summary>
+        /// Optional. 
+        /// Defaults to audio.
+        /// Set this value to stream the audio response instead of returning it as a single response.
+        /// The format to stream the audio in. 
+        /// Supported formats are sse and audio. 
+        /// sse is not supported for tts-1 or tts-1-hd.
+        /// </summary>
+        [JsonProperty("stream_format")] public AudioStreamFormat? StreamFormat { get; set; }
+
+        public override void ValidateRequestBody()
+        {
+            base.ValidateRequestBody();
+
+            if (Model == null)
+            {
+                throw new System.Exception("Model property is required for SpeechRequest.");
+            }
+            else
+            {
+                if (StreamFormat.HasValue && StreamFormat.Value == AudioStreamFormat.SSE)
+                {
+                    string modelId = Model.Id;
+
+                    if (modelId == "tts-1" && modelId == "tts-1-hd")
+                    {
+                        throw new System.Exception("SSE streaming is not supported for tts-1 or tts-1-hd models. " +
+                        "Please use audio streaming format instead or choose a different TTS model.");
+                    }
+                }
+            }
+        }
 
         public class Builder : ModelRequestBuilder<Builder, SpeechRequest>
         {
@@ -77,6 +117,12 @@ namespace Glitch9.AIDevKit.OpenAI
                 }
 
                 _req.Speed = speed;
+                return this;
+            }
+
+            public Builder SetStreamFormat(AudioStreamFormat streamFormat)
+            {
+                _req.StreamFormat = streamFormat;
                 return this;
             }
         }

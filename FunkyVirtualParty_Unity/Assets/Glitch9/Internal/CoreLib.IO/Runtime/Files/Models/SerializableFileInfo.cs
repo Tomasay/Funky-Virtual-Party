@@ -40,7 +40,7 @@ namespace Glitch9.IO.Files
         /// </summary>
         [JsonIgnore] public string Url => url;
         [JsonIgnore]
-        public MIMEType MimeType
+        public virtual MIMEType MimeType
         {
             get
             {

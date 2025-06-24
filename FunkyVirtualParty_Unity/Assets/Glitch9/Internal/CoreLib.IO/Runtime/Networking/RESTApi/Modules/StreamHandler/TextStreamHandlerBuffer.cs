@@ -68,7 +68,7 @@ namespace Glitch9.IO.Networking.RESTApi
                 string encodedText = Encoding.UTF8.GetString(fullDataChunk);
                 if (!_ignoreLogs) _client.Logger.Stream(encodedText);
 
-                _streamHandler?.OnReceiveStreamedData(encodedText); // null check 보호
+                _streamHandler?.OnReceiveData(encodedText); // null check 보호
 
                 int lastFullCharIndex = GetLastFullCharIndex(fullDataChunk);
                 if (lastFullCharIndex < fullDataChunk.Length - 1)

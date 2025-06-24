@@ -13,7 +13,8 @@ namespace Glitch9.AIDevKit
     {
         // log info -------------------------------------------------------------
         [SerializeField] private string id = Guid.NewGuid().ToString();
-        [SerializeField, FormerlySerializedAs("taskType")] private int endpointType;
+        [Obsolete("Use requestType instead."), SerializeField, FormerlySerializedAs("taskType")] private int endpointType;
+        [SerializeField] private string requestType;
         [SerializeField] private string sender;
         [SerializeField] private UnixTime createdAt = UnixTime.Now;
         [SerializeField] private bool archived = false;
@@ -37,10 +38,13 @@ namespace Glitch9.AIDevKit
         [SerializeReference] private List<IFile> inputFiles;
         [SerializeReference] private List<IFile> outputFiles;
 
-
         public string Id => id;
         public string Name => modelName;
-        public int TaskType => endpointType;
+        [Obsolete("Use RequestType instead.")] public int EndpointType => endpointType;
+#pragma warning disable CS0618 // Type or member is obsolete
+        public string RequestType => string.IsNullOrEmpty(requestType) ?
+            requestType = GENTasks.RequestType.ConvertLegacyValue(endpointType) : requestType;
+#pragma warning restore CS0618 // Type or member is obsolete
         public string Sender => sender;
         public UnixTime CreatedAt => createdAt;
         public Api Api => api;
@@ -64,9 +68,10 @@ namespace Glitch9.AIDevKit
         public bool IsArchived => archived;
 
         public PromptRecord() { }
-        internal PromptRecord InitializeCommon(int endpointType, Model model, string sender, Usage usage, int n)
+        internal PromptRecord InitializeCommon(string requestType, Model model, string sender, Usage usage, int n)
         {
-            this.endpointType = endpointType;
+            // this.endpointType = endpointType;
+            this.requestType = requestType;
             this.sender = sender;
             this.usage = usage;
 

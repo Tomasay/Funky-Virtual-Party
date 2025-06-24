@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Glitch9.IO.Files;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -12,6 +13,49 @@ namespace Glitch9.AIDevKit.OpenAI
     /// </remarks>
     public class TranscriptionRequest : AIRequest
     {
+        public class ChunkingStrategyWrapper
+        {
+            public class ServerVad
+            {
+                /// <summary>
+                /// Required. Must be set to server_vad to enable manual chunking using server side VAD.
+                /// </summary>
+                [JsonProperty("type")] public string Type { get; set; }
+
+                /// <summary>
+                /// Optional. Defaults to 300
+                /// Amount of audio to include before the VAD detected speech (in milliseconds).
+                /// </summary>
+                [JsonProperty("prefix_padding_ms")] public int? PrefixPaddingMs { get; set; }
+
+                /// <summary>
+                /// Optional. Defaults to 200
+                /// Duration of silence to detect speech stop (in milliseconds). With shorter values the model will respond 
+                /// more quickly, but may jump in on short pauses from the user.
+                /// </summary>
+                [JsonProperty("silence_duration_ms")] public int? SilenceDurationMs { get; set; }
+
+                /// <summary>
+                /// Optional. Defaults to 0.5
+                /// Sensitivity threshold (0.0 to 1.0) for voice activity detection. A higher threshold will require louder 
+                /// audio to activate the model, and thus might perform better in noisy environments.
+                /// </summary>
+                [JsonProperty("threshold")] public float? Threshold { get; set; }
+            }
+
+            /// <summary>
+            /// Automatically set chunking parameters based on the audio. Must be set to "auto".
+            /// </summary>
+            [JsonProperty("chunking_strategy")] public string ChunkingStrategyType { get; set; } = "auto";
+
+            /// <summary>
+            /// Optional. If chunking_strategy is set to server_vad, 
+            /// this object can be provided to tweak VAD detection parameters manually.
+            /// </summary>
+            [JsonProperty("server_vad")] public ServerVad ServerVadConfig { get; set; }
+        }
+
+
         /// <summary>
         /// Required. 
         /// The audio file object (not file name) to transcribe,
@@ -48,6 +92,32 @@ namespace Glitch9.AIDevKit.OpenAI
         /// </remarks>
         [JsonProperty("timestamp_granularities")] public string[] TimestampGranularities { get; set; }
 
+        /// <summary>
+        /// Optional.
+        /// Controls how the audio is cut into chunks. 
+        /// When set to "auto", the server first normalizes loudness and then uses voice activity detection (VAD) to choose boundaries. 
+        /// server_vad object can be provided to tweak VAD detection parameters manually.
+        /// If unset, the audio is transcribed as a single block.
+        /// </summary>
+        [JsonProperty("chunking_strategy")] public ChunkingStrategyWrapper ChunkingStrategy { get; set; }
+
+        /// <summary>
+        /// Optional. Additional information to include in the transcription response. logprobs will return the log 
+        /// probabilities of the tokens in the response to understand the model's confidence in the transcription. 
+        /// logprobs only works with response_format set to json and only with the models gpt-4o-transcribe 
+        /// and gpt-4o-mini-transcribe.
+        /// </summary>
+        [JsonProperty("include")] public List<string> Include { get; set; }
+
+        /// <summary>
+        /// Optional. Defaults to false
+        /// If set to true, the model response data will be streamed to the client as it is generated using 
+        /// server-sent events. See the Streaming section of the Speech-to-Text guide for more information.
+        /// 
+        /// Note: Streaming is not supported for the whisper-1 model and will be ignored.
+        /// </summary>
+        [JsonProperty("stream")] public bool? Stream { get; set; }
+
         public class Builder : ModelRequestBuilder<Builder, TranscriptionRequest>
         {
             public Builder SetFile(File<AudioClip> file)
@@ -83,6 +153,24 @@ namespace Glitch9.AIDevKit.OpenAI
             public Builder SetTimestampGranularities(string[] timestampGranularities)
             {
                 _req.TimestampGranularities = timestampGranularities;
+                return this;
+            }
+
+            public Builder SetChunkingStrategy(ChunkingStrategyWrapper chunkingStrategy)
+            {
+                _req.ChunkingStrategy = chunkingStrategy;
+                return this;
+            }
+
+            public Builder SetInclude(List<string> include)
+            {
+                _req.Include = include;
+                return this;
+            }
+
+            public Builder SetStream(bool stream)
+            {
+                _req.Stream = stream;
                 return this;
             }
         }

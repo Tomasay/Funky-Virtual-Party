@@ -12,6 +12,7 @@ namespace Glitch9.AIDevKit
         private readonly StringBuilder _sb = new();
         private readonly List<ToolCall> _toolCalls = new();
 
+        public SingleResponseStreamHandler() { }
         public SingleResponseStreamHandler(
             Action onStart = null,
             Action<string> onReceiveText = null,
@@ -28,7 +29,7 @@ namespace Glitch9.AIDevKit
             if (onDone != null) this.onDone += onDone;
         }
 
-        protected override void OnReceiveChunk(ChatCompletionChunk chunk)
+        internal override void ProcessChunk(ChatCompletionChunk chunk)
         {
             ChatDelta delta = chunk?.Value?.FirstDelta();
             if (delta == null) return;
@@ -54,14 +55,27 @@ namespace Glitch9.AIDevKit
             {
                 _toolCalls.AddRange(delta.ToolCalls);
                 onReceiveToolCalls?.Invoke(delta.ToolCalls);
+                _funtionManagerCallback?.Invoke(delta.ToolCalls);
             }
         }
 
-        protected override ChatCompletion CreateResult()
+        internal override ChatCompletion BuildFinalResult()
         {
             string streamedText = _sb.ToString();
             AIDevKitDebug.Mark($"SingleResponseStreamHandler: Received text: {streamedText}");
             _sb.Clear();
+
+            if (_task.textProcessor != null)
+            {
+                if (_lastChunk == null || _lastChunk.Value == null)
+                {
+                    AIDevKitDebug.Error("Last chunk is null, cannot process text.");
+                }
+                else
+                {
+                    _lastChunk.Value.ProcessText(_task.textProcessor);
+                }
+            }
 
             return ChatCompletionFactory.Create(
                 streamedText,

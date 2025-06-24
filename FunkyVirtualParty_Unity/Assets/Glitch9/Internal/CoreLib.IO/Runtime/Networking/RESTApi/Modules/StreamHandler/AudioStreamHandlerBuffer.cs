@@ -1,38 +1,39 @@
-
-
 using System;
 using Glitch9.CoreLib.IO.Audio;
+using UnityEngine;
 
 namespace Glitch9.IO.Networking.RESTApi
 {
-    public class AudioStreamHandlerBuffer : BaseStreamHandlerBuffer<PcmAudioStreamHandler>
+    public class AudioStreamHandlerBuffer : BaseStreamHandlerBuffer<AudioStreamHandler>
     {
-        private Func<byte[], int, float[]> _converter;
+        private readonly Func<byte[], int, float[]> _converter;
 
-        public AudioStreamHandlerBuffer(RESTClient client, PcmAudioStreamHandler audioStreamHandler, bool ignoreLogs) : base(client, audioStreamHandler, ignoreLogs)
+        public AudioStreamHandlerBuffer(RESTClient client, AudioStreamHandler audioStreamHandler, bool ignoreLogs) : base(client, audioStreamHandler, ignoreLogs)
         {
-            AudioFormat audioFormat = audioStreamHandler.audioFormat;
-            int offsetSample = audioStreamHandler.headerSize;
+            AudioFormat audioFormat = audioStreamHandler.AudioFormat;
+            int offsetSample = audioFormat.HeaderSize;
 
             if (audioFormat == null) throw new ArgumentNullException(nameof(audioFormat), "Audio format cannot be null.");
+
+            Debug.Log($"AudioStreamHandlerBuffer: Initializing with format {audioFormat.Encoding}, SampleRate: {audioFormat.SampleRate}, BitDepth: {audioFormat.BitDepth}, Bitrate: {audioFormat.Bitrate}");
 
             if (audioFormat.Encoding == AudioEncoding.WAV)
             {
                 if (audioFormat.BitDepth == BitDepth.Bit8)
                 {
-                    _converter = (fileBytes, size) => WavUtil.Convert8BitByteArray(fileBytes, offsetSample);
+                    _converter = (audioBytes, size) => WavUtil.Convert8BitByteArray(audioBytes, offsetSample);
                 }
                 else if (audioFormat.BitDepth == BitDepth.Bit16)
                 {
-                    _converter = (fileBytes, size) => WavUtil.Convert16BitByteArray(fileBytes, offsetSample);
+                    _converter = (audioBytes, size) => WavUtil.Convert16BitByteArray(audioBytes, offsetSample);
                 }
                 else if (audioFormat.BitDepth == BitDepth.Bit24)
                 {
-                    _converter = (fileBytes, size) => WavUtil.Convert24BitByteArray(fileBytes, offsetSample);
+                    _converter = (audioBytes, size) => WavUtil.Convert24BitByteArray(audioBytes, offsetSample);
                 }
                 else if (audioFormat.BitDepth == BitDepth.Bit32)
                 {
-                    _converter = (fileBytes, size) => WavUtil.Convert32BitByteArray(fileBytes, offsetSample);
+                    _converter = (audioBytes, size) => WavUtil.Convert32BitByteArray(audioBytes, offsetSample);
                 }
                 else
                 {
@@ -41,15 +42,15 @@ namespace Glitch9.IO.Networking.RESTApi
             }
             else if (audioFormat.Encoding == AudioEncoding.PCM)
             {
-                _converter = (data, size) => AudioProcessor.PCM16ToFloatArray(data);
+                _converter = (audioBytes, size) => AudioProcessor.PCM16ToFloatArray(audioBytes);
             }
             else if (audioFormat.Encoding == AudioEncoding.ULaw || audioFormat.Encoding == AudioEncoding.Mulaw)
             {
-                _converter = (data, size) => AudioProcessor.G711uLawToFloatArray(data);
+                _converter = (audioBytes, size) => AudioProcessor.G711uLawToFloatArray(audioBytes);
             }
             else if (audioFormat.Encoding == AudioEncoding.ALaw)
             {
-                _converter = (data, size) => AudioProcessor.G711aLawToFloatArray(data);
+                _converter = (audioBytes, size) => AudioProcessor.G711aLawToFloatArray(audioBytes);
             }
             else
             {
@@ -57,12 +58,12 @@ namespace Glitch9.IO.Networking.RESTApi
             }
         }
 
-        protected override bool ProcessData(byte[] streamedData, int dataLength)
+        protected override bool ProcessData(byte[] audioBytes, int dataLength)
         {
-            float[] audioData = _converter(streamedData, dataLength);
+            float[] audioData = _converter(audioBytes, dataLength);
             if (audioData == null || audioData.Length == 0) return false;
 
-            _streamHandler.onStream?.Invoke(audioData);
+            _streamHandler.onReceiveData?.Invoke(audioData);
             return true;
         }
     }

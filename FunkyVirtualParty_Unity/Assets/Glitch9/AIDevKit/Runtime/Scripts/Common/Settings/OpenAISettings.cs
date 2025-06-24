@@ -39,14 +39,15 @@ namespace Glitch9.AIDevKit.OpenAI
         /// </summary>
         public static string DefaultAssistantAPIModel => Instance.defaultASS;
 
-        public static string DefaultLLM => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultLLM, AIDevKitConfig.kDefault_OpenAI_LLM);
-        public static string DefaultIMG => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultIMG, AIDevKitConfig.kDefault_OpenAI_IMG);
-        public static string DefaultTTS => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultTTS, AIDevKitConfig.kDefault_OpenAI_TTS);
-        public static string DefaultSTT => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultSTT, AIDevKitConfig.kDefault_OpenAI_STT);
-        public static string DefaultEMB => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultEMB, AIDevKitConfig.kDefault_OpenAI_EMB);
-        public static string DefaultMOD => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultMOD, AIDevKitConfig.kDefault_OpenAI_MOD);
-        public static string DefaultRTM => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultRTM, AIDevKitConfig.kDefault_OpenAI_RTM);
-        public static string DefaultVoice => ModelUtil.ReturnDefaultIfEmpty(Instance.defaultVoice, AIDevKitConfig.kDefault_OpenAI_Voice);
+        public static string DefaultLLM => Instance.defaultLLM.OrDefault(AIDevKitConfig.kDefault_OpenAI_LLM);
+        public static string DefaultIMG => Instance.defaultIMG.OrDefault(AIDevKitConfig.kDefault_OpenAI_IMG);
+        public static string DefaultTTS => Instance.defaultTTS.OrDefault(AIDevKitConfig.kDefault_OpenAI_TTS);
+        public static string DefaultSTT => Instance.defaultSTT.OrDefault(AIDevKitConfig.kDefault_OpenAI_STT);
+        public static string DefaultEMB => Instance.defaultEMB.OrDefault(AIDevKitConfig.kDefault_OpenAI_EMB);
+        public static string DefaultMOD => Instance.defaultMOD.OrDefault(AIDevKitConfig.kDefault_OpenAI_MOD);
+        public static string DefaultRTM => Instance.defaultRTM.OrDefault(AIDevKitConfig.kDefault_OpenAI_RTM);
+        public static string DefaultVoice => Instance.defaultVoice.OrDefault(AIDevKitConfig.kDefault_OpenAI_Voice);
+
         public static string GetAdminApiKey() => Instance.adminKey?.GetKey();
 
         public static bool IsDefaultModel(string id, ModelFeature feature)

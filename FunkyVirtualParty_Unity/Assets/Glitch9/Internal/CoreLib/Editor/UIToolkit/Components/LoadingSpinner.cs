@@ -14,11 +14,9 @@ namespace Glitch9.Editor.UIToolkit
             style.width = size;
             style.height = size;
             style.backgroundImage = new StyleBackground((Texture2D)EditorGUIUtility.IconContent("WaitSpin00").image);
-            /*
             style.backgroundSize = new BackgroundSize(Length.Auto(), Length.Auto());
             style.backgroundPositionX = new StyleBackgroundPosition(new BackgroundPosition(BackgroundPositionKeyword.Center));
             style.backgroundPositionY = new StyleBackgroundPosition(new BackgroundPosition(BackgroundPositionKeyword.Center));
-            */
 
             _rotationSchedule = schedule.Execute(UpdateFrame).Every(100);
 

@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Glitch9.AIDevKit.GENTasks;
+using Glitch9.CoreLib.IO.Audio;
 using Glitch9.IO.Networking.RESTApi;
 using UnityEngine;
 
@@ -32,10 +33,14 @@ namespace Glitch9.AIDevKit.OpenAI
             return await req.ExecuteAsync();
         }
 
-        internal override async UniTask StreamResponseAsync(GENResponseTask task, Type jsonSchemaType, IChatCompletionStreamHandler streamHandler)
+        internal override async UniTask StreamResponseAsync(GENResponseTask task, Type jsonSchemaType, ChatCompletionStreamHandler streamHandler)
         {
+            if (streamHandler == null)
+                throw new ArgumentNullException(nameof(streamHandler), "Stream handler cannot be null.");
+
+            streamHandler.Initialize(OpenAIUtil.BuildChatCompletionChunk, task);
             ChatCompletionRequest req = task.CreateChatCompletionRequest(jsonSchemaType, true);
-            await req.StreamAsync(streamHandler);
+            await req.StreamAsync();
         }
 
         internal override async UniTask<GeneratedImage> GenerateImageAsync(GENImageTask task)
@@ -63,9 +68,9 @@ namespace Glitch9.AIDevKit.OpenAI
 
             if (result != null)
             {
-                size ??= OpenAIUtils.GetDefaultImageSize(task.model);
-                quality ??= OpenAIUtils.GetDefaultImageQuality(task.model);
-                Usage usage = OpenAIUtils.CreateImageUsage(modelId, size.Value, quality.Value, task.n);
+                size ??= ImageOptionPolicy.GetDefaultImageSize(task.model);
+                quality ??= ImageOptionPolicy.GetDefaultImageQuality(task.model);
+                Usage usage = UsageFactory.Image(modelId, size.Value, quality.Value, task.n);
                 result.Usage = usage;
             }
 
@@ -97,9 +102,9 @@ namespace Glitch9.AIDevKit.OpenAI
 
             if (result != null)
             {
-                size ??= OpenAIUtils.GetDefaultImageSize(task.model);
-                ImageQuality quality = OpenAIUtils.GetDefaultImageQuality(task.model);
-                Usage usage = OpenAIUtils.CreateImageUsage(modelId, size.Value, quality, task.n);
+                size ??= ImageOptionPolicy.GetDefaultImageSize(task.model);
+                ImageQuality quality = ImageOptionPolicy.GetDefaultImageQuality(task.model);
+                Usage usage = UsageFactory.Image(modelId, size.Value, quality, task.n);
                 result.Usage = usage;
             }
 
@@ -136,6 +141,7 @@ namespace Glitch9.AIDevKit.OpenAI
         internal override async UniTask<GeneratedAudio> GenerateSpeechAsync(GENSpeechTask task)
         {
             if (task.model == null) task.model = OpenAISettings.DefaultTTS;
+            if (string.IsNullOrEmpty(task.voiceId)) task.voiceId = OpenAISettings.DefaultVoice;
 
             SpeechRequest.Builder builder = new SpeechRequest.Builder()
                 .SetSender(task.sender)
@@ -160,10 +166,31 @@ namespace Glitch9.AIDevKit.OpenAI
             return result;
         }
 
+        internal override async UniTask StreamSpeechAsync(GENSpeechTask task, StreamingAudioPlayer streamingAudioPlayer)
+        {
+            if (streamingAudioPlayer == null)
+                throw new ArgumentNullException(nameof(streamingAudioPlayer), "Streaming audio player cannot be null.");
+
+            if (task.model == null) task.model = OpenAISettings.DefaultTTS;
+            if (string.IsNullOrEmpty(task.voiceId)) task.voiceId = OpenAISettings.DefaultVoice;
+
+            SpeechRequest.Builder builder = new SpeechRequest.Builder()
+                .SetSender(task.sender)
+                .SetIgnoreLogs(task._ignoreLogs)
+                .SetModel(task.model)
+                .SetPrompt(task.prompt)
+                .SetVoice(task.voiceId)
+                .SetOutputPath(task._outputPath)
+                .SetResponseFormat(task.outputMimeType)
+                .SetCancellationToken(task.token);
+
+            if (task.speed != null) builder.SetSpeed(task.speed.Value);
+
+            await builder.Build().StreamAsync(streamingAudioPlayer);
+        }
+
         internal override async UniTask<Transcript> GenerateTranscriptAsync(GENTranscriptTask task)
         {
-            // Model model = task.model;
-            // if (model == null) model = OpenAISettings.DefaultSTT;
             if (task.model == null)
                 task.model = OpenAISettings.DefaultSTT;
 
@@ -179,10 +206,32 @@ namespace Glitch9.AIDevKit.OpenAI
             return await builder.Build().ExecuteAsync();
         }
 
+        internal override async UniTask StreamTranscriptAsync(GENTranscriptTask task, TranscriptStreamHandler streamHandler)
+        {
+            if (task.model == null)
+                task.model = OpenAISettings.DefaultSTT;
+
+            if (streamHandler == null)
+                throw new ArgumentNullException(nameof(streamHandler), "Stream handler cannot be null for streaming transcription.");
+
+            streamHandler.Initialize(OpenAIUtil.BuildTranscriptChunk, task);
+
+            TranscriptionRequest.Builder builder = new TranscriptionRequest.Builder()
+                .SetSender(task.sender)
+                .SetIgnoreLogs(task._ignoreLogs)
+                .SetModel(task.model)
+                .SetFile(task.prompt)
+                .SetStream(true)
+                .SetStreamHandler(streamHandler)
+                .SetCancellationToken(task.token);
+
+            if (task.language != null) builder.SetLanguage(task.language.Value);
+
+            await builder.Build().StreamAsync();
+        }
+
         internal override async UniTask<Transcript> GenerateTranslationAsync(GENTranslationTask task)
         {
-            // Model model = task.model;
-            // if (model == null) model = OpenAISettings.DefaultSTT;
             if (task.model == null)
                 task.model = OpenAISettings.DefaultSTT;
 
@@ -198,8 +247,6 @@ namespace Glitch9.AIDevKit.OpenAI
 
         internal override UniTask<SafetyRating[]> GenerateModerationAsync(GENModerationTask task)
         {
-            // Model model = task.model;
-            // if (model == null) model = OpenAISettings.DefaultMOD;
             if (task.model == null)
                 task.model = OpenAISettings.DefaultMOD;
 

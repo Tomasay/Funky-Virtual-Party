@@ -11,10 +11,10 @@ namespace Glitch9.AIDevKit
         {
             if (ShouldIgnoreThisTask(task)) return null;
 
-            var endpoint = ResolveEndpoint(task);
+            var requestType = ResolveRequestType(task);
 
             var record = new PromptRecord()
-                .InitializeCommon(endpoint, task.model, task.sender, result.Usage, task.n)
+                .InitializeCommon(requestType, task.model, task.sender, result.Usage, task.n)
                 .SetPromptText(ResolvePromptText(task))
                 .SetOutputMimeType(task.outputMimeType)
                 .SetRequestOptions(task.options);
@@ -52,7 +52,7 @@ namespace Glitch9.AIDevKit
         internal static PromptRecord Create(GENResponseTask task, ChatCompletion result)
         {
             var r = new PromptRecord()
-                .InitializeCommon(EndpointType.ChatCompletion, task.model, task.sender, result.Usage, task.n)
+                .InitializeCommon(RequestType.ChatCompletion, task.model, task.sender, result.Usage, task.n)
                 .SetPromptText(task.prompt)
                 .SetOutputTexts(result.ToStringArray())
                 .SetInputFiles(task.attachedFiles.ToArray())
@@ -62,21 +62,21 @@ namespace Glitch9.AIDevKit
             return r.SaveToDatabase();
         }
 
-        private static int ResolveEndpoint(IGENTask task)
+        private static string ResolveRequestType(IGENTask task)
         {
             return task switch
             {
-                GENResponseTask => EndpointType.ChatCompletion,
-                GENImageTask => EndpointType.ImageCreation,
-                GENInpaintTask => EndpointType.ImageEdit,
+                GENResponseTask => RequestType.ChatCompletion,
+                GENImageTask => RequestType.Image,
+                GENInpaintTask => RequestType.ImageInpaint,
                 //GENImageVariationTask => EndpointType.ImageVariation,
-                GENSpeechTask => EndpointType.Speech,
-                GENVideoTask => EndpointType.Video,
-                GENSoundEffectTask => EndpointType.SoundEffect,
-                GENModerationTask => EndpointType.Moderation,
-                GENAudioIsolationTask => EndpointType.AudioIsolation,
-                GENVoiceChangeTask => EndpointType.VoiceChange,
-                GENCodeTask => EndpointType.CodeGeneration,
+                GENSpeechTask => RequestType.Speech,
+                GENVideoTask => RequestType.Video,
+                GENSoundEffectTask => RequestType.SoundEffect,
+                GENModerationTask => RequestType.Moderation,
+                GENAudioIsolationTask => RequestType.AudioIsolation,
+                GENVoiceChangeTask => RequestType.VoiceChange,
+                GENCodeTask => RequestType.CodeGeneration,
                 _ => throw new NotSupportedException($"PromptRecordFactory does not support {task.GetType().Name} tasks.")
             };
         }

@@ -44,11 +44,9 @@ namespace Glitch9.AIDevKit.OpenAI.Services
             }
         }
 
-        public async UniTask StreamAsync(ChatCompletionRequest req, IChatCompletionStreamHandler streamHandler)
+        public async UniTask StreamAsync(ChatCompletionRequest req)
         {
-            req.StreamHandler = streamHandler.SetFactory(client.CreateChunk);
             req.Stream = true;
-
             await CreateAsync(req);
         }
     }

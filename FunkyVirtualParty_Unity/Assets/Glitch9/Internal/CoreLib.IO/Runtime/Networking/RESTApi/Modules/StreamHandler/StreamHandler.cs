@@ -5,21 +5,27 @@ namespace Glitch9.IO.Networking.RESTApi
 {
     public interface IStreamHandler
     {
-        void StartStreaming();
+        void OnStart();
         void OnError(string error);
         void OnProgress(float progress);
-        void FinishStreaming();
+        void OnDone();
         bool GetProgressEnabled => true;
     }
 
     public interface ITextStreamHandler : IStreamHandler
     {
-        void OnReceiveStreamedData(string streamedText);
+        void OnReceiveData(string streamedText);
     }
 
     public interface IBinaryStreamHandler : IStreamHandler
     {
-        void OnReceiveStreamedData(byte[] streamedData);
+        void OnReceiveData(byte[] streamedData);
+    }
+
+    public interface IAudioStreamHandler : IStreamHandler
+    {
+        AudioFormat AudioFormat { get; }
+        void OnReceiveData(float[] streamedAudio);
     }
 
     public class TextStreamHandler : StreamHandler<string>, ITextStreamHandler
@@ -41,28 +47,26 @@ namespace Glitch9.IO.Networking.RESTApi
             Action onReceiveDataDone = null) : base(onReceiveDataStart, onReceiveData, onError, onProgress, onReceiveDataDone) { }
     }
 
-    public class PcmAudioStreamHandler : StreamHandler<float[]>
+    public class AudioStreamHandler : StreamHandler<float[]>, IAudioStreamHandler
     {
-        public readonly AudioFormat audioFormat;
-        public readonly int headerSize; // size of the header in bytes
-        public PcmAudioStreamHandler(
+        public AudioFormat AudioFormat => audioFormat;
+        private readonly AudioFormat audioFormat;
+        public AudioStreamHandler(
             AudioFormat audioFormat,
-            int headerSize = 44, // 44 bytes for WAV header
             Action onStart = null,
-            Action<float[]> onStream = null,
+            Action<float[]> onReceiveAudio = null,
             Action<string> onError = null,
             Action<float> onProgress = null,
-            Action onDone = null) : base(onStart, onStream, onError, onProgress, onDone)
+            Action onDone = null) : base(onStart, onReceiveAudio, onError, onProgress, onDone)
         {
             this.audioFormat = audioFormat;
-            this.headerSize = headerSize;
         }
     }
 
     public abstract class StreamHandler<T> : IStreamHandler
     {
         public Action onStart;
-        public Action<T> onStream;
+        public Action<T> onReceiveData;
         public Action<string> onError;
         public Action<float> onProgress;
         public Action onDone;
@@ -76,20 +80,20 @@ namespace Glitch9.IO.Networking.RESTApi
             Action onDone = null)
         {
             this.onStart += onStart;
-            this.onStream += onStream;
+            this.onReceiveData += onStream;
             this.onError += onError;
             this.onProgress += onProgress;
             this.onDone += onDone;
         }
 
-        public virtual void StartStreaming() => onStart?.Invoke();
-        public virtual void OnReceiveStreamedData(T data) => onStream?.Invoke(data);
+        public virtual void OnStart() => onStart?.Invoke();
+        public virtual void OnReceiveData(T data) => onReceiveData?.Invoke(data);
         public virtual void OnError(string error)
         {
             onError?.Invoke(error);
-            FinishStreaming();
+            OnDone();
         }
         public virtual void OnProgress(float progress) => onProgress?.Invoke(progress);
-        public virtual void FinishStreaming() => onDone?.Invoke();
+        public virtual void OnDone() => onDone?.Invoke();
     }
 }

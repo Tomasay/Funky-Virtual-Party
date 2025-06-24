@@ -7,7 +7,7 @@ namespace Glitch9.Editor.UIToolkit
         public static Label SelectableLabel(string text, string className = null)
         {
             var label = new Label(text);
-            //label.selection.isSelectable = true;
+            label.selection.isSelectable = true;
             if (!string.IsNullOrEmpty(className)) label.AddToClassList(className);
             return label;
         }

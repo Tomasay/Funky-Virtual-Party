@@ -32,13 +32,8 @@ namespace Glitch9.AIDevKit
 
 
         // Project Context
-        [SerializeField] private string projectPath;
+        [SerializeField] private string projectPath = Application.dataPath;
         [SerializeField] private ProjectContext projectContext = new();
-
-        private void OnEnable()
-        {
-            projectPath = Application.dataPath;
-        }
 
         // Static GetSetters ------------------------------------------------------------------------------------------------
 

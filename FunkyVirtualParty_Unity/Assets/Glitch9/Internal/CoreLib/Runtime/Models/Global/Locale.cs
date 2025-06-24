@@ -168,7 +168,7 @@ namespace Glitch9
                 SystemLanguage.Swedish => "sv",
                 SystemLanguage.Russian => "ru",
                 SystemLanguage.Hungarian => "hu",
-                //SystemLanguage.Hindi => "hi",
+                SystemLanguage.Hindi => "hi",
                 SystemLanguage.Turkish => "tr",
                 SystemLanguage.Romanian => "ro",
                 SystemLanguage.Danish => "da",
@@ -211,7 +211,7 @@ namespace Glitch9
                 "ru" => SystemLanguage.Russian,
                 "hu" => SystemLanguage.Hungarian,
                 "tr" => SystemLanguage.Turkish,
-                //"hi" => SystemLanguage.Hindi,
+                "hi" => SystemLanguage.Hindi,
                 "ro" => SystemLanguage.Romanian,
                 "da" => SystemLanguage.Danish,
                 "nl" => SystemLanguage.Dutch,
@@ -265,7 +265,7 @@ namespace Glitch9
                 SystemLanguage.Swedish => "sv-SE",
                 SystemLanguage.Russian => "ru-RU",
                 SystemLanguage.Hungarian => "hu-HU",
-                //SystemLanguage.Hindi => "hi-IN",
+                SystemLanguage.Hindi => "hi-IN",
                 _ => "auto",
             };
 

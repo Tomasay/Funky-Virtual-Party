@@ -36,7 +36,7 @@ namespace Glitch9.AIDevKit.Google
             return ChatCompletionFactory.Create(result.GetChatChoices(), result.Usage);
         }
 
-        internal override async UniTask StreamResponseAsync(GENResponseTask task, Type jsonSchemaType, IChatCompletionStreamHandler streamHandler)
+        internal override async UniTask StreamResponseAsync(GENResponseTask task, Type jsonSchemaType, ChatCompletionStreamHandler streamHandler)
         {
             GenerateContentRequest req = CreateTextRequest(task, jsonSchemaType);
             await req.StreamAsync(streamHandler);

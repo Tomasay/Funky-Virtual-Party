@@ -97,7 +97,7 @@ namespace Glitch9.AIDevKit.OpenAI
             JObject obj = new()
             {
                 ["role"] = JToken.FromObject(value.Role, serializer),
-                ["content"] = value.Content != null ? OpenAIUtils.CreateThreadMessageContentJToken(value.Content.ToList(), serializer) : null,
+                ["content"] = value.Content != null ? OpenAIUtil.CreateThreadMessageContentJToken(value.Content.ToList(), serializer) : null,
                 ["name"] = value.Name != null ? JToken.FromObject(value.Name, serializer) : null,
                 ["id"] = value.Id != null ? JToken.FromObject(value.Id, serializer) : null,
                 ["object"] = value.Object != null ? JToken.FromObject(value.Object, serializer) : null,

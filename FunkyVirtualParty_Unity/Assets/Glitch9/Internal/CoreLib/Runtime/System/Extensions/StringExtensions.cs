@@ -205,5 +205,10 @@ namespace Glitch9
         {
             return string.IsNullOrEmpty(text) ? Array.Empty<string>() : new[] { text };
         }
+
+        public static string OrDefault(this string value, string defaultValue)
+        {
+            return string.IsNullOrWhiteSpace(value) ? defaultValue : value;
+        }
     }
 }

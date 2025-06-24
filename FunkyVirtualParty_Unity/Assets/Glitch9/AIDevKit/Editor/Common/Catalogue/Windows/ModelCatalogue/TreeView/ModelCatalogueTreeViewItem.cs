@@ -179,7 +179,7 @@ namespace Glitch9.AIDevKit.Editor
 
         public string FamilyDisplayName => GetFamilyDisplayName();
         public bool IsNew => GetIsNew();
-        public bool IsDefault => _isDefault ??= ModelUtil.IsDefaultModel(Id, Api, Capability);
+        public bool IsDefault => _isDefault ??= ModelPolicy.IsDefaultModel(Id, Api, Capability);
         public double Per1MInputToken => GetPer1MInputToken();
         public double Per1MOutputToken => GetPer1MOutputToken();
         public bool CanDelete => !IsDefault && !IsLocked;

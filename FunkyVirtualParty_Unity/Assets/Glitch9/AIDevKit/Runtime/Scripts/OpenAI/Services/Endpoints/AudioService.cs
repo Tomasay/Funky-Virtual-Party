@@ -63,6 +63,40 @@ namespace Glitch9.AIDevKit.OpenAI.Services
             if (res == null) return null;
             return new(res.AudioOutput, res.OutputPath);
         }
+
+        public async UniTask StreamAsync(SpeechRequest req, StreamingAudioPlayer streamingAudioPlayer)
+        {
+            if (req.Model == null) req.Model = OpenAISettings.DefaultTTS;
+            if (req.Voice == null) req.Voice = OpenAISettings.DefaultVoice;
+
+            // if (req.ResponseFormat != null)
+            // {
+            //     AudioEncoding encoding = req.ResponseFormat.Value;
+
+            //     if (encoding != AudioEncoding.PCM)
+            //     {
+            //         client.Logger.Warning("Unity does not support any audio format other than PCM for streaming audio. " +
+            //             "Defaulting to PCM format.");
+            //     }
+            // }
+
+            streamingAudioPlayer.InputSampleRate = OpenAIConfig.TTSInputSampleRate;
+
+            req.options.OutputAudioFormat = new AudioFormat()
+            {
+                Encoding = AudioEncoding.PCM,
+                SampleRate = SampleRate.Hz16000,
+            };
+
+            req.StreamHandler = new AudioStreamHandler(
+                audioFormat: req.options.OutputAudioFormat,
+                onStart: streamingAudioPlayer.PushStart,
+                onDone: streamingAudioPlayer.PushDone,
+                onReceiveAudio: streamingAudioPlayer.PushSamples
+            );
+
+            await client.POSTCreateAsync(kEndpoint, this, req);
+        }
     }
 
     public class TranscriptionService : CRUDServiceBase<OpenAI>
@@ -81,6 +115,13 @@ namespace Glitch9.AIDevKit.OpenAI.Services
             if (req.Model == null) req.Model = OpenAISettings.DefaultSTT;
             req.MIMEType = MIMEType.MultipartForm;
             return await client.POSTCreateAsync<TranscriptionRequest, OpenAITranscript>(kEndpoint, this, req);
+        }
+
+        public async UniTask StreamAsync(TranscriptionRequest req)
+        {
+            if (req.Model == null) req.Model = OpenAISettings.DefaultSTT;
+            req.MIMEType = MIMEType.MultipartForm;
+            await client.POSTCreateAsync(kEndpoint, this, req);
         }
     }
 

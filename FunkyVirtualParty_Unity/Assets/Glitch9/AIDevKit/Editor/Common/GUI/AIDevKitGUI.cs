@@ -108,15 +108,15 @@ namespace Glitch9.AIDevKit.Editor
         internal static ImageSize ImageSizePopup(ImageSize selected, Model model)
         {
             // check if the current model supports the selected image size
-            if (model != null && !ImageOptionUtil.IsImageSizeSupported(selected, model))
+            if (model != null && !ImageOptionPolicy.IsImageSizeSupported(selected, model))
             {
-                selected = AIDevKitConfig.GetDefaultImageSizeForModel(model.Id);
+                selected = ModelPolicy.GetDefaultImageSize(model.Id);
             }
 
             return (ImageSize)EditorGUILayout.EnumPopup(
                 label: GUIContents.ImageSize,
                 selected: selected,
-                checkEnabled: size => ImageOptionUtil.IsImageSizeSupported((ImageSize)size, model),
+                checkEnabled: size => ImageOptionPolicy.IsImageSizeSupported((ImageSize)size, model),
                 includeObsolete: false
             );
         }
@@ -124,15 +124,15 @@ namespace Glitch9.AIDevKit.Editor
         internal static ImageQuality ImageQualityPopup(ImageQuality selected, Model model)
         {
             // check if the current model supports the selected image quality
-            if (model != null && !ImageOptionUtil.IsImageQualitySupported(selected, model))
+            if (model != null && !ImageOptionPolicy.IsImageQualitySupported(selected, model))
             {
-                selected = AIDevKitConfig.GetDefaultImageQualityForModel(model.Id);
+                selected = ModelPolicy.GetDefaultImageQuality(model.Id);
             }
 
             return (ImageQuality)EditorGUILayout.EnumPopup(
                 label: GUIContents.ImageQuality,
                 selected: selected,
-                checkEnabled: quality => ImageOptionUtil.IsImageQualitySupported((ImageQuality)quality, model),
+                checkEnabled: quality => ImageOptionPolicy.IsImageQualitySupported((ImageQuality)quality, model),
                 includeObsolete: false
             );
         }
