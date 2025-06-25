@@ -139,7 +139,7 @@ namespace Glitch9.Editor.UIToolkit
         internal static void SetupTextArea(TextField textField, float height, EventCallback<ChangeEvent<string>> onInputValueChanged)
         {
             textField.AddManipulator(new BlinkingCursor());
-            textField.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
+            //textField.SetVerticalScrollerVisibility(ScrollerVisibility.Auto);
             textField.style.position = Position.Absolute;
             textField.multiline = true;
             textField.style.unityTextOverflowPosition = TextOverflowPosition.Start;
