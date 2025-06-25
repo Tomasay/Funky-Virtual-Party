@@ -462,12 +462,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     void SetDecoyAnswers(string decoyAnswers)
     {
+        Debug.Log("Decoy Answers: " + decoyAnswers);
+
         if (decoyAnswers.Equals("")) return;
 
         foreach (string d in decoyAnswers.Split(','))
         {
             GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-            ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize dibling index so decoy answers are not always the last ones
+            ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize sibling index so decoy answers are not always the last ones
             ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
             AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
             aob.SetText(d);

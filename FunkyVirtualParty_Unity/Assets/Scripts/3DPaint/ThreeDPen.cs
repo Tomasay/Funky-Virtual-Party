@@ -245,8 +245,11 @@ public class ThreeDPen : ImmediateModeShapeDrawer
             pp.ClearAllPoints();
             pp.Dispose();
         }
-        currentLine.ClearAllPoints();
-        currentLine.Dispose();
+        if (currentLine != null)
+        {
+            currentLine.ClearAllPoints();
+            currentLine.Dispose();
+        }
     }
 
     public void ChangeColor(Color c)

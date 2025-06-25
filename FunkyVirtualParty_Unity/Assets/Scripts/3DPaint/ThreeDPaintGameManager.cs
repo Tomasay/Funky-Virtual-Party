@@ -487,7 +487,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 #endif
                 pen.SaveCurrentDrawingLines();
 
+#if !UNITY_WEBGL
                 decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), 3, OnDecoyAnswersGenerated);
+#endif
 
                 VRtistrySyncer.instance.ArtGuesses = "";
 

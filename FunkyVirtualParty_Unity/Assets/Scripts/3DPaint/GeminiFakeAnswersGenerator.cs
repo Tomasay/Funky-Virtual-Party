@@ -5,27 +5,30 @@ using UnityEngine.UI;
 
 using AiToolbox;
 
+#if !UNITY_WEBGL
 using Glitch9.AIDevKit;
 using Glitch9.AIDevKit.Google;
+using Glitch9.AIDevKit.OpenAI;
+#endif
 
 public class GeminiFakeAnswersGenerator : MonoBehaviour
 {
+#if !UNITY_WEBGL
     public GeminiParameters parameters;
 
     //Front, Back, Left, Right
     public Camera[] artViewCameras;
     public RenderTexture[] artViewRTs;
+    public Texture2D testTexture;
     private Texture2D[] artTextures; // Generated textures from cam views
-
-    private void Start()
-    {
-        //Test
-        //GenerateFakeAnswers("The worst costume you could wear to a halloween party?", "minion", 5, onRequestCompleteTest);
-    }
+    public RawImage[] rawImages; // Generated textures from cam views
 
     private void Awake()
     {
         artTextures = new Texture2D[artViewCameras.Length];
+
+        //Test
+        GenerateFakeAnswers("The worst costume you could wear to a halloween party?", "minion", 5, onRequestCompleteTest);
     }
 
     //Text Only
@@ -122,7 +125,7 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
                 artViewCameras[i].Render();
 
                 //Convert RT to Texture2D
-                artTextures[i] = new Texture2D(512, 512, TextureFormat.RGB24, false);
+                artTextures[i] = new Texture2D(artViewRTs[i].width, artViewRTs[i].height);
                 RenderTexture.active = artViewRTs[i];
                 artTextures[i].ReadPixels(new Rect(0, 0, artViewRTs[i].width, artViewRTs[i].height), 0, 0);
                 artTextures[i].Apply();
@@ -135,6 +138,7 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
                 .ExecuteAsync();
 
             onRequestCompleteCallback.Invoke(reply);
+            //Debug.Log("Decoy Answers: " + reply);
         }
         catch (System.Exception ex)
         {
@@ -149,4 +153,5 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
             Debug.Log(ss);
         }
     }
+#endif
 }
