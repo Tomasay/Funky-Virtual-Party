@@ -12,12 +12,6 @@ using FMODUnity;
 
 public class ThreeDPen : ImmediateModeShapeDrawer
 {
-    List<List<PolylinePath>> drawingLines;
-
-    List<PolylinePath> currentDrawingLines;
-
-    PolylinePath currentLine;
-
     Color currentColor = Color.black;
 
     [SerializeField]
@@ -55,15 +49,8 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     public bool active;
 
-    //The amount of time that has to pass before another point can be created
-    const float pointSecondDelay = 0.01f;
-
-    float lastPointTime;
-
     const int maxPointCount = 100000;
     int currentPointCount;
-
-    Vector3 lastPenPos;
 
     private bool canPaint = true;
 
@@ -85,38 +72,35 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
         Draw.Position = linesParent.transform.position;
 
-        drawingLines = new List<List<PolylinePath>>();
-        currentDrawingLines = new List<PolylinePath>();
-
         ShapesMaterialUtils.Prewarm();
     }
 
     private void Start()
     {
-        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine();  isPainting = true; });
+#if !UNITY_WEBGL
+        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); isPainting = true; });
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
         VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
 
-#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
     }
 
     private void OnDestroy()
     {
+#if !UNITY_WEBGL
         VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); isPainting = true; });
         VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPainting = false; });
         VRtistrySyncer.instance.penEnabledChanged.RemoveListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.RemoveListener(ChangeColor);
 
-#if !UNITY_WEBGL
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
 
         //Dispose of all polylines
         //Dispose current lines
-        foreach (List<PolylinePath> ppl in drawingLines)
+        foreach (List<PolylinePath> ppl in DrawingsSyncer.instance.drawingLines)
         {
             foreach (PolylinePath pp in ppl)
             {
@@ -124,8 +108,6 @@ public class ThreeDPen : ImmediateModeShapeDrawer
                 pp.Dispose();
             }
         }
-        currentLine.ClearAllPoints();
-        currentLine.Dispose();
     }
 
 #if !UNITY_WEBGL
@@ -147,14 +129,6 @@ public class ThreeDPen : ImmediateModeShapeDrawer
         {
             AddNewLinePoint();
             OnDraw.Invoke();
-        }
-#endif
-#if UNITY_WEBGL
-        if (isPainting && (transform.position - lastPenPos).magnitude > 0.01f && (Time.time - lastPointTime) > pointSecondDelay && currentPointCount < maxPointCount)
-        {
-            AddNewLinePoint();
-            OnDraw.Invoke();
-            lastPenPos = transform.position;
         }
 #endif
 
@@ -192,63 +166,42 @@ public class ThreeDPen : ImmediateModeShapeDrawer
         using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
         {
             //Draw any previous lines in the drawing
-            if (currentDrawingLines != null && currentDrawingLines.Count > 0)
+            if (DrawingsSyncer.instance.drawingLines != null && DrawingsSyncer.instance.drawingLines.Count > 0)
             {
-                foreach (PolylinePath pp in currentDrawingLines)
+                foreach (PolylinePath plp in DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count-1])
                 {
-                    if (pp.Count > 1)
+                    if (plp.Count > 1)
                     {
-                        Draw.Polyline(pp, closed: false, thickness: 0.01f); // Drawing happens here
+                        Draw.Polyline(plp, closed: false, thickness: 0.01f); // Drawing happens here
                     }
                 }
-            }
-            //Draw current line being drawn
-            if (currentLine != null && currentLine.Count > 1)
-            {
-                Draw.Polyline(currentLine, closed: false, thickness: 0.01f); // Drawing happens here
             }
         }
     }
 
     private void CreateNewLine()
     {
-        //If previous line had points in it, it needs to be added to the list for current drawing
-        if(currentLine != null && currentLine.Count > 0)
-        {
-            currentDrawingLines.Add(currentLine);
-        }
-
-        //Instantiate new line
-        currentLine = new PolylinePath();
+        PenStrokeModel newPenStroke = new PenStrokeModel();
+        newPenStroke.lineColor = currentColor;
+        int currentDrawing = DrawingsSyncer.instance.Drawings.Count-1;
+        DrawingsSyncer.instance.Drawings[currentDrawing].penStrokes.Add(newPenStroke);
     }
 
     private void AddNewLinePoint()
     {
         Vector3 pos = tip.position - linesParent.position;
+
+        int i = DrawingsSyncer.instance.drawingLines.Count-1;
+        int j = DrawingsSyncer.instance.drawingLines[i].Count - 1;
+        PolylinePath currentLine = DrawingsSyncer.instance.drawingLines[i][j];
+
         if (currentLine.Count == 0 || Vector3.Distance(currentLine.LastPoint.point, pos) > 0.001f)
         {
-            currentLine.AddPoint(pos, currentColor);
-            lastPointTime = Time.time;
-        }
-    }
-
-    public void SaveCurrentDrawingLines()
-    {
-        drawingLines.Add(currentDrawingLines);
-    }
-
-    public void EraseAllCurrentLines()
-    {
-        //Dispose current lines
-        foreach (PolylinePath pp in currentDrawingLines)
-        {
-            pp.ClearAllPoints();
-            pp.Dispose();
-        }
-        if (currentLine != null)
-        {
-            currentLine.ClearAllPoints();
-            currentLine.Dispose();
+            LinePointModel newLinePoint = new LinePointModel();
+            newLinePoint.position = pos;
+            int k = DrawingsSyncer.instance.Drawings.Count-1;
+            int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[k].penStrokes.Count-1;
+            DrawingsSyncer.instance.Drawings[k].penStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
         }
     }
 

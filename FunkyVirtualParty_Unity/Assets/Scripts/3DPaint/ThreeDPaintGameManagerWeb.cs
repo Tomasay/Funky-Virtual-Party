@@ -215,7 +215,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         //Reset any painting from previous round
         paintTexture.Clear();
-        pen.EraseAllCurrentLines();
 
         //Reset results from previous round
         ClearPlayerResults();
@@ -245,7 +244,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Reset any painting from practicing
                 paintTexture.Clear();
-                pen.EraseAllCurrentLines();
                 break;
             case "vr painting":
                 //Bake mannequin IK

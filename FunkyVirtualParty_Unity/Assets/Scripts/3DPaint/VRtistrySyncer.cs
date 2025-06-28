@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using Normal.Realtime;
+using Normal.Realtime.Serialization;
 
 public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 {
