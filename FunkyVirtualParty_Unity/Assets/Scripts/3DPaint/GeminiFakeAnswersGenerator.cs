@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+#if !UNITY_WEBGL
 using AiToolbox;
 
-#if !UNITY_WEBGL
 using Glitch9.AIDevKit;
 using Glitch9.AIDevKit.Google;
 using Glitch9.AIDevKit.OpenAI;
