@@ -19,7 +19,6 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
     //Front, Back, Left, Right
     public Camera[] artViewCameras;
     public RenderTexture[] artViewRTs;
-    public Texture2D testTexture;
     private Texture2D[] artTextures; // Generated textures from cam views
     public RawImage[] rawImages; // Generated textures from cam views
 

@@ -6,4 +6,7 @@ public partial class DrawingModel
 {
     [RealtimeProperty(1, true)]
     private RealtimeArray<PenStrokeModel> _penStrokes;
+
+    [RealtimeProperty(2, true, true)]
+    private byte[] _paintTexture;
 }

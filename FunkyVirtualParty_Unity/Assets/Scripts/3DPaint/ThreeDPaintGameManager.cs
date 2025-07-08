@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -465,13 +466,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 //Clear practice painting
                 paintTexture.Clear();
 
+                //Instantiate new drawing
+                DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
+
                 timeVRPosingStarted = Time.time;
 
                 break;
             case "vr painting":
-                //Instantiate new drawing
-                DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
-
                 //Enable VR tools
                 pen.CanPaint = true;
                 sprayGun.CanPaint = true;
@@ -482,6 +483,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
             case "clients guessing":
+                //Network paint texture
+                DrawingsSyncer.instance.Drawings.Last().paintTexture = paintTexture.GetPngData();
+
 #if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 0);
                 fmodInstance.setParameterByName("VRtistryClock", 0);

@@ -5,6 +5,7 @@ using UnityEngine.Events;
 using Normal.Realtime;
 using Normal.Realtime.Serialization;
 using Shapes;
+using PaintIn3D;
 
 public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 {
@@ -13,6 +14,9 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     public List<List<PolylinePath>> drawingLines;
 
     public RealtimeArray<DrawingModel> Drawings { get => model.drawings; }
+
+    [SerializeField]
+    P3dPaintableTexture paintTexture;
 
     private void Awake()
     {
@@ -51,6 +55,15 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         drawingLines.Add(new List<PolylinePath>());
 
         model.penStrokes.modelAdded += PenStrokes_modelAdded;
+        model.paintTextureDidChange += Model_paintTextureDidChange;
+    }
+
+    //Drawing's paint texture was changed
+    private void Model_paintTextureDidChange(DrawingModel model, byte[] value)
+    {
+#if UNITY_WEBGL //Override final texture on mobile to ensure it is 100% correct
+        paintTexture.LoadFromData(value);
+#endif
     }
 
     //New line within a drawing created
@@ -67,5 +80,5 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         int currentPenStrokeIndex = Drawings[Drawings.Count - 1].penStrokes.Count - 1;
         drawingLines[drawingLines.Count-1][currentLineIndex].AddPoint(model.position, Drawings[Drawings.Count-1].penStrokes[currentPenStrokeIndex].lineColor);
     }
-    #endregion
+#endregion
 }
