@@ -20,7 +20,6 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
     public Camera[] artViewCameras;
     public RenderTexture[] artViewRTs;
     private Texture2D[] artTextures; // Generated textures from cam views
-    public RawImage[] rawImages; // Generated textures from cam views
 
     private void Awake()
     {

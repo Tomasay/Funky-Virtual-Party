@@ -468,6 +468,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Instantiate new drawing
                 DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
+                Debug.Log("Instantiated new Drawing");
 
                 timeVRPosingStarted = Time.time;
 
@@ -483,8 +484,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
             case "clients guessing":
-                //Network paint texture
+                //Network paint texture, pose data, and title
                 DrawingsSyncer.instance.Drawings.Last().paintTexture = paintTexture.GetPngData();
+                DrawingsSyncer.instance.StorePoseData(armature);
+                DrawingsSyncer.instance.Drawings.Last().title = GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
 
 #if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 0);
