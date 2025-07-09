@@ -468,7 +468,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Instantiate new drawing
                 DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
-                Debug.Log("Instantiated new Drawing");
 
                 timeVRPosingStarted = Time.time;
 

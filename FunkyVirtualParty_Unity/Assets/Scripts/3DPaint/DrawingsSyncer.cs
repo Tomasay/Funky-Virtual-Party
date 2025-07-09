@@ -36,11 +36,6 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         drawingLines = new List<List<PolylinePath>>();
     }
 
-    private void Update()
-    {
-        Debug.Log("Drawings: " + model.drawings.Count);
-    }
-
     /// <summary>
     /// Stores pose data for the current drawing being worked on
     /// </summary>
@@ -50,8 +45,8 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         foreach (Transform t in armature.GetComponentsInChildren<Transform>())
         {
             JointModel newJointInfo = new JointModel();
-            newJointInfo.pos = t.position;
-            newJointInfo.rot = t.rotation;
+            newJointInfo.pos = t.localPosition;
+            newJointInfo.rot = t.localRotation;
 
             Drawings[Drawings.Count - 1].poseData.Add(newJointInfo);
         }
@@ -67,8 +62,16 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         Transform[] transforms = armature.GetComponentsInChildren<Transform>();
         for (int i = 0; i < Drawings[drawingIndex].poseData.Count; i++)
         {
-            transforms[i].position = Drawings[drawingIndex].poseData[i].pos;
-            transforms[i].rotation = Drawings[drawingIndex].poseData[i].rot;
+            transforms[i].localPosition = Drawings[drawingIndex].poseData[i].pos;
+            transforms[i].localRotation = Drawings[drawingIndex].poseData[i].rot;
+
+            //Ignore hip height set by height slider
+            if(i == 1)
+            {
+                Vector3 pos = transforms[i].localPosition;
+                pos.y = 0;
+                transforms[i].localPosition = pos;
+            }
         }
     }
 

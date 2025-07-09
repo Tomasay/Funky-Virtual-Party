@@ -78,7 +78,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     private void Start()
     {
 #if !UNITY_WEBGL
-        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); isPainting = true; });
+        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine();});
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
         VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
@@ -90,7 +90,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     private void OnDestroy()
     {
 #if !UNITY_WEBGL
-        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); isPainting = true; });
+        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine();});
         VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPainting = false; });
         VRtistrySyncer.instance.penEnabledChanged.RemoveListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.RemoveListener(ChangeColor);
@@ -181,10 +181,14 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     private void CreateNewLine()
     {
-        PenStrokeModel newPenStroke = new PenStrokeModel();
-        newPenStroke.lineColor = currentColor;
-        int currentDrawing = DrawingsSyncer.instance.Drawings.Count-1;
-        DrawingsSyncer.instance.Drawings[currentDrawing].penStrokes.Add(newPenStroke);
+        int currentDrawing = DrawingsSyncer.instance.Drawings.Count - 1;
+        if (currentDrawing >= 0)
+        {
+            PenStrokeModel newPenStroke = new PenStrokeModel();
+            newPenStroke.lineColor = currentColor;
+            DrawingsSyncer.instance.Drawings[currentDrawing].penStrokes.Add(newPenStroke);
+            isPainting = true;
+        }
     }
 
     private void AddNewLinePoint()

@@ -26,7 +26,7 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
         artTextures = new Texture2D[artViewCameras.Length];
 
         //Test
-        GenerateFakeAnswers("The worst costume you could wear to a halloween party?", "minion", 5, onRequestCompleteTest);
+        //GenerateFakeAnswers("The worst costume you could wear to a halloween party?", "minion", 5, onRequestCompleteTest);
     }
 
     //Text Only
