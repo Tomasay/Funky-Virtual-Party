@@ -20,6 +20,9 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
+    GameObject[] artPieceLineParents;
+
+    [SerializeField]
     P3dPaintableTexture[] galleryPaintTextures;
 
     [SerializeField]
@@ -27,6 +30,9 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 
     [SerializeField]
     TMP_Text[] galleryTitles;
+
+    [SerializeField]
+    Transform linesParent;
 
     private void Awake()
     {
@@ -71,6 +77,29 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
                 Vector3 pos = transforms[i].localPosition;
                 pos.y = 0;
                 transforms[i].localPosition = pos;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Shifts drawing lines over to be placed on appropriate gallery pedestals
+    /// </summary>
+    public void SetDrawingGalleryPositions()
+    {
+        if (drawingLines != null && drawingLines.Count > 0)
+        {
+            for (int i = 0; i < drawingLines.Count; i++)
+            {
+                Vector3 posOffset = linesParent.position - artPieceLineParents[i].transform.position;
+                for (int j = 0; j < drawingLines[i].Count; j++)
+                {
+                    for (int k = 0; k < drawingLines[i][j].Count; k++)
+                    {
+                        PolylinePoint point = drawingLines[i][j][k]; //:o
+                        point.point -= posOffset;
+                        drawingLines[i][j].SetPoint(k, point);
+                    }
+                }
             }
         }
     }

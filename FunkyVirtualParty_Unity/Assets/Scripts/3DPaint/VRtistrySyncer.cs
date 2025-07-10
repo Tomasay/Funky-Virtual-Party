@@ -83,7 +83,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         VRCompletedTutorial = false;
         IsPainting = false;
         IsDrawing = false;
-        //IsPenEnabled = true;
+        IsPenEnabled = true;
         IsPaletteMirrored = false;
         IsPaletteEnabled = false;
         PenColor = Color.black;
@@ -124,7 +124,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             if (currentModel.isFreshModel)
             {
                 currentModel.state = "clients answering";
-                //currentModel.isPenEnabled = true;
+                currentModel.isPenEnabled = true;
             }
 
             // Register for events

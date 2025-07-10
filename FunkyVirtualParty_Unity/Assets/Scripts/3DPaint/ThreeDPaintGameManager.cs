@@ -91,6 +91,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     const string dontSayWarning = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
 
+    [SerializeField]
+    Transform vrPlayerGallerySpawnPos;
+
     private void Awake()
     {
         playerPoints = new Dictionary<int, int>();
@@ -512,7 +515,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 SceneChangerSyncer.instance.FadeOutManual();
                 vrPlayer.Ahp.useMovement = false;
-                Invoke("ResetVRPlayerPos", 1);
+                StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
                 break;
             case "vr guessing":
                 //Show guesses
@@ -666,6 +669,16 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 VRtistrySyncer.instance.ArtGuesses = "";
 
                 break;
+            case "gallery":
+                DrawingsSyncer.instance.SetDrawingGalleryPositions();
+
+                StartCoroutine("ShowLeaderboard");
+
+                VRtistrySyncer.instance.ArtGuesses = "";
+
+                StartCoroutine(SetVRPlayerPos(vrPlayerGallerySpawnPos.position, 0));
+
+                break;
             case "game over":
                 StartCoroutine("EndGame");
                 break;
@@ -674,16 +687,26 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
     }
 
-    void ResetVRPlayerPos()
+    IEnumerator SetVRPlayerPos(Vector3 pos, int delay = 0)
     {
-        vrPlayer.Ahp.SetPosition(vrPlayer.spawnPos);
+        yield return new WaitForSeconds(delay);
+
+        vrPlayer.Ahp.SetPosition(pos);
         vrPlayer.trackerOffsetsParent.localRotation = Quaternion.Euler(0, 0, 0);
         SceneChangerSyncer.instance.FadeInManual();
     }
 
     void SetLeaderboardState()
     {
-        VRtistrySyncer.instance.State = "leaderboard";
+        if (currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
+        {
+            VRtistrySyncer.instance.State = "gallery";
+        }
+        else
+        {
+            VRtistrySyncer.instance.State = "leaderboard";
+        }
+        
     }
 
     void ClearPlayerAnswers()

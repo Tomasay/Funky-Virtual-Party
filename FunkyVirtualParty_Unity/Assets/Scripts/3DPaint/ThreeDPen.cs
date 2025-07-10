@@ -165,14 +165,29 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     {
         using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
         {
-            //Draw any previous lines in the drawing
             if (DrawingsSyncer.instance.drawingLines != null && DrawingsSyncer.instance.drawingLines.Count > 0)
             {
-                foreach (PolylinePath plp in DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count-1])
+                if (VRtistrySyncer.instance.State.Equals("gallery") || VRtistrySyncer.instance.State.Equals("game over")) //If in gallery state, render all drawings
                 {
-                    if (plp.Count > 1)
+                    foreach (List<PolylinePath> plpList in DrawingsSyncer.instance.drawingLines)
                     {
-                        Draw.Polyline(plp, closed: false, thickness: 0.01f); // Drawing happens here
+                        foreach (PolylinePath plp in plpList)
+                        {
+                            if (plp.Count > 1)
+                            {
+                                Draw.Polyline(plp, closed: false, thickness: 0.01f);
+                            }
+                        }
+                    }
+                }
+                else //Else, only render current drawing
+                {
+                    foreach (PolylinePath plp in DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1])
+                    {
+                        if (plp.Count > 1)
+                        {
+                            Draw.Polyline(plp, closed: false, thickness: 0.01f);
+                        }
                     }
                 }
             }
