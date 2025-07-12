@@ -90,25 +90,25 @@ public class ClientPlayerCustomizer : MonoBehaviour
 
     private void NextHatCustomization()
     {
-        if (RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex < RealtimeSingletonWeb.instance.LocalPlayer.hats.Length)
+        if (RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex < RealtimeSingletonWeb.instance.LocalPlayer.hats.Length-1)
         {
             RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex++;
         }
         else
         {
-            RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex = 0;
+            RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex = -1;
         }
     }
 
     private void PreviousHatCustomization()
     {
-        if (RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex > 0)
+        if (RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex >= 0)
         {
             RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex--;
         }
         else
         {
-            RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex = RealtimeSingletonWeb.instance.LocalPlayer.hats.Length;
+            RealtimeSingletonWeb.instance.LocalPlayer.syncer.HatIndex = RealtimeSingletonWeb.instance.LocalPlayer.hats.Length-1;
         }
     }
 
@@ -140,7 +140,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         }
         else
         {
-            colIndex = pallete.width;
+            colIndex = pallete.width-1;
         }
 
         RealtimeSingletonWeb.instance.LocalPlayer.syncer.Color = pallete.GetPixel(colIndex, 0);
