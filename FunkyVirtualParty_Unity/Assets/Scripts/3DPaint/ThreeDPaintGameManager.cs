@@ -72,6 +72,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     List<AnswerOptionButton> answerResults;
 
+    [SerializeField]
+    RectTransform canvasGalleryTransform;
+
+    [SerializeField]
+    Transform vrPlayerGallerySpawnPos;
+
+    [SerializeField]
+    MannequinHeightSlider mannequinHeightSlider;
+
 #if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
@@ -90,9 +99,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
     private VRtistryVRPlayerController vrPlayer;
 
     const string dontSayWarning = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
-
-    [SerializeField]
-    Transform vrPlayerGallerySpawnPos;
 
     private void Awake()
     {
@@ -670,6 +676,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 break;
             case "gallery":
+                //Move canvas to gallery
+                RectTransform rt = (uiCanvas.transform as RectTransform);
+                rt.position = canvasGalleryTransform.position;
+                rt.rotation = canvasGalleryTransform.rotation;
+
+                mannequinHeightSlider.gameObject.SetActive(false);
+
                 DrawingsSyncer.instance.SetDrawingGalleryPositions();
 
                 StartCoroutine("ShowLeaderboard");
@@ -822,16 +835,17 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         yield return new WaitForSeconds(ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
 
-        //Disable leaderboard
-        leaderboardParent.SetActive(false);
-        ClearPlayerAnswers();
-
         if (currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
         {
             VRtistrySyncer.instance.State = "game over";
         }
         else
         {
+            //Disable leaderboard
+            leaderboardParent.SetActive(false);
+            ClearPlayerAnswers();
+
+            //Setup next round
             VRtistrySyncer.instance.CurrentPrompt = GetPrompt();
             VRtistrySyncer.instance.State = "clients answering";
             VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
