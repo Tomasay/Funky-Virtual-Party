@@ -15,6 +15,9 @@ public class VRtistryVRPlayerController : VRPlayerController
     [SerializeField]
     public GameObject UIPointer;
 
+    [SerializeField]
+    public PointerVisualizer UIPointerPreview;
+
     [HideInInspector]
     public Vector3 spawnPos;
 

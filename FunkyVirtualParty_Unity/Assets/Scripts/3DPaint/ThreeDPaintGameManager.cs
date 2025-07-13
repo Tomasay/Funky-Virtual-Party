@@ -98,6 +98,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private VRtistryVRPlayerController vrPlayer;
 
+    private float pointerPreviewDrawDistance; 
+
     const string dontSayWarning = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
 
     private void Awake()
@@ -216,6 +218,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.AddListener(OnStartPoint);
         vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.AddListener(OnStopPoint);
+
+        pointerPreviewDrawDistance = vrPlayer.UIPointerPreview.rayDrawDistance;
     }
 
     void OnStartPoint(Vector3 vec, GameObject g)
@@ -389,6 +393,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
 
         headerText.enabled = true;
+
+        vrPlayer.UIPointerPreview.rayDrawDistance = 0;
     }
 
     [Button]
@@ -568,7 +574,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 }
 
                 //UX
-                vrPlayer.UIPointer.SetActive(true);
+                vrPlayer.UIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
                 vrPlayer.leftHand.Release();
                 vrPlayer.rightHand.Release();
 
@@ -580,6 +586,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 break;
             case "results":
                 headerText.text = "Displaying results";
+
+                vrPlayer.UIPointerPreview.rayDrawDistance = 0;
 
                 //Answer results
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
