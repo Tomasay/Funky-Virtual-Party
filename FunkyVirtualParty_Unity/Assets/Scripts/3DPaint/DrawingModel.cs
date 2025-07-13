@@ -15,4 +15,7 @@ public partial class DrawingModel
 
     [RealtimeProperty(4, true, true)]
     private string _title;
+
+    [RealtimeProperty(5, true)]
+    private RealtimeArray<PenStrokeModel> _practicePenStrokes;
 }

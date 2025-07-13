@@ -438,6 +438,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
         switch (state)
         {
             case "clients answering":
+                //Instantiate new drawing
+                DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
+
+                //Clear previous painting
+                paintTexture.Clear();
+
                 VRtistrySyncer.instance.VRPlayerGuess = -1;
                 VRtistrySyncer.instance.PlayerGuesses = "";
 
@@ -474,9 +480,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Clear practice painting
                 paintTexture.Clear();
-
-                //Instantiate new drawing
-                DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
 
                 timeVRPosingStarted = Time.time;
 

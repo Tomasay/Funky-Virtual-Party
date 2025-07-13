@@ -14,6 +14,8 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 
     public List<List<PolylinePath>> drawingLines;
 
+    public List<List<PolylinePath>> practiceDrawingLines;
+
     public RealtimeArray<DrawingModel> Drawings { get => model.drawings; }
 
     [SerializeField]
@@ -40,6 +42,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         instance = this;
 
         drawingLines = new List<List<PolylinePath>>();
+        practiceDrawingLines = new List<List<PolylinePath>>();
     }
 
     /// <summary>
@@ -131,8 +134,10 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     private void Drawings_modelAdded(RealtimeArray<DrawingModel> array, DrawingModel model, bool remote)
     {
         drawingLines.Add(new List<PolylinePath>());
+        practiceDrawingLines.Add(new List<PolylinePath>());
 
         model.penStrokes.modelAdded += PenStrokes_modelAdded;
+        model.practicePenStrokes.modelAdded += PracticePenStrokes_modelAdded;
         model.paintTextureDidChange += Model_paintTextureDidChange;
         model.poseData.modelAdded += PoseData_modelAdded;
         model.titleDidChange += Model_titleDidChange;
@@ -171,13 +176,28 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         drawingLines[drawingLines.Count-1].Add(new PolylinePath());
         model.linePoints.modelAdded += LinePoints_modelAdded;
     }
-    
-    //New point within a line create
+
+    //New line while practicing created
+    private void PracticePenStrokes_modelAdded(RealtimeArray<PenStrokeModel> array, PenStrokeModel model, bool remote)
+    {
+        practiceDrawingLines[practiceDrawingLines.Count - 1].Add(new PolylinePath());
+        model.linePoints.modelAdded += PracticeLinePoints_modelAdded;
+    }
+
+    //New point within a line created
     private void LinePoints_modelAdded(RealtimeArray<LinePointModel> array, LinePointModel model, bool remote)
     {
         int currentLineIndex = drawingLines[drawingLines.Count-1].Count-1;
         int currentPenStrokeIndex = Drawings[Drawings.Count - 1].penStrokes.Count - 1;
         drawingLines[drawingLines.Count-1][currentLineIndex].AddPoint(model.position, Drawings[Drawings.Count-1].penStrokes[currentPenStrokeIndex].lineColor);
     }
-#endregion
+
+    //New point within a practice line created
+    private void PracticeLinePoints_modelAdded(RealtimeArray<LinePointModel> array, LinePointModel model, bool remote)
+    {
+        int currentLineIndex = practiceDrawingLines[practiceDrawingLines.Count - 1].Count - 1;
+        int currentPenStrokeIndex = Drawings[Drawings.Count - 1].practicePenStrokes.Count - 1;
+        practiceDrawingLines[practiceDrawingLines.Count - 1][currentLineIndex].AddPoint(model.position, Drawings[Drawings.Count - 1].practicePenStrokes[currentPenStrokeIndex].lineColor);
+    }
+    #endregion
 }

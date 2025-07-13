@@ -59,13 +59,16 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     public UnityEvent OnDraw;
 
+    private const float LINE_THICKNESS = 0.01f;
+    private const float NEW_POINT_DISTANCE_THRESHOLD = 0.001f;
+
     private void Awake()
     {
         tipMesh.material.color = currentColor;
 
         //Set Draw defaults for Polylines
         Draw.BlendMode = ShapesBlendMode.Opaque;
-        Draw.Thickness = 0.01f;
+        Draw.Thickness = LINE_THICKNESS;
         Draw.PolylineGeometry = PolylineGeometry.Billboard;
         Draw.DetailLevel = DetailLevel.Minimal;
         Draw.PolylineJoins = PolylineJoins.Round;
@@ -165,28 +168,45 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     {
         using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
         {
-            if (DrawingsSyncer.instance.drawingLines != null && DrawingsSyncer.instance.drawingLines.Count > 0)
+            bool isVRPlayerPracticing = (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering");
+            if (isVRPlayerPracticing)
             {
-                if (VRtistrySyncer.instance.State.Equals("gallery") || VRtistrySyncer.instance.State.Equals("game over")) //If in gallery state, render all drawings
+                if (DrawingsSyncer.instance.practiceDrawingLines != null && DrawingsSyncer.instance.practiceDrawingLines.Count > 0)
                 {
-                    foreach (List<PolylinePath> plpList in DrawingsSyncer.instance.drawingLines)
-                    {
-                        foreach (PolylinePath plp in plpList)
-                        {
-                            if (plp.Count > 1)
-                            {
-                                Draw.Polyline(plp, closed: false, thickness: 0.01f);
-                            }
-                        }
-                    }
-                }
-                else //Else, only render current drawing
-                {
-                    foreach (PolylinePath plp in DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1])
+                    foreach (PolylinePath plp in DrawingsSyncer.instance.practiceDrawingLines[DrawingsSyncer.instance.practiceDrawingLines.Count - 1])
                     {
                         if (plp.Count > 1)
                         {
-                            Draw.Polyline(plp, closed: false, thickness: 0.01f);
+                            Draw.Polyline(plp, closed: false, thickness: LINE_THICKNESS);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (DrawingsSyncer.instance.drawingLines != null && DrawingsSyncer.instance.drawingLines.Count > 0)
+                {
+                    if (VRtistrySyncer.instance.State.Equals("gallery") || VRtistrySyncer.instance.State.Equals("game over")) //If in gallery state, render all drawings
+                    {
+                        foreach (List<PolylinePath> plpList in DrawingsSyncer.instance.drawingLines)
+                        {
+                            foreach (PolylinePath plp in plpList)
+                            {
+                                if (plp.Count > 1)
+                                {
+                                    Draw.Polyline(plp, closed: false, thickness: LINE_THICKNESS);
+                                }
+                            }
+                        }
+                    }
+                    else //Else, only render current drawing
+                    {
+                        foreach (PolylinePath plp in DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1])
+                        {
+                            if (plp.Count > 1)
+                            {
+                                Draw.Polyline(plp, closed: false, thickness: LINE_THICKNESS);
+                            }
                         }
                     }
                 }
@@ -196,12 +216,23 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     private void CreateNewLine()
     {
+        bool isVRPlayerPracticing = (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering");
+
         int currentDrawing = DrawingsSyncer.instance.Drawings.Count - 1;
         if (currentDrawing >= 0)
         {
             PenStrokeModel newPenStroke = new PenStrokeModel();
             newPenStroke.lineColor = currentColor;
-            DrawingsSyncer.instance.Drawings[currentDrawing].penStrokes.Add(newPenStroke);
+
+            if (isVRPlayerPracticing)
+            {
+                DrawingsSyncer.instance.Drawings[currentDrawing].practicePenStrokes.Add(newPenStroke);
+            }
+            else
+            {
+                DrawingsSyncer.instance.Drawings[currentDrawing].penStrokes.Add(newPenStroke);
+            }
+
             isPainting = true;
         }
     }
@@ -210,17 +241,38 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     {
         Vector3 pos = tip.position - linesParent.position;
 
-        int i = DrawingsSyncer.instance.drawingLines.Count-1;
-        int j = DrawingsSyncer.instance.drawingLines[i].Count - 1;
-        PolylinePath currentLine = DrawingsSyncer.instance.drawingLines[i][j];
+        bool isVRPlayerPracticing = (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering");
 
-        if (currentLine.Count == 0 || Vector3.Distance(currentLine.LastPoint.point, pos) > 0.001f)
+        PolylinePath currentLine;
+        if (isVRPlayerPracticing)
+        {
+            int i = DrawingsSyncer.instance.practiceDrawingLines.Count - 1;
+            int j = DrawingsSyncer.instance.practiceDrawingLines[i].Count - 1;
+            currentLine = DrawingsSyncer.instance.practiceDrawingLines[i][j];
+        }
+        else
+        {
+            int i = DrawingsSyncer.instance.drawingLines.Count - 1;
+            int j = DrawingsSyncer.instance.drawingLines[i].Count - 1;
+            currentLine = DrawingsSyncer.instance.drawingLines[i][j];
+        }
+
+        if (currentLine.Count == 0 || Vector3.Distance(currentLine.LastPoint.point, pos) > NEW_POINT_DISTANCE_THRESHOLD)
         {
             LinePointModel newLinePoint = new LinePointModel();
             newLinePoint.position = pos;
-            int k = DrawingsSyncer.instance.Drawings.Count-1;
-            int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[k].penStrokes.Count-1;
-            DrawingsSyncer.instance.Drawings[k].penStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
+            int k = DrawingsSyncer.instance.Drawings.Count - 1;
+
+            if (isVRPlayerPracticing)
+            {
+                int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[k].practicePenStrokes.Count - 1;
+                DrawingsSyncer.instance.Drawings[k].practicePenStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
+            }
+            else
+            {
+                int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[k].penStrokes.Count - 1;
+                DrawingsSyncer.instance.Drawings[k].penStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
+            }
         }
     }
 
