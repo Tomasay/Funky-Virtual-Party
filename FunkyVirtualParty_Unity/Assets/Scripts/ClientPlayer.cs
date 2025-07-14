@@ -64,6 +64,8 @@ public class ClientPlayer : MonoBehaviour
 
     protected PlayerInput playerInput;
 
+    public Color outlineColor;
+
     public string PlayerSocketID { get => playerSocketID; set => playerSocketID = value; }
     public byte PlayerByteID { get => playerByteID; set => playerByteID = value; }
     public string PlayerIP { get => playerIP; set => playerIP = value; }
@@ -306,7 +308,8 @@ public class ClientPlayer : MonoBehaviour
 
         Color.RGBToHSV(col, out float H, out float S, out float V);
         smr.material.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
-        smr.material.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
+        outlineColor = Color.HSVToRGB(H, S, V - 0.75f);
+        smr.material.SetColor("_OutlineColor", outlineColor);
     }
 
     public int GetColorIndex()

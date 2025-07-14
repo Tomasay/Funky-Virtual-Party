@@ -65,7 +65,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     GameObject armature;
 
     [SerializeField]
-    Material clientMat, clientHighlightedMat;
+    Material clientMat;
 
     [SerializeField]
     GeminiFakeAnswersGenerator decoyAnswersGenerator;
@@ -98,7 +98,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private VRtistryVRPlayerController vrPlayer;
 
-    private float pointerPreviewDrawDistance; 
+    private float pointerPreviewDrawDistance;
+
+    List<Tween> clientPulsateTweens;
+
+    int[] numOfPointersOnClients; //How many pointers are currently on a client? Used to determine highlighting effects
 
     const string dontSayWarning = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
 
@@ -110,6 +114,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         playerNameIcons = new List<GameObject>();
         currentLeaderboardCards = new List<GameObject>();
+
+        clientPulsateTweens = new List<Tween>();
 
         headerText.text = "";
         playerResultsHeaderText.text = "";
@@ -147,6 +153,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     public void CreateClientPlayerButtons()
     {
+        numOfPointersOnClients = new int[ClientPlayer.clients.Count];
+
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
             //Create a new button object
@@ -178,8 +186,31 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 eventID = EventTriggerType.PointerExit
             };
 
-            entry.callback.AddListener(delegate { cp.smr.material = clientHighlightedMat; });
-            exit.callback.AddListener(delegate { cp.smr.material = clientMat; });
+            entry.callback.AddListener(delegate {
+                //Pause all tweens. Keep highlighted player outlined, and remove outline from all other clients
+                int highlightedClientIndex = ClientPlayer.clients.IndexOf(cp);
+                numOfPointersOnClients[highlightedClientIndex]++;
+
+                for (int i = 0; i < clientPulsateTweens.Count; i++)
+                {
+                    clientPulsateTweens[i].Pause();
+                    ClientPlayer.clients[i].smr.material.SetColor("_OutlineColor", ClientPlayer.clients[i].outlineColor);
+                }
+                cp.smr.material.SetColor("_OutlineColor", Color.white);
+            });
+            exit.callback.AddListener(delegate {
+                int highlightedClientIndex = ClientPlayer.clients.IndexOf(cp);
+                numOfPointersOnClients[highlightedClientIndex]--;
+
+                for (int i = 0; i < clientPulsateTweens.Count; i++)
+                {
+                    if (numOfPointersOnClients[i] <= 0)
+                    {
+                        ClientPlayer.clients[i].smr.material.SetColor("_OutlineColor", ClientPlayer.clients[i].outlineColor);
+                        clientPulsateTweens[i].Play();
+                    }
+                }
+            });
 
             eventTrigger.triggers.Add(entry);
             eventTrigger.triggers.Add(exit);
@@ -267,6 +298,16 @@ public class ThreeDPaintGameManager : MonoBehaviour
     float timeVRPosingStarted;
     private void Update()
     {
+        if (numOfPointersOnClients != null)
+        {
+            string s = "";
+            foreach (int i in numOfPointersOnClients)
+            {
+                s += i + ", ";
+            }
+            Debug.Log("numOfPointersOnClients: " + s);
+        }
+
         switch (VRtistrySyncer.instance.State)
         {
             case "clients answering":
@@ -581,6 +622,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
                     (cp as VRtistryClientPlayer).SetButtonInteractable(true);
+                    clientPulsateTweens.Add(cp.smr.material.DOColor(Color.white, "_OutlineColor", 1).SetLoops(9999, LoopType.Yoyo));
                 }
 
                 break;
@@ -945,6 +987,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
     public void GuessPlayerVR(int playerID)
     {
         VRtistrySyncer.instance.VRPlayerGuess = playerID;
+
+        //Reset all client mats and pulsate tweens
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
+        {
+            clientPulsateTweens[i].Kill();
+            ClientPlayer.clients[i].smr.material.SetColor("_OutlineColor", ClientPlayer.clients[i].outlineColor);
+        }
+        clientPulsateTweens = new List<Tween>();
+        numOfPointersOnClients = new int[ClientPlayer.clients.Count];
 
         /*
         if (playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner))
