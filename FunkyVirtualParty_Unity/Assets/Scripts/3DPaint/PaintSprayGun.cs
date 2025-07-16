@@ -4,6 +4,7 @@ using UnityEngine;
 using PaintIn3D;
 using UnityEngine.Events;
 using UnityEngine.Animations;
+using Normal.Realtime;
 
 #if !UNITY_WEBGL
 using FMODUnity;
@@ -39,6 +40,15 @@ public class PaintSprayGun : MonoBehaviour
     [SerializeField]
     ParentConstraint constraint;
 
+    [SerializeField]
+    Rigidbody rb;
+
+    [SerializeField]
+    RealtimeTransform realtimeTransform;
+
+    [SerializeField]
+    AudioSource sprayAudioSource;
+
     private bool canPaint = true;
 
     bool isInHand;
@@ -47,6 +57,9 @@ public class PaintSprayGun : MonoBehaviour
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
     public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { StopPainting(); } } }
+    public Rigidbody Rb { get => rb; }
+    public RealtimeTransform RealtimeTransform { get => realtimeTransform; }
+    public AudioSource SprayAudioSource { get => sprayAudioSource; }
 
     public UnityEvent OnSpray;
 

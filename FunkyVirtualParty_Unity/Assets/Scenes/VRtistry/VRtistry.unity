@@ -192,17 +192,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec299a8414adb43499867771c43b4e97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  parameters:
-    apiKey: 
-    apiKeyEncryption: 0
-    apiKeyRemoteConfigKey: gemini_api_key
-    apiKeyEncryptionPassword: 5958c2da-2310-4e5b-a43b-b7180a3a52ed
-    model: 0
-    temperature: 1
-    role: 
-    timeout: 0
-    throttle: 0
-    _serialized: 1
   artViewCameras:
   - {fileID: 1136848084}
   - {fileID: 1514810740}
@@ -5404,7 +5393,7 @@ MonoBehaviour:
   paintTexture: {fileID: 2013511371}
   pen: {fileID: 7458268345991492319}
   sprayGun: {fileID: 4590413093659771401}
-  paintPalette: {fileID: 2548461492699794797}
+  paintPalette: {fileID: 2548461492699794804}
   leaderboardParent: {fileID: 596728880}
   leaderboardPlayerCardPrefab: {fileID: 6238558976040201411, guid: 1b6521e42ad5bc84fa2b8619db4a1141, type: 3}
   playerNameIconPrefab: {fileID: 5338170772655075645, guid: 703cf2a0a7c27a84792d1c4e26234659, type: 3}
@@ -5415,7 +5404,6 @@ MonoBehaviour:
   tutorial: {fileID: 559476009}
   armature: {fileID: 749618738}
   clientMat: {fileID: 2100000, guid: 7e8947bdd23f6834bb85ae93e47ad469, type: 2}
-  clientHighlightedMat: {fileID: 2100000, guid: bbc79e4f9fd60214a9dd8cf4aab2c9de, type: 2}
   decoyAnswersGenerator: {fileID: 17381916}
   canvasGalleryTransform: {fileID: 1501612793}
   vrPlayerGallerySpawnPos: {fileID: 1164537294}
@@ -25786,17 +25774,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cc1554df25145d443a32794258d6956c, type: 3}
---- !u!1 &2548461492699794797 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 594011468458317952, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
-  m_PrefabInstance: {fileID: 3126534367314531821}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2548461492699794804 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5798207331972594948, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
   m_PrefabInstance: {fileID: 3126534367314531821}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2548461492699794797}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 33e0b7c1495db1743b6169cd1760b184, type: 3}
@@ -25893,6 +25876,30 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5559262786836256587, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5559262786836256587, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+      propertyPath: onRelease.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5559262786836256587, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5559262786836256587, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 3126534367314531822}
+    - target: {fileID: 5559262786836256587, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: set_isKinematic
+      objectReference: {fileID: 0}
+    - target: {fileID: 5559262786836256587, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+      propertyPath: onGrab.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UnityEngine.Rigidbody, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 5798207331972594948, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
       propertyPath: pen
       value: 
@@ -25915,6 +25922,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+--- !u!54 &3126534367314531822 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 3585005752254527412, guid: 897ee46fce9c16c4e8558af77fe36949, type: 3}
+  m_PrefabInstance: {fileID: 3126534367314531821}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4590413093659771400
 PrefabInstance:
   m_ObjectHideFlags: 0

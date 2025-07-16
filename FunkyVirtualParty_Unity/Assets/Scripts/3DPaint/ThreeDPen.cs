@@ -5,6 +5,7 @@ using Shapes;
 using Autohand;
 using UnityEngine.Events;
 using UnityEngine.Animations;
+using Normal.Realtime;
 
 #if !UNITY_WEBGL
 using FMODUnity;
@@ -43,6 +44,9 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     ThreeDPaintGameManager gm;
 #endif
 
+    [SerializeField]
+    RealtimeTransform realtimeTransform;
+
     bool isPainting;
 
     bool isInHand;
@@ -56,6 +60,9 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
     public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; if (HapticsManager.instance) { HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } } }
+
+    public Rigidbody Rb { get => rb; }
+    public RealtimeTransform RealtimeTransform { get => realtimeTransform;}
 
     public UnityEvent OnDraw;
 
@@ -296,14 +303,19 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 #endif
     }
 
+    bool firstTimeActive = true; //Used to ignore setting initial penEnabled value to true in VRtistrySyncer
     public void SetActive(bool active)
     {
 #if !UNITY_WEBGL
-        tipMeshSyncer.Enabled = active;
-        baseMeshSyncer.Enabled = active;
-        col.enabled = active;
-        tipCol.enabled = active;
-        this.active = active;
+        if (!firstTimeActive)
+        {
+            tipMeshSyncer.Enabled = active;
+            baseMeshSyncer.Enabled = active;
+            col.enabled = active;
+            tipCol.enabled = active;
+            this.active = active;
+        }
+        firstTimeActive = false;
 #endif
 #if UNITY_WEBGL
         this.active = active;

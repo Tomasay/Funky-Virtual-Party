@@ -5223,125 +5223,16 @@ MonoBehaviour:
   showEvents: 1
   onGrab:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3787740351373264215}
-        m_TargetAssemblyTypeName: Normal.Realtime.RealtimeComponent`1[[Normal.Realtime.RealtimeTransformModel,
-          Normcore
-        m_MethodName: RequestOwnership
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5967974369228407090}
-        m_TargetAssemblyTypeName: PaintSprayGun, Assembly-CSharp
-        m_MethodName: set_IsInHand
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 4590413094623354109}
-        m_TargetAssemblyTypeName: UnityEngine.Rigidbody, UnityEngine
-        m_MethodName: set_isKinematic
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onRelease:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5967974369228407090}
-        m_TargetAssemblyTypeName: PaintSprayGun, Assembly-CSharp
-        m_MethodName: set_IsInHand
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 4590413094623354109}
-        m_TargetAssemblyTypeName: UnityEngine.Rigidbody, UnityEngine
-        m_MethodName: set_isKinematic
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   onSqueeze:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5967974369228407090}
-        m_TargetAssemblyTypeName: PaintSprayGun, Assembly-CSharp
-        m_MethodName: OnSqueeze
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 4590413093245808668}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: Play
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onUnsqueeze:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5967974369228407090}
-        m_TargetAssemblyTypeName: PaintSprayGun, Assembly-CSharp
-        m_MethodName: OnUnsqueeze
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 4590413093245808668}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: Stop
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   onHighlight:
     m_PersistentCalls:
       m_Calls: []
@@ -6232,6 +6123,9 @@ MonoBehaviour:
   palette: {fileID: 0}
   col: {fileID: 4590413094623354108}
   constraint: {fileID: 6361721950504437107}
+  rb: {fileID: 4590413094623354109}
+  realtimeTransform: {fileID: 3787740351373264215}
+  sprayAudioSource: {fileID: 4590413093245808668}
   active: 0
   OnSpray:
     m_PersistentCalls:

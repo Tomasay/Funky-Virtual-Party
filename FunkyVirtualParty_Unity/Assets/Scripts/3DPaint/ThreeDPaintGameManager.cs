@@ -39,7 +39,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     PaintSprayGun sprayGun;
 
     [SerializeField]
-    GameObject paintPalette;
+    PaintPalette paintPalette;
 
     [SerializeField]
     GameObject leaderboardParent, leaderboardPlayerCardPrefab;
@@ -108,6 +108,54 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     private void Awake()
     {
+#if !UNITY_WEBGL
+        //Tool callbacks
+        //Pen
+        Grabbable g = pen.gameObject.GetComponent<Grabbable>();
+        g.onGrab.AddListener(delegate {
+            pen.RealtimeTransform.RequestOwnership();
+            pen.Rb.isKinematic = false;
+            pen.IsInHand = true;
+        });
+        g.onRelease.AddListener(delegate {
+            pen.Rb.isKinematic = true;
+            pen.IsInHand = false;
+        });
+        g.onSqueeze.AddListener(pen.OnTriggerPressed);
+        g.onUnsqueeze.AddListener(pen.OnTriggerReleased);
+
+        //Spray gun
+        g = sprayGun.gameObject.GetComponent<Grabbable>();
+        g.onGrab.AddListener(delegate {
+            sprayGun.RealtimeTransform.RequestOwnership();
+            sprayGun.Rb.isKinematic = false;
+            sprayGun.IsInHand = true;
+        });
+        g.onRelease.AddListener(delegate {
+            sprayGun.Rb.isKinematic = true;
+            sprayGun.IsInHand = false;
+        });
+        g.onSqueeze.AddListener(delegate {
+            sprayGun.OnSqueeze();
+            sprayGun.SprayAudioSource.Play();
+        });
+        g.onUnsqueeze.AddListener(delegate {
+            sprayGun.OnUnsqueeze();
+            sprayGun.SprayAudioSource.Stop();
+        });
+
+        //Paint palette
+        g = paintPalette.gameObject.GetComponent<Grabbable>();
+        g.onGrab.AddListener(delegate {
+            paintPalette.RealtimeTransform.RequestOwnership();
+            paintPalette.Rb.isKinematic = false;
+        });
+        g.onRelease.AddListener(delegate {
+            paintPalette.Rb.isKinematic = true;
+        });
+#endif
+
+
         playerPoints = new Dictionary<int, int>();
 
         answerResults = new List<AnswerOptionButton>();
@@ -285,7 +333,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
         else
         {
-            paintPalette.GetComponent<PaintPalette>().SetActive(visible);
+            paintPalette.gameObject.GetComponent<PaintPalette>().SetActive(visible);
         }
     }
 
@@ -305,7 +353,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
             {
                 s += i + ", ";
             }
-            Debug.Log("numOfPointersOnClients: " + s);
         }
 
         switch (VRtistrySyncer.instance.State)
@@ -1210,7 +1257,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         pen.GetComponent<Grabbable>().handType = toolHand;
         sprayGun.GetComponent<Grabbable>().handType = toolHand;
-        paintPalette.GetComponent<Grabbable>().handType = (toolHand == HandType.left) ? HandType.right : HandType.left;
+        paintPalette.gameObject.GetComponent<Grabbable>().handType = (toolHand == HandType.left) ? HandType.right : HandType.left;
 
         needToGrabPalette = true;
         GrabTool(!VRtistrySyncer.instance.IsPenEnabled);
@@ -1226,13 +1273,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         bool isPaletteHandLeft = !(toolHand == HandType.left);
 
-        PaintPalette pp = paintPalette.GetComponent<PaintPalette>();
-        if(pp.currentMeshLeft != isPaletteHandLeft)
+        if(paintPalette.currentMeshLeft != isPaletteHandLeft)
         {
             VRtistrySyncer.instance.IsPaletteMirrored = !VRtistrySyncer.instance.IsPaletteMirrored;
         }
 
-        ParentConstraint pc = paintPalette.GetComponent<ParentConstraint>();
+        ParentConstraint pc = paintPalette.gameObject.GetComponent<ParentConstraint>();
 
         pc.RemoveSource(0);
         ConstraintSource src = new ConstraintSource();
@@ -1260,7 +1306,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             pen.GetComponent<Collider>().enabled = false;
         }
 
-        paintPalette.GetComponent<MeshCollider>().enabled = true;
+        paintPalette.gameObject.GetComponent<MeshCollider>().enabled = true;
 
         //Grab palette
         if (isPaletteHandLeft)
@@ -1272,7 +1318,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             vrPlayer.rightHand.Grab(GrabType.InstantGrab);
         }
 
-        paintPalette.GetComponent<ParentConstraint>().constraintActive = false;
+        paintPalette.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
 
         needToGrabPalette = false;
     }
@@ -1292,9 +1338,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         VRtistrySyncer.instance.IsPaletteEnabled = false;
 
-        paintPalette.GetComponent<MeshCollider>().enabled = false;
+        paintPalette.gameObject.GetComponent<MeshCollider>().enabled = false;
 
-        ParentConstraint pc = paintPalette.GetComponent<ParentConstraint>();
+        ParentConstraint pc = paintPalette.gameObject.GetComponent<ParentConstraint>();
 
         pc.RemoveSource(0);
         ConstraintSource src = new ConstraintSource();

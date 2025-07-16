@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Animations;
+using Normal.Realtime;
 
 public class PaintPalette : MonoBehaviour
 {
@@ -21,10 +22,19 @@ public class PaintPalette : MonoBehaviour
     [SerializeField]
     ParentConstraint constraint;
 
+    [SerializeField]
+    Rigidbody rb;
+
+    [SerializeField]
+    RealtimeTransform realtimeTransform;
+
     MeshFilter mf;
     MeshCollider mc;
 
     public UnityEvent OnColorChanged;
+
+    public Rigidbody Rb { get => rb; }
+    public RealtimeTransform RealtimeTransform { get => realtimeTransform; }
 
 #if !UNITY_WEBGL
     Color colorToSet;
