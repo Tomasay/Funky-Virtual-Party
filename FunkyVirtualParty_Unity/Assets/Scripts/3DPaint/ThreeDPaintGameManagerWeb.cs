@@ -68,13 +68,13 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     Quaternion drawingModelStartingRot;
 
     [SerializeField]
-    Camera drawingPhaseCamera, guessingPhaseCamera;
+    Camera drawingPhaseCamera, guessingPhaseCamera, galleryCamera;
 
     [SerializeField]
     MannequinSolverClient mannequinSolver;
 
     [SerializeField]
-    GameObject leaderboardPlayerCardPrefab, leaderboardParent;
+    GameObject leaderboardPlayerCardPrefab, leaderboardParent, galleryLeaderboardParent;
     List<GameObject> currentLeaderboardCards;
 
     [SerializeField]
@@ -189,6 +189,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             inputTimerText.enabled = false;
             blurTimerText.enabled = false;
             blurHeaderText.text = "Waiting for VR player to complete tutorial...";
+        }
+        else if(answersSeparated.Length != ClientPlayer.clients.Count)
+        {
+            blurHeaderText.text = "Waiting for all players to submit their answer...";
         }
     }
 
@@ -400,6 +404,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 guessingPhaseCamera.gameObject.SetActive(false);
 
                 blurHeaderText.text = "";
+                guessingHeaderText.text = "";
 
                 //Create duplicate list of answers, sorted by amount of players chose that answer
                 List<AnswerOptionButton> answerResultsSorted = answerResults.OrderBy(o => o.GetNumberOfPlayers()).ToList();
@@ -450,6 +455,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 */
 
                 StartCoroutine("DisplayLeaderboard");
+                break;
+            case "gallery":
+                StartCoroutine("DisplayLeaderboard");
+
+                drawingPhaseCamera.gameObject.SetActive(false);
+                guessingPhaseCamera.gameObject.SetActive(false);
+                galleryCamera.gameObject.SetActive(true);
+
                 break;
             case "game over":
                 break;
@@ -557,7 +570,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         answerInputField.DeactivateInputField();
 
         inputCanvas.enabled = false;
-        blurHeaderText.text = "Waiting for all players to submit their answer...";
         playerInputParent.SetActive(false);
     }
 
@@ -665,7 +677,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         }
         currentLeaderboardCards = new List<GameObject>();
 
-        leaderboardCanvas.enabled = true;
+        leaderboardCanvas.enabled = VRtistrySyncer.instance.State.Equals("leaderboard");
 
         //Sort player points
         IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
@@ -674,7 +686,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         //Add player cards
         foreach (KeyValuePair<int, int> entry in sortedDict)
         {
-            GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
+            GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, (VRtistrySyncer.instance.State.Equals("gallery")) ? galleryLeaderboardParent.transform : leaderboardParent.transform);
             newCard.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Color;
             newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Name;
             //newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
@@ -694,7 +706,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         }
 
         //Add VR Card
-        GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
+        GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, (VRtistrySyncer.instance.State.Equals("gallery")) ? galleryLeaderboardParent.transform : leaderboardParent.transform);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         //vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
