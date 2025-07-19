@@ -20,8 +20,11 @@ public class FaceCamera : MonoBehaviour
     {
         var t = transformIsRect ? GetComponent<RectTransform>() : transform;
 
-        t.LookAt(cameraToLookAt.transform);
-        t.rotation = Quaternion.LookRotation(cameraToLookAt.transform.forward);
+        if (cameraToLookAt)
+        {
+            t.LookAt(cameraToLookAt.transform);
+            t.rotation = Quaternion.LookRotation(cameraToLookAt.transform.forward);
+        }
     }
 
     [Button]

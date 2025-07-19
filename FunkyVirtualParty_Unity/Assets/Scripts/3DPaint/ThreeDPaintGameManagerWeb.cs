@@ -33,6 +33,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     TMP_Text blurTimerText, inputTimerText;
 
     [SerializeField]
+    Image blurImage;
+
+    [SerializeField]
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
@@ -118,6 +121,17 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         LeanTouch.OnFingerDown += LeanTouch_OnFingerDown;
 
         Draw.Position = linesParent.transform.position;
+
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
+    }
+
+    void OnLocalPlayerSpawned()
+    {
+        VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
+        if (vcp && vcp.usingPhone == 0)
+        {
+            vcp.TogglePhone();
+        }
     }
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
@@ -235,10 +249,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Enable phone anim for local player, which will then be synced for everyone else
                 VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
-                if (vcp.usingPhone == 0)
+                //There is a change that this code runs before client has spawned in, so have to check if vcp is null
+                //There is also a check on player spawn to enable the client's phone animation when starting the game
+                if (vcp && vcp.usingPhone == 0)
                 {
                     vcp.TogglePhone();
                 }
+
+                blurImage.enabled = true;
                 break;
             case "vr posing":
                 //Show blurred view
@@ -279,6 +297,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 tapAndHoldRotateTutorial.SetActive(!tapAndHoldRotateLearned);
 
                 guessingCanvas.enabled = true;
+
+                blurImage.enabled = false;
 
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);
@@ -457,6 +477,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 StartCoroutine("DisplayLeaderboard");
                 break;
             case "gallery":
+                DrawingsSyncer.instance.SetDrawingGalleryPositions();
+
                 StartCoroutine("DisplayLeaderboard");
 
                 drawingPhaseCamera.gameObject.SetActive(false);
