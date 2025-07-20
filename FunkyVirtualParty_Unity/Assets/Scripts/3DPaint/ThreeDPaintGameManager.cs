@@ -890,6 +890,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
         currentLeaderboardCards = new List<GameObject>();
 
+        //Need to wait a frame to allow card objects to be destroyed so sibling index parameter works
+        yield return new WaitForEndOfFrame();
+
         //Show leaderboard
         headerText.text = "";
         playerResultsHeaderText.text = "";
