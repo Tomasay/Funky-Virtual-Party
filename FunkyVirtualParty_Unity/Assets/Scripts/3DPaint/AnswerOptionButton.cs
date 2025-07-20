@@ -187,7 +187,7 @@ public class AnswerOptionButton : MonoBehaviour
             {
                 SetImageAlpha(playerIcons[i].GetComponentsInChildren<Image>()[0], 0);
                 SetImageAlpha(playerIcons[i].GetComponentsInChildren<Image>()[1], 0);
-                playerIcons[i].GetComponentInChildren<TMP_Text>().text = "500";
+                playerIcons[i].GetComponentInChildren<TMP_Text>().text = "" + ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
                 playerIcons[i].GetComponentInChildren<TMP_Text>().color = Color.green;
                 playerIcons[i].GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Bold;
 
