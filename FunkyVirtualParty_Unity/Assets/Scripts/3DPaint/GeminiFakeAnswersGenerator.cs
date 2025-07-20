@@ -15,6 +15,8 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
     public RenderTexture[] artViewRTs;
     private Texture2D[] artTextures; // Generated textures from cam views
 
+    public bool disableFakeAnswers = false;
+
 #if !UNITY_WEBGL
     private void Awake()
     {
@@ -26,6 +28,9 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
 
     public async void GenerateFakeAnswers(string question, string chosenAnswer, int numOfAnswersToGenerate, System.Action<string> onRequestCompleteCallback)
     {
+        if (disableFakeAnswers)
+            return;
+
         try
         {
             string testPrompt1 = "You are playing a game of VRtistry, a minigame similar to Pictionary. " +
