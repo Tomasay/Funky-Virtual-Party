@@ -39,6 +39,9 @@ public partial class ClientSyncModel
 
     [RealtimeProperty(11, true, true)]
     private int _isDancing; //Stores last dance anim. -1 if not dancing
+
+    [RealtimeProperty(12, true, true)]
+    private int _score; //Generic score property to be used in any game
 }
 
 

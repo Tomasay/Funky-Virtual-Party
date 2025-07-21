@@ -88,8 +88,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
     EventInstance fmodInstance;
 #endif
 
-    Dictionary<int, int> playerPoints;
-
     int currentRound = 1;
 
     HandType toolHand = HandType.right;
@@ -155,9 +153,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
         });
 #endif
 
-
-        playerPoints = new Dictionary<int, int>();
-
         answerResults = new List<AnswerOptionButton>();
 
         playerNameIcons = new List<GameObject>();
@@ -171,11 +166,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
         headerText.enabled = false;
 
         finishedPaintingEarlyButton.gameObject.SetActive(false);
-
-        foreach (ClientPlayer cp in ClientPlayer.clients)
-        {
-            playerPoints.Add(cp.realtimeView.ownerIDSelf, 0);
-        }
 
         Invoke("CreateClientPlayerButtons", 1);
 
@@ -634,11 +624,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             //AddPlayerToResults(j, true);
 
                             VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); vcp.smr.material = clientMat; });
+                            vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
 
                             VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
-
-                            playerPoints[i] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
                         }
                     }
                     else
@@ -648,7 +636,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             //AddPlayerToResults(j, false);
 
                             VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { GuessPlayerVR(j); vcp.smr.material = clientMat; });
+                            vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
                         }
                     }
                 }
@@ -669,7 +657,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
                     (cp as VRtistryClientPlayer).SetButtonInteractable(true);
-                    clientPulsateTweens.Add(cp.smr.material.DOColor(Color.white, "_OutlineColor", 1).SetLoops(9999, LoopType.Yoyo));
+                    clientPulsateTweens.Add(cp.smr.material.DOColor(Color.gray, "_OutlineColor", 1).SetLoops(9999, LoopType.Yoyo));
                 }
 
                 break;
@@ -901,7 +889,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
         //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowLeaderboard", "");
 
         //Sort player points
-        IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
+        Dictionary<int, int> unsortedDict = new Dictionary<int, int>();
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            unsortedDict.Add(cp.realtimeView.ownerIDSelf, cp.syncer.Score);
+        }
+
+        IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in unsortedDict orderby entry.Value descending select entry;
 
         int vrPlayerPos = 0;
         //Add player cards
@@ -1009,7 +1003,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         GameObject pi = Instantiate(playerNameIconPrefab, playerNamesIconParent.transform);
         pi.GetComponentInChildren<TMP_Text>(true).text = ClientPlayer.GetClientByCurrentOwnerID(playerID).syncer.Name;
-        pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { GuessPlayerVR(playerID); });
+        pi.GetComponentInChildren<Button>(true).onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(playerID)); });
         pi.GetComponentInChildren<Button>(true).interactable = false;
         //pi.GetComponent<Image>().color = correct ? Color.green : Color.red;
         pi.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(playerID).syncer.Color;
@@ -1034,7 +1028,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     /// <summary>
     /// Method called when VR player guesses which player wrote the selected prompt
     /// </summary>
-    public void GuessPlayerVR(int playerID)
+    IEnumerator GuessPlayerVR(int playerID)
     {
         VRtistrySyncer.instance.VRPlayerGuess = playerID;
 
@@ -1047,7 +1041,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
         clientPulsateTweens = new List<Tween>();
         numOfPointersOnClients = new int[ClientPlayer.clients.Count];
 
-        /*
         if (playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner))
         {
             VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_PLAYER;
@@ -1057,9 +1050,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
         {
             headerText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote the answer";
         }
-        */
-
-        headerText.text = "Waiting for clients to submit guesses";
 
         //Remove client buttons
         foreach (ClientPlayer cp in ClientPlayer.clients)
@@ -1069,17 +1059,24 @@ public class ThreeDPaintGameManager : MonoBehaviour
             vcp.playerButton.onClick.RemoveAllListeners();
         }
 
-        //If all clients have also guessed, move to results phase
-        if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        yield return new WaitForSeconds(3);
+
+        if (!VRtistrySyncer.instance.State.Equals("results"))
         {
-            VRtistrySyncer.instance.State = "results";
+            headerText.text = "Waiting for clients to submit guesses";
+
+            //If all clients have also guessed, move to results phase
+            if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+            {
+                VRtistrySyncer.instance.State = "results";
+            }
         }
     }
 
     [Button]
     public void GuessFirstPlayer()
     {
-        GuessPlayerVR(0);
+        StartCoroutine(GuessPlayerVR(1));
     }
 
     void GrabTool(bool isSprayGun)

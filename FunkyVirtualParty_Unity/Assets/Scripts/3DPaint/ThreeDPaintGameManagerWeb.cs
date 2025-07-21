@@ -93,14 +93,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     List<AnswerOptionButton> answerButtons, answerResults;
 
-    Dictionary<int, int> playerPoints;
-
-    string answerOwnerIDPlayerIsGuessing;
+    int answerOwnerIDPlayerIsGuessing;
 
     private void Awake()
     {
-        playerPoints = new Dictionary<int, int>();
-
         currentLeaderboardCards = new List<GameObject>();
         answerButtons = new List<AnswerOptionButton>();
         answerResults = new List<AnswerOptionButton>();
@@ -109,11 +105,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         answerInputButton.onPointerDown.AddListener(ButtonPointerDown);
         answerInputButton.onPointerUp.AddListener(ButtonPointerUp);
-
-        foreach (ClientPlayer cp in ClientPlayer.clients)
-        {
-            playerPoints.Add(cp.realtimeView.ownerIDSelf, 0);
-        }
 
         inputCanvas.enabled = true;
         guessingCanvas.enabled = false;
@@ -357,7 +348,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                         if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
                         {
                             guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                            answerOwnerIDPlayerIsGuessing = ownerAndAnswer[0];
+                            answerOwnerIDPlayerIsGuessing = ownerID;
                             break;
                         }
                     }
@@ -372,7 +363,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                         if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID == VRtistrySyncer.instance.ChosenAnswerOwner)
                         {
                             guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                            answerOwnerIDPlayerIsGuessing = ownerAndAnswer[0];
+                            answerOwnerIDPlayerIsGuessing = ownerID;
                             break;
                         }
                     }
@@ -386,7 +377,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                     if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID  != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
                     {
                         GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                        ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                        ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerID)); });
                         AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                         aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
                         aob.playerID = ownerAndAnswer[0];
@@ -411,15 +402,12 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                         {
                             AddPlayerToResults(i, ownerAndGuess[1]);
                         }
-
-                        if (int.TryParse(ownerAndGuess[1], out int j) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
-                        {
-                            playerPoints[j] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
-                        }
                     }
                 }
                 break;
             case "results":
+                guessingCanvas.enabled = false;
+
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
 
@@ -606,13 +594,36 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             VRtistrySyncer.instance.ArtGuesses += "\n" + clientID + ":" + clientGuessID;
         }
 
+        if (int.TryParse(clientGuessID, out int j) && j == VRtistrySyncer.instance.ChosenAnswerOwner)
+        {
+            RealtimeSingletonWeb.instance.LocalPlayer.syncer.Score += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
+        }
+
         guessingHeaderText.text = "Waiting for other players to answer";
 
         ClearPlayerAnswers();
     }
 
-    void SubmitPlayerGuess(int clientID, string clientGuessID)
+    IEnumerator SubmitPlayerGuess(int clientID, int clientGuessID)
     {
+        //Tell user if they were right/wrong
+        if (clientGuessID == answerOwnerIDPlayerIsGuessing)
+        {
+            RealtimeSingletonWeb.instance.LocalPlayer.syncer.Score += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_PLAYER;
+            guessingHeaderText.text = "Correct!";
+        }
+        else
+        {
+            guessingHeaderText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote \n" + GetAnswerByOwnerID(answerOwnerIDPlayerIsGuessing);
+        }
+
+        ClearPlayerAnswers();
+
+        yield return new WaitForSeconds(3);
+
+        guessingHeaderText.text = "Waiting for other players to answer";
+
+        //Sync their answer once they have had 3 seconds to see if they were right
         if (VRtistrySyncer.instance.PlayerGuesses.Equals(""))
         {
             VRtistrySyncer.instance.PlayerGuesses = clientID + ":" + clientGuessID;
@@ -621,13 +632,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         {
             VRtistrySyncer.instance.PlayerGuesses += "\n" + clientID + ":" + clientGuessID;
         }
-
-        if (clientGuessID.Equals(answerOwnerIDPlayerIsGuessing))
-        {
-            playerPoints[RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf] += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_PLAYER;
-        }
-
-        guessingCanvas.enabled = false;
 
         (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
     }
@@ -705,7 +709,13 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         leaderboardCanvas.enabled = VRtistrySyncer.instance.State.Equals("leaderboard");
 
         //Sort player points
-        IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in playerPoints orderby entry.Value descending select entry;
+        Dictionary<int, int> unsortedDict = new Dictionary<int, int>();
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            unsortedDict.Add(cp.realtimeView.ownerIDSelf, cp.syncer.Score);
+        }
+
+        IOrderedEnumerable<KeyValuePair<int, int>> sortedDict = from entry in unsortedDict orderby entry.Value descending select entry;
 
         int vrPlayerPos = 0;
         //Add player cards
