@@ -22,8 +22,7 @@ public class FaceCamera : MonoBehaviour
 
         if (cameraToLookAt)
         {
-            t.LookAt(cameraToLookAt.transform);
-            t.rotation = Quaternion.LookRotation(cameraToLookAt.transform.forward);
+            t.LookAt(2 * transform.position - cameraToLookAt.transform.position);
         }
     }
 
@@ -33,7 +32,6 @@ public class FaceCamera : MonoBehaviour
         cameraToLookAt = Camera.main;
         var t = transformIsRect ? GetComponent<RectTransform>() : transform;
 
-        t.LookAt(cameraToLookAt.transform);
-        t.rotation = Quaternion.LookRotation(cameraToLookAt.transform.forward);
+        t.LookAt(2 * transform.position - cameraToLookAt.transform.position);
     }
 }
