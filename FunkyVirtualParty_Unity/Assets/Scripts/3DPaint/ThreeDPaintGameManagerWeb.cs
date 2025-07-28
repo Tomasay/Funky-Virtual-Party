@@ -121,6 +121,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
         if (vcp && vcp.usingPhone == 0)
         {
+            vcp.SetSitAnim();
             vcp.TogglePhone();
         }
     }
@@ -250,6 +251,9 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 blurImage.enabled = true;
                 break;
             case "vr posing":
+                inputTimerText.enabled = false;
+                blurTimerText.enabled = false;
+
                 //Show blurred view
                 inputCanvas.enabled = false;
 

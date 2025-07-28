@@ -26,8 +26,6 @@ public class VRtistryClientPlayer : ClientPlayer
         }
 
         SetSpawnRotation();
-        Invoke("SetSitAnim", 1);
-        Invoke("TogglePhone", 1);
         Invoke("SetupTextBubbleTransforms", 3);
     }
 
@@ -118,7 +116,7 @@ public class VRtistryClientPlayer : ClientPlayer
         }
     }
 
-    void SetSitAnim()
+    public void SetSitAnim()
     {
         animSyncer.Trigger = "Sit1";
     }

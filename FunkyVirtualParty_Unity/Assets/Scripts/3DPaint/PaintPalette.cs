@@ -29,7 +29,10 @@ public class PaintPalette : MonoBehaviour
     RealtimeTransform realtimeTransform;
 
     MeshFilter mf;
+
+#if !UNITY_WEBGL //No collider necessary on web
     MeshCollider mc;
+#endif
 
     public UnityEvent OnColorChanged;
 
@@ -60,7 +63,10 @@ public class PaintPalette : MonoBehaviour
         }
 
         mf = GetComponent<MeshFilter>();
+
+#if !UNITY_WEBGL //No collider necessary on web
         mc = GetComponent<MeshCollider>();
+#endif
     }
 
     private void OnDestroy()
@@ -114,7 +120,10 @@ public class PaintPalette : MonoBehaviour
         currentMeshLeft = !currentMeshLeft;
 
         mf.sharedMesh = currentMeshLeft ? leftHandMesh : rightHandMesh;
+
+#if !UNITY_WEBGL //No collider necessary on web
         mc.sharedMesh = currentMeshLeft ? leftHandMesh : rightHandMesh;
+#endif
 
         foreach (MeshRenderer mr in colorMeshes)
         {
