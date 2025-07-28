@@ -40,6 +40,7 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
             "You are looking at the front, back, left, and right views of the VR player's creation of that answer in that order. " +
             "In order to make the game more interesting, I need you to come up with " + numOfAnswersToGenerate + " " +
             "guesses of what you think it is based on the images. Your answers should be distinct from one another. " +
+            "No two answers should contain the same word. " +
             "Your answers should be one or two words max. Make sure your answers are not too similar to the chosen answer. " +
             "Please give me the answers only, each separated by a comma. " +
             "You may include spaces in the answers, but make sure there are no spaces in between different answers, only commas." +

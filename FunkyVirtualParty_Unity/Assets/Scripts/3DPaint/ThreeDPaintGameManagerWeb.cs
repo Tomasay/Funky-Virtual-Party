@@ -241,7 +241,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Enable phone anim for local player, which will then be synced for everyone else
                 VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
-                //There is a change that this code runs before client has spawned in, so have to check if vcp is null
+                //There is a chance that this code runs before client has spawned in, so have to check if vcp is null
                 //There is also a check on player spawn to enable the client's phone animation when starting the game
                 if (vcp && vcp.usingPhone == 0)
                 {
