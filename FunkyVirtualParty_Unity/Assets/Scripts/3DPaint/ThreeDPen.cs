@@ -173,6 +173,14 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     public override void DrawShapes(Camera cam)
     {
+#if UNITY_WEBGL
+        int myLayer = LayerMask.NameToLayer("Blur");
+        if (!((cam.cullingMask & 1 << myLayer) != 0))
+        {
+            return;
+        }
+#endif
+
         using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
         {
             bool isVRPlayerPracticing = (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering");

@@ -71,7 +71,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     Quaternion drawingModelStartingRot;
 
     [SerializeField]
-    Camera drawingPhaseCamera, guessingPhaseCamera, galleryCamera;
+    Camera drawingPhaseCamera, guessingPhaseCamera, galleryCamera, blurCamera;
 
     [SerializeField]
     MannequinSolverClient mannequinSolver;
@@ -95,11 +95,16 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     int answerOwnerIDPlayerIsGuessing;
 
+    RenderTexture blurRT;
+
     private void Awake()
     {
         currentLeaderboardCards = new List<GameObject>();
         answerButtons = new List<AnswerOptionButton>();
         answerResults = new List<AnswerOptionButton>();
+
+        blurRT = new RenderTexture(Screen.width, Screen.height, 0);
+        blurCamera.targetTexture = blurRT;
 
         drawingModelStartingRot = drawingModel.transform.rotation;
 
