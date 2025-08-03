@@ -21,6 +21,7 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
     bool firstTimeMainMenu = true;
 
     public string CurrentScene { get => model.currentScene; set => model.currentScene = value; }
+    public SceneChangerSyncModel Model { get => model; }
 
     private void Awake()
     {
@@ -78,6 +79,8 @@ public class SceneChangerSyncer : RealtimeComponent<SceneChangerSyncModel>
     void OnSceneChange(SceneChangerSyncModel previousModel, string val)
     {
 #if UNITY_WEBGL
+        if (!RealtimeSingletonWeb.instance.safeToJoinMinigames) return;
+
         val += "Client";
 
         if (SceneUtility.GetBuildIndexByScenePath(val) != -1)

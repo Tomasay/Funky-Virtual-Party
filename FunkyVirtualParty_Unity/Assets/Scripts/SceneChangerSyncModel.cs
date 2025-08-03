@@ -10,5 +10,3 @@ public partial class SceneChangerSyncModel
     [RealtimeProperty(1, true, true)]
     private string _currentScene;
 }
-
-

@@ -69,6 +69,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
     public CustomAvatars.RealtimeAvatar VRAvatar { get => realtimeAvatarManager.avatars[0]; }
     public bool isVRAvatarSpawned { get => realtimeAvatarManager.avatars.Count > 0; }
 
+    public bool safeToJoinMinigames = false;
+
 #if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void ReloadPage();
@@ -111,7 +113,16 @@ public class RealtimeSingletonWeb : MonoBehaviour
         if(!avatar.isOwnedRemotelyInHierarchy) //Check to make sure avatar isn't just being destroyed to switch scenes
         {
 #if UNITY_WEBGL
-            ReloadPage();
+            if (!disconnectingDueToNoHost && !disconnectingMaxPlayers && !disconnectingMinigameInProgress)
+            {
+#if !UNITY_EDITOR
+                //ReloadPage();
+#endif
+            }
+            else
+            {
+                disconnectingDueToNoHost = disconnectingMaxPlayers = disconnectingMinigameInProgress = false;
+            }
 #endif
         }
     }
@@ -168,7 +179,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
     void CheckProperConnection()
     {
         //Disconnect circumstances
-        Debug.Log("Avatars: " + realtimeAvatarManager.avatars.Count);
         if (!(realtimeAvatarManager.avatars.Count > 0))
         {
             disconnectingDueToNoHost = true;
@@ -192,6 +202,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
 
         //If all good, connect and spawn player
+        safeToJoinMinigames = true;
+
         SetJoinedUI(true);
 
 #if !UNITY_EDITOR && UNITY_WEBGL
@@ -251,8 +263,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
             joinRoomCanvas.enabled = true;
             partyCodeInvalid.gameObject.SetActive(true);
             CheckValidPartyCode(partyCodeInput.text);
-
-            disconnectingDueToNoHost = false;
         }
 
         if(disconnectingMaxPlayers)
@@ -262,8 +272,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
             joinRoomCanvas.enabled = true;
             maxPlayersReached.gameObject.SetActive(true);
             CheckValidPartyCode(partyCodeInput.text);
-
-            disconnectingMaxPlayers = false;
         }
 
         if (disconnectingMinigameInProgress)
@@ -273,8 +281,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
             joinRoomCanvas.enabled = true;
             minigameInProgress.gameObject.SetActive(true);
             CheckValidPartyCode(partyCodeInput.text);
-
-            disconnectingMinigameInProgress = false;
         }
 
     }
