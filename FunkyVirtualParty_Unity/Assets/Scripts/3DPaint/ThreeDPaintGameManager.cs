@@ -288,6 +288,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.AddListener(OnStartPoint);
         vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.AddListener(OnStopPoint);
 
+        vrPlayer.SetCanvas(uiCanvas.gameObject);
+
         pointerPreviewDrawDistance = vrPlayer.UIPointerPreview.rayDrawDistance;
     }
 
@@ -446,6 +448,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     public void OnTutorialCompleted()
     {
+        vrPlayer.UIWarningArrow.SetActive(false);
         VRtistrySyncer.instance.VRCompletedTutorial = true;
 
         if (!VRtistrySyncer.instance.Answers.Equals(""))
@@ -522,6 +525,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         switch (state)
         {
             case "clients answering":
+                if(VRtistrySyncer.instance.VRCompletedTutorial) vrPlayer.UIWarningArrow.SetActive(false);
+
                 //Instantiate new drawing
                 DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
 
@@ -548,6 +553,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 fmodInstance.setParameterByName("VRtistryPhase", 1);
 #endif
 
+                vrPlayer.UIWarningArrow.SetActive(true);
+
                 solver.EnablePosing();
 
                 //Disable VR tools
@@ -569,6 +576,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 break;
             case "vr painting":
+                vrPlayer.UIWarningArrow.SetActive(false);
+
                 //Enable VR tools
                 pen.CanPaint = true;
                 sprayGun.CanPaint = true;
@@ -613,6 +622,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
                 break;
             case "vr guessing":
+                vrPlayer.UIWarningArrow.SetActive(true);
+
                 //Show guesses
                 string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 foreach (string g in guessesSeparated)
@@ -664,6 +675,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 break;
             case "results":
+                vrPlayer.UIWarningArrow.SetActive(false);
+
                 headerText.text = "Displaying results";
 
                 vrPlayer.UIPointerPreview.rayDrawDistance = 0;
@@ -766,6 +779,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 break;
             case "gallery":
+                vrPlayer.UIWarningArrow.SetActive(false);
+
                 //Move canvas to gallery
                 RectTransform rt = (uiCanvas.transform as RectTransform);
                 rt.position = canvasGalleryTransform.position;
