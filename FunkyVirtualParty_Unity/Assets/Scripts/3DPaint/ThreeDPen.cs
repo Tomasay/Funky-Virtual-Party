@@ -16,9 +16,6 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     Color currentColor = Color.black;
 
     [SerializeField]
-    Transform linesParent;
-
-    [SerializeField]
     Transform tip;
 
     [SerializeField]
@@ -28,10 +25,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     MeshSyncer tipMeshSyncer, baseMeshSyncer;
 
     [SerializeField]
-    ParentConstraint constraint;
-
-    [SerializeField]
-    PaintPalette palette;
+    public ParentConstraint constraint;
 
     [SerializeField]
     Collider col, tipCol;
@@ -39,13 +33,15 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     [SerializeField]
     Rigidbody rb;
 
-#if !UNITY_WEBGL
-    [SerializeField]
-    ThreeDPaintGameManager gm;
-#endif
-
     [SerializeField]
     RealtimeTransform realtimeTransform;
+
+#if !UNITY_WEBGL
+    [HideInInspector]
+    public ThreeDPaintGameManager gm;
+#endif
+
+    Transform linesParent;
 
     bool isPainting;
 
@@ -63,6 +59,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     public Rigidbody Rb { get => rb; }
     public RealtimeTransform RealtimeTransform { get => realtimeTransform;}
+    public Transform LinesParent { get => linesParent; set { linesParent = value; Draw.Position = linesParent.position; } }
 
     public UnityEvent OnDraw;
 
@@ -80,15 +77,10 @@ public class ThreeDPen : ImmediateModeShapeDrawer
         Draw.DetailLevel = DetailLevel.Minimal;
         Draw.PolylineJoins = PolylineJoins.Round;
 
-        Draw.Position = linesParent.transform.position;
-
         ShapesMaterialUtils.Prewarm();
-    }
 
-    private void Start()
-    {
 #if !UNITY_WEBGL
-        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine();});
+        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); });
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
         VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
         VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
@@ -142,7 +134,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
         }
 #endif
 
-        if(Draw.Position != linesParent.transform.position)
+        if(linesParent && Draw.Position != linesParent.transform.position)
         {
             Draw.Position = linesParent.transform.position;
         }
@@ -173,6 +165,13 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
     public override void DrawShapes(Camera cam)
     {
+#if UNITY_ANDROID
+        if (Camera.main != cam) //Only draw to main camera (avoid warning overlay cam)
+        {
+            return;
+        }
+#endif
+
         using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
         {
             bool isVRPlayerPracticing = (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering");
@@ -233,11 +232,11 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
             if (isVRPlayerPracticing)
             {
-                DrawingsSyncer.instance.Drawings[currentDrawing].practicePenStrokes.Add(newPenStroke);
+                DrawingsSyncer.instance.Drawings[(uint)currentDrawing].practicePenStrokes.Add(newPenStroke);
             }
             else
             {
-                DrawingsSyncer.instance.Drawings[currentDrawing].penStrokes.Add(newPenStroke);
+                DrawingsSyncer.instance.Drawings[(uint)currentDrawing].penStrokes.Add(newPenStroke);
             }
 
             isPainting = true;
@@ -272,13 +271,13 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 
             if (isVRPlayerPracticing)
             {
-                int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[k].practicePenStrokes.Count - 1;
-                DrawingsSyncer.instance.Drawings[k].practicePenStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
+                int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[(uint)k].practicePenStrokes.Count - 1;
+                DrawingsSyncer.instance.Drawings[(uint)k].practicePenStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
             }
             else
             {
-                int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[k].penStrokes.Count - 1;
-                DrawingsSyncer.instance.Drawings[k].penStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
+                int lastPenStrokeIndex = DrawingsSyncer.instance.Drawings[(uint)k].penStrokes.Count - 1;
+                DrawingsSyncer.instance.Drawings[(uint)k].penStrokes[lastPenStrokeIndex].linePoints.Add(newLinePoint);
             }
         }
     }
