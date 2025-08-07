@@ -39,12 +39,6 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
-    ThreeDPen pen;
-
-    [SerializeField]
-    PaintSprayGun sprayGun;
-
-    [SerializeField]
     Canvas inputCanvas, guessingCanvas, leaderboardCanvas;
 
     [SerializeField]
@@ -94,6 +88,10 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     List<AnswerOptionButton> answerButtons, answerResults;
 
     int answerOwnerIDPlayerIsGuessing;
+
+    ThreeDPen pen;
+
+    PaintSprayGun sprayGun;
 
     private void Awake()
     {
@@ -145,6 +143,13 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.RemoveListener(SetNewPrompt);
         VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerSubmittedAnswer);
+
+        answerInputButton.onPointerDown.RemoveListener(ButtonPointerDown);
+        answerInputButton.onPointerUp.RemoveListener(ButtonPointerUp);
+
+        LeanTouch.OnFingerDown -= LeanTouch_OnFingerDown;
+
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
     }
 
     void Update()
@@ -280,6 +285,16 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 blurTimerText.enabled = false;
                 inputTimerText.enabled = false;
+
+                if (!sprayGun)
+                {
+                    sprayGun = GameObject.FindAnyObjectByType<PaintSprayGun>();
+                }
+                if (!pen)
+                {
+                    pen = GameObject.FindAnyObjectByType<ThreeDPen>();
+                    pen.LinesParent = linesParent.transform;
+                }
 
                 //Make sure there's no lingering drawings
                 pen.CanPaint = false;

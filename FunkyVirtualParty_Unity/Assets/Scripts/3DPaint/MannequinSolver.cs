@@ -37,7 +37,7 @@ public class MannequinSolver : MonoBehaviour
     Mesh colliderMesh;
 
     bool updatePose = false;
-    static bool poseHeightAdjusted;
+    public bool poseHeightAdjusted;
 
     private void Start()
     {
@@ -102,7 +102,7 @@ public class MannequinSolver : MonoBehaviour
         BakeMesh();
 
         Vector3 compareVector = new Vector3(Mathf.Round(colliderMesh.bounds.center.x * 1000f) / 1000f, Mathf.Round(colliderMesh.bounds.center.y * 100f) / 100f, Mathf.Round(colliderMesh.bounds.center.z * 100f) / 100f);
-        Debug.Log("compareVector: " + compareVector);
+        //Debug.Log("compareVector: " + compareVector);
 
         for (int i = 0; i < maxAttempts; i++)
         {
@@ -134,6 +134,7 @@ public class MannequinSolver : MonoBehaviour
 
         if (!poseHeightAdjusted)
         {
+            Debug.Log("Bro what");
             mannequinIK.transform.position += new Vector3(0, posingHeightOffset, 0);
             poseHeightAdjusted = true;
         }

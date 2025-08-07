@@ -33,15 +33,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
-    ThreeDPen pen;
-
-    [SerializeField]
-    PaintSprayGun sprayGun;
-
-    [SerializeField]
-    PaintPalette paintPalette;
-
-    [SerializeField]
     GameObject leaderboardParent, leaderboardPlayerCardPrefab;
     List<GameObject> currentLeaderboardCards;
 
@@ -81,12 +72,21 @@ public class ThreeDPaintGameManager : MonoBehaviour
     [SerializeField]
     MannequinHeightSlider mannequinHeightSlider;
 
+    [SerializeField]
+    Transform linesParent;
+
 #if !UNITY_WEBGL
     [SerializeField]
     EventReference musicEvent;
 
     EventInstance fmodInstance;
 #endif
+
+    ThreeDPen pen;
+
+    PaintSprayGun sprayGun;
+
+    PaintPalette paintPalette;
 
     int currentRound = 1;
 
@@ -104,8 +104,62 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     const string dontSayWarning = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
 
+    RealtimeTransform[] armatureRTs;
+    Vector3[] armaturePositions;
+    Quaternion[] armatureRotations;
+
     private void Awake()
     {
+        answerResults = new List<AnswerOptionButton>();
+
+        playerNameIcons = new List<GameObject>();
+        currentLeaderboardCards = new List<GameObject>();
+
+        clientPulsateTweens = new List<Tween>();
+
+        armatureRTs = armature.transform.root.gameObject.GetComponentsInChildren<RealtimeTransform>();
+        armaturePositions = new Vector3[armatureRTs.Length];
+        armatureRotations = new Quaternion[armatureRTs.Length];
+        for (int i = 0; i < armatureRTs.Length; i++)
+        {
+            armaturePositions[i] = armatureRTs[i].transform.position;
+            armatureRotations[i] = armatureRTs[i].transform.rotation;
+        }
+
+        headerText.text = "";
+        playerResultsHeaderText.text = "";
+        timerText.text = "";
+        headerText.enabled = false;
+
+        finishedPaintingEarlyButton.gameObject.SetActive(false);
+
+        Invoke("CreateClientPlayerButtons", 1);
+
+        StartCoroutine("StartGame");
+
+#if !UNITY_WEBGL
+        fmodInstance = RuntimeManager.CreateInstance(musicEvent);
+        fmodInstance.start();
+#endif
+    }
+
+    private void Start()
+    {
+        //Spawn tools
+        Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
+        options.ownedByClient = true;
+
+        pen = Realtime.Instantiate("3DPen", Vector3.zero, Quaternion.identity, options).GetComponent<ThreeDPen>();
+        pen.LinesParent = linesParent;
+#if !UNITY_WEBGL
+        pen.gm = this;
+#endif
+
+        sprayGun = Realtime.Instantiate("PaintSprayGun", Vector3.zero, Quaternion.identity, options).GetComponent<PaintSprayGun>();
+        paintPalette = Realtime.Instantiate("PaintPalette", Vector3.zero, Quaternion.identity, options).GetComponent<PaintPalette>();
+
+        tutorial.SetTools(sprayGun, pen, paintPalette);
+
 #if !UNITY_WEBGL
         //Tool callbacks
         //Pen
@@ -153,32 +207,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
         });
 #endif
 
-        answerResults = new List<AnswerOptionButton>();
-
-        playerNameIcons = new List<GameObject>();
-        currentLeaderboardCards = new List<GameObject>();
-
-        clientPulsateTweens = new List<Tween>();
-
-        headerText.text = "";
-        playerResultsHeaderText.text = "";
-        timerText.text = "";
-        headerText.enabled = false;
-
-        finishedPaintingEarlyButton.gameObject.SetActive(false);
-
-        Invoke("CreateClientPlayerButtons", 1);
-
-        StartCoroutine("StartGame");
-
-#if !UNITY_WEBGL
-        fmodInstance = RuntimeManager.CreateInstance(musicEvent);
-        fmodInstance.start();
-#endif
-    }
-
-    private void Start()
-    {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
         VRtistrySyncer.instance.OnPlayerGuessedArt.AddListener(PlayerGuessedArt);
@@ -271,6 +299,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+
+        RealtimeSingleton.instance.RealtimeAvatarManager.localAvatar.OnHandMeshVisibilityChanged.RemoveListener(OnHandVisibilityChanged);
+        vrPlayer.leftHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
+        vrPlayer.rightHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
+        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.RemoveListener(OnStartPoint);
+        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.RemoveListener(OnStopPoint);
     }
 
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -528,7 +562,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 if(VRtistrySyncer.instance.VRCompletedTutorial) vrPlayer.UIWarningArrow.SetActive(false);
 
                 //Instantiate new drawing
-                DrawingsSyncer.instance.Drawings.Add(new DrawingModel());
+                uint key = (uint)DrawingsSyncer.instance.Drawings.Count;
+                Debug.Log("Key: " + key);
+                DrawingsSyncer.instance.Drawings.Add(key, new DrawingModel());
 
                 //Clear previous painting
                 paintTexture.Clear();
@@ -589,9 +625,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 break;
             case "clients guessing":
                 //Network paint texture, pose data, and title
-                DrawingsSyncer.instance.Drawings.Last().paintTexture = paintTexture.GetPngData();
+                DrawingsSyncer.instance.Drawings.Last().Value.paintTexture = paintTexture.GetPngData();
                 DrawingsSyncer.instance.StorePoseData(armature);
-                DrawingsSyncer.instance.Drawings.Last().title = GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
+                DrawingsSyncer.instance.Drawings.Last().Value.title = GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
 
 #if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 0);
@@ -796,6 +832,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 StartCoroutine(SetVRPlayerPos(vrPlayerGallerySpawnPos.position, 0));
 
+                Invoke("ResetArmatureTransforms", 1);
+
                 break;
             case "game over":
                 StartCoroutine("EndGame");
@@ -875,6 +913,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
 #endif
 
         yield return new WaitForSeconds(1);
+
+        //Destroy tools
+        Realtime.Destroy(pen.gameObject);
+        Realtime.Destroy(sprayGun.gameObject);
+        Realtime.Destroy(paintPalette.gameObject);
 
         SceneChangerSyncer.instance.CurrentScene = "MainMenu";
     }
@@ -1131,7 +1174,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
 
         //Setup constraint
-        ParentConstraint pc = (isSprayGun) ? sprayGun.GetComponent<ParentConstraint>() : pen.GetComponent<ParentConstraint>();
+        ParentConstraint pc = (isSprayGun) ? sprayGun.constraint : pen.constraint;
         if (pc.sourceCount > 0) pc.RemoveSource(0);
         ConstraintSource src = new ConstraintSource();
         src.sourceTransform = isToolHandLeft ? vrPlayer.leftHandGrabPoint : vrPlayer.rightHandGrabPoint;
@@ -1190,7 +1233,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         //Debug.Log("Successfully grabbed: " + g.gameObject.name);
 
-        if(g.gameObject.name.Equals("3DPen") || g.gameObject.name.Equals("Paint Spray Gun"))
+        if(g.gameObject.name.Equals("3DPen(Clone)") || g.gameObject.name.Equals("PaintSprayGun(Clone)"))
         {
             //Re-enable palette colliders
             foreach (Collider c in paintPalette.gameObject.GetComponentsInChildren<Collider>())
@@ -1213,13 +1256,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
             if (!VRtistrySyncer.instance.IsPenEnabled)
             {
-                sprayGun.GetComponent<ParentConstraint>().constraintActive = false;
-                pc = pen.GetComponent<ParentConstraint>();
+                sprayGun.constraint.constraintActive = false;
+                pc = pen.constraint;
             }
             else
             {
-                pen.GetComponent<ParentConstraint>().constraintActive = false;
-                pc = sprayGun.GetComponent<ParentConstraint>();
+                pen.constraint.constraintActive = false;
+                pc = sprayGun.constraint;
             }
 
             pc.RemoveSource(0);
@@ -1239,7 +1282,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 sprayGun.SetMeshVisibility(true);
             }
         }
-        else if(g.gameObject.name.Equals("PaintPalette"))
+        else if(g.gameObject.name.Equals("PaintPalette(Clone)"))
         {
             if(!VRtistrySyncer.instance.IsPenEnabled)
             {
@@ -1295,7 +1338,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             VRtistrySyncer.instance.IsPaletteMirrored = !VRtistrySyncer.instance.IsPaletteMirrored;
         }
 
-        ParentConstraint pc = paintPalette.gameObject.GetComponent<ParentConstraint>();
+        ParentConstraint pc = paintPalette.constraint;
 
         pc.RemoveSource(0);
         ConstraintSource src = new ConstraintSource();
@@ -1335,7 +1378,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
             vrPlayer.rightHand.Grab(GrabType.InstantGrab);
         }
 
-        paintPalette.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+        paintPalette.constraint.constraintActive = false;
 
         needToGrabPalette = false;
     }
@@ -1357,7 +1400,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
         paintPalette.gameObject.GetComponent<MeshCollider>().enabled = false;
 
-        ParentConstraint pc = paintPalette.gameObject.GetComponent<ParentConstraint>();
+        ParentConstraint pc = paintPalette.constraint;
 
         pc.RemoveSource(0);
         ConstraintSource src = new ConstraintSource();
@@ -1372,6 +1415,16 @@ public class ThreeDPaintGameManager : MonoBehaviour
     {
         vrPlayer.Ahp.HeadPhysicsFollower.headCollider.enabled = active;
         vrPlayer.Ahp.capsuleColl.enabled = active;
+    }
+
+    void ResetArmatureTransforms()
+    {
+        //Start at index 2 to avoid armature parent + hips
+        for (int i = 2; i < armatureRTs.Length; i++)
+        {
+            armatureRTs[i].transform.position = armaturePositions[i];
+            armatureRTs[i].transform.rotation = armatureRotations[i];
+        }
     }
 
     public string FormatTime(float time)

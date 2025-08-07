@@ -20,7 +20,7 @@ public class PaintPalette : MonoBehaviour
     public bool currentMeshLeft = true;
 
     [SerializeField]
-    ParentConstraint constraint;
+    public ParentConstraint constraint;
 
     [SerializeField]
     Rigidbody rb;
@@ -43,7 +43,7 @@ public class PaintPalette : MonoBehaviour
     Color colorToSet;
 #endif
 
-    void Start()
+    void Awake()
     {
         VRtistrySyncer.instance.PaletteMirrored.AddListener(Mirror);
         VRtistrySyncer.instance.paletteEnabledChanged.AddListener(SetActive);
@@ -103,7 +103,7 @@ public class PaintPalette : MonoBehaviour
         {
             VRtistrySyncer.instance.PenColor = colorToSet;
         }
-        else if(other.name.Equals("Paint Spray Gun"))
+        else if(other.name.Equals("PaintSprayGun(Clone)"))
         {
             VRtistrySyncer.instance.SprayGunColor = colorToSet;
         }

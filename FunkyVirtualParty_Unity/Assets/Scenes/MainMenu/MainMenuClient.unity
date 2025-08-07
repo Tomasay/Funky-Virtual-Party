@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -234,6 +233,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -586,6 +586,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 913975642317102756, guid: 8e14ebd052934284396df099c39084a8, type: 3}
+      propertyPath: _viewUUID
+      value: fa655363-2750-44a2-8369-516b17ccf420
+      objectReference: {fileID: 0}
     - target: {fileID: 1041015948400364690, guid: 8e14ebd052934284396df099c39084a8, type: 3}
       propertyPath: m_RootOrder
       value: 10
@@ -690,6 +694,10 @@ PrefabInstance:
     - target: {fileID: 376541852131382824, guid: 8e14ebd052934284396df099c39084a8, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 913975642317102756, guid: 8e14ebd052934284396df099c39084a8, type: 3}
+      propertyPath: _viewUUID
+      value: b3f5e6a6-d420-4f63-8076-145a27f1125b
       objectReference: {fileID: 0}
     - target: {fileID: 1041015948400364690, guid: 8e14ebd052934284396df099c39084a8, type: 3}
       propertyPath: m_RootOrder
@@ -1971,6 +1979,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
   m_SortingOrder: 1
@@ -2199,6 +2208,10 @@ PrefabInstance:
     - target: {fileID: 376541852131382824, guid: 8e14ebd052934284396df099c39084a8, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 913975642317102756, guid: 8e14ebd052934284396df099c39084a8, type: 3}
+      propertyPath: _viewUUID
+      value: 8ae7df3b-5efd-4992-acd0-f82edcebdd84
       objectReference: {fileID: 0}
     - target: {fileID: 1041015948400364690, guid: 8e14ebd052934284396df099c39084a8, type: 3}
       propertyPath: m_RootOrder
@@ -4278,6 +4291,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: -1
@@ -5201,6 +5215,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -5925,6 +5940,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -6539,6 +6555,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -7096,6 +7113,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 913975642317102756, guid: 8e14ebd052934284396df099c39084a8, type: 3}
+      propertyPath: _viewUUID
+      value: cbc08c70-0310-4e72-bbc4-f7731f939b06
+      objectReference: {fileID: 0}
     - target: {fileID: 1041015948400364690, guid: 8e14ebd052934284396df099c39084a8, type: 3}
       propertyPath: m_RootOrder
       value: 9
@@ -7234,12 +7255,11 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: 47153da3-1311-41a1-ac6d-8cd277b3d7d9
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 1766206021}
+    isDeprecated: 0
   _childViews: []
 --- !u!4 &1766206023
 Transform:
@@ -8297,6 +8317,7 @@ MonoBehaviour:
   LocalPlayerSpawned:
     m_PersistentCalls:
       m_Calls: []
+  safeToJoinMinigames: 0
   roomCode: 
 --- !u!1 &2027479459
 GameObject:
@@ -9024,6 +9045,9 @@ MonoBehaviour:
   - {fileID: 566606611587223288, guid: 5d8ad4c553ed95c42a526b0be2e0a435, type: 3}
   - {fileID: 4490812570648585615, guid: 106b4f7f8aaf55c409cbb8bb9cf3f889, type: 3}
   - {fileID: 5531231052371847854, guid: 60c88e966a0f8324da766221921ee65f, type: 3}
+  - {fileID: 7728315887617822915, guid: a81ce31e21e10cd4d84ec80b831b1bc7, type: 3}
+  - {fileID: 594011468458317952, guid: eb0b039dd934a8649989ef0abdb7954d, type: 3}
+  - {fileID: 4590413094623354086, guid: 20dd4867ade2a6c4286d8706e432de10, type: 3}
 --- !u!1001 &6405218447694999098
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -32,13 +32,10 @@ public class PaintSprayGun : MonoBehaviour
     MeshSyncer baseMeshSyncer;
 
     [SerializeField]
-    PaintPalette palette;
-
-    [SerializeField]
     Collider col;
 
     [SerializeField]
-    ParentConstraint constraint;
+    public ParentConstraint constraint;
 
     [SerializeField]
     Rigidbody rb;
@@ -68,10 +65,7 @@ public class PaintSprayGun : MonoBehaviour
         paintColorMat.color = colors[colorIndex];
         ps.startColor = colors[colorIndex];
         paintSphere.Color = colors[colorIndex];
-    }
 
-    private void Start()
-    {
         VRtistrySyncer.instance.StartedPainting.AddListener(ps.Play);
         VRtistrySyncer.instance.StoppedPainting.AddListener(ps.Stop);
         VRtistrySyncer.instance.penEnabledChanged.AddListener(IsPenEnabledChanged);

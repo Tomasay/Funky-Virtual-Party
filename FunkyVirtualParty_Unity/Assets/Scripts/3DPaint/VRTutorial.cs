@@ -26,13 +26,10 @@ public class VRTutorial : MonoBehaviour
     [SerializeField]
     GameObject introButtons;
 
-    [SerializeField]
     PaintSprayGun sprayGun;
 
-    [SerializeField]
     ThreeDPen pen;
 
-    [SerializeField]
     PaintPalette palette;
 
     private VRtistryVRPlayerController vrPlayer;
@@ -60,6 +57,13 @@ public class VRTutorial : MonoBehaviour
     void Start()
     {
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+    }
+
+    public void SetTools(PaintSprayGun sg, ThreeDPen p, PaintPalette pp)
+    {
+        sprayGun = sg;
+        pen = p;
+        palette = pp;
 
         sprayGun.OnSpray.AddListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
         pen.OnDraw.AddListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });

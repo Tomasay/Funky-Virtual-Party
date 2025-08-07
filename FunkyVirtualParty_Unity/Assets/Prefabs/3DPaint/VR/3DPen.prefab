@@ -92,7 +92,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7728315887617822915}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -152,7 +152,7 @@ MeshCollider:
   m_GameObject: {fileID: 7728315887617822915}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
@@ -237,19 +237,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useCullingMasks: 0
-  linesParent: {fileID: 0}
   tip: {fileID: 7458268347831345583}
   tipMesh: {fileID: 2020831445175293482}
   baseMesh: {fileID: 8088608048997232918}
   tipMeshSyncer: {fileID: 3439077255721469996}
   baseMeshSyncer: {fileID: 8272064927683547111}
   constraint: {fileID: 4189939568797337253}
-  palette: {fileID: 0}
   col: {fileID: 7458268346312224142}
   tipCol: {fileID: 7957478968766357229}
   rb: {fileID: 7458268346312224145}
-  gm: {fileID: 0}
   realtimeTransform: {fileID: 1964613435646494720}
+  gm: {fileID: 0}
   active: 0
   OnDraw:
     m_PersistentCalls:
@@ -1104,8 +1102,8 @@ ParentConstraint:
   m_GameObject: {fileID: 7728315887617822915}
   m_Enabled: 1
   m_Weight: 1
-  m_TranslationAtRest: {x: 0.3353, y: -0.4213, z: 0.7188665}
-  m_RotationAtRest: {x: -54.586, y: 0, z: 0}
+  m_TranslationAtRest: {x: 0.3353, y: -0.3828, z: 0.7286}
+  m_RotationAtRest: {x: 44.017982, y: 0, z: 0}
   m_TranslationOffsets: []
   m_RotationOffsets: []
   m_AffectTranslationX: 1
@@ -1115,7 +1113,7 @@ ParentConstraint:
   m_AffectRotationY: 1
   m_AffectRotationZ: 1
   m_IsContraintActive: 0
-  m_IsLocked: 0
+  m_IsLocked: 1
   m_Sources: []
 --- !u!114 &8164021777672993061
 MonoBehaviour:
@@ -1133,17 +1131,18 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: 
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 1964613435646494720}
+    isDeprecated: 0
   - componentID: 2
     component: {fileID: 8272064927683547111}
+    isDeprecated: 0
   _childViews:
   - componentID: 1
     component: {fileID: 1566523209847632854}
+    isDeprecated: 0
 --- !u!114 &1964613435646494720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1242,7 +1241,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8069402188390524747}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1286,7 +1285,7 @@ BoxCollider:
   m_GameObject: {fileID: 8069402188390524747}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Size: {x: 0.020889338, y: 0.020889338, z: 0.028004557}
   m_Center: {x: 4.656613e-10, y: 0, z: 0.12283039}
@@ -1306,12 +1305,11 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: 
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 3439077255721469996}
+    isDeprecated: 0
   _childViews: []
 --- !u!114 &3439077255721469996
 MonoBehaviour:

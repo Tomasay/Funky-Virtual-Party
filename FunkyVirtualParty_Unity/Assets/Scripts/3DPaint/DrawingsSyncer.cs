@@ -16,7 +16,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 
     public List<List<PolylinePath>> practiceDrawingLines;
 
-    public RealtimeArray<DrawingModel> Drawings { get => model.drawings; }
+    public RealtimeDictionary<DrawingModel> Drawings { get => model.drawings; }
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -45,6 +45,32 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         practiceDrawingLines = new List<List<PolylinePath>>();
     }
 
+#if UNITY_ANDROID || UNITY_STANDALONE_WIN
+    private void Start()
+    {
+        int count = Drawings.Count;
+        for (int i = 0; i < count; i++)
+        {
+            uint k = (uint)i;
+            Drawings.Remove(k);
+        }
+    }
+#endif
+
+    private void OnDestroy()
+    {
+        Drawings.modelAdded -= Drawings_modelAdded;
+        for (int i = 0; i < Drawings.Count; i++)
+        {
+            uint k = (uint)i;
+            Drawings[k].penStrokes.modelAdded -= PenStrokes_modelAdded;
+            Drawings[k].practicePenStrokes.modelAdded -= PracticePenStrokes_modelAdded;
+            Drawings[k].paintTextureDidChange -= Model_paintTextureDidChange;
+            Drawings[k].poseData.modelAdded -= PoseData_modelAdded;
+            Drawings[k].titleDidChange -= Model_titleDidChange;
+        }
+    }
+
     /// <summary>
     /// Stores pose data for the current drawing being worked on
     /// </summary>
@@ -57,7 +83,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
             newJointInfo.pos = t.localPosition;
             newJointInfo.rot = t.localRotation;
 
-            Drawings[Drawings.Count - 1].poseData.Add(newJointInfo);
+            Drawings[(uint)Drawings.Count - 1].poseData.Add(newJointInfo);
         }
     }
 
@@ -69,10 +95,10 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     public void ApplyPoseData(GameObject armature, int drawingIndex)
     {
         Transform[] transforms = armature.GetComponentsInChildren<Transform>();
-        for (int i = 0; i < Drawings[drawingIndex].poseData.Count; i++)
+        for (int i = 1; i < Drawings[(uint)drawingIndex].poseData.Count; i++)
         {
-            transforms[i].localPosition = Drawings[drawingIndex].poseData[i].pos;
-            transforms[i].localRotation = Drawings[drawingIndex].poseData[i].rot;
+            transforms[i].localPosition = Drawings[(uint)drawingIndex].poseData[i].pos;
+            transforms[i].localRotation = Drawings[(uint)drawingIndex].poseData[i].rot;
 
             //Ignore hip height set by height slider
             if(i == 1)
@@ -129,9 +155,9 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     }
 
 
-    #region Variable Callbacks
+#region Variable Callbacks
     //New drawing created
-    private void Drawings_modelAdded(RealtimeArray<DrawingModel> array, DrawingModel model, bool remote)
+    private void Drawings_modelAdded(RealtimeDictionary<DrawingModel> dictionary, uint key, DrawingModel model, bool remote)
     {
         drawingLines.Add(new List<PolylinePath>());
         practiceDrawingLines.Add(new List<PolylinePath>());
@@ -188,16 +214,16 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     private void LinePoints_modelAdded(RealtimeArray<LinePointModel> array, LinePointModel model, bool remote)
     {
         int currentLineIndex = drawingLines[drawingLines.Count-1].Count-1;
-        int currentPenStrokeIndex = Drawings[Drawings.Count - 1].penStrokes.Count - 1;
-        drawingLines[drawingLines.Count-1][currentLineIndex].AddPoint(model.position, Drawings[Drawings.Count-1].penStrokes[currentPenStrokeIndex].lineColor);
+        int currentPenStrokeIndex = Drawings[(uint)Drawings.Count - 1].penStrokes.Count - 1;
+        drawingLines[drawingLines.Count-1][currentLineIndex].AddPoint(model.position, Drawings[(uint)Drawings.Count-1].penStrokes[currentPenStrokeIndex].lineColor);
     }
 
     //New point within a practice line created
     private void PracticeLinePoints_modelAdded(RealtimeArray<LinePointModel> array, LinePointModel model, bool remote)
     {
         int currentLineIndex = practiceDrawingLines[practiceDrawingLines.Count - 1].Count - 1;
-        int currentPenStrokeIndex = Drawings[Drawings.Count - 1].practicePenStrokes.Count - 1;
-        practiceDrawingLines[practiceDrawingLines.Count - 1][currentLineIndex].AddPoint(model.position, Drawings[Drawings.Count - 1].practicePenStrokes[currentPenStrokeIndex].lineColor);
+        int currentPenStrokeIndex = Drawings[(uint)Drawings.Count - 1].practicePenStrokes.Count - 1;
+        practiceDrawingLines[practiceDrawingLines.Count - 1][currentLineIndex].AddPoint(model.position, Drawings[(uint)Drawings.Count - 1].practicePenStrokes[currentPenStrokeIndex].lineColor);
     }
-    #endregion
+#endregion
 }
