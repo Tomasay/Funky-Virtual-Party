@@ -213,6 +213,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed += RealtimeAvatarManager_avatarDestroyed;
 
         InvokeRepeating("Test", 1, 1);
     }
@@ -299,12 +300,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
+        RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed -= RealtimeAvatarManager_avatarDestroyed;
 
         RealtimeSingleton.instance.RealtimeAvatarManager.localAvatar.OnHandMeshVisibilityChanged.RemoveListener(OnHandVisibilityChanged);
-        vrPlayer.leftHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
-        vrPlayer.rightHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
-        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.RemoveListener(OnStartPoint);
-        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.RemoveListener(OnStopPoint);
     }
 
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -325,6 +323,15 @@ public class ThreeDPaintGameManager : MonoBehaviour
         vrPlayer.SetCanvas(uiCanvas.gameObject);
 
         pointerPreviewDrawDistance = vrPlayer.UIPointerPreview.rayDrawDistance;
+    }
+
+    private void RealtimeAvatarManager_avatarDestroyed(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
+    {
+        //These have to go on the avatar's destriy event to ensure that the hands still exist
+        vrPlayer.leftHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
+        vrPlayer.rightHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
+        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.RemoveListener(OnStartPoint);
+        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.RemoveListener(OnStopPoint);
     }
 
     void OnStartPoint(Vector3 vec, GameObject g)
