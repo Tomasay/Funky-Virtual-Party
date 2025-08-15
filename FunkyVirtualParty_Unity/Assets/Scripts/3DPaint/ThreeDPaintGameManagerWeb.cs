@@ -316,13 +316,13 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
 
                 //Answer buttons
+                answerButtonParent.SetActive(false);
                 foreach (string a in answersSeparated)
                 {
                     string[] ownerAndAnswer = a.Split(':');
 
                     GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
                     string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
-                    Debug.Log(guessGuessOwner);
                     ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
                     AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                     aob.SetText(ownerAndAnswer[1]);
@@ -502,20 +502,25 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     void SetDecoyAnswers(string decoyAnswers)
     {
-        Debug.Log("Decoy Answers: " + decoyAnswers);
-
-        if (decoyAnswers.Equals("")) return;
-
-        foreach (string d in decoyAnswers.Split(','))
+        if (decoyAnswers.Equals("")) //Decoy answers were reset
         {
-            GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-            ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize sibling index so decoy answers are not always the last ones
-            ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
-            AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-            aob.SetText(d);
-            aob.playerID = "decoy";
-            answerButtons.Add(aob);
+            return;
         }
+        else if (!decoyAnswers.Contains("AI request failed"))
+        {
+            foreach (string d in decoyAnswers.Split(','))
+            {
+                GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize sibling index so decoy answers are not always the last ones
+                ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
+                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                aob.SetText(d);
+                aob.playerID = "decoy";
+                answerButtons.Add(aob);
+            }
+        }
+        
+        answerButtonParent.SetActive(true);
     }
 
     public void OpenKeyboard()
