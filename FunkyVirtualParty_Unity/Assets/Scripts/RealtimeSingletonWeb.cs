@@ -116,7 +116,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
             if (!disconnectingDueToNoHost && !disconnectingMaxPlayers && !disconnectingMinigameInProgress)
             {
 #if !UNITY_EDITOR
-                //ReloadPage();
+                ReloadPage();
 #endif
             }
             else
