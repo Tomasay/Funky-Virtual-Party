@@ -89,9 +89,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     int answerOwnerIDPlayerIsGuessing;
 
-    ThreeDPen pen;
-
-    PaintSprayGun sprayGun;
+    PaintBrush paintBrush;
 
     private void Awake()
     {
@@ -286,19 +284,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 blurTimerText.enabled = false;
                 inputTimerText.enabled = false;
 
-                if (!sprayGun)
+                if (!paintBrush)
                 {
-                    sprayGun = GameObject.FindAnyObjectByType<PaintSprayGun>();
-                }
-                if (!pen)
-                {
-                    pen = GameObject.FindAnyObjectByType<ThreeDPen>();
-                    pen.LinesParent = linesParent.transform;
+                    paintBrush = GameObject.FindAnyObjectByType<PaintBrush>();
+                    paintBrush.LinesParent = linesParent.transform;
                 }
 
                 //Make sure there's no lingering drawings
-                pen.CanPaint = false;
-                sprayGun.CanPaint = false;
+                paintBrush.CanPaint = false;
 
                 playersAnswering = false;
                 guessing = true;

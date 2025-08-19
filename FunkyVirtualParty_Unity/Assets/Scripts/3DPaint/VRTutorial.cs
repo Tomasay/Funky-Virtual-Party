@@ -26,9 +26,7 @@ public class VRTutorial : MonoBehaviour
     [SerializeField]
     GameObject introButtons;
 
-    PaintSprayGun sprayGun;
-
-    ThreeDPen pen;
+    PaintBrush paintBrush;
 
     PaintPalette palette;
 
@@ -59,14 +57,12 @@ public class VRTutorial : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
     }
 
-    public void SetTools(PaintSprayGun sg, ThreeDPen p, PaintPalette pp)
+    public void SetTools(PaintBrush pb, PaintPalette pp)
     {
-        sprayGun = sg;
-        pen = p;
+        paintBrush = pb;
         palette = pp;
 
-        sprayGun.OnSpray.AddListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
-        pen.OnDraw.AddListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
+        paintBrush.OnDraw.AddListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
         palette.OnColorChanged.AddListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
     }
 
@@ -179,8 +175,7 @@ public class VRTutorial : MonoBehaviour
 
     void RemoveListeners()
     {
-        sprayGun.OnSpray.RemoveListener(delegate { if (CurrentStage == TutorialStage.Spray) CurrentStage = TutorialStage.SwapTools; });
-        pen.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
+        paintBrush.OnDraw.RemoveListener(delegate { if (CurrentStage == TutorialStage.Draw) CurrentStage = TutorialStage.SwapColors; });
         palette.OnColorChanged.RemoveListener(delegate { hasRotated = true; if (CurrentStage == TutorialStage.SwapColors) CurrentStage = TutorialStage.Movement; });
         vrPlayer.Ahp.OnMove.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
         vrPlayer.Ahp.OnRotate.RemoveListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });

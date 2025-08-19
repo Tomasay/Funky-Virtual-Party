@@ -101,11 +101,7 @@ public class PaintPalette : MonoBehaviour
     {
         if (other.name.Equals("Tip"))
         {
-            VRtistrySyncer.instance.PenColor = colorToSet;
-        }
-        else if(other.name.Equals("PaintSprayGun(Clone)"))
-        {
-            VRtistrySyncer.instance.SprayGunColor = colorToSet;
+            VRtistrySyncer.instance.BrushColor = colorToSet;
         }
 
         OnColorChanged.Invoke();

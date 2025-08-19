@@ -29,40 +29,37 @@ public partial class VRtistrySyncModel
     private bool _isPainting; //Is the VR player spraying paint
 
     [RealtimeProperty(8, true, true)]
-    private bool _isDrawing; //Is the VR player drawing with the pen
+    private bool _isDrawing; //Is the VR player drawing with the paint brush
 
     [RealtimeProperty(9, true, true)]
-    private Vector3 _drawingIncrement; //The latest point from pen drawing lines
+    private Vector3 _drawingIncrement; //The latest point from brush drawing lines
 
     [RealtimeProperty(10, true, true)]
-    private bool _isPenEnabled; //Is the pen enabled and in the VR player's hand? If false, the spray gun is
-
-    [RealtimeProperty(11, true, true)]
-    private Color _penColor;
+    private Color _brushColor;
 
     [RealtimeProperty(12, true, true)]
-    private Color _sprayGunColor;
-
-    [RealtimeProperty(13, true, true)]
     private bool _isPaletteMirrored;
 
-    [RealtimeProperty(14, true, true)]
+    [RealtimeProperty(13, true, true)]
     private int _vrPlayerGuess; //The client ID that the vr player thinks wrote the answer
 
-    [RealtimeProperty(15, true, true)]
+    [RealtimeProperty(14, true, true)]
     private int _vrPlayerPoints;
 
-    [RealtimeProperty(16, true, true)]
+    [RealtimeProperty(15, true, true)]
     private bool _vrCompletedTutorial;
 
-    [RealtimeProperty(17, true, true)]
+    [RealtimeProperty(16, true, true)]
     private string _artGuesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_ANSWERID"
 
-    [RealtimeProperty(18, true, true)]
+    [RealtimeProperty(17, true, true)]
     private float _clientAnswerTimer; //Time left for clients to submit an answer to the prompt
 
-    [RealtimeProperty(19, true, true)]
+    [RealtimeProperty(18, true, true)]
     private float _drawingTimer; //Time left for vr player to finish drawing
+
+    [RealtimeProperty(19, true, true)]
+    private bool _isBrushEnabled; //Is the brush enabled and in the VR player's hand?
 
     [RealtimeProperty(20, true, true)]
     private bool _isPaletteEnabled; //Is the palette enabled and visible. Set when vr player grabs/drops

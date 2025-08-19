@@ -6,14 +6,19 @@ using Autohand;
 using UnityEngine.Events;
 using UnityEngine.Animations;
 using Normal.Realtime;
+using PaintIn3D;
+using DG.Tweening;
 
 #if !UNITY_WEBGL
 using FMODUnity;
 #endif
 
-public class ThreeDPen : ImmediateModeShapeDrawer
+public class PaintBrush : ImmediateModeShapeDrawer
 {
     Color currentColor = Color.black;
+
+    [SerializeField]
+    P3dPaintSphere paintSphere;
 
     [SerializeField]
     Transform tip;
@@ -28,7 +33,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     public ParentConstraint constraint;
 
     [SerializeField]
-    Collider col, tipCol;
+    public Collider col, tipCol;
 
     [SerializeField]
     Rigidbody rb;
@@ -58,7 +63,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; if (HapticsManager.instance) { HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } } }
 
     public Rigidbody Rb { get => rb; }
-    public RealtimeTransform RealtimeTransform { get => realtimeTransform;}
+    public RealtimeTransform RealtimeTransform { get => realtimeTransform; }
     public Transform LinesParent { get => linesParent; set { linesParent = value; Draw.Position = linesParent.position; } }
 
     public UnityEvent OnDraw;
@@ -82,8 +87,8 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 #if !UNITY_WEBGL
         VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); });
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
-        VRtistrySyncer.instance.penEnabledChanged.AddListener(SetActive);
-        VRtistrySyncer.instance.penColorChanged.AddListener(ChangeColor);
+        VRtistrySyncer.instance.brushEnabledChanged.AddListener(SetActive);
+        VRtistrySyncer.instance.brushColorChanged.AddListener(ChangeColor);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
@@ -92,10 +97,10 @@ public class ThreeDPen : ImmediateModeShapeDrawer
     private void OnDestroy()
     {
 #if !UNITY_WEBGL
-        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine();});
+        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); });
         VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPainting = false; });
-        VRtistrySyncer.instance.penEnabledChanged.RemoveListener(SetActive);
-        VRtistrySyncer.instance.penColorChanged.RemoveListener(ChangeColor);
+        VRtistrySyncer.instance.brushEnabledChanged.RemoveListener(SetActive);
+        VRtistrySyncer.instance.brushColorChanged.RemoveListener(ChangeColor);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
@@ -134,7 +139,7 @@ public class ThreeDPen : ImmediateModeShapeDrawer
         }
 #endif
 
-        if(linesParent && Draw.Position != linesParent.transform.position)
+        if (linesParent && Draw.Position != linesParent.transform.position)
         {
             Draw.Position = linesParent.transform.position;
         }
@@ -287,18 +292,20 @@ public class ThreeDPen : ImmediateModeShapeDrawer
 #if !UNITY_WEBGL
         if (IsInHand)
         {
-            if(!(currentColor == c))
+            if (!(currentColor == c))
             {
                 RuntimeManager.PlayOneShot("event:/SFX/Drop", transform.position);
             }
 
+            paintSphere.Color = c;
+
             currentColor = c;
-            tipMesh.material.color =c;
+            tipMesh.material.DOColor(c, 0.25f);
         }
 #endif
 #if UNITY_WEBGL
         currentColor = c;
-            tipMesh.material.color = c;
+        tipMesh.material.DOColor(c, 0.25f);
 #endif
     }
 

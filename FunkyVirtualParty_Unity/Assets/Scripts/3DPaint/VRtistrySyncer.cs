@@ -12,8 +12,8 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public MyStringEvent OnStateChangeEvent, OnPromptChangedEvent, OnPlayerAnswered, OnPlayerGuessedArt, OnPlayerGuessedPlayer, OnDecoyAnswersChanged;
 
     public UnityEvent StartedPainting, StoppedPainting, StartedDrawing, StoppedDrawing, PaletteMirrored;
-    public UnityEvent<bool> penEnabledChanged, paletteEnabledChanged;
-    public UnityEvent<Color> penColorChanged, spraygunColorChanged;
+    public UnityEvent<bool> brushEnabledChanged, paletteEnabledChanged;
+    public UnityEvent<Color> brushColorChanged;
 
     public string State { get => model.state; set => model.state = value; }
     public string Answers { get => model.answers; set => model.answers = value; }
@@ -29,12 +29,11 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public bool VRCompletedTutorial { get => model.vrCompletedTutorial; set => model.vrCompletedTutorial = value; }
     public bool IsPainting { get => model.isPainting; set => model.isPainting = value; }
     public bool IsDrawing { get => model.isDrawing; set => model.isDrawing = value; }
-    public bool IsPenEnabled { get => model.isPenEnabled; set => model.isPenEnabled = value; }
     public bool IsPaletteMirrored { get => model.isPaletteMirrored; set => model.isPaletteMirrored = value; }
+    public bool IsBrushEnabled { get => model.isBrushEnabled; set => model.isBrushEnabled = value; }
     public bool IsPaletteEnabled { get => model.isPaletteEnabled; set => model.isPaletteEnabled = value; }
 
-    public Color PenColor { get => model.penColor; set => model.penColor = value; }
-    public Color SprayGunColor { get => model.sprayGunColor; set => model.sprayGunColor = value; }
+    public Color BrushColor { get => model.brushColor; set => model.brushColor = value; }
 
     private bool isWeb;
 
@@ -55,11 +54,10 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         StoppedDrawing = new UnityEvent();
         PaletteMirrored = new UnityEvent();
 
-        penEnabledChanged = new UnityEvent<bool>();
+        brushEnabledChanged = new UnityEvent<bool>();
         paletteEnabledChanged = new UnityEvent<bool>();
 
-        penColorChanged = new UnityEvent<Color>();
-        spraygunColorChanged = new UnityEvent<Color>();
+        brushColorChanged = new UnityEvent<Color>();
 
 #if UNITY_WEBGL
         isWeb = true;
@@ -83,11 +81,9 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         VRCompletedTutorial = false;
         IsPainting = false;
         IsDrawing = false;
-        IsPenEnabled = true;
         IsPaletteMirrored = false;
         IsPaletteEnabled = false;
-        PenColor = Color.black;
-        SprayGunColor = Color.black;
+        BrushColor = Color.black;
 
         //TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
@@ -110,11 +106,10 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             currentModel.playerGuessesDidChange -= OnPlayerGuessesDidChange;
             previousModel.isPaintingDidChange -= OnIsPaintingDidChange;
             previousModel.isDrawingDidChange -= OnIsDrawingDidChange;
-            previousModel.isPenEnabledDidChange -= OnIsPenEnabledChanged;
+            previousModel.isBrushEnabledDidChange -= OnIsBrushEnabledChanged;
             previousModel.isPaletteMirroredDidChange -= OnIsPaletteMirroredChanged;
             previousModel.isPaletteEnabledDidChange -= OnIsPaletteEnabledChanged;
-            previousModel.penColorDidChange -= OnPenColorChanged;
-            previousModel.sprayGunColorDidChange -= OnSprayGunColorChanged;
+            previousModel.brushColorDidChange -= OnBrushColorChanged;
             previousModel.currentPromptDidChange -= OnPromptChanged;
         }
 
@@ -124,7 +119,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             if (currentModel.isFreshModel)
             {
                 currentModel.state = "clients answering";
-                currentModel.isPenEnabled = true;
+                currentModel.isBrushEnabled = true;
             }
 
             // Register for events
@@ -135,11 +130,10 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             currentModel.playerGuessesDidChange += OnPlayerGuessesDidChange;
             currentModel.isPaintingDidChange += OnIsPaintingDidChange;
             currentModel.isDrawingDidChange += OnIsDrawingDidChange;
-            currentModel.isPenEnabledDidChange += OnIsPenEnabledChanged;
+            currentModel.isBrushEnabledDidChange += OnIsBrushEnabledChanged;
             currentModel.isPaletteMirroredDidChange += OnIsPaletteMirroredChanged;
             currentModel.isPaletteEnabledDidChange += OnIsPaletteEnabledChanged;
-            currentModel.penColorDidChange += OnPenColorChanged;
-            currentModel.sprayGunColorDidChange += OnSprayGunColorChanged;
+            currentModel.brushColorDidChange += OnBrushColorChanged;
             currentModel.currentPromptDidChange += OnPromptChanged;
         }
     }
@@ -203,9 +197,9 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         }
     }
 
-    private void OnIsPenEnabledChanged(VRtistrySyncModel model, bool value)
+    private void OnIsBrushEnabledChanged(VRtistrySyncModel model, bool value)
     {
-        penEnabledChanged.Invoke(value);
+        brushEnabledChanged.Invoke(value);
     }
 
     private void OnIsPaletteMirroredChanged(VRtistrySyncModel model, bool value)
@@ -218,14 +212,9 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         paletteEnabledChanged.Invoke(value);
     }
 
-    private void OnPenColorChanged(VRtistrySyncModel model, Color value)
+    private void OnBrushColorChanged(VRtistrySyncModel model, Color value)
     {
-        penColorChanged.Invoke(value);
-    }
-
-    private void OnSprayGunColorChanged(VRtistrySyncModel model, Color value)
-    {
-        spraygunColorChanged.Invoke(value);
+        brushColorChanged.Invoke(value);
     }
 
     private void OnPromptChanged(VRtistrySyncModel model, string value)
