@@ -84,6 +84,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
         IsPaletteMirrored = false;
         IsPaletteEnabled = false;
         BrushColor = Color.black;
+        IsBrushEnabled = false;
 
         //TutorialMenu.instance.allPlayersReady.AddListener(delegate { State = "countdown"; });
     }
@@ -119,7 +120,6 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             if (currentModel.isFreshModel)
             {
                 currentModel.state = "clients answering";
-                currentModel.isBrushEnabled = true;
             }
 
             // Register for events

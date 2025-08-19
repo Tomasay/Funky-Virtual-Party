@@ -102,9 +102,8 @@ public class PaintPalette : MonoBehaviour
         if (other.name.Equals("Tip"))
         {
             VRtistrySyncer.instance.BrushColor = colorToSet;
+            OnColorChanged.Invoke();
         }
-
-        OnColorChanged.Invoke();
     }
 #endif
 

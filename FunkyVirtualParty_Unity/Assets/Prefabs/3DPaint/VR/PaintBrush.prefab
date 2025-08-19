@@ -281,6 +281,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 268941912e4482e429f5ff19f05f77cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnHandleHitline:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8249772499573377131
 GameObject:
   m_ObjectHideFlags: 0
@@ -441,7 +444,7 @@ MeshCollider:
   m_GameObject: {fileID: 8791102766381239950}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
@@ -665,6 +668,7 @@ MonoBehaviour:
   tipCol: {fileID: 4293903983472528782}
   rb: {fileID: 8249772501264467028}
   realtimeTransform: {fileID: 1062768595587965381}
+  paintSyncer: {fileID: 1032525423628394151}
   gm: {fileID: 0}
   active: 0
   OnDraw:

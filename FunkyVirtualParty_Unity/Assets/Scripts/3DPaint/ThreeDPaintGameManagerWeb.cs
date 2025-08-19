@@ -291,7 +291,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 }
 
                 //Make sure there's no lingering drawings
-                paintBrush.CanPaint = false;
+                paintBrush.CanPaintAir = false;
 
                 playersAnswering = false;
                 guessing = true;

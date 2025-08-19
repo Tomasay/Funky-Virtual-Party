@@ -313,12 +313,13 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     void OnStartPoint(Vector3 vec, GameObject g)
     {
-        paintBrush.CanPaint = false;
+        paintBrush.CanPaintAir = false;
     }
 
     void OnStopPoint(Vector3 vec, GameObject g)
     {
-        paintBrush.CanPaint = (VRtistrySyncer.instance.State.Equals("clients answering") || VRtistrySyncer.instance.State.Equals("vr painting"));
+        paintBrush.CanPaintAir = (VRtistrySyncer.instance.State.Equals("clients answering") || VRtistrySyncer.instance.State.Equals("vr painting"));
+        if (!VRtistrySyncer.instance.VRCompletedTutorial && ((int)tutorial.CurrentStage) < 2) paintBrush.CanPaintAir = false;
     }
 
     bool shouldToolsBeVisible = false; //Should tools be marked visible when hands reconnect?
@@ -469,12 +470,14 @@ public class ThreeDPaintGameManager : MonoBehaviour
         if (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering")
         {
             //Enable VR tools
-            paintBrush.CanPaint = true;
+            paintBrush.CanPaintAir = true;
 
             GrabToolsStart();
 
             //Display text that players are answering
             headerText.text = "Players are typing their answers \nUse this time to practice painting!";
+
+            paintBrush.CanPaintAir = true;
         }
 
         headerText.enabled = true;
@@ -524,6 +527,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         VRtistrySyncer.instance.State = "vr painting";
     }
 
+    bool firstTimeClientsAnswering = true;
     void OnStateChanged(string state)
     {
         switch (state)
@@ -545,12 +549,12 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
 
                 //Enable VR tools
-                paintBrush.CanPaint = true;
+                if(!firstTimeClientsAnswering) paintBrush.CanPaintAir = true;
 
                 //Display text that players are answering
                 headerText.text = "Players are typing their answers \nUse this time to practice painting!";
 
-                vrPlayer.Ahp.useMovement = true;
+                firstTimeClientsAnswering = false;
 
                 break;
             case "vr posing":
@@ -563,7 +567,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 solver.EnablePosing();
 
                 //Disable VR tools
-                paintBrush.CanPaint = false;
+                paintBrush.CanPaintAir = false;
                 DropTool();
                 DropPalette();
 
@@ -583,7 +587,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 vrPlayer.UIWarningArrow.SetActive(false);
 
                 //Enable VR tools
-                paintBrush.CanPaint = true;
+                paintBrush.CanPaintAir = true;
 
                 //UI
                 headerText.text = dontSayWarning + "Your prompt is: <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\n\n";
@@ -610,7 +614,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 VRtistrySyncer.instance.ArtGuesses = "";
 
                 //Disable VR tools
-                paintBrush.CanPaint = false;
+                paintBrush.CanPaintAir = false;
 
                 //Display all answers
                 headerText.text = "Clients are guessing what your art is";
@@ -809,7 +813,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
         }
     }
 
-    IEnumerator SetVRPlayerPos(Vector3 pos, int delay = 0)
+    public IEnumerator SetVRPlayerPos(Vector3 pos, int delay = 0)
     {
         yield return new WaitForSeconds(delay);
 

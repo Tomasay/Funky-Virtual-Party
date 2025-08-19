@@ -41,6 +41,9 @@ public class PaintBrush : ImmediateModeShapeDrawer
     [SerializeField]
     RealtimeTransform realtimeTransform;
 
+    [SerializeField]
+    public P3DPaintSyncer paintSyncer;
+
 #if !UNITY_WEBGL
     [HideInInspector]
     public ThreeDPaintGameManager gm;
@@ -48,7 +51,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     Transform linesParent;
 
-    bool isPainting;
+    bool isPaintingAir;
 
     bool isInHand;
 
@@ -57,10 +60,10 @@ public class PaintBrush : ImmediateModeShapeDrawer
     const int maxPointCount = 100000;
     int currentPointCount;
 
-    private bool canPaint = true;
+    private bool canPaintAir = false;
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
-    public bool CanPaint { get => canPaint; set { canPaint = value; if (!value) { isPainting = false; if (HapticsManager.instance) { HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } } }
+    public bool CanPaintAir { get => canPaintAir; set { canPaintAir = value; if (!value) { isPaintingAir = false; if (HapticsManager.instance) { HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } } }
 
     public Rigidbody Rb { get => rb; }
     public RealtimeTransform RealtimeTransform { get => realtimeTransform; }
@@ -86,7 +89,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
 #if !UNITY_WEBGL
         VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); });
-        VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPainting = false; });
+        VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPaintingAir = false; });
         VRtistrySyncer.instance.brushEnabledChanged.AddListener(SetActive);
         VRtistrySyncer.instance.brushColorChanged.AddListener(ChangeColor);
 
@@ -98,7 +101,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
     {
 #if !UNITY_WEBGL
         VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); });
-        VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPainting = false; });
+        VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPaintingAir = false; });
         VRtistrySyncer.instance.brushEnabledChanged.RemoveListener(SetActive);
         VRtistrySyncer.instance.brushColorChanged.RemoveListener(ChangeColor);
 
@@ -132,7 +135,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
     void Update()
     {
 #if !UNITY_WEBGL
-        if (isPainting && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
+        if (isPaintingAir && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             OnDraw.Invoke();
@@ -148,7 +151,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
 #if !UNITY_WEBGL
     public void OnTriggerPressed(Hand h, Grabbable g)
     {
-        if (canPaint)
+        if (canPaintAir)
         {
             VRtistrySyncer.instance.realtimeView.RequestOwnership();
             VRtistrySyncer.instance.IsDrawing = true;
@@ -159,7 +162,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     public void OnTriggerReleased(Hand h, Grabbable g)
     {
-        if (canPaint)
+        if (canPaintAir)
         {
             HapticsManager.instance.StopHaptics(h.left);
 
@@ -244,7 +247,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
                 DrawingsSyncer.instance.Drawings[(uint)currentDrawing].penStrokes.Add(newPenStroke);
             }
 
-            isPainting = true;
+            isPaintingAir = true;
         }
     }
 
