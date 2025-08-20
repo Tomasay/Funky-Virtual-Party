@@ -17,6 +17,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     public List<List<PolylinePath>> practiceDrawingLines;
 
     public RealtimeDictionary<DrawingModel> Drawings { get => model.drawings; }
+    public DrawingModel CurrentDrawing { get => Drawings[(uint)Drawings.Count - 1]; }
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -35,6 +36,8 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 
     [SerializeField]
     Transform linesParent;
+
+    public P3DPaintSyncer paintSyncer;
 
     private void Awake()
     {
@@ -66,6 +69,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
             Drawings[k].penStrokes.modelAdded -= PenStrokes_modelAdded;
             Drawings[k].practicePenStrokes.modelAdded -= PracticePenStrokes_modelAdded;
             Drawings[k].paintTextureDidChange -= Model_paintTextureDidChange;
+            Drawings[k].paintHitLines.modelAdded -= PaintHitLines_modelAdded;
             Drawings[k].poseData.modelAdded -= PoseData_modelAdded;
             Drawings[k].titleDidChange -= Model_titleDidChange;
         }
@@ -165,6 +169,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         model.penStrokes.modelAdded += PenStrokes_modelAdded;
         model.practicePenStrokes.modelAdded += PracticePenStrokes_modelAdded;
         model.paintTextureDidChange += Model_paintTextureDidChange;
+        model.paintHitLines.modelAdded += PaintHitLines_modelAdded;
         model.poseData.modelAdded += PoseData_modelAdded;
         model.titleDidChange += Model_titleDidChange;
     }
@@ -190,10 +195,15 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         paintTexture.LoadFromData(value);
 #endif
 
-        if (Drawings.Count >= 1)
-        {
-            galleryPaintTextures[Drawings.Count - 1].LoadFromData(value);
-        }
+        galleryPaintTextures[Drawings.Count - 1].LoadFromData(value);
+    }
+
+    //New hit line in paint texture
+    private void PaintHitLines_modelAdded(RealtimeArray<PaintHitLineModel> array, PaintHitLineModel model, bool remote)
+    {
+#if UNITY_WEBGL
+        paintSyncer.ReceiveHitLine(model);
+#endif
     }
 
     //New line within a drawing created

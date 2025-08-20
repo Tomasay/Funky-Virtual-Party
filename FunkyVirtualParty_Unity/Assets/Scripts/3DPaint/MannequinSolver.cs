@@ -134,7 +134,6 @@ public class MannequinSolver : MonoBehaviour
 
         if (!poseHeightAdjusted)
         {
-            Debug.Log("Bro what");
             mannequinIK.transform.position += new Vector3(0, posingHeightOffset, 0);
             poseHeightAdjusted = true;
         }

@@ -548,8 +548,11 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
 
-                //Enable VR tools
-                if(!firstTimeClientsAnswering) paintBrush.CanPaintAir = true;
+                if (!firstTimeClientsAnswering)
+                {
+                    paintBrush.CanPaintAir = true;
+                    vrPlayer.Ahp.useMovement = true;
+                }
 
                 //Display text that players are answering
                 headerText.text = "Players are typing their answers \nUse this time to practice painting!";
