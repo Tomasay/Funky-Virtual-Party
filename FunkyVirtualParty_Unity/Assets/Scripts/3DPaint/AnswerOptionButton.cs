@@ -190,6 +190,8 @@ public class AnswerOptionButton : MonoBehaviour
                 (i.transform as RectTransform).DOMove(cp.transform.position, 1);
                 i.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 1);
 
+                yield return new WaitForSeconds(0.5f);
+
                 float nameHeight = cp.playerNameText.transform.localPosition.y;
                 cp.playerNameText.DOColor(Color.green, 0.25f);
                 cp.playerNameText.transform.DOLocalMoveY(nameHeight + 5, 0.25f);

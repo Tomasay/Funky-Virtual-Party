@@ -26,7 +26,7 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
     public const int CLIENT_ANSWER_TIME_AMOUNT = 60;
 
     //The amount of time between animating each player answer and players that chose that answer in the results phase
-    public const int PLAYER_ANSWER_ANIMATION_TIME = 4;
+    public const int PLAYER_ANSWER_ANIMATION_TIME = 5;
 
     //The amount of time the leaderboard is displayed for between rounds
     public const int LEADERBOARD_DISPLAY_TIME = 6;

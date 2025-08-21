@@ -165,7 +165,7 @@ public class VRTutorial : MonoBehaviour
         introButtons.SetActive(false);
 
         bButtonEnabled = false;
-        headerText.text = "Touch the paint brush to draw directly on the mannequin";
+        headerText.text = "Touch the paint brush to the mannequin to paint on it";
     }
 
     IEnumerator OnPaintAir()
