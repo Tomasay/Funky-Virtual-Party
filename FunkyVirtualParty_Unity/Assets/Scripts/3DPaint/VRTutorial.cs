@@ -81,7 +81,7 @@ public class VRTutorial : MonoBehaviour
     {
         vrPlayer = avatar.GetComponent<VRtistryVRPlayerController>();
 
-        vrPlayer.Ahp.useMovement = false;
+        vrPlayer.Ahp.maxMoveSpeed = 0;
 
         vrPlayer.Ahp.OnMove.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasMoved = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
         vrPlayer.Ahp.OnRotate.AddListener(delegate { if (CurrentStage == TutorialStage.Movement) { hasRotated = true; if (hasMoved && hasRotated) { CurrentStage = TutorialStage.Done; } } });
@@ -94,7 +94,7 @@ public class VRTutorial : MonoBehaviour
 
     public void SkipButtonPressed()
     {
-        vrPlayer.Ahp.useMovement = true;
+        vrPlayer.Ahp.maxMoveSpeed = 3;
 
         RemoveListeners();
 
@@ -127,7 +127,7 @@ public class VRTutorial : MonoBehaviour
                 headerText.text = "To switch handedness, press the primary button in the hand holding your color palette";
                 break;
             case TutorialStage.Movement:
-                vrPlayer.Ahp.useMovement = true;
+                vrPlayer.Ahp.maxMoveSpeed = 3;
 
                 swapHandsInstructions.SetActive(false);
                 movementInstructions.SetActive(true);
