@@ -55,7 +55,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
     GameObject loadingCircle;
 
     [SerializeField]
-    TMP_Text[] scenePartyCodeLetters;
+    public TMP_Text[] scenePartyCodeLetters;
 
     bool disconnectingDueToNoHost, disconnectingMaxPlayers, disconnectingMinigameInProgress;
 
@@ -92,6 +92,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
         else
         {
             SetJoinedUI(false);
+            instance.scenePartyCodeLetters = scenePartyCodeLetters;
+            instance.SetScenePartyCodeText();
             instance.keyboardController = keyboardController;
             Destroy(gameObject);
         }
@@ -208,6 +210,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
         safeToJoinMinigames = true;
 
         SetJoinedUI(true);
+        SetScenePartyCodeText();
 
 #if !UNITY_EDITOR && UNITY_WEBGL
         if(keyboardController) keyboardController.CloseKeyboard();
@@ -233,12 +236,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     void SetJoinedUI(bool animate)
     {
-        //Set party code text in scene
-        for (int i = 0; i < scenePartyCodeLetters.Length; i++)
-        {
-            scenePartyCodeLetters[i].text = "" + partyCodeInput.text[i];
-        }
-
         loadingCircle.SetActive(false);
 
         foreach (GameObject g in objectsToEnableOnJoin)
@@ -261,6 +258,14 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
         controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
+    }
+
+    public void SetScenePartyCodeText()
+    {
+        for (int i = 0; i < scenePartyCodeLetters.Length; i++)
+        {
+            scenePartyCodeLetters[i].text = "" + realtime.room.name[i];
+        }
     }
 
     void CheckDisconnectedReason(Realtime realtime)
