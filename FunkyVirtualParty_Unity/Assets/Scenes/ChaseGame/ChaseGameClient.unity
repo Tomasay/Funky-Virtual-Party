@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -783,7 +782,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 214337148}
-  m_LocalRotation: {x: -0.017822815, y: 0.98192, z: -0.14411525, w: -0.12143459}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.3699865, y: 6.237, z: 17.264166}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1135,14 +1134,14 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: bc6bb85e-f571-493e-86e0-ed94221e64cb
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 0}
+    isDeprecated: 1
   - componentID: 2
     component: {fileID: 329968155}
+    isDeprecated: 0
   _childViews: []
 --- !u!64 &329968157
 MeshCollider:
@@ -3328,14 +3327,14 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: a9fbadf1-4530-4093-a6b6-2a836d3ed273
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 0}
+    isDeprecated: 1
   - componentID: 2
     component: {fileID: 856776019}
+    isDeprecated: 0
   _childViews: []
 --- !u!65 &856776021
 BoxCollider:
@@ -3435,7 +3434,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 857979951}
-  m_LocalRotation: {x: -0.013399944, y: 0.98650694, z: -0.10835194, w: -0.122001864}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3478,14 +3477,14 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: 0ae31689-ed67-4596-8e2a-e4fbb4407df8
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 0}
+    isDeprecated: 1
   - componentID: 2
     component: {fileID: 878842879}
+    isDeprecated: 0
   _childViews: []
 --- !u!64 &878842881
 MeshCollider:
@@ -3597,12 +3596,11 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: 764b1083-fb46-436d-8e65-1b28486db683
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 919451524}
+    isDeprecated: 0
   _childViews: []
 --- !u!4 &919451526
 Transform:
@@ -3778,6 +3776,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
@@ -4047,14 +4046,14 @@ MonoBehaviour:
   _sceneViewUUID: 
   _viewUUID: aa7eb765-6763-4ec5-ab2e-197e45b5e8d3
   _sceneViewPreventOwnershipTakeover: 0
-  _sceneViewDestroyWhenOwnerOrLastClientLeaves: 1
-  _sceneViewDestroyWhenOwnerOrLastClientLeavesMigrated: 1
   _sceneViewDestroyWhenLastClientLeaves: 1
   _components:
   - componentID: 1
     component: {fileID: 0}
+    isDeprecated: 1
   - componentID: 2
     component: {fileID: 1014536538}
+    isDeprecated: 0
   _childViews: []
 --- !u!65 &1014536540
 BoxCollider:
@@ -4110,14 +4109,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1026532392}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.65257, y: -0.1908214, z: 0.17485557, w: 0.7121553}
   m_LocalPosition: {x: -8.765699, y: -1.7139335, z: -6.6781864}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 719795432}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 85, y: -30, z: 0}
 --- !u!114 &1026532394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4535,7 +4534,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1173168232}
-  m_LocalRotation: {x: -0.017822815, y: 0.98192, z: -0.14411525, w: -0.12143459}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -6958,7 +6957,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2115956145}
-  m_LocalRotation: {x: -0.015611033, y: 0.9843789, z: -0.1262308, w: -0.12173868}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
