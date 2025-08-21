@@ -54,6 +54,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
     [SerializeField]
     GameObject loadingCircle;
 
+    [SerializeField]
+    TMP_Text[] scenePartyCodeLetters;
+
     bool disconnectingDueToNoHost, disconnectingMaxPlayers, disconnectingMinigameInProgress;
 
 
@@ -230,6 +233,12 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     void SetJoinedUI(bool animate)
     {
+        //Set party code text in scene
+        for (int i = 0; i < scenePartyCodeLetters.Length; i++)
+        {
+            scenePartyCodeLetters[i].text = "" + partyCodeInput.text[i];
+        }
+
         loadingCircle.SetActive(false);
 
         foreach (GameObject g in objectsToEnableOnJoin)
