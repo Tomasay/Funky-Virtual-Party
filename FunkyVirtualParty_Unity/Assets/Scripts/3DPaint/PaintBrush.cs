@@ -312,19 +312,14 @@ public class PaintBrush : ImmediateModeShapeDrawer
 #endif
     }
 
-    bool firstTimeActive = true; //Used to ignore setting initial penEnabled value to true in VRtistrySyncer
     public void SetActive(bool active)
     {
 #if !UNITY_WEBGL
-        if (!firstTimeActive)
-        {
-            tipMeshSyncer.Enabled = active;
-            baseMeshSyncer.Enabled = active;
-            col.enabled = active;
-            tipCol.enabled = active;
-            this.active = active;
-        }
-        firstTimeActive = false;
+        tipMeshSyncer.Enabled = active;
+        baseMeshSyncer.Enabled = active;
+        col.enabled = active;
+        tipCol.enabled = active;
+        this.active = active;
 #endif
 #if UNITY_WEBGL
         this.active = active;
