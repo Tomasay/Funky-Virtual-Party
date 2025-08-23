@@ -8,6 +8,7 @@ using UnityEngine.Animations;
 using Normal.Realtime;
 using PaintIn3D;
 using DG.Tweening;
+using NaughtyAttributes;
 
 #if !UNITY_WEBGL
 using FMODUnity;
@@ -44,6 +45,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
     [SerializeField]
     public P3DPaintSyncer paintSyncer;
 
+    public P3dPaintableTexture paintTexture;
+
 #if !UNITY_WEBGL
     [HideInInspector]
     public ThreeDPaintGameManager gm;
@@ -73,6 +76,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     private const float LINE_THICKNESS = 0.01f;
     private const float NEW_POINT_DISTANCE_THRESHOLD = 0.001f;
+    private const float REVEAL_ANIMATION_SPEED = 0.01f;
 
     private void Awake()
     {
@@ -228,6 +232,141 @@ public class PaintBrush : ImmediateModeShapeDrawer
                 }
             }
         }
+    }
+
+    public void AnimatePaintingReveal()
+    {
+        StartCoroutine("AnimatePaintLines");
+        StartCoroutine("AnimatePaintTexture");
+    }
+
+    public float linesSpeed = 0.01f, collisionSpeed = 0.005f;
+
+    IEnumerator AnimatePaintLines()
+    {
+        // Cache refs to avoid deep indexing in hot loops
+        var drawings = DrawingsSyncer.instance.drawingLines;
+        if (drawings == null || drawings.Count == 0) yield break;
+
+        var lines = drawings[drawings.Count - 1];
+        if (lines == null || lines.Count == 0) yield break;
+
+        int pointCount = DrawingsSyncer.instance.GetCurrentDrawingLinesPointCount();
+        if (pointCount <= 0) yield break;
+
+
+        float animSpeed = REVEAL_ANIMATION_SPEED;
+        float timeItWillTake = pointCount * REVEAL_ANIMATION_SPEED;
+
+        if (timeItWillTake > 3)
+        {
+            animSpeed = 3.0f / ((float)pointCount);
+        }
+
+        //Make all points transparent
+        for (int i = 0; i < DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1].Count; i++)
+        {
+            for (int j = 0; j < DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1][i].Count; j++)
+            {
+                PolylinePoint p = DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1][i][j];
+                Color col = p.color;
+                col.a = 0;
+                p.color = col;
+                DrawingsSyncer.instance.drawingLines[DrawingsSyncer.instance.drawingLines.Count - 1][i][j] = p;
+            }
+        }
+
+        //Set them back to opaque with a delay in between
+        float pointsPerSecond = 1f / animSpeed;
+        int li = 0;      // line index
+        int pj = 0;      // point index within current line
+        float accumulator = 0f;
+
+        while (li < lines.Count)
+        {
+            accumulator += pointsPerSecond * Time.deltaTime;
+
+            int toReveal = Mathf.FloorToInt(accumulator);
+            if (toReveal > 0)
+            {
+                accumulator -= toReveal;
+
+                while (toReveal > 0 && li < lines.Count)
+                {
+                    var line = lines[li];
+
+                    // Reveal current point
+                    var p = line[pj];
+                    var col = p.color;
+                    col.a = 1f;
+                    p.color = col;
+                    line[pj] = p;
+                    lines[li] = line;
+
+                    // Advance indices
+                    pj++;
+                    if (pj >= line.Count)
+                    {
+                        pj = 0;
+                        li++;
+                    }
+
+                    toReveal--;
+                }
+            }
+
+            // One frame; effective speed governed by pointsPerSecond
+            yield return null;
+        }
+    }
+
+    IEnumerator AnimatePaintTexture()
+    {
+        // 1) Compute duration cap (seconds per step)
+        int steps = paintTexture.States.Count;
+        Debug.Log("steps: " + steps);
+        if (steps <= 0) yield break;
+
+        float animSpeed = REVEAL_ANIMATION_SPEED; // seconds per step
+        float planned = steps * REVEAL_ANIMATION_SPEED;
+        if (planned > 3f) animSpeed = 3f / steps;
+
+        // If animSpeed <= 0, just jump to the end
+        if (animSpeed <= 0f)
+        {
+            while (paintTexture.CanRedo) paintTexture.Redo();
+            yield break;
+        }
+
+        // 2) Prep baseline (oldest state)
+        while (paintTexture.CanUndo) paintTexture.Undo();
+
+        // 3) Accumulator: reveal multiple steps per frame if needed
+        float stepsPerSecond = 1f / animSpeed;
+        float acc = 0f;
+
+        // Choose the time source
+        System.Func<float> dt = new System.Func<float>(() => Time.deltaTime);
+
+        while (paintTexture.CanRedo)
+        {
+            acc += stepsPerSecond * dt();
+
+            int toApply = Mathf.FloorToInt(acc);
+            if (toApply > 0) acc -= toApply;
+
+            // Apply as many redo steps as our time budget allows this frame
+            while (toApply-- > 0 && paintTexture.CanRedo)
+            {
+                paintTexture.Redo();
+            }
+
+            // If nothing applied (e.g., very slow rate), still progress next frame
+            yield return null;
+        }
+
+        //Once animation has played using low res texture, update to full res
+        paintTexture.LoadFromData(DrawingsSyncer.instance.CurrentDrawing.paintTexture);
     }
 
     private void CreateNewLine()

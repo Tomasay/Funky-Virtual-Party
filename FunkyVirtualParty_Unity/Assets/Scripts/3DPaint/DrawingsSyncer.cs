@@ -20,7 +20,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     public DrawingModel CurrentDrawing { get => Drawings[(uint)Drawings.Count - 1]; }
 
     [SerializeField]
-    P3dPaintableTexture paintTexture;
+    public P3dPaintableTexture paintTexture;
 
     [SerializeField]
     GameObject[] artPieceLineParents;
@@ -73,6 +73,20 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
             Drawings[k].poseData.modelAdded -= PoseData_modelAdded;
             Drawings[k].titleDidChange -= Model_titleDidChange;
         }
+    }
+
+    public int GetCurrentDrawingLinesPointCount()
+    {
+        int pointCount = 0;
+        if (drawingLines != null && drawingLines.Count > 0)
+        {
+            for (int i = 0; i < drawingLines[drawingLines.Count - 1].Count; i++)
+            {
+                pointCount += drawingLines[drawingLines.Count - 1][i].Count;
+            }
+        }
+
+        return pointCount;
     }
 
     /// <summary>
@@ -192,7 +206,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     private void Model_paintTextureDidChange(DrawingModel model, byte[] value)
     {
 #if UNITY_WEBGL //Override final texture on main model on mobile to ensure it is 100% correct
-        paintTexture.LoadFromData(value);
+        //paintTexture.LoadFromData(value);
 #endif
 
         galleryPaintTextures[Drawings.Count - 1].LoadFromData(value);

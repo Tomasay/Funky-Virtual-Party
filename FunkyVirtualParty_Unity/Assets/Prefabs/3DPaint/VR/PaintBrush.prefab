@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   paintIn: 0
-  interval: 0
+  interval: 0.025
   pointA: {fileID: 5600238665438627613}
   pointB: {fileID: 3983745941214837320}
   fraction: 1
@@ -669,11 +669,14 @@ MonoBehaviour:
   rb: {fileID: 8249772501264467028}
   realtimeTransform: {fileID: 1062768595587965381}
   paintSyncer: {fileID: 1032525423628394151}
+  paintTexture: {fileID: 0}
   gm: {fileID: 0}
   active: 0
   OnDraw:
     m_PersistentCalls:
       m_Calls: []
+  linesSpeed: 0.01
+  collisionSpeed: 0.005
 --- !u!114 &1584145475314874822
 MonoBehaviour:
   m_ObjectHideFlags: 0

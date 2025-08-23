@@ -51,6 +51,7 @@ public class P3DPaintSyncer : MonoBehaviour, IHitPoint, IHitLine
 			{
 				// Submit the hit line
 				hitLine.HandleHitLine(lhm.preview, lhm.priority, lhm.pressure, lhm.seed, lhm.position, lhm.endPosition, lhm.rotation, lhm.clip);
+				DrawingsSyncer.instance.paintTexture.StoreState();
 			}
 		}
 	}

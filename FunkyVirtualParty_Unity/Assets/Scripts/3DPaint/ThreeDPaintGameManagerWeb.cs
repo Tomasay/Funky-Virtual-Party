@@ -228,6 +228,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
         //Reset any painting from previous round
         paintTexture.Clear();
+        paintTexture.ClearStates();
 
         //Reset results from previous round
         ClearPlayerResults();
@@ -264,6 +265,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Reset any painting from practicing
                 paintTexture.Clear();
+                paintTexture.ClearStates();
                 break;
             case "vr painting":
                 //Bake mannequin IK
@@ -288,6 +290,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 {
                     paintBrush = GameObject.FindAnyObjectByType<PaintBrush>();
                     paintBrush.LinesParent = linesParent.transform;
+                    paintBrush.paintTexture = paintTexture;
                 }
 
                 //Make sure there's no lingering drawings
@@ -346,6 +349,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                         answerResults.Add(aob);
                     }
                 }
+
+                paintBrush.AnimatePaintingReveal();
                 break;
             case "vr guessing":
                 string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
