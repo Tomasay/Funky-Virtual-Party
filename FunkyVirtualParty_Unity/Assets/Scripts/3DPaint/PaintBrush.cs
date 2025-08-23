@@ -281,6 +281,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
             }
         }
 
+        yield return new WaitForSeconds(0.5f);
+
         //Set them back to opaque with a delay in between
         float pointsPerSecond = 1f / animSpeed;
         int li = 0;      // line index
@@ -327,6 +329,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     IEnumerator AnimatePaintTexture()
     {
+        yield return new WaitForSeconds(0.5f);
+
         // 1) Compute duration cap (seconds per step)
         int steps = paintSyncer.currentHitLineModels.Count;
         Debug.Log("steps: " + steps);

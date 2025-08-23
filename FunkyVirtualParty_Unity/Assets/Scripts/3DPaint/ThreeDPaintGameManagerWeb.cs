@@ -225,7 +225,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         guessing = false;
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
-        paintBrush.revealAnimationComplete = false;
+        if(paintBrush) paintBrush.revealAnimationComplete = false;
 
         //Clear answers from previous round
         ClearPlayerAnswers();
