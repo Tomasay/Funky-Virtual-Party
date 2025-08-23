@@ -87,24 +87,26 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
         ShapesMaterialUtils.Prewarm();
 
+        VRtistrySyncer.instance.brushColorChanged.AddListener(ChangeColor);
+
 #if !UNITY_WEBGL
         VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); });
         VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPaintingAir = false; });
         VRtistrySyncer.instance.brushEnabledChanged.AddListener(SetActive);
-        VRtistrySyncer.instance.brushColorChanged.AddListener(ChangeColor);
-
+        
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
 #endif
     }
 
     private void OnDestroy()
     {
+        VRtistrySyncer.instance.brushColorChanged.RemoveListener(ChangeColor);
+
 #if !UNITY_WEBGL
         VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); });
         VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPaintingAir = false; });
         VRtistrySyncer.instance.brushEnabledChanged.RemoveListener(SetActive);
-        VRtistrySyncer.instance.brushColorChanged.RemoveListener(ChangeColor);
-
+        
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 #endif
 
@@ -307,6 +309,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
         }
 #endif
 #if UNITY_WEBGL
+        paintSphere.Color = c;
+
         currentColor = c;
         tipMesh.material.DOColor(c, 0.25f);
 #endif
