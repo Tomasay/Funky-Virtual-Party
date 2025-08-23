@@ -12,6 +12,9 @@ Material:
   m_ValidKeywords:
   - _ALPHATEST_ON
   - _CELPRIMARYMODE_SINGLE
+  - _DETAILMAPBLENDINGMODE_MULTIPLY
+  - _GRADIENTSPACE_WORLD
+  - _OUTLINESPACE_SCREEN
   - _TEXTUREBLENDINGMODE_MULTIPLY
   m_InvalidKeywords:
   - _UNITYSHADOWMODE_NONE
@@ -41,6 +44,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DetailMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _EmissionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -52,6 +59,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 1
+    - _BaseMapPremultiply: 0
     - _Blend: 0
     - _CameraDistanceImpact: 0
     - _CelExtraEnabled: 0
@@ -59,6 +67,8 @@ Material:
     - _CelPrimaryMode: 1
     - _Cull: 2
     - _Cutoff: 0.17857143
+    - _DetailMapBlendingMode: 0
+    - _DetailMapImpact: 0
     - _DstBlend: 0
     - _FlatRimEdgeSmoothness: 0.5
     - _FlatRimLightAlign: 0
@@ -72,12 +82,15 @@ Material:
     - _GradientCenterY: 0
     - _GradientEnabled: 0
     - _GradientSize: 10
+    - _GradientSpace: 0
     - _LightContribution: 0
     - _LightFalloffSize: 0
     - _LightmapDirectionPitch: 0
     - _LightmapDirectionYaw: 0
     - _OutlineDepthOffset: 0
+    - _OutlineEnabled: 0
     - _OutlineScale: 0
+    - _OutlineSpace: 0
     - _OutlineWidth: 0
     - _OverrideLightmapDir: 0
     - _QueueOffset: 0
@@ -93,9 +106,11 @@ Material:
     - _TextureBlendingMode: 0
     - _TextureImpact: 0
     - _UnityShadowMode: 0
+    - _UnityShadowOcclusion: 0
     - _UnityShadowPower: 0.339
     - _UnityShadowSharpness: 10
     - _VertexColorsEnabled: 0
+    - _VertexExtrusionSmoothNormals: 0
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.627451, g: 0.8117647, b: 0.6156863, a: 1}
@@ -105,6 +120,7 @@ Material:
     - _ColorDimExtra: {r: 0.85023, g: 0.85034, b: 0.85045, a: 0.85056}
     - _ColorDimSteps: {r: 0.85023, g: 0.85034, b: 0.85045, a: 0.85056}
     - _ColorGradient: {r: 0.85023, g: 0.85034, b: 0.85045, a: 0.85056}
+    - _DetailMapColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _FlatRimColor: {r: 0.85023, g: 0.85034, b: 0.85045, a: 0.85056}
     - _FlatSpecularColor: {r: 0.85023, g: 0.85034, b: 0.85045, a: 0.85056}

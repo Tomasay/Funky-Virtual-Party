@@ -64,6 +64,31 @@ half4 SplatmapFragment_DSTRM(Varyings IN) : SV_TARGET
     InputData inputData;
     InitializeInputData(IN, normalTS, inputData);
 
+    // If lightmap is enabled, flip the normal if the lightmap is flipped.
+    /*
+#if defined(LIGHTMAP_ON)
+    const half lightmapWorkaroundFlip = -1.0;
+    inputData.normalWS = lightmapWorkaroundFlip * inputData.normalWS;
+#endif
+    */
+
+#if UNITY_VERSION > 202340
+    SETUP_DEBUG_TEXTURE_DATA_FOR_TEX(inputData, IN.uvMainAndLM.xy, _BaseMap);
+#elif VERSION_GREATER_EQUAL(12, 1)
+    SETUP_DEBUG_TEXTURE_DATA(inputData, IN.uvMainAndLM.xy, _BaseMap);
+#endif
+
+    #if defined(_DBUFFER)
+    half3 specular = half3(0.0h, 0.0h, 0.0h);
+    ApplyDecal(IN.clipPos,
+        albedo,
+        specular,
+        inputData.normalWS,
+        metallic,
+        occlusion,
+        smoothness);
+    #endif
+
 #ifdef TERRAIN_GBUFFER
 
     BRDFData brdfData;
@@ -102,7 +127,19 @@ half4 SplatmapFragment_DSTRM(Varyings IN) : SV_TARGET
         #endif
     }
 
-    half4 color = UniversalFragment_DSTRM(inputData, albedo, /* emission */ half3(0, 0, 0), alpha);
+    SurfaceData surfaceData;
+    surfaceData.albedo = albedo;
+    surfaceData.alpha = alpha;
+    surfaceData.emission = 0;
+    surfaceData.specular = 0;
+    surfaceData.smoothness = smoothness;
+    surfaceData.metallic = metallic;
+    surfaceData.occlusion = occlusion;
+    surfaceData.normalTS = normalTS;
+    surfaceData.clearCoatMask = 0;
+    surfaceData.clearCoatSmoothness = 0;
+
+    half4 color = UniversalFragment_DSTRM(inputData, surfaceData, IN.uvMainAndLM.xy);
 
     SplatmapFinalColor(color, inputData.fogCoord);
 

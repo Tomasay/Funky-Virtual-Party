@@ -58,11 +58,17 @@
         _UnityShadowColor("[_UNITYSHADOWMODE_COLOR]Color", Color) = (0.85023, 0.85034, 0.85045, 0.85056)
         _UnityShadowSharpness("Sharpness", Range(1, 10)) = 1.0
 
+		// Editmode props
+        [HideInInspector] _QueueOffset("Queue offset", Float) = 0.0
+
+    	[Space]
+    	[Space]
+
         // --------------------------------
         // --- From `TerrainLit.shader` ---
         // --------------------------------
         [HideInInspector] [ToggleUI] _EnableHeightBlend("EnableHeightBlend", Float) = 0.0
-        _HeightTransition("Height Transition", Range(0, 1.0)) = 0.0
+        [HideInInspector] _HeightTransition("Height Transition", Range(0, 1.0)) = 0.0
         // Layer count is passed down to guide height-blend enable/disable, due
         // to the fact that heigh-based blend will be broken with multipass.
         [HideInInspector] [PerRendererData] _NumLayersCount ("Total Layer Count", Float) = 1.0
@@ -96,7 +102,11 @@
 
 		[HideInInspector] _TerrainHolesTexture("Holes Map (RGB)", 2D) = "white" {}
 
-        [ToggleUI] _EnableInstancedPerPixelNormal("Enable Instanced per-pixel normal", Float) = 1.0
+        [HideInInspector] [ToggleUI] _EnableInstancedPerPixelNormal("Enable Instanced per-pixel normal", Float) = 1.0
+
+		/* start CurvedWorld */
+		//[CurvedWorldBendSettings] _CurvedWorldBendSettings("0|1|1", Vector) = (0, 0, 0, 0)
+		/* end CurvedWorld */
     }
 
     HLSLINCLUDE
@@ -107,12 +117,16 @@
 
     SubShader
     {
-        Tags { "Queue" = "Geometry-100" "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "UniversalMaterialType" = "Lit" "IgnoreProjector" = "False"}
+        Tags { "Queue" = "Geometry-100" "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" "UniversalMaterialType" = "Lit" "IgnoreProjector" = "False" "TerrainCompatible" = "True"}
+
+    	HLSLINCLUDE
+    	#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Version.hlsl"
+    	ENDHLSL
 
         Pass
         {
             Name "ForwardLit"
-            Tags { "LightMode" = "UniversalForward" }
+            Tags { "LightMode" = "UniversalForwardOnly" }
             HLSLPROGRAM
             #pragma target 3.0
 
@@ -133,14 +147,33 @@
 
             // -------------------------------------
             // Universal Pipeline keywords
+            #if VERSION_GREATER_EQUAL(11, 0)
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
+            #else
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #endif
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
             #pragma multi_compile _ SHADOWS_SHADOWMASK
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #if VERSION_GREATER_EQUAL(12, 0)
+            #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
+            #pragma multi_compile_fragment _ _LIGHT_LAYERS
+            #pragma multi_compile_fragment _ _LIGHT_COOKIES
+            #pragma multi_compile _ _CLUSTERED_RENDERING
+            #endif
+            #if UNITY_VERSION >= 202220
+            #pragma multi_compile _ _FORWARD_PLUS
+            #pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
+            #endif
+            #if UNITY_VERSION >= 600000
+            #include_with_pragmas "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl"
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
+            #endif
 
             // -------------------------------------
             // Unity defined keywords
@@ -148,6 +181,10 @@
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #if UNITY_VERSION >= 202230
+            #pragma multi_compile _ DYNAMICLIGHTMAP_ON
+            #pragma multi_compile_fragment _ DEBUG_DISPLAY
+            #endif
             #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
 
             #pragma shader_feature_local_fragment _TERRAIN_BLEND_HEIGHT
@@ -156,12 +193,28 @@
             // Sample normal in pixel shader when doing instancing
             #pragma shader_feature_local _TERRAIN_INSTANCED_PERPIXEL_NORMAL
 
+            // Detail map.
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #pragma shader_feature_local_fragment _DETAILMAPBLENDINGMODE_MULTIPLY _DETAILMAPBLENDINGMODE_ADD _DETAILMAPBLENDINGMODE_INTERPOLATE
+
+            TEXTURE2D(_DetailMap);
+            SAMPLER(sampler_DetailMap);
+
             #define FLATKIT_TERRAIN 1
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "LibraryUrp/StylizedInput.hlsl"
             #include "LibraryUrp/Lighting_DR.hlsl"
             #include "LibraryUrp/TerrainLitPasses_DR.hlsl"
+            
+			/* start CurvedWorld */
+			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
+			//#define CURVEDWORLD_BEND_ID_1
+			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
+			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
+			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
+			/* end CurvedWorld */
+
             ENDHLSL
         }
 
@@ -183,66 +236,23 @@
             #pragma multi_compile_instancing
             #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
-            ENDHLSL
-        }
-
-        Pass
-        {
-            Name "GBuffer"
-            Tags{"LightMode" = "UniversalGBuffer"}
-
-            HLSLPROGRAM
-            #pragma exclude_renderers gles
-            #pragma target 3.0
-            #pragma vertex SplatmapVert
-            #pragma fragment SplatmapFragment_DSTRM
-
-            #define _METALLICSPECGLOSSMAP 1
-            #define _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A 1
-
-            // -------------------------------------
-            // Flat Kit
-            #pragma shader_feature_local __ _CELPRIMARYMODE_SINGLE _CELPRIMARYMODE_STEPS _CELPRIMARYMODE_CURVE
-            #pragma shader_feature_local DR_CEL_EXTRA_ON
-            #pragma shader_feature_local DR_GRADIENT_ON
-            #pragma shader_feature_local DR_SPECULAR_ON
-            #pragma shader_feature_local DR_RIM_ON
-            #pragma shader_feature_local __ _UNITYSHADOWMODE_MULTIPLY _UNITYSHADOWMODE_COLOR
-
             // -------------------------------------
             // Universal Pipeline keywords
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            //#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            //#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
 
-            // -------------------------------------
-            // Unity defined keywords
-            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
-            #pragma multi_compile _ LIGHTMAP_ON
-            #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
-            //#pragma multi_compile_fog
-            #pragma multi_compile_instancing
-            #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
-
-            #pragma shader_feature_local _TERRAIN_BLEND_HEIGHT
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _MASKMAP
-            // Sample normal in pixel shader when doing instancing
-            #pragma shader_feature_local _TERRAIN_INSTANCED_PERPIXEL_NORMAL
-            #define TERRAIN_GBUFFER 1
-
-            #define FLATKIT_TERRAIN 1
+            // This is used during shadow map generation to differentiate between directional and punctual light shadows, as they use different formulas to apply Normal Bias
+            #pragma multi_compile_vertex _ _CASTING_PUNCTUAL_LIGHT_SHADOW
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
-            #include "LibraryUrp/StylizedInput.hlsl"
-            #include "LibraryUrp/Lighting_DR.hlsl"
-            #include "LibraryUrp/TerrainLitPasses_DR.hlsl"
+            
+			/* start CurvedWorld */
+			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
+			//#define CURVEDWORLD_BEND_ID_1
+			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
+			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
+			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
+			/* end CurvedWorld */
+
             ENDHLSL
         }
 
@@ -265,6 +275,15 @@
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
+            
+			/* start CurvedWorld */
+			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
+			//#define CURVEDWORLD_BEND_ID_1
+			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
+			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
+			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
+			/* end CurvedWorld */
+
             ENDHLSL
         }
 
@@ -286,7 +305,20 @@
             #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
 
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
+            #if VERSION_GREATER_EQUAL(12, 0)
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitDepthNormalsPass.hlsl"
+            #else
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
+            #endif
+
+			/* start CurvedWorld */
+			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
+			//#define CURVEDWORLD_BEND_ID_1
+			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
+			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
+			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
+			/* end CurvedWorld */
+
             ENDHLSL
         }
 
@@ -307,6 +339,47 @@
             #define SCENESELECTIONPASS
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitPasses.hlsl"
+            
+			/* start CurvedWorld */
+			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
+			//#define CURVEDWORLD_BEND_ID_1
+			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
+			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
+			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
+			/* end CurvedWorld */
+
+            ENDHLSL
+        }
+
+        // This pass it not used during regular rendering, only for lightmap baking.
+        Pass
+        {
+            Name "Meta"
+            Tags{"LightMode" = "Meta"}
+
+            Cull Off
+
+            HLSLPROGRAM
+            #pragma vertex TerrainVertexMeta
+            #pragma fragment TerrainFragmentMeta
+
+            #pragma multi_compile_instancing
+            #pragma instancing_options assumeuniformscaling nomatrices nolightprobe nolightmap
+            #pragma shader_feature EDITOR_VISUALIZATION
+            #define _METALLICSPECGLOSSMAP 1
+            #define _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A 1
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/Terrain/TerrainLitMetaPass.hlsl"
+
+			/* start CurvedWorld */
+			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
+			//#define CURVEDWORLD_BEND_ID_1
+			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
+			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
+			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
+			/* end CurvedWorld */
+
             ENDHLSL
         }
 
@@ -315,7 +388,7 @@
     Dependency "AddPassShader" = "Hidden/Flat Kit/Terrain/Lit (Add Pass)"
     Dependency "BaseMapShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Base Pass)"
     Dependency "BaseMapGenShader" = "Hidden/Universal Render Pipeline/Terrain/Lit (Basemap Gen)"
-    
+
     Fallback "Hidden/Universal Render Pipeline/FallbackError"
-    CustomEditor "StylizedSurfaceEditor"
+    CustomEditor "FlatKit.TerrainEditor"
 }
