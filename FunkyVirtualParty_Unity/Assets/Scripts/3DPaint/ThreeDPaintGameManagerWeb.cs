@@ -261,7 +261,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             case "vr posing":
                 if (!paintBrush)
                 {
-                    paintBrush = GameObject.FindAnyObjectByType<PaintBrush>(true);
+                    paintBrush = FindAnyObjectByType<PaintBrush>();
                     paintBrush.LinesParent = linesParent.transform;
                     paintBrush.paintTexture = paintTexture;
                     paintBrush.OnRevealAnimationComplete.AddListener(OnRevealAnimationComplete);
