@@ -9,9 +9,19 @@ public class P3DPaintSyncer : MonoBehaviour, IHitPoint, IHitLine
 {
 	public UnityEvent OnHandleHitline;
 
-    private void Awake()
+	public List<PaintHitLineModel> currentHitLineModels;
+	int currentHitLineIndex = 0;
+
+	P3dPaintSphere paintSphere;
+	IHitLine hitLine;
+
+	private void Awake()
     {
+		paintSphere = GetComponent<P3dPaintSphere>();
+		hitLine = GetComponent<IHitLine>();
+
 		OnHandleHitline = new UnityEvent();
+		currentHitLineModels = new List<PaintHitLineModel>();
 
 		DrawingsSyncer.instance.paintSyncer = this;
 	}
@@ -34,6 +44,7 @@ public class P3DPaintSyncer : MonoBehaviour, IHitPoint, IHitLine
 		newHitLine.endPosition = endPosition;
 		newHitLine.rotation = rotation;
 		newHitLine.clip = clip;
+		newHitLine.color = paintSphere.Color;
 
 		DrawingsSyncer.instance.CurrentDrawing.paintHitLines.Add(newHitLine);
 
@@ -43,16 +54,26 @@ public class P3DPaintSyncer : MonoBehaviour, IHitPoint, IHitLine
 
 	public void ReceiveHitLine(PaintHitLineModel lhm)
 	{
-		// Loop through all components that implement IHitLine
-		foreach (var hitLine in GetComponentsInChildren<IHitLine>())
-		{
-			// Ignore this one so we don't recursively paint
-			if ((Object)hitLine != this)
-			{
-				// Submit the hit line
-				hitLine.HandleHitLine(lhm.preview, lhm.priority, lhm.pressure, lhm.seed, lhm.position, lhm.endPosition, lhm.rotation, lhm.clip);
-				DrawingsSyncer.instance.paintTexture.StoreState();
-			}
-		}
+		currentHitLineModels.Add(lhm);
 	}
+
+	public void RevealHitLine()
+    {
+		PaintHitLineModel lhm = currentHitLineModels[currentHitLineIndex];
+		paintSphere.Color = lhm.color;
+		hitLine.HandleHitLine(lhm.preview, lhm.priority, lhm.pressure, lhm.seed, lhm.position, lhm.endPosition, lhm.rotation, lhm.clip);
+		currentHitLineIndex++;
+	}
+
+	public void ResetStoredHitLines()
+    {
+		currentHitLineModels.Clear();
+		currentHitLineModels = new List<PaintHitLineModel>();
+		currentHitLineIndex = 0;
+	}
+
+	public bool CanRevealAnotherHitLine()
+    {
+		return currentHitLineIndex < currentHitLineModels.Count;
+    }
 }

@@ -74,12 +74,18 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     public UnityEvent OnDraw;
 
+    public UnityEvent OnRevealAnimationComplete;
+
+    public bool revealAnimationComplete;
+
     private const float LINE_THICKNESS = 0.01f;
     private const float NEW_POINT_DISTANCE_THRESHOLD = 0.001f;
     private const float REVEAL_ANIMATION_SPEED = 0.01f;
 
     private void Awake()
     {
+        OnRevealAnimationComplete = new UnityEvent();
+
         tipMesh.material.color = currentColor;
 
         //Set Draw defaults for Polylines
@@ -240,7 +246,6 @@ public class PaintBrush : ImmediateModeShapeDrawer
         StartCoroutine("AnimatePaintTexture");
     }
 
-    public float linesSpeed = 0.01f, collisionSpeed = 0.005f;
 
     IEnumerator AnimatePaintLines()
     {
@@ -323,7 +328,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
     IEnumerator AnimatePaintTexture()
     {
         // 1) Compute duration cap (seconds per step)
-        int steps = paintTexture.States.Count;
+        int steps = paintSyncer.currentHitLineModels.Count;
         Debug.Log("steps: " + steps);
         if (steps <= 0) yield break;
 
@@ -331,34 +336,20 @@ public class PaintBrush : ImmediateModeShapeDrawer
         float planned = steps * REVEAL_ANIMATION_SPEED;
         if (planned > 3f) animSpeed = 3f / steps;
 
-        // If animSpeed <= 0, just jump to the end
-        if (animSpeed <= 0f)
-        {
-            while (paintTexture.CanRedo) paintTexture.Redo();
-            yield break;
-        }
-
-        // 2) Prep baseline (oldest state)
-        while (paintTexture.CanUndo) paintTexture.Undo();
-
-        // 3) Accumulator: reveal multiple steps per frame if needed
+        //Reveal multiple steps per frame if needed
         float stepsPerSecond = 1f / animSpeed;
         float acc = 0f;
-
-        // Choose the time source
-        System.Func<float> dt = new System.Func<float>(() => Time.deltaTime);
-
-        while (paintTexture.CanRedo)
+        while (paintSyncer.CanRevealAnotherHitLine())
         {
-            acc += stepsPerSecond * dt();
+            acc += stepsPerSecond * Time.deltaTime;
 
             int toApply = Mathf.FloorToInt(acc);
             if (toApply > 0) acc -= toApply;
 
             // Apply as many redo steps as our time budget allows this frame
-            while (toApply-- > 0 && paintTexture.CanRedo)
+            while (toApply-- > 0 && paintSyncer.CanRevealAnotherHitLine())
             {
-                paintTexture.Redo();
+                paintSyncer.RevealHitLine();
             }
 
             // If nothing applied (e.g., very slow rate), still progress next frame
@@ -366,7 +357,10 @@ public class PaintBrush : ImmediateModeShapeDrawer
         }
 
         //Once animation has played using low res texture, update to full res
-        paintTexture.LoadFromData(DrawingsSyncer.instance.CurrentDrawing.paintTexture);
+        //paintTexture.LoadFromData(DrawingsSyncer.instance.CurrentDrawing.paintTexture);
+
+        revealAnimationComplete = true;
+        OnRevealAnimationComplete.Invoke();
     }
 
     private void CreateNewLine()

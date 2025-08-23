@@ -27,4 +27,7 @@ public partial class PaintHitLineModel
 
     [RealtimeProperty(8, true, true)]
     bool _clip;
+
+    [RealtimeProperty(9, true, true)]
+    Color _color;
 }

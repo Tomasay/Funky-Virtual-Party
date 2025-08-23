@@ -124,8 +124,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
     {
-        tapAndHoldRotateLearned = true;
-        tapAndHoldRotateTutorial.SetActive(false);
+        if (paintBrush.revealAnimationComplete)
+        {
+            tapAndHoldRotateLearned = true;
+            tapAndHoldRotateTutorial.SetActive(false);
+        }
     }
 
     private void Start()
@@ -158,7 +161,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             answerInputField.caretPosition = answerInputField.text.Length;
         }
 
-        if(guessing)
+        if(guessing && paintBrush.revealAnimationComplete)
         {
             if(tapAndHoldRotateLearned)
             {
@@ -222,13 +225,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         guessing = false;
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
+        paintBrush.revealAnimationComplete = false;
 
         //Clear answers from previous round
         ClearPlayerAnswers();
 
         //Reset any painting from previous round
         paintTexture.Clear();
-        paintTexture.ClearStates();
+        DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
 
         //Reset results from previous round
         ClearPlayerResults();
@@ -255,6 +259,14 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 blurImage.enabled = true;
                 break;
             case "vr posing":
+                if (!paintBrush)
+                {
+                    paintBrush = GameObject.FindAnyObjectByType<PaintBrush>(true);
+                    paintBrush.LinesParent = linesParent.transform;
+                    paintBrush.paintTexture = paintTexture;
+                    paintBrush.OnRevealAnimationComplete.AddListener(OnRevealAnimationComplete);
+                }
+
                 inputTimerText.enabled = false;
                 blurTimerText.enabled = false;
 
@@ -265,7 +277,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
                 //Reset any painting from practicing
                 paintTexture.Clear();
-                paintTexture.ClearStates();
+                DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
                 break;
             case "vr painting":
                 //Bake mannequin IK
@@ -286,21 +298,11 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 blurTimerText.enabled = false;
                 inputTimerText.enabled = false;
 
-                if (!paintBrush)
-                {
-                    paintBrush = GameObject.FindAnyObjectByType<PaintBrush>();
-                    paintBrush.LinesParent = linesParent.transform;
-                    paintBrush.paintTexture = paintTexture;
-                }
-
                 //Make sure there's no lingering drawings
                 paintBrush.CanPaintAir = false;
 
                 playersAnswering = false;
                 guessing = true;
-
-                leanTouch.gameObject.SetActive(true);
-                tapAndHoldRotateTutorial.SetActive(!tapAndHoldRotateLearned);
 
                 guessingCanvas.enabled = true;
 
@@ -496,6 +498,12 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void OnRevealAnimationComplete()
+    {
+        leanTouch.gameObject.SetActive(true);
+        tapAndHoldRotateTutorial.SetActive(!tapAndHoldRotateLearned);
     }
 
     void SetDecoyAnswers(string decoyAnswers)
