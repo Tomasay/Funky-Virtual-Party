@@ -198,7 +198,11 @@ public class RealtimeSingletonWeb : MonoBehaviour
             return;
         }
 
-        if (!SceneChangerSyncer.instance.CurrentScene.Equals("MainMenu") && !SceneChangerSyncer.instance.CurrentScene.Equals(""))
+        if(SceneManager.GetActiveScene().name.Equals("VRtistryStandaloneClient"))
+        {
+            //TODO: setup system to check if game is in progress for standalone
+        }
+        else if (!SceneChangerSyncer.instance.CurrentScene.Equals("MainMenu") && !SceneChangerSyncer.instance.CurrentScene.Equals(""))
         {
             disconnectingMinigameInProgress = true;
             realtime.Disconnect();
@@ -256,7 +260,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
             mainMenuCam.transform.Rotate(90, 0, 0);
         }
 
-        controllerCanvas.enabled = true;
+        if(controllerCanvas) controllerCanvas.enabled = true;
         enableCustomizationsButton.gameObject.SetActive(true);
     }
 
@@ -301,6 +305,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SpawnPlayer()
     {
+        Debug.Log("SpawnPlayer");
         string currentScene = SceneManager.GetActiveScene().name;
 
         GameObject newPlayer = Realtime.Instantiate(currentScene + "Player", Realtime.InstantiateOptions.defaults);

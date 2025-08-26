@@ -40,7 +40,7 @@ public class ClientManagerNormcore : MonoBehaviour
             linkInfoText.enabled = true;
             partyCodeText.enabled = true;
 
-            connectingUICamera.enabled = false;
+            if (connectingUICamera) connectingUICamera.enabled = false;
         }
     }
 
@@ -95,7 +95,7 @@ public class ClientManagerNormcore : MonoBehaviour
         linkInfoText.enabled = true;
         partyCodeText.enabled = true;
 
-        connectingUICamera.enabled = false;
+        if(connectingUICamera) connectingUICamera.enabled = false;
     }
 
     private string GenerateCode()

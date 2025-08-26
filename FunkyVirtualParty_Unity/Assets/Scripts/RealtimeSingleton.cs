@@ -33,8 +33,6 @@ public class RealtimeSingleton : MonoBehaviour
 
     private void Awake()
     {
-
-        
         //Singleton instantiation
         if (!instance)
         {
