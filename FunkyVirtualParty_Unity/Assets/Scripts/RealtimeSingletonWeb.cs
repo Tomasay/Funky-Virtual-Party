@@ -250,13 +250,13 @@ public class RealtimeSingletonWeb : MonoBehaviour
         if(animate)
         {
             joinRoomCanvas.GetComponent<Animator>().SetTrigger("Close");
-            logoCanvas.GetComponent<Animator>().SetTrigger("Close");
+            if(logoCanvas) logoCanvas.GetComponent<Animator>().SetTrigger("Close");
             mainMenuCam.transform.DORotate(new Vector3(45, 0, 0), 1.5f);
         }
         else
         {
             joinRoomCanvas.gameObject.SetActive(false);
-            logoCanvas.gameObject.SetActive(false);
+            if(logoCanvas) logoCanvas.gameObject.SetActive(false);
             mainMenuCam.transform.Rotate(90, 0, 0);
         }
 

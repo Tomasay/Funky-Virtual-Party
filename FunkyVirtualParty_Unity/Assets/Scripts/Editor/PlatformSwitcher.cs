@@ -16,12 +16,18 @@ public class PlatformSwitcher : EditorWindow
 
         //Scene list
         List<EditorBuildSettingsScene> editorBuildSettingsScenes = new List<EditorBuildSettingsScene>();
+
+        /*
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MainMenu/MainMenuClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/ChaseGame/ChaseGameClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Shootout/ShootoutClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Kaiju/KaijuClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/VRTistryClient.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MazeGame/MazeGameClient.unity", true));
+        */
+
+        editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/Standalone/VRtistryStandaloneClient.unity", true));
+
         EditorBuildSettings.scenes = editorBuildSettingsScenes.ToArray();
     }
 
@@ -36,12 +42,18 @@ public class PlatformSwitcher : EditorWindow
 
         //Scene list
         List<EditorBuildSettingsScene> editorBuildSettingsScenes = new List<EditorBuildSettingsScene>();
+
+        /*
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MainMenu/MainMenu.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/ChaseGame/ChaseGame.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Shootout/Shootout.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/Kaiju/Kaiju.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/VRTistry.unity", true));
         editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/MazeGame/MazeGame.unity", true));
+        */
+
+        editorBuildSettingsScenes.Add(new EditorBuildSettingsScene("Assets/Scenes/VRTistry/Standalone/VRtistryStandalone.unity", true));
+
         EditorBuildSettings.scenes = editorBuildSettingsScenes.ToArray();
     }
 }

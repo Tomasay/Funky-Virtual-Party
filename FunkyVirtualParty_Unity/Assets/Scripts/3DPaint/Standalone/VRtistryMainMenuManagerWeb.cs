@@ -53,7 +53,6 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         if (vcp && vcp.usingPhone == 0)
         {
             vcp.SetSitAnim();
-            //vcp.TogglePhone();
         }
     }
 

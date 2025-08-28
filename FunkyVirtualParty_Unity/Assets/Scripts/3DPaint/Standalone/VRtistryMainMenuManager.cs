@@ -76,6 +76,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
         }
     }
 
+    [Button]
     public void PlayButtonClicked()
     {
         lobbyInfoCanvas.enabled = false;

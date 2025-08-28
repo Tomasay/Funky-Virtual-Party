@@ -150,7 +150,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
         paintBrush = Realtime.Instantiate("PaintBrush", Vector3.zero, Quaternion.identity, options).GetComponent<PaintBrush>();
         paintBrush.LinesParent = linesParent;
 #if !UNITY_WEBGL
-        paintBrush.gm = this;
+        //TODO: CHANGED FOR STANDALONE
+        //paintBrush.gm = this;
 #endif
 
         paintPalette = Realtime.Instantiate("PaintPalette", Vector3.zero, Quaternion.identity, options).GetComponent<PaintPalette>();

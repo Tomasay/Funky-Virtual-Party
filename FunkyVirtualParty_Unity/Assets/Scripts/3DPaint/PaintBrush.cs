@@ -49,7 +49,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
 #if !UNITY_WEBGL
     [HideInInspector]
-    public ThreeDPaintGameManager gm;
+    public VRtistryGameManager gm;
 #endif
 
     Transform linesParent;

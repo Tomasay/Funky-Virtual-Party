@@ -9237,6 +9237,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abc9f122b21b2bf4fba754d3d786c6a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input_field: {fileID: 0}
+  raw_image_qr_code: {fileID: 0}
 --- !u!114 &686348621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14543,14 +14545,12 @@ VideoPlayer:
   m_DataSource: 0
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 2
-  m_TargetAudioSources:
-  - {fileID: 0}
-  m_DirectAudioVolumes:
-  - 1
+  m_TargetAudioSources: []
+  m_DirectAudioVolumes: []
   m_Url: 
-  m_EnabledAudioTracks: 01
-  m_DirectAudioMutes: 00
-  m_ControlledAudioTrackCount: 1
+  m_EnabledAudioTracks: 
+  m_DirectAudioMutes: 
+  m_ControlledAudioTrackCount: 0
   m_PlayOnAwake: 0
   m_SkipOnDrop: 1
   m_Looping: 1
@@ -16052,6 +16052,13 @@ MonoBehaviour:
   vrPlayerGallerySpawnPos: {fileID: 1164537294}
   mannequinHeightSlider: {fileID: 667738069}
   linesParent: {fileID: 312209335}
+  musicEvent:
+    Guid:
+      Data1: -1433382967
+      Data2: 1096983145
+      Data3: 1271356330
+      Data4: -25941865
+    Path: event:/Music/VRtistry
 --- !u!1 &1217136618
 GameObject:
   m_ObjectHideFlags: 0

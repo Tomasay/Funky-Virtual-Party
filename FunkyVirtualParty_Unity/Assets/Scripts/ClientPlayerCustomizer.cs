@@ -9,6 +9,8 @@ public class ClientPlayerCustomizer : MonoBehaviour
     [SerializeField] Button enableCustomizationButton, closeCustomizationButton;
     [SerializeField] Canvas controllerCanvas;
     [SerializeField] Camera cam;
+    [SerializeField] Transform playerCustomizationCameraTransform, defaultCameraTransform;
+    [SerializeField] float playerCustomizationNearClipPlane;
 
     void Start()
     {
@@ -33,15 +35,16 @@ public class ClientPlayerCustomizer : MonoBehaviour
     private void EnableCustomization()
     {
         //Camera
+        if (cam.TryGetComponent<Animator>(out Animator anim)) anim.applyRootMotion = true;
         cam.transform.parent = RealtimeSingletonWeb.instance.LocalPlayer.Anim.transform;
-        cam.transform.localPosition = new Vector3(0, 5, 10);
-        cam.transform.localRotation = Quaternion.Euler(new Vector3(15, 180, 0));
-        cam.nearClipPlane = 3;
+        cam.transform.localPosition = playerCustomizationCameraTransform.position;
+        cam.transform.localRotation = playerCustomizationCameraTransform.rotation;
+        cam.nearClipPlane = playerCustomizationNearClipPlane;
 
         SetNonLocalClientPlayerVisibility(false);
 
         //Enable UI components
-        controllerCanvas.enabled = false;
+        if(controllerCanvas) controllerCanvas.enabled = false;
         toggleHatLeftButton.gameObject.SetActive(true);
         toggleHatRightButton.gameObject.SetActive(true);
         toggleColorLeftButton.gameObject.SetActive(true);
@@ -56,14 +59,15 @@ public class ClientPlayerCustomizer : MonoBehaviour
     {
         //Camera
         cam.transform.parent = null;
-        cam.transform.position = new Vector3(0, 24, -20);
-        cam.transform.rotation = Quaternion.Euler(new Vector3(45, 0, 0));
+        cam.transform.position = defaultCameraTransform.position;
+        cam.transform.rotation = defaultCameraTransform.rotation;
         cam.nearClipPlane = 0.3f;
+        if (cam.TryGetComponent<Animator>(out Animator anim)) anim.applyRootMotion = false;
 
         SetNonLocalClientPlayerVisibility(true);
 
         //Disable UI components
-        controllerCanvas.enabled = true;
+        if(controllerCanvas) controllerCanvas.enabled = true;
         toggleHatLeftButton.gameObject.SetActive(false);
         toggleHatRightButton.gameObject.SetActive(false);
         toggleColorLeftButton.gameObject.SetActive(false);
