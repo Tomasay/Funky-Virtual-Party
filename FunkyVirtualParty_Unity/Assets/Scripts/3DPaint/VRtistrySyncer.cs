@@ -119,6 +119,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             // If this is a model that has no data set on it
             if (currentModel.isFreshModel)
             {
+                //TODO: Changed for standalone
                 currentModel.state = "main menu";
             }
 

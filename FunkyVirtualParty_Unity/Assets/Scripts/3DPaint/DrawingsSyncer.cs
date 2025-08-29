@@ -51,11 +51,9 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 #if UNITY_ANDROID || UNITY_STANDALONE_WIN
     private void Start()
     {
-        int count = Drawings.Count;
-        for (int i = 0; i < count; i++)
+        foreach (KeyValuePair<uint, DrawingModel> entry in Drawings)
         {
-            uint k = (uint)i;
-            Drawings.Remove(k);
+            Drawings.Remove(entry.Key);
         }
     }
 #endif
@@ -73,6 +71,35 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
             Drawings[k].poseData.modelAdded -= PoseData_modelAdded;
             Drawings[k].titleDidChange -= Model_titleDidChange;
         }
+    }
+
+    /// <summary>
+    /// Used for resetting syncer when returning to main menu in standalone
+    /// </summary>
+    public void ResetDrawingsSyncer()
+    {
+        //Remove callbacks
+        Drawings.modelAdded -= Drawings_modelAdded;
+        for (int i = 0; i < Drawings.Count; i++)
+        {
+            uint k = (uint)i;
+            Drawings[k].penStrokes.modelAdded -= PenStrokes_modelAdded;
+            Drawings[k].practicePenStrokes.modelAdded -= PracticePenStrokes_modelAdded;
+            Drawings[k].paintTextureDidChange -= Model_paintTextureDidChange;
+            Drawings[k].paintHitLines.modelAdded -= PaintHitLines_modelAdded;
+            Drawings[k].poseData.modelAdded -= PoseData_modelAdded;
+            Drawings[k].titleDidChange -= Model_titleDidChange;
+        }
+
+        //Reset Drawings
+        foreach (KeyValuePair<uint, DrawingModel> entry in Drawings)
+        {
+            Drawings.Remove(entry.Key);
+        }
+
+        //Reset Polylines
+        drawingLines = new List<List<PolylinePath>>();
+        practiceDrawingLines = new List<List<PolylinePath>>();
     }
 
     public int GetCurrentDrawingLinesPointCount()

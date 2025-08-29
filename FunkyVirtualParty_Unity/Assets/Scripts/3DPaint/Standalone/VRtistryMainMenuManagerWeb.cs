@@ -6,12 +6,14 @@ using Normal.Realtime;
 
 public class VRtistryMainMenuManagerWeb : MonoBehaviour
 {
-    [SerializeField] Camera mainCam;
+    [SerializeField] Camera mainMenuCam, drawingPhaseCam;
     [SerializeField] Animator mainCamAnim;
 
     [SerializeField] RawImage animatedLogo;
 
     [SerializeField] GameObject[] clientIndicators;
+    [SerializeField] Canvas joinedAndWaitingCanvas;
+    [SerializeField] ClientPlayerCustomizer clientCustomizer;
 
     void Start()
     {
@@ -41,10 +43,10 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     private void EnableVRAvatarVisibility()
     {
         int layerMaskToAdd = 1 << LayerMask.NameToLayer("ClientOnly");
-        mainCam.cullingMask |= layerMaskToAdd;
+        mainMenuCam.cullingMask |= layerMaskToAdd;
 
         layerMaskToAdd = 1 << LayerMask.NameToLayer("Hand");
-        mainCam.cullingMask |= layerMaskToAdd;
+        mainMenuCam.cullingMask |= layerMaskToAdd;
     }
 
     void OnLocalPlayerSpawned()
@@ -66,6 +68,22 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         for (int i = 0; i < ClientPlayer.clients.Count; i++)
         {
             clientIndicators[i].SetActive(false);
+        }
+    }
+
+    public void HideMainMenuUI()
+    {
+        mainMenuCam.gameObject.SetActive(false);
+        drawingPhaseCam.gameObject.SetActive(true);
+
+        clientCustomizer.DisableCustomization();
+        clientCustomizer.canvas.enabled = false;
+
+        joinedAndWaitingCanvas.enabled = false;
+
+        foreach (GameObject ci in clientIndicators)
+        {
+            ci.SetActive(false);
         }
     }
 }

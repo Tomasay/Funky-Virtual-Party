@@ -21,6 +21,9 @@ using NaughtyAttributes;
 public class VRtistryGameManager : MonoBehaviour
 {
     [SerializeField]
+    VRtistryMainMenuManager mainMenuManager;
+
+    [SerializeField]
     TextAsset promptList;
 
     [SerializeField]
@@ -65,6 +68,8 @@ public class VRtistryGameManager : MonoBehaviour
 
     [SerializeField]
     RectTransform canvasGalleryTransform;
+    Vector3 canvasDefaultPos;
+    Quaternion canvasDefaultRot;
 
     [SerializeField]
     Transform vrPlayerGallerySpawnPos;
@@ -75,10 +80,10 @@ public class VRtistryGameManager : MonoBehaviour
     [SerializeField]
     Transform linesParent;
 
-#if !UNITY_WEBGL
     [SerializeField]
-    EventReference musicEvent;
+    string musicEventPath;
 
+#if !UNITY_WEBGL
     EventInstance fmodInstance;
 #endif
 
@@ -131,22 +136,25 @@ public class VRtistryGameManager : MonoBehaviour
 
         finishedPaintingEarlyButton.gameObject.SetActive(false);
 
+        canvasDefaultPos = (uiCanvas.transform as RectTransform).position;
+        canvasDefaultRot = (uiCanvas.transform as RectTransform).rotation;
+
 #if !UNITY_WEBGL
-        fmodInstance = RuntimeManager.CreateInstance(musicEvent);
+        fmodInstance = RuntimeManager.CreateInstance(musicEventPath);
         fmodInstance.start();
 #endif
     }
 
     private void Start()
     {
+        RealtimeSingleton.instance.Realtime.didConnectToRoom += Realtime_didConnectToRoom;
+
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed += RealtimeAvatarManager_avatarDestroyed;
     }
 
-    public void SetupGame()
+    private void Realtime_didConnectToRoom(Realtime realtime)
     {
-        CreateClientPlayerButtons();
-
         //Spawn tools
         Realtime.InstantiateOptions options = new Realtime.InstantiateOptions();
         options.ownedByClient = true;
@@ -187,6 +195,11 @@ public class VRtistryGameManager : MonoBehaviour
             paintPalette.Rb.isKinematic = true;
         });
 #endif
+    }
+
+    public void SetupGame()
+    {
+        CreateClientPlayerButtons();
 
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
@@ -447,6 +460,13 @@ public class VRtistryGameManager : MonoBehaviour
     }
 
     [Button]
+    public void PressContinueButton()
+    {
+        GrabToolsStart();
+        tutorial.ContinueButtonPressed();
+    }
+
+    [Button]
     public void PressSkipButton()
     {
         OnTutorialCompleted();
@@ -516,14 +536,6 @@ public class VRtistryGameManager : MonoBehaviour
 
         solver.SetPose();
 
-        /*
-        while (armature.transform.localPosition != Vector3.zero)
-        {
-            Debug.Log("Setting Pose");
-            solver.SetPose();
-        }
-        */
-
         GrabToolsStart();
         VRtistrySyncer.instance.State = "vr painting";
     }
@@ -533,12 +545,18 @@ public class VRtistryGameManager : MonoBehaviour
     {
         switch (state)
         {
+            case "main menu":
+                //Move canvas to gallery
+                RectTransform rt = (uiCanvas.transform as RectTransform);
+                rt.position = canvasDefaultPos;
+                rt.rotation = canvasDefaultRot;
+
+                break;
             case "clients answering":
                 if (VRtistrySyncer.instance.VRCompletedTutorial) vrPlayer.UIWarningArrow.SetActive(false);
 
                 //Instantiate new drawing
                 uint key = (uint)DrawingsSyncer.instance.Drawings.Count;
-                Debug.Log("Key: " + key);
                 DrawingsSyncer.instance.Drawings.Add(key, new DrawingModel());
 
                 //Clear previous painting
@@ -792,9 +810,9 @@ public class VRtistryGameManager : MonoBehaviour
                 vrPlayer.UIWarningArrow.SetActive(false);
 
                 //Move canvas to gallery
-                RectTransform rt = (uiCanvas.transform as RectTransform);
-                rt.position = canvasGalleryTransform.position;
-                rt.rotation = canvasGalleryTransform.rotation;
+                RectTransform rtt = (uiCanvas.transform as RectTransform);
+                rtt.position = canvasGalleryTransform.position;
+                rtt.rotation = canvasGalleryTransform.rotation;
 
                 mannequinHeightSlider.gameObject.SetActive(false);
 
@@ -866,10 +884,8 @@ public class VRtistryGameManager : MonoBehaviour
         return "";
     }
 
-    public IEnumerator StartGame()
+    public void StartGame()
     {
-        yield return new WaitForSeconds(3);
-
         VRtistrySyncer.instance.CurrentPrompt = GetPrompt();
         VRtistrySyncer.instance.State = "clients answering";
     }
@@ -886,11 +902,11 @@ public class VRtistryGameManager : MonoBehaviour
         fmodInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
 #endif
 
-        yield return new WaitForSeconds(1);
+        StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
 
-        //Destroy tools
-        Realtime.Destroy(paintBrush.gameObject);
-        Realtime.Destroy(paintPalette.gameObject);
+        VRtistrySyncer.instance.State = "main menu";
+        mainMenuManager.ReturnToMainMenu();
+        DrawingsSyncer.instance.ResetDrawingsSyncer();
     }
 
     IEnumerator ShowLeaderboard()
@@ -965,6 +981,14 @@ public class VRtistryGameManager : MonoBehaviour
 
         if (currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
         {
+            //Disable leaderboard
+            leaderboardParent.SetActive(false);
+            ClearPlayerAnswers();
+
+            //Setup for potential next game
+            VRtistrySyncer.instance.Answers = "";
+            currentRound = 1;
+
             VRtistrySyncer.instance.State = "game over";
         }
         else

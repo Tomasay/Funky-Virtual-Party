@@ -28,7 +28,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
 
     [SerializeField] GameObject[] clientIndicators;
 
-    [SerializeField] Canvas lobbyInfoCanvas, gameCanvas;
+    [SerializeField] Canvas lobbyInfoCanvas, tutorialCanvas, gameCanvas;
 
     [SerializeField] Button playButton;
 
@@ -76,14 +76,26 @@ public class VRtistryMainMenuManager : MonoBehaviour
         }
     }
 
+    public void ReturnToMainMenu()
+    {
+        lobbyInfoCanvas.enabled = true;
+        tutorialCanvas.enabled = false;
+        gameCanvas.enabled = false;
+
+        gameManager.SetupGame();
+        gameManager.StartGame();
+        clientIndicators[0].transform.parent.gameObject.SetActive(true);
+    }
+
     [Button]
     public void PlayButtonClicked()
     {
         lobbyInfoCanvas.enabled = false;
+        tutorialCanvas.enabled = true;
         gameCanvas.enabled = true;
 
         gameManager.SetupGame();
-        gameManager.StartCoroutine("StartGame");
+        gameManager.StartGame();
         clientIndicators[0].transform.parent.gameObject.SetActive(false);
     }
 

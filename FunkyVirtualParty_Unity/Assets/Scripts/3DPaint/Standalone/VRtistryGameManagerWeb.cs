@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Linq;
 using Lean.Touch;
 using Shapes;
+using NaughtyAttributes;
 
 public class VRtistryGameManagerWeb : MonoBehaviour
 {
@@ -25,6 +26,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void SetPointerDownOnButton(bool isDown);
 #endif
+
+    [SerializeField]
+    VRtistryMainMenuManagerWeb mainMenuManager;
 
     [SerializeField]
     TMP_Text inputHeaderText, blurHeaderText, guessingHeaderText;
@@ -80,6 +84,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     [SerializeField]
     GameObject tapAndHoldRotateTutorial;
     bool tapAndHoldRotateLearned;
+
+    [SerializeField]
+    GameObject sculptStand;
 
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
@@ -228,6 +235,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         switch (s)
         {
             case "clients answering":
+                ToggleSculptStand(true);
+                mainMenuManager.HideMainMenuUI();
                 ResetAnswerResultsBubbles();
 
                 inputTimerText.enabled = true;
@@ -767,6 +776,24 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         //Disable leaderboard
         leaderboardCanvas.enabled = false;
+    }
+
+    [Button]
+    public void HideSculptStand()
+    {
+        ToggleSculptStand(false);
+    }
+
+    void ToggleSculptStand(bool visible)
+    {
+        foreach (MeshRenderer mr in sculptStand.GetComponentsInChildren<MeshRenderer>())
+        {
+            mr.enabled = visible;
+        }
+        foreach (SkinnedMeshRenderer smr in sculptStand.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            smr.enabled = visible;
+        }
     }
 
     public string FormatTime(float time)

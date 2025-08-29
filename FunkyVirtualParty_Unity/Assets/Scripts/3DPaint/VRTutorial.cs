@@ -8,8 +8,10 @@ using Autohand;
 
 public class VRTutorial : MonoBehaviour
 {
+    //TODO: Changed for standalone
     [SerializeField]
-    ThreeDPaintGameManager gm;
+    //ThreeDPaintGameManager gm;
+    VRtistryGameManager gm;
 
     [SerializeField]
     GraphicRaycaster raycaster;

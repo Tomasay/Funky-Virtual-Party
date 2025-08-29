@@ -12,6 +12,13 @@ public class ClientPlayerCustomizer : MonoBehaviour
     [SerializeField] Transform playerCustomizationCameraTransform, defaultCameraTransform;
     [SerializeField] float playerCustomizationNearClipPlane;
 
+    [HideInInspector] public Canvas canvas;
+
+    private void Awake()
+    {
+        canvas = GetComponent<Canvas>();
+    }
+
     void Start()
     {
         enableCustomizationButton.onClick.AddListener(EnableCustomization);
@@ -55,7 +62,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(false);
     }
 
-    private void DisableCustomization()
+    public void DisableCustomization()
     {
         //Camera
         cam.transform.parent = null;
