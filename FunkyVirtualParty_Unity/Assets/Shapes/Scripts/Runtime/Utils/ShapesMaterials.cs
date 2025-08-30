@@ -64,7 +64,7 @@ namespace Shapes {
 				shaderName = SHAPES_SHADER_PATH_PREFIX + shaderName + " " + blendModeSuffix;
 				Shader shaderObj = Shader.Find( shaderName );
 				if( shaderObj == null ) {
-					Debug.LogError( "Could not find shader " + shaderName );
+					//Debug.LogError( "Could not find shader " + shaderName );
 					return null;
 				}
 
