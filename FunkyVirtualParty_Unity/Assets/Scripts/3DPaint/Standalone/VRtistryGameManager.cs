@@ -197,6 +197,7 @@ public class VRtistryGameManager : MonoBehaviour
 #endif
     }
 
+    public bool gameSetup = false;
     public void SetupGame()
     {
         CreateClientPlayerButtons();
@@ -207,6 +208,8 @@ public class VRtistryGameManager : MonoBehaviour
         VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
 
         InvokeRepeating("Test", 1, 1);
+
+        gameSetup = true;
     }
 
     public void CreateClientPlayerButtons()
@@ -558,6 +561,7 @@ public class VRtistryGameManager : MonoBehaviour
                 //Instantiate new drawing
                 uint key = (uint)DrawingsSyncer.instance.Drawings.Count;
                 DrawingsSyncer.instance.Drawings.Add(key, new DrawingModel());
+                Debug.Log("Added Drawing with key: " + key);
 
                 //Clear previous painting
                 paintTexture.Clear();

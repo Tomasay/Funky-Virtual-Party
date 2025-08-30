@@ -82,8 +82,6 @@ public class VRtistryMainMenuManager : MonoBehaviour
         tutorialCanvas.enabled = false;
         gameCanvas.enabled = false;
 
-        gameManager.SetupGame();
-        gameManager.StartGame();
         clientIndicators[0].transform.parent.gameObject.SetActive(true);
     }
 
@@ -94,7 +92,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
         tutorialCanvas.enabled = true;
         gameCanvas.enabled = true;
 
-        gameManager.SetupGame();
+        if(!gameManager.gameSetup) gameManager.SetupGame();
         gameManager.StartGame();
         clientIndicators[0].transform.parent.gameObject.SetActive(false);
     }

@@ -55,8 +55,31 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         {
             Drawings.Remove(entry.Key);
         }
+
+        //StartCoroutine("Test");
     }
 #endif
+
+    IEnumerator Test()
+    {
+        yield return new WaitForSeconds(3);
+
+        for (int i = 0; i < 3; i++)
+        {
+            uint key = (uint)DrawingsSyncer.instance.Drawings.Count;
+            DrawingsSyncer.instance.Drawings.Add(key, new DrawingModel());
+            Debug.Log("Added Drawing with key: " + key);
+            yield return new WaitForSeconds(1);
+        }
+
+        //Reset Drawings
+        foreach (KeyValuePair<uint, DrawingModel> entry in Drawings)
+        {
+            Drawings.Remove(entry.Key);
+            Debug.Log("Removed Drawing with key: " + entry.Key);
+            yield return new WaitForSeconds(1);
+        }
+    }
 
     private void OnDestroy()
     {
@@ -94,6 +117,7 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
         //Reset Drawings
         foreach (KeyValuePair<uint, DrawingModel> entry in Drawings)
         {
+            Debug.Log("Removing Drawing with key: " + entry.Key);
             Drawings.Remove(entry.Key);
         }
 
