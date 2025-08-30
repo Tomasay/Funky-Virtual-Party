@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class ClientPlayerCustomizer : MonoBehaviour
@@ -13,6 +14,8 @@ public class ClientPlayerCustomizer : MonoBehaviour
     [SerializeField] float playerCustomizationNearClipPlane;
 
     [HideInInspector] public Canvas canvas;
+
+    public UnityEvent OnCustomizationEnabled, OnCustomizationDisabled;
 
     private void Awake()
     {
@@ -60,6 +63,8 @@ public class ClientPlayerCustomizer : MonoBehaviour
         enableCustomizationButton.gameObject.SetActive(false);
 
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(false);
+
+        OnCustomizationEnabled.Invoke();
     }
 
     public void DisableCustomization()
@@ -83,6 +88,8 @@ public class ClientPlayerCustomizer : MonoBehaviour
         enableCustomizationButton.gameObject.SetActive(true);
 
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(true);
+
+        OnCustomizationDisabled.Invoke();
     }
 
     void SetNonLocalClientPlayerVisibility(bool visible)

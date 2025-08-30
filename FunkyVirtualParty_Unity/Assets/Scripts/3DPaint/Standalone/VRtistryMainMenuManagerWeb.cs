@@ -17,7 +17,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
     void Start()
     {
-        RealtimeSingletonWeb.instance.Realtime.didConnectToRoom += Realtime_didConnectToRoom;
+        RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.AddListener(OnProperlyConnectedToRoom);
         RealtimeSingletonWeb.instance.LocalPlayerSpawned.AddListener(OnLocalPlayerSpawned);
 
         if (ClientPlayer.OnClientConnected == null)
@@ -28,16 +28,31 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
         ClientPlayer.OnClientConnected.AddListener(UpdateClientIndicators);
         ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicators);
+
+        clientCustomizer.OnCustomizationEnabled.AddListener(OnClientCustomizerEnabled);
+        clientCustomizer.OnCustomizationDisabled.AddListener(OnClientCustomizerDisabled);
     }
 
-    private void Realtime_didConnectToRoom(Realtime realtime)
+    private void OnProperlyConnectedToRoom()
     {
         animatedLogo.enabled = false; //TODO Setup animation so this gets erased nicely before zooming out
         mainCamAnim.SetTrigger("Zoom Out");
 
         Invoke("EnableVRAvatarVisibility", 1);
 
-        RealtimeSingletonWeb.instance.Realtime.didConnectToRoom -= Realtime_didConnectToRoom;
+        RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.RemoveListener(OnProperlyConnectedToRoom);
+    }
+
+    void OnClientCustomizerEnabled()
+    {
+        clientIndicators[0].transform.parent.gameObject.SetActive(false);
+        joinedAndWaitingCanvas.enabled = false;
+    }
+
+    void OnClientCustomizerDisabled()
+    {
+        clientIndicators[0].transform.parent.gameObject.SetActive(true);
+        joinedAndWaitingCanvas.enabled = true;
     }
 
     private void EnableVRAvatarVisibility()

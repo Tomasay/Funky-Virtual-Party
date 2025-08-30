@@ -3291,7 +3291,7 @@ PrefabInstance:
     - target: {fileID: 549655460268315275, guid: ae1a3bc5e160cbd4b9a0196049493c7b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: e89b999ee0c317349be0114bef1d71cf, type: 2}
+      objectReference: {fileID: 2100000, guid: a545ef43eb4e57942a46cdcdb950e3ba, type: 2}
     - target: {fileID: 919132149155446097, guid: ae1a3bc5e160cbd4b9a0196049493c7b, type: 3}
       propertyPath: m_Name
       value: SculptStand
@@ -4926,12 +4926,20 @@ PrefabInstance:
       value: 27
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2308b7ad4a3426c4ab224f319f5c46f2, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2308b7ad4a3426c4ab224f319f5c46f2, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 2308b7ad4a3426c4ab224f319f5c46f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -8.680699
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2308b7ad4a3426c4ab224f319f5c46f2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -6.1839333
+      value: -6.186
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2308b7ad4a3426c4ab224f319f5c46f2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -15838,6 +15846,7 @@ MonoBehaviour:
   mannequinHeightSlider: {fileID: 667738069}
   linesParent: {fileID: 312209335}
   musicEventPath: event:/Music/VRtistry
+  gameSetup: 0
 --- !u!1 &1217136618
 GameObject:
   m_ObjectHideFlags: 0

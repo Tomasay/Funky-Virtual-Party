@@ -62,6 +62,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public UnityEvent LocalPlayerSpawned;
 
+    public UnityEvent ProperlyConnectedToRoom;
+
 
     public ClientPlayer LocalPlayer { get => localPlayer; }
 
@@ -100,6 +102,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
         if (LocalPlayerSpawned == null)
             LocalPlayerSpawned = new UnityEvent();
+
+        if (ProperlyConnectedToRoom == null)
+            ProperlyConnectedToRoom = new UnityEvent();
 
         realtimeAvatarManager = GetComponent<CustomAvatars.RealtimeAvatarManager>();
 
@@ -211,6 +216,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
 
         //If all good, connect and spawn player
+        ProperlyConnectedToRoom.Invoke();
+
         safeToJoinMinigames = true;
 
         SetJoinedUI(true);

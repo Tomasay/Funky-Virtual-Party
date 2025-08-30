@@ -10,6 +10,7 @@ using System.Linq;
 using Lean.Touch;
 using Shapes;
 using NaughtyAttributes;
+using DG.Tweening;
 
 public class VRtistryGameManagerWeb : MonoBehaviour
 {
@@ -61,7 +62,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     Button submitButton;
 
     [SerializeField]
-    GameObject answerButtonPrefab, answerButtonParent, answerResultsParent;
+    GameObject answerButtonPrefab, answerButtonParent, answerButtonBG, answerResultsParent;
 
     [SerializeField]
     GameObject drawingModel, linesParent;
@@ -307,11 +308,13 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 //Answer buttons
                 answerButtonParent.SetActive(false);
+                answerButtonBG.SetActive(false);
                 foreach (string a in answersSeparated)
                 {
                     string[] ownerAndAnswer = a.Split(':');
 
                     GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                    ab.transform.localScale = Vector3.zero;
                     string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
                     ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
                     AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
@@ -509,6 +512,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             foreach (string d in decoyAnswers.Split(','))
             {
                 GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                ab.transform.localScale = Vector3.zero;
                 ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize sibling index so decoy answers are not always the last ones
                 ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
                 AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
@@ -519,6 +523,22 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         }
 
         answerButtonParent.SetActive(true);
+        answerButtonParent.transform.localScale = Vector3.one;
+        StartCoroutine("AnimateAnswerButtonsIn");
+    }
+
+    IEnumerator AnimateAnswerButtonsIn()
+    {
+        //Animate buttons in
+        answerButtonBG.SetActive(true);
+        answerButtonBG.transform.localScale = Vector3.zero;
+        (answerButtonBG.transform as RectTransform).DOScale(1, 0.25f);
+        yield return new WaitForSeconds(0.25f);
+        foreach (AnswerOptionButton aob in answerButtonParent.GetComponentsInChildren<AnswerOptionButton>())
+        {
+            (aob.transform as RectTransform).DOScale(answerButtonPrefab.transform.localScale, 0.25f);
+            yield return new WaitForSeconds(0.125f);
+        }
     }
 
     public void OpenKeyboard()
@@ -682,11 +702,22 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void ClearPlayerAnswers()
     {
+        StartCoroutine("ClearPlayerAnswersAnimation");
+    }
+
+    IEnumerator ClearPlayerAnswersAnimation()
+    {
+        (answerButtonBG.transform as RectTransform).DOScale(0, 0.25f);
+        (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
+
+        yield return new WaitForSeconds(0.25f);
+
         foreach (AnswerOptionButton aob in answerButtons)
         {
             Destroy(aob.gameObject);
         }
         answerButtons = new List<AnswerOptionButton>();
+        answerButtonBG.SetActive(false);
     }
 
     void ResetAnswerResultsBubbles()
@@ -782,6 +813,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     public void HideSculptStand()
     {
         ToggleSculptStand(false);
+    }
+
+    [Button]
+    public void ShowSculptStand()
+    {
+        ToggleSculptStand(true);
     }
 
     void ToggleSculptStand(bool visible)
