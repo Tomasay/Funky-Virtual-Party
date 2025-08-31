@@ -391,6 +391,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                     if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
                     {
                         GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                        ab.transform.localScale = Vector3.zero;
                         ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerID)); });
                         AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                         aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
@@ -398,6 +399,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                         answerButtons.Add(aob);
                     }
                 }
+                StartCoroutine("AnimateAnswerButtonsIn");
 
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
 
@@ -643,6 +645,13 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         guessingHeaderText.text = "Waiting for other players to answer";
 
+        //If there's only 1 client, clear answers BG since there will be no guessing of other clients
+        //This should only happen when testing in editor
+        if(ClientPlayer.clients.Count == 1)
+        {
+            (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
+        }
+
         ClearPlayerAnswers();
     }
 
@@ -659,6 +668,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             guessingHeaderText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote \n" + GetAnswerByOwnerID(answerOwnerIDPlayerIsGuessing);
         }
 
+        (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
         ClearPlayerAnswers();
 
         yield return new WaitForSeconds(3);
@@ -708,7 +718,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     IEnumerator ClearPlayerAnswersAnimation()
     {
         (answerButtonBG.transform as RectTransform).DOScale(0, 0.25f);
-        (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
 
         yield return new WaitForSeconds(0.25f);
 
