@@ -66,17 +66,15 @@ mergeInto(LibraryManager.library, {
 	ReloadPage: function ()
 	{
 		//Reload to correct domain, removing party code parameter
-		if(window.location.href.includes("partycrashers.app/Testing"))
-		{
-			window.location = "https://www.partycrashers.app/Testing";
+		const url = new URL(window.location.href);
+  
+		if (url.searchParams.has("partyCode")) {
+			url.searchParams.delete("partyCode"); // remove the parameter
+			window.location.replace(url.origin + url.pathname); 
 		}
-		else if(window.location.href.includes("partycrashers.app/TestingToo"))
-		{
-			window.location = "https://www.partycrashers.app/TestingToo";
-		}
-		else
-		{
-			window.location = "https://www.partycrashers.app"
+		else {
+			// No parameter, just reload normally
+			window.location.reload();
 		}
 	},
 	CheckURLPartyCode: function ()
