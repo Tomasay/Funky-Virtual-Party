@@ -329,11 +329,12 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     IEnumerator AnimatePaintTexture()
     {
+        paintTexture.Clear();
+
         yield return new WaitForSeconds(0.5f);
 
         // 1) Compute duration cap (seconds per step)
         int steps = paintSyncer.currentHitLineModels.Count;
-        Debug.Log("steps: " + steps);
         if (steps <= 0) yield break;
 
         float animSpeed = REVEAL_ANIMATION_SPEED; // seconds per step

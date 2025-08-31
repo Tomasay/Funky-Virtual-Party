@@ -54,6 +54,9 @@ public class P3DPaintSyncer : MonoBehaviour, IHitPoint, IHitLine
 
 	public void ReceiveHitLine(PaintHitLineModel lhm)
 	{
+		paintSphere.Color = lhm.color;
+		hitLine.HandleHitLine(lhm.preview, lhm.priority, lhm.pressure, lhm.seed, lhm.position, lhm.endPosition, lhm.rotation, lhm.clip);
+
 		currentHitLineModels.Add(lhm);
 	}
 
