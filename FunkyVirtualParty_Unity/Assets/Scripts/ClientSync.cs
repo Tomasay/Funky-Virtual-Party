@@ -60,6 +60,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             // If this is a model that has no data set on it
             if (currentModel.isFreshModel)
             {
+                currentModel.isDancing = -1;
             }
 
             //Update to match new data

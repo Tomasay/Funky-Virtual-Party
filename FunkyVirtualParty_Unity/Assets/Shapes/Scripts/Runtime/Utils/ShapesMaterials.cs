@@ -55,8 +55,10 @@ namespace Shapes {
 			// in editor, we want to use the material *assets*, not create any materials
 			string path = $"{ShapesIO.GeneratedMaterialsFolder}/{GetMaterialName( shaderName, blendModeSuffix, keywords )}.mat";
 			Material mat = AssetDatabase.LoadAssetAtPath<Material>( path );
-			if( mat == null )
-				Debug.LogWarning( "Failed to load material " + path );
+			if (mat == null)
+			{
+				//Debug.LogWarning( "Failed to load material " + path );
+			}
 			return mat;
 
 			#else

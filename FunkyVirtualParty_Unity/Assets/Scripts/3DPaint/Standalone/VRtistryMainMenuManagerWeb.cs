@@ -27,7 +27,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
             ClientPlayer.OnClientDisconnected = new MyCPEvent();
 
         ClientPlayer.OnClientConnected.AddListener(UpdateClientIndicators);
-        ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicators);
+        ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicatorsDelayed); //Adding delay so that Client count is accurate
 
         clientCustomizer.OnCustomizationEnabled.AddListener(OnClientCustomizerEnabled);
         clientCustomizer.OnCustomizationDisabled.AddListener(OnClientCustomizerDisabled);
@@ -67,13 +67,13 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     void OnLocalPlayerSpawned()
     {
         VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
-        if (vcp && vcp.usingPhone == 0)
+        if (vcp)
         {
             vcp.SetSitAnim();
         }
     }
 
-    private void UpdateClientIndicators(ClientPlayer cp)
+    void UpdateClientIndicators(ClientPlayer cp)
     {
         foreach (GameObject ci in clientIndicators)
         {
@@ -84,6 +84,17 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         {
             clientIndicators[i].SetActive(false);
         }
+    }
+
+    void UpdateClientIndicatorsDelayed(ClientPlayer cp)
+    {
+        StartCoroutine(UpdateClientIndicatorsDelayedCoroutine(cp));
+    }
+
+    IEnumerator UpdateClientIndicatorsDelayedCoroutine(ClientPlayer cp)
+    {
+        yield return new WaitForSeconds(0.5f);
+        UpdateClientIndicators(cp);
     }
 
     public void HideMainMenuUI()

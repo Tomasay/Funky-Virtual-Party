@@ -105,7 +105,7 @@ public class VRtistryGameManager : MonoBehaviour
 
     int[] numOfPointersOnClients; //How many pointers are currently on a client? Used to determine highlighting effects
 
-    const string dontSayWarning = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
+    const string DONT_SAY_WARNING = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
 
     RealtimeTransform[] armatureRTs;
     Vector3[] armaturePositions;
@@ -601,7 +601,7 @@ public class VRtistryGameManager : MonoBehaviour
                 VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.ownerIDSelf;
 
                 //UI
-                headerText.text = dontSayWarning + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
+                headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 //Clear practice painting
                 paintTexture.Clear();
@@ -616,7 +616,7 @@ public class VRtistryGameManager : MonoBehaviour
                 paintBrush.CanPaintAir = true;
 
                 //UI
-                headerText.text = dontSayWarning + "Your prompt is: <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\n\n";
+                headerText.text = DONT_SAY_WARNING + "Your prompt is: <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\n\n";
                 timerText.enabled = true;
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
@@ -1036,6 +1036,7 @@ public class VRtistryGameManager : MonoBehaviour
     void PlayerGuessedPlayer(string guesses)
     {
         //Check to see if all players have guessed, if so move to next state
+        Debug.Log("VRPlayerGuess: " + VRtistrySyncer.instance.VRPlayerGuess + "  Player guesses: " + guesses.Split('\n').Length + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
         if (VRtistrySyncer.instance.VRPlayerGuess != -1 && guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
         {
             VRtistrySyncer.instance.State = "results";
@@ -1125,6 +1126,7 @@ public class VRtistryGameManager : MonoBehaviour
             headerText.text = "Waiting for clients to submit guesses";
 
             //If all clients have also guessed, move to results phase
+            Debug.Log("Player guesses: " + VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
             if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
             {
                 VRtistrySyncer.instance.State = "results";

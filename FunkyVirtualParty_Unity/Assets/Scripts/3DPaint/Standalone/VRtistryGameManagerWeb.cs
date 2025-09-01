@@ -350,56 +350,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 paintBrush.AnimatePaintingReveal();
                 break;
             case "vr guessing":
-                string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
-
-                //If local player is the one who wrote the picked answer, show them someone else's answer
-                if (VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-                {
-                    foreach (string a in answersSeparated2)
-                    {
-                        string[] ownerAndAnswer = a.Split(':');
-
-                        if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-                        {
-                            guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                            answerOwnerIDPlayerIsGuessing = ownerID;
-                            break;
-                        }
-                    }
-                }
-                //Else, show them the owner of the picked answer
-                else
-                {
-                    foreach (string a in answersSeparated2)
-                    {
-                        string[] ownerAndAnswer = a.Split(':');
-
-                        if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID == VRtistrySyncer.instance.ChosenAnswerOwner)
-                        {
-                            guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                            answerOwnerIDPlayerIsGuessing = ownerID;
-                            break;
-                        }
-                    }
-                }
-
-                //Player Answer buttons, show everyone but self
-                foreach (string a in answersSeparated2)
-                {
-                    string[] ownerAndAnswer = a.Split(':');
-
-                    if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-                    {
-                        GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                        ab.transform.localScale = Vector3.zero;
-                        ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerID)); });
-                        AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                        aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
-                        aob.playerID = ownerAndAnswer[0];
-                        answerButtons.Add(aob);
-                    }
-                }
-                StartCoroutine("AnimateAnswerButtonsIn");
+                Invoke("CreatePlayerGuessButtons", 0.5f);
 
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
 
@@ -497,6 +448,60 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         }
     }
 
+    void CreatePlayerGuessButtons()
+    {
+        string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
+
+        //If local player is the one who wrote the picked answer, show them someone else's answer
+        if (VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+        {
+            foreach (string a in answersSeparated2)
+            {
+                string[] ownerAndAnswer = a.Split(':');
+
+                if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+                {
+                    guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
+                    answerOwnerIDPlayerIsGuessing = ownerID;
+                    break;
+                }
+            }
+        }
+        //Else, show them the owner of the picked answer
+        else
+        {
+            foreach (string a in answersSeparated2)
+            {
+                string[] ownerAndAnswer = a.Split(':');
+
+                if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID == VRtistrySyncer.instance.ChosenAnswerOwner)
+                {
+                    guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
+                    answerOwnerIDPlayerIsGuessing = ownerID;
+                    break;
+                }
+            }
+        }
+
+        //Player Answer buttons, show everyone but self
+        foreach (string a in answersSeparated2)
+        {
+            string[] ownerAndAnswer = a.Split(':');
+
+            if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+            {
+                GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                ab.transform.localScale = Vector3.zero;
+                ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerID)); });
+                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
+                aob.playerID = ownerAndAnswer[0];
+                answerButtons.Add(aob);
+            }
+        }
+        StartCoroutine("AnimateAnswerButtonsIn");
+    }
+
     void OnRevealAnimationComplete()
     {
         leanTouch.gameObject.SetActive(true);
@@ -532,6 +537,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     IEnumerator AnimateAnswerButtonsIn()
     {
         //Animate buttons in
+        answerButtonParent.transform.localScale = Vector3.one;
         answerButtonBG.SetActive(true);
         answerButtonBG.transform.localScale = Vector3.zero;
         (answerButtonBG.transform as RectTransform).DOScale(1, 0.25f);
@@ -645,13 +651,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         guessingHeaderText.text = "Waiting for other players to answer";
 
-        //If there's only 1 client, clear answers BG since there will be no guessing of other clients
-        //This should only happen when testing in editor
-        if(ClientPlayer.clients.Count == 1)
-        {
-            (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
-        }
-
+        (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
         ClearPlayerAnswers();
     }
 
