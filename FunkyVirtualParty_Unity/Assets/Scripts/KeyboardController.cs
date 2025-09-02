@@ -94,6 +94,7 @@ public class KeyboardController : MonoBehaviour
         {
             currentField.text = currentField.text.Substring(0, 4);
         }
+        //Debug.Log("Updating dummy field with " + currentField.gameObject.name + ": " + currentField.text);
         UpdateInputFieldText(currentField.text);
 
 #elif UNITY_EDITOR && UNITY_WEBGL

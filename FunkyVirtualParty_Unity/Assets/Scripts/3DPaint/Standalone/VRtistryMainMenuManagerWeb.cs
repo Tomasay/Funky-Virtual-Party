@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Normal.Realtime;
+using System.Runtime.InteropServices;
 
 public class VRtistryMainMenuManagerWeb : MonoBehaviour
 {
@@ -14,6 +15,11 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     [SerializeField] GameObject[] clientIndicators;
     [SerializeField] Canvas joinedAndWaitingCanvas;
     [SerializeField] ClientPlayerCustomizer clientCustomizer;
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+    [DllImport("__Internal")]
+    private static extern void SetInteractiveWidgetOverlay();
+#endif
 
     void Start()
     {
@@ -41,6 +47,10 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         Invoke("EnableVRAvatarVisibility", 1);
 
         RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.RemoveListener(OnProperlyConnectedToRoom);
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        SetInteractiveWidgetOverlay();
+#endif
     }
 
     void OnClientCustomizerEnabled()

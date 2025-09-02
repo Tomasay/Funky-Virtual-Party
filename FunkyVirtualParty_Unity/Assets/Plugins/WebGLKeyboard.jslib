@@ -96,5 +96,29 @@ mergeInto(LibraryManager.library, {
 		if(window.navigator.vibrate){
 			navigator.vibrate(hapticTime);
 		}
+	},
+	SetInteractiveWidgetOverlay: function ()
+	{
+	    window.overlayKeyboard = true;
+	},
+	ManuallyOpenKeyboard: function()
+	{
+		//Does not work on any browser for IOS, or any version of Firefox
+
+		//Make sure dummy input is focused
+		document.getElementById("dummyInput").focus();
+
+		//Add necessary parameters to manually open keyboard
+		const input = document.getElementById("dummyInput");
+		input.setAttribute("contenteditable", "true");
+		input.setAttribute("virtualkeyboardpolicy", "manual");
+
+		navigator.virtualKeyboard.show();
+
+		//Remove the parameters so that clicking input fields still works. Need a short delay to allow keyboard to open first
+		setTimeout(() => {
+			input.removeAttribute("contenteditable");
+			input.removeAttribute("virtualkeyboardpolicy");
+		}, 100);
 	}
 });

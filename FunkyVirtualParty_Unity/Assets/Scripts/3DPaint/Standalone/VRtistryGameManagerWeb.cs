@@ -26,6 +26,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     [DllImport("__Internal")]
     private static extern void SetPointerDownOnButton(bool isDown);
+
+    [DllImport("__Internal")]
+    private static extern void TriggerHaptic(int hapticTime);
+
+    [DllImport("__Internal")]
+    private static extern void ManuallyOpenKeyboard();
 #endif
 
     [SerializeField]
@@ -250,6 +256,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 }
 
                 blurImage.enabled = true;
+
+                answerInputButton.onClick.Invoke();
+#if UNITY_WEBGL && !UNITY_EDITOR
+                ManuallyOpenKeyboard();
+                TriggerHaptic(200);
+#endif
                 break;
             case "vr posing":
                 if (!paintBrush)
