@@ -54,8 +54,6 @@ public class KeyboardController : MonoBehaviour
         codeFieldButton.onPointerUp.AddListener(ButtonPointerUp);
         codeFieldButton.onPointerUp.AddListener(delegate { SetField(codeField); });
 
-        nameField.onValueChanged.AddListener(delegate { UpdateDummyInputTextWithCharacterLimit(12); });
-        codeField.onValueChanged.AddListener(delegate { UpdateDummyInputTextWithCharacterLimit(4); });
         codeField.onValueChanged.AddListener(delegate { RealtimeSingletonWeb.instance.CheckValidPartyCode(codeField.text); });
 
         string storedName = GetNameData();
@@ -87,6 +85,16 @@ public class KeyboardController : MonoBehaviour
         {
             SetField(codeField);
         }
+
+        if (currentField == nameField && currentField.text.Length > 12)
+        {
+            currentField.text = currentField.text.Substring(0, 12);
+        }
+        else if (currentField == codeField && currentField.text.Length > 4)
+        {
+            currentField.text = currentField.text.Substring(0, 4);
+        }
+        UpdateInputFieldText(currentField.text);
 
 #elif UNITY_EDITOR && UNITY_WEBGL
         if (Keyboard.current.tabKey.wasPressedThisFrame && nameField.isFocused)
@@ -138,20 +146,6 @@ public class KeyboardController : MonoBehaviour
     {
         currentField = f;
         UpdateInputFieldText(f.text);
-    }
-
-    public void UpdateDummyInputText()
-    {
-        UpdateInputFieldText(currentField.text);
-    }
-
-    public void UpdateDummyInputTextWithCharacterLimit(int limit)
-    {
-        if (currentField.text.Length > limit)
-        {
-            currentField.text = currentField.text.Substring(0, limit);
-        }
-        UpdateInputFieldText(currentField.text);
     }
 #endif
 }
