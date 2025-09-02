@@ -255,7 +255,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                     vcp.TogglePhone();
                 }
 
-                blurImage.enabled = true;
+                blurImage.gameObject.SetActive(true);
 
                 answerInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -311,7 +311,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 guessingCanvas.enabled = true;
 
-                blurImage.enabled = false;
+                blurImage.gameObject.SetActive(false);
 
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);

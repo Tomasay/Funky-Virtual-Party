@@ -74,7 +74,8 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
     {
         if (!val.Equals(""))
         {
-            anim.SetBool(ToggleBool, !anim.GetBool(ToggleBool));
+            //Debug.Log("Toggling bool " + val + " from " + anim.GetBool(val) + " to " + !anim.GetBool(val));
+            anim.SetBool(val, !anim.GetBool(val));
             Invoke("ResetToggleBool", 1);
         }
     }
