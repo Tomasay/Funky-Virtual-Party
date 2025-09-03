@@ -42,7 +42,7 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
             "guesses of what you think it is based on the images. Your answers should be distinct from one another. " +
             "No two answers should contain the same word. " +
             "Your answers should be one or two words max. Make sure your answers are not too similar to the chosen answer. " +
-            "Please give me the answers only, each separated by a comma. " +
+            "Your response must be the answers only, each separated by a comma. Include no other text besides those answers. " +
             "You may include spaces in the answers, but make sure there are no spaces in between different answers, only commas." +
             "Use humor with some of these answers, as this game is usually played with friends and the " +
             "goal is to make people laugh. Just make sure the answers make sense for the original question and what you see in the images. " +
@@ -91,7 +91,7 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
 
             string reply = await testPrompt1
                 .GENResponse()
-                .SetModel(GoogleModel.Gemini2_0_Flash)
+                .SetModel(GoogleModel.Gemini2_0_Flash_Lite)
                 .Attach(artTextures)
                 .ExecuteAsync();
 
