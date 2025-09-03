@@ -22,9 +22,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     private static extern void OnKeyboardInput();
 
     [DllImport("__Internal")]
-    private static extern void UpdateInputFieldText(string txt);
-
-    [DllImport("__Internal")]
     private static extern void SetPointerDownOnButton(bool isDown);
 
     [DllImport("__Internal")]
@@ -33,6 +30,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     [DllImport("__Internal")]
     private static extern void ManuallyOpenKeyboard();
 #endif
+
+    [SerializeField]
+    KeyboardController keyboardController;
 
     [SerializeField]
     VRtistryMainMenuManagerWeb mainMenuManager;
@@ -601,26 +601,16 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     {
         currentField = f;
 #if UNITY_WEBGL && !UNITY_EDITOR
-        UpdateInputFieldText(currentField.text);
+        keyboardController.SetField(f);
 #endif
     }
 
-    public void UpdateDummyInputText()
-    {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        UpdateInputFieldText(currentField.text);
-#endif
-    }
-
-    public void UpdateDummyInputTextWithCharacterLimit(int limit)
+    public void RestrictCharacterLimit(int limit)
     {
         if (currentField.text.Length > limit)
         {
             currentField.text = currentField.text.Substring(0, limit);
         }
-#if UNITY_WEBGL && !UNITY_EDITOR
-        UpdateInputFieldText(currentField.text);
-#endif
     }
 
     public void SubmitAnswer()

@@ -1715,7 +1715,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 1408861839}
         m_TargetAssemblyTypeName: VRtistryGameManagerWeb, Assembly-CSharp
-        m_MethodName: UpdateDummyInputTextWithCharacterLimit
+        m_MethodName: RestrictCharacterLimit
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -14810,6 +14810,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 692deaeca01106b47974ad12033e5187, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  keyboardController: {fileID: 1408861836}
   mainMenuManager: {fileID: 1408861838}
   inputHeaderText: {fileID: 335623523}
   blurHeaderText: {fileID: 381874098}
