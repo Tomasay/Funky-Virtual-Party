@@ -16,10 +16,15 @@ using FMODUnity;
 
 public class PaintBrush : ImmediateModeShapeDrawer
 {
+    public bool canAirAndCollisionPaintAtSameTime = false;
+
     Color currentColor = Color.black;
 
     [SerializeField]
     P3dPaintSphere paintSphere;
+
+    [SerializeField]
+    P3dHitBetween paintHitBetween;
 
     [SerializeField]
     Transform tip;
@@ -100,8 +105,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
         VRtistrySyncer.instance.brushColorChanged.AddListener(ChangeColor);
 
 #if !UNITY_WEBGL
-        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate { CreateNewLine(); });
-        VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPaintingAir = false; });
+        VRtistrySyncer.instance.StartedDrawing.AddListener(delegate {CreateNewLine(); if (!canAirAndCollisionPaintAtSameTime) { paintHitBetween.enabled = false; } });
+        VRtistrySyncer.instance.StoppedDrawing.AddListener(delegate { isPaintingAir = false; if (!canAirAndCollisionPaintAtSameTime) { paintHitBetween.enabled = true; } });
         VRtistrySyncer.instance.brushEnabledChanged.AddListener(SetActive);
         
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
@@ -113,8 +118,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
         VRtistrySyncer.instance.brushColorChanged.RemoveListener(ChangeColor);
 
 #if !UNITY_WEBGL
-        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); });
-        VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPaintingAir = false; });
+        VRtistrySyncer.instance.StartedDrawing.RemoveListener(delegate { CreateNewLine(); if (!canAirAndCollisionPaintAtSameTime) { paintHitBetween.enabled = false; } });
+        VRtistrySyncer.instance.StoppedDrawing.RemoveListener(delegate { isPaintingAir = false; if (!canAirAndCollisionPaintAtSameTime) { paintHitBetween.enabled = true; } });
         VRtistrySyncer.instance.brushEnabledChanged.RemoveListener(SetActive);
         
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;

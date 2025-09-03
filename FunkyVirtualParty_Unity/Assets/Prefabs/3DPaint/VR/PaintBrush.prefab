@@ -657,7 +657,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useCullingMasks: 0
+  canAirAndCollisionPaintAtSameTime: 0
   paintSphere: {fileID: 7221151599500054089}
+  paintHitBetween: {fileID: 1557921605653615913}
   tip: {fileID: 8249772499573377130}
   tipMesh: {fileID: 316311845049743878}
   baseMesh: {fileID: 7330876957854603475}
@@ -675,8 +677,10 @@ MonoBehaviour:
   OnDraw:
     m_PersistentCalls:
       m_Calls: []
-  linesSpeed: 0.01
-  collisionSpeed: 0.005
+  OnRevealAnimationComplete:
+    m_PersistentCalls:
+      m_Calls: []
+  revealAnimationComplete: 0
 --- !u!114 &1584145475314874822
 MonoBehaviour:
   m_ObjectHideFlags: 0
