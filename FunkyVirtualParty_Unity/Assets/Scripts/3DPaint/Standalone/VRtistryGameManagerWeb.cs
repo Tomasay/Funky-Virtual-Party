@@ -44,7 +44,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     TMP_Text blurTimerText, inputTimerText;
 
     [SerializeField]
-    Image blurImage;
+    RectTransform blurWipUI;
 
     [SerializeField]
     P3dPaintableTexture paintTexture;
@@ -255,8 +255,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                     vcp.TogglePhone();
                 }
 
-                blurImage.gameObject.SetActive(true);
-
                 answerInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
                 ManuallyOpenKeyboard();
@@ -285,6 +283,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
                 break;
             case "vr painting":
+                blurWipUI.DOScale(1, 0.5f);
+
                 //Bake mannequin IK
                 mannequinSolver.SetPoseColliders();
 
@@ -311,7 +311,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 guessingCanvas.enabled = true;
 
-                blurImage.gameObject.SetActive(false);
+                blurWipUI.DOScale(0, 0.5f);
 
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);
