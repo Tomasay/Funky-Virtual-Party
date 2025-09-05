@@ -50,7 +50,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
-    Canvas inputCanvas, guessingCanvas, leaderboardCanvas;
+    Canvas joinedAndWaitingCanvas, inputCanvas, guessingCanvas, leaderboardCanvas;
 
     [SerializeField]
     GameObject playerInputParent;
@@ -76,7 +76,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     Quaternion drawingModelStartingRot;
 
     [SerializeField]
-    Camera drawingPhaseCamera, guessingPhaseCamera, galleryCamera;
+    Camera mainMenuCamera, drawingPhaseCamera, guessingPhaseCamera, galleryCamera;
 
     [SerializeField]
     MannequinSolverClient mannequinSolver;
@@ -87,6 +87,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     [SerializeField]
     LeanTouch leanTouch;
+
+    [SerializeField]
+    LeanDragRotate leanDrag;
 
     [SerializeField]
     GameObject tapAndHoldRotateTutorial;
@@ -100,7 +103,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
-    bool guessing = false; //Are players guessing?
 
     List<AnswerOptionButton> answerButtons, answerResults;
 
@@ -163,7 +165,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             answerInputField.caretPosition = answerInputField.text.Length;
         }
 
-        if (guessing && paintBrush.revealAnimationComplete)
+        if ((VRtistrySyncer.instance.State.Equals("clients guessing") || VRtistrySyncer.instance.State.Equals("vr guessing")) && paintBrush.revealAnimationComplete)
         {
             if (tapAndHoldRotateLearned)
             {
@@ -224,13 +226,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         playerInputParent.SetActive(true); //Enable input
         playersAnswering = true;
 
-        guessing = false;
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
         if (paintBrush) paintBrush.revealAnimationComplete = false;
-
-        //Clear answers from previous round
-        ClearPlayerAnswers();
 
         //Reset any painting from previous round
         paintTexture.Clear();
@@ -244,7 +242,19 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     {
         switch (s)
         {
+            case "main menu":
+                //Reset any painting from previous round
+                paintTexture.Clear();
+                DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
+
+                ResetAnswerResultsBubbles();
+
+                joinedAndWaitingCanvas.enabled = true;
+
+                mainMenuCamera.gameObject.SetActive(true);
+                break;
             case "clients answering":
+                joinedAndWaitingCanvas.enabled = false;
                 initialEaselCanvas.SetActive(false);
                 ToggleSculptStand(true);
                 mainMenuManager.HideMainMenuUI();
@@ -300,6 +310,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
             case "clients guessing":
+                tapAndHoldRotateLearned = false;
+
                 guessingHeaderText.text = "What is it?";
 
                 (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
@@ -311,7 +323,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 paintBrush.CanPaintAir = false;
 
                 playersAnswering = false;
-                guessing = true;
 
                 guessingCanvas.enabled = true;
 
@@ -370,9 +381,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
 
-                leanTouch.gameObject.SetActive(false);
-                tapAndHoldRotateTutorial.SetActive(false);
-
                 //All players have guessed, so add guesses to results
                 string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 foreach (string g in guessesSeparated)
@@ -389,6 +397,10 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 }
                 break;
             case "results":
+                leanDrag.enabled = false;
+                leanTouch.gameObject.SetActive(false);
+                tapAndHoldRotateTutorial.SetActive(false);
+
                 guessingCanvas.enabled = false;
 
                 drawingPhaseCamera.gameObject.SetActive(true);
@@ -520,6 +532,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void OnRevealAnimationComplete()
     {
+        leanDrag.enabled = true;
         leanTouch.gameObject.SetActive(true);
         tapAndHoldRotateTutorial.SetActive(!tapAndHoldRotateLearned);
     }
