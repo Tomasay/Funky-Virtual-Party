@@ -95,6 +95,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     [SerializeField]
     GameObject sculptStand;
 
+    [SerializeField]
+    GameObject initialEaselCanvas;
+
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
     bool guessing = false; //Are players guessing?
@@ -242,6 +245,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         switch (s)
         {
             case "clients answering":
+                initialEaselCanvas.SetActive(false);
                 ToggleSculptStand(true);
                 mainMenuManager.HideMainMenuUI();
                 ResetAnswerResultsBubbles();
