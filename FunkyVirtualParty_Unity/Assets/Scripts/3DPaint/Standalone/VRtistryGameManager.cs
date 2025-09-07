@@ -1382,8 +1382,8 @@ public class VRtistryGameManager : MonoBehaviour
 
     void ResetArmatureTransforms()
     {
-        //Start at index 2 to avoid armature parent + hips
-        for (int i = 2; i < armatureRTs.Length; i++)
+        //Start at index 3 to avoid armature parent + hips
+        for (int i = 3; i < armatureRTs.Length; i++)
         {
             armatureRTs[i].transform.position = armaturePositions[i];
             armatureRTs[i].transform.rotation = armatureRotations[i];
