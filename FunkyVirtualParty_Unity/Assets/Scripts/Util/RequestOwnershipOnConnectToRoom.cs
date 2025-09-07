@@ -15,8 +15,6 @@ public class RequestOwnershipOnConnectToRoom : MonoBehaviour
 
     private void Realtime_didConnectToRoom(Realtime realtime)
     {
-        Debug.Log("Requesting ownership");
-
         realtimeView = GetComponent<RealtimeView>();
 
         realtimeView.RequestOwnership();

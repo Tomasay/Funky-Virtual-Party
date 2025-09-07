@@ -549,7 +549,10 @@ public class VRtistryGameManager : MonoBehaviour
         switch (state)
         {
             case "main menu":
-                //Move canvas to gallery
+                VRtistrySyncer.instance.VRPlayerPoints = 0;
+
+                paintTexture.Clear();
+
                 RectTransform rt = (uiCanvas.transform as RectTransform);
                 rt.position = canvasDefaultPos;
                 rt.rotation = canvasDefaultRot;
@@ -574,7 +577,7 @@ public class VRtistryGameManager : MonoBehaviour
                 if (!firstTimeClientsAnswering)
                 {
                     paintBrush.CanPaintAir = true;
-                    vrPlayer.Ahp.useMovement = true;
+                    vrPlayer.Ahp.maxMoveSpeed = 3;
                 }
 
                 //Display text that players are answering
@@ -650,7 +653,7 @@ public class VRtistryGameManager : MonoBehaviour
                 finishedPaintingEarlyButton.gameObject.SetActive(false);
 
                 SceneChangerSyncer.instance.FadeOutManual();
-                vrPlayer.Ahp.useMovement = false;
+                vrPlayer.Ahp.maxMoveSpeed = 0;
                 StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
                 break;
             case "vr guessing":

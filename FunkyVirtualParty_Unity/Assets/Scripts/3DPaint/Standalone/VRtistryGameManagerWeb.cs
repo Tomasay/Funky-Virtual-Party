@@ -243,8 +243,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         switch (s)
         {
             case "main menu":
+                RealtimeSingletonWeb.instance.LocalPlayer.syncer.Score = 0;
+
                 //Reset any painting from previous round
                 paintTexture.Clear();
+                drawingModel.transform.rotation = drawingModelStartingRot;
                 DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
 
                 ResetAnswerResultsBubbles();
