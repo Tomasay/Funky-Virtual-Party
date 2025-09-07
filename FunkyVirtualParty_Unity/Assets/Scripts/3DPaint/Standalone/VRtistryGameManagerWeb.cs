@@ -134,6 +134,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerSubmittedAnswer);
         VRtistrySyncer.instance.OnDecoyAnswersChanged.AddListener(SetDecoyAnswers);
+        VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
     }
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
@@ -150,6 +151,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.RemoveListener(SetNewPrompt);
         VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerSubmittedAnswer);
+        VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
 
         answerInputButton.onPointerDown.RemoveListener(ButtonPointerDown);
         answerInputButton.onPointerUp.RemoveListener(ButtonPointerUp);
@@ -675,6 +677,15 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
         ClearPlayerAnswers();
+    }
+
+    void PlayerGuessedPlayer(string guesses)
+    {
+        //Check to see if VR is only player left to guess
+        if (VRtistrySyncer.instance.VRPlayerGuess == -1 && guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        {
+            guessingHeaderText.text = "Waiting for VR player to answer";
+        }
     }
 
     IEnumerator SubmitPlayerGuess(int clientID, int clientGuessID)
