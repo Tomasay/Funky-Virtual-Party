@@ -1388,6 +1388,7 @@ public class VRtistryGameManager : MonoBehaviour
             armatureRTs[i].transform.position = armaturePositions[i];
             armatureRTs[i].transform.rotation = armatureRotations[i];
         }
+        solver.SetPose(); //Make sure collider is reset
     }
 
     public string FormatTime(float time)
