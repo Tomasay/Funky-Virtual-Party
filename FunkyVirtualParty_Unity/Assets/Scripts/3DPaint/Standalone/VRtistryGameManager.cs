@@ -1129,7 +1129,7 @@ public class VRtistryGameManager : MonoBehaviour
             headerText.text = "Waiting for clients to submit guesses";
 
             //If all clients have also guessed, move to results phase
-            Debug.Log("Player guesses: " + VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
+            //Debug.Log("Player guesses: " + VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
             if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
             {
                 VRtistrySyncer.instance.State = "results";

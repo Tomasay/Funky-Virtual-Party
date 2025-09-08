@@ -79,7 +79,6 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     public void ResetDrawingsSyncer()
     {
         //Remove callbacks
-        Drawings.modelAdded -= Drawings_modelAdded;
         for (int i = 0; i < Drawings.Count; i++)
         {
             uint k = (uint)i;
