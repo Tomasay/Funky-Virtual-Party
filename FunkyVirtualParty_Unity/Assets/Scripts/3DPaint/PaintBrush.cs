@@ -227,10 +227,6 @@ public class PaintBrush : ImmediateModeShapeDrawer
                             {
                                 if (plp.Count > 1)
                                 {
-                                    for (int i = 0; i < plp.Count; i++)
-                                    {
-                                        Debug.Log("Drawing point: " + plp[i].point);
-                                    }
                                     Draw.Polyline(plp, closed: false, thickness: LINE_THICKNESS);
                                 }
                             }

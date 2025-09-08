@@ -128,13 +128,13 @@ public class VRtistryClientPlayer : ClientPlayer
         if(usingPhone == 0)
         {
             usingPhone = Random.Range(1, 4);
-            animSyncer.ToggleBool = "UsingPhone" + usingPhone;
+            animSyncer.SetBool = "UsingPhone" + usingPhone + " True";
             animSyncer.AnimOffset = Random.Range(0.0f, 1.0f);
             phones[usingPhone - 1].Enabled = true;
         }
         else
         {
-            animSyncer.ToggleBool = "UsingPhone" + usingPhone;
+            animSyncer.SetBool = "UsingPhone" + usingPhone + " False";
             phones[usingPhone - 1].Enabled = false;
             usingPhone = 0;
         }

@@ -9,7 +9,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
     Animator anim;
 
     public string Trigger { get => model.trigger; set => model.trigger = value; }
-    public string ToggleBool { get => model.toggleBool; set => model.toggleBool = value; }
+    public string SetBool { get => model.setBool; set => model.setBool = value; }
     public float AnimOffset { get => model.animOffset; set => model.animOffset = value; }
 
     void Awake()
@@ -23,7 +23,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
         {
             // Unregister from events
             previousModel.triggerDidChange -= OnTriggerChange;
-            previousModel.toggleBoolDidChange -= OnToggleBool;
+            previousModel.setBoolDidChange -= OnSetBool;
             previousModel.animOffsetDidChange -= OnAnimOffsetChange;
         }
 
@@ -39,7 +39,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
 
             // Register for events
             currentModel.triggerDidChange += OnTriggerChange;
-            currentModel.toggleBoolDidChange += OnToggleBool;
+            currentModel.setBoolDidChange += OnSetBool;
             currentModel.animOffsetDidChange += OnAnimOffsetChange;
         }
     }
@@ -70,19 +70,19 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
         anim.SetFloat("AnimOffset", val);
     }
 
-    void OnToggleBool(AnimatorSyncModel previousModel, string val)
+    void OnSetBool(AnimatorSyncModel previousModel, string val)
     {
         if (!val.Equals(""))
         {
-            //Debug.Log("Toggling bool " + val + " from " + anim.GetBool(val) + " to " + !anim.GetBool(val));
-            anim.SetBool(val, !anim.GetBool(val));
-            Invoke("ResetToggleBool", 1);
-        }
-    }
+            string[] values = val.Split(' ');
+            string boolName = values[0];
+            bool boolVal = bool.Parse(values[1]);
 
-    void ResetToggleBool()
-    {
-        ToggleBool = "";
+            ClientPlayer cp = transform.root.gameObject.GetComponent<ClientPlayer>();
+            Debug.Log(cp.syncer.Name + ": Setting bool " + boolName + " to " + boolVal);
+
+            anim.SetBool(boolName, boolVal);
+        }
     }
     #endregion
 }
