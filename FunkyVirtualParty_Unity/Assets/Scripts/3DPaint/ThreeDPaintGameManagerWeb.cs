@@ -124,7 +124,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
     {
-        if (paintBrush.revealAnimationComplete)
+        if (paintBrush.RevealAnimationComplete)
         {
             tapAndHoldRotateLearned = true;
             tapAndHoldRotateTutorial.SetActive(false);
@@ -161,7 +161,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
             answerInputField.caretPosition = answerInputField.text.Length;
         }
 
-        if(guessing && paintBrush.revealAnimationComplete)
+        if(guessing && paintBrush.RevealAnimationComplete)
         {
             if(tapAndHoldRotateLearned)
             {
@@ -225,7 +225,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         guessing = false;
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
-        if(paintBrush) paintBrush.revealAnimationComplete = false;
+        if (paintBrush) paintBrush.ResetRevealAnimation();
 
         //Clear answers from previous round
         ClearPlayerAnswers();

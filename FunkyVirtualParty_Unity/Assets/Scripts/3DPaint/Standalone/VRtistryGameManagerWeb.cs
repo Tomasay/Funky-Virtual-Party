@@ -139,7 +139,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
     {
-        if (paintBrush.revealAnimationComplete)
+        if (paintBrush.RevealAnimationComplete)
         {
             tapAndHoldRotateLearned = true;
             tapAndHoldRotateTutorial.SetActive(false);
@@ -167,7 +167,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             answerInputField.caretPosition = answerInputField.text.Length;
         }
 
-        if ((VRtistrySyncer.instance.State.Equals("clients guessing") || VRtistrySyncer.instance.State.Equals("vr guessing")) && paintBrush.revealAnimationComplete)
+        if ((VRtistrySyncer.instance.State.Equals("clients guessing") || VRtistrySyncer.instance.State.Equals("vr guessing")) && paintBrush.RevealAnimationComplete)
         {
             if (tapAndHoldRotateLearned)
             {
@@ -230,7 +230,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
-        if (paintBrush) paintBrush.revealAnimationComplete = false;
+        if (paintBrush) paintBrush.ResetRevealAnimation();
 
         //Reset any painting from previous round
         paintTexture.Clear();
@@ -257,6 +257,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 joinedAndWaitingCanvas.enabled = true;
 
                 mainMenuCamera.gameObject.SetActive(true);
+                galleryCamera.gameObject.SetActive(false);
                 break;
             case "clients answering":
                 joinedAndWaitingCanvas.enabled = false;
@@ -311,6 +312,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 blurTimerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
                 blurHeaderText.text = "VR Player is creating a masterpiece...";
 
+                mainMenuCamera.gameObject.SetActive(false);
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
@@ -466,6 +468,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 break;
             case "gallery":
                 DrawingsSyncer.instance.SetDrawingGalleryPositions();
+                Draw.Rotation = Quaternion.identity;
 
                 StartCoroutine("DisplayLeaderboard");
 

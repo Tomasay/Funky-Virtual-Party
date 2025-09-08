@@ -81,7 +81,9 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     public UnityEvent OnRevealAnimationComplete;
 
-    public bool revealAnimationComplete;
+    bool revealAirPaintComplete, revealCollisionPaintComplete, revealAnimationComplete;
+
+    public bool RevealAnimationComplete { get => revealAnimationComplete; }
 
     private const float LINE_THICKNESS = 0.01f;
     private const float NEW_POINT_DISTANCE_THRESHOLD = 0.001f;
@@ -225,6 +227,10 @@ public class PaintBrush : ImmediateModeShapeDrawer
                             {
                                 if (plp.Count > 1)
                                 {
+                                    for (int i = 0; i < plp.Count; i++)
+                                    {
+                                        Debug.Log("Drawing point: " + plp[i].point);
+                                    }
                                     Draw.Polyline(plp, closed: false, thickness: LINE_THICKNESS);
                                 }
                             }
@@ -256,13 +262,28 @@ public class PaintBrush : ImmediateModeShapeDrawer
     {
         // Cache refs to avoid deep indexing in hot loops
         var drawings = DrawingsSyncer.instance.drawingLines;
-        if (drawings == null || drawings.Count == 0) yield break;
+        if (drawings == null || drawings.Count == 0)
+        {
+            revealAirPaintComplete = true;
+            CheckRevealAnimationComplete();
+            yield break;
+        }
 
         var lines = drawings[drawings.Count - 1];
-        if (lines == null || lines.Count == 0) yield break;
+        if (lines == null || lines.Count == 0)
+        {
+            revealAirPaintComplete = true;
+            CheckRevealAnimationComplete();
+            yield break;
+        }
 
         int pointCount = DrawingsSyncer.instance.GetCurrentDrawingLinesPointCount();
-        if (pointCount <= 0) yield break;
+        if (pointCount <= 0)
+        {
+            revealAirPaintComplete = true;
+            CheckRevealAnimationComplete();
+            yield break;
+        }
 
 
         float animSpeed = REVEAL_ANIMATION_SPEED;
@@ -330,6 +351,9 @@ public class PaintBrush : ImmediateModeShapeDrawer
             // One frame; effective speed governed by pointsPerSecond
             yield return null;
         }
+
+        revealAirPaintComplete = true;
+        CheckRevealAnimationComplete();
     }
 
     IEnumerator AnimatePaintTexture()
@@ -340,7 +364,13 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
         // 1) Compute duration cap (seconds per step)
         int steps = paintSyncer.currentHitLineModels.Count;
-        if (steps <= 0) yield break;
+        if (steps <= 0)
+        {
+            revealCollisionPaintComplete = true;
+            CheckRevealAnimationComplete();
+
+            yield break;
+        }
 
         float animSpeed = REVEAL_ANIMATION_SPEED; // seconds per step
         float planned = steps * REVEAL_ANIMATION_SPEED;
@@ -369,8 +399,24 @@ public class PaintBrush : ImmediateModeShapeDrawer
         //Once animation has played using low res texture, update to full res
         //paintTexture.LoadFromData(DrawingsSyncer.instance.CurrentDrawing.paintTexture);
 
-        revealAnimationComplete = true;
-        OnRevealAnimationComplete.Invoke();
+        revealCollisionPaintComplete = true;
+        CheckRevealAnimationComplete();
+    }
+
+    void CheckRevealAnimationComplete()
+    {
+        if (revealAirPaintComplete && revealCollisionPaintComplete)
+        {
+            revealAnimationComplete = true;
+            OnRevealAnimationComplete.Invoke();
+        }
+    }
+
+    public void ResetRevealAnimation()
+    {
+        revealAnimationComplete = false;
+        revealAirPaintComplete = false;
+        revealCollisionPaintComplete = false;
     }
 
     private void CreateNewLine()
