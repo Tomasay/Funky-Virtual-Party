@@ -38,7 +38,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
         RealtimeSingleton.instance.Realtime.didConnectToRoom += Realtime_didConnectToRoom;
 
         ClientPlayer.OnClientConnected.AddListener(UpdateClientIndicators);
-        ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicators);
+        ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicatorsDelayed); //Adding delay so that Client count is accurate
     }
 
     private void OnDestroy()
@@ -46,7 +46,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
         RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 
         ClientPlayer.OnClientConnected.RemoveListener(UpdateClientIndicators);
-        ClientPlayer.OnClientDisconnected.RemoveListener(UpdateClientIndicators);
+        ClientPlayer.OnClientDisconnected.RemoveListener(UpdateClientIndicatorsDelayed);
     }
 
     private void Realtime_didConnectToRoom(Realtime realtime)
@@ -74,6 +74,17 @@ public class VRtistryMainMenuManager : MonoBehaviour
         {
             clientIndicators[i].SetActive(false);
         }
+    }
+
+    void UpdateClientIndicatorsDelayed(ClientPlayer cp)
+    {
+        StartCoroutine(UpdateClientIndicatorsDelayedCoroutine(cp));
+    }
+
+    IEnumerator UpdateClientIndicatorsDelayedCoroutine(ClientPlayer cp)
+    {
+        yield return new WaitForSeconds(0.5f);
+        UpdateClientIndicators(cp);
     }
 
     public void ReturnToMainMenu()

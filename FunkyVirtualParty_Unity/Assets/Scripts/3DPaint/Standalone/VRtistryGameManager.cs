@@ -909,7 +909,11 @@ public class VRtistryGameManager : MonoBehaviour
         fmodInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
 #endif
 
-        StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
+        StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 0));
+
+        //Disable leaderboard
+        leaderboardParent.SetActive(false);
+        ClearPlayerAnswers();
 
         VRtistrySyncer.instance.State = "main menu";
         mainMenuManager.ReturnToMainMenu();
@@ -988,10 +992,6 @@ public class VRtistryGameManager : MonoBehaviour
 
         if (currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
         {
-            //Disable leaderboard
-            leaderboardParent.SetActive(false);
-            ClearPlayerAnswers();
-
             //Setup for potential next game
             VRtistrySyncer.instance.Answers = "";
             currentRound = 1;

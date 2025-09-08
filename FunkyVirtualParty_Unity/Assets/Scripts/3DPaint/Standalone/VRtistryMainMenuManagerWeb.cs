@@ -39,6 +39,18 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         clientCustomizer.OnCustomizationDisabled.AddListener(OnClientCustomizerDisabled);
     }
 
+    private void OnDestroy()
+    {
+        RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.RemoveListener(OnProperlyConnectedToRoom);
+        RealtimeSingletonWeb.instance.LocalPlayerSpawned.RemoveListener(OnLocalPlayerSpawned);
+
+        ClientPlayer.OnClientConnected.RemoveListener(UpdateClientIndicators);
+        ClientPlayer.OnClientDisconnected.RemoveListener(UpdateClientIndicatorsDelayed);
+
+        clientCustomizer.OnCustomizationEnabled.RemoveListener(OnClientCustomizerEnabled);
+        clientCustomizer.OnCustomizationDisabled.RemoveListener(OnClientCustomizerDisabled);
+    }
+
     private void OnProperlyConnectedToRoom()
     {
         animatedLogo.enabled = false; //TODO Setup animation so this gets erased nicely before zooming out
