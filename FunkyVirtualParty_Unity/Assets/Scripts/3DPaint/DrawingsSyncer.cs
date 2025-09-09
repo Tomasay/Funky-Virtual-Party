@@ -39,6 +39,8 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 
     public P3DPaintSyncer paintSyncer;
 
+    float initialHipHeight;
+
     private void Awake()
     {
         //Singleton
@@ -46,6 +48,8 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
 
         drawingLines = new List<List<PolylinePath>>();
         practiceDrawingLines = new List<List<PolylinePath>>();
+
+        initialHipHeight = galleryArmatures[0].GetComponentsInChildren<Transform>()[1].localPosition.y;
     }
 
 #if UNITY_ANDROID || UNITY_STANDALONE_WIN
@@ -148,12 +152,13 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
             if(i == 1)
             {
                 Vector3 pos = transforms[i].localPosition;
-                pos.y = 0;
+                pos.y = initialHipHeight;
                 transforms[i].localPosition = pos;
             }
         }
     }
 
+    
     /// <summary>
     /// Shifts drawing lines over to be placed on appropriate gallery pedestals
     /// </summary>
