@@ -960,6 +960,7 @@ public class VRtistryGameManager : MonoBehaviour
         foreach (KeyValuePair<int, int> entry in sortedDict)
         {
             GameObject newCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
+            (newCard.transform as RectTransform).localScale = new Vector3(0, 1, 1);
             newCard.GetComponent<Image>().color = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Color;
             newCard.GetComponentsInChildren<TMP_Text>()[0].text = ClientPlayer.GetClientByCurrentOwnerID(entry.Key).syncer.Name;
             //newCard.GetComponentsInChildren<TMP_Text>()[1].text = GetAnswerByOwnerID(entry.Key);
@@ -980,6 +981,7 @@ public class VRtistryGameManager : MonoBehaviour
 
         //Add VR Card
         GameObject vrCard = Instantiate(leaderboardPlayerCardPrefab, leaderboardParent.transform);
+        (vrCard.transform as RectTransform).localScale = new Vector3(0, 1, 1);
         vrCard.GetComponentsInChildren<TMP_Text>()[0].text = "VR Player";
         //vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
@@ -987,6 +989,16 @@ public class VRtistryGameManager : MonoBehaviour
         vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);
+
+        //Animate cards in
+        foreach (RectTransform rt in leaderboardParent.GetComponentsInChildren<RectTransform>())
+        {
+            if (rt.gameObject.name.Contains("LeaderboardPlayerCardVR"))
+            {
+                rt.DOScaleX(1, 0.25f);
+                yield return new WaitForSeconds(0.125f);
+            }
+        }
 
         yield return new WaitForSeconds(ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
 
