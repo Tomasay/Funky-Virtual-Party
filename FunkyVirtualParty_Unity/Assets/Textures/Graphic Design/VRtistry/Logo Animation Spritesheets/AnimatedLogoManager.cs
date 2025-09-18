@@ -36,13 +36,17 @@ public class AnimatedLogoManager : MonoBehaviour
 
     public void Next()
     {
-        if (erased) return;
-
-        if (index % 2 == 0)
+        if (erased)
         {
-            NextDelayed();
+            foreach (GameObject g in eraseAnimations)
+            {
+                g.SetActive(false);
+            }
+            return;
         }
-        else
+
+        NextDelayed();
+        if (index % 3 == 0)
         {
             Invoke("NextDelayed", stateIdleTime);
         }
@@ -69,27 +73,27 @@ public class AnimatedLogoManager : MonoBehaviour
 
     public void EraseOut()
     {
-        if (index == 0 || index == 9) //Blue
+        if (index == 0 || index == 1 || index == 14) //Blue
         {
             inOutloop[index].SetActive(false);
             eraseAnimations[0].SetActive(true);
         }
-        else if (index == 1 || index == 2) //Red
+        else if (index == 2 || index == 3 || index == 4) //Red
         {
             inOutloop[index].SetActive(false);
             eraseAnimations[1].SetActive(true);
         }
-        else if (index == 3 || index == 4) //Green
+        else if (index == 5 || index == 6 || index == 7) //Green
         {
             inOutloop[index].SetActive(false);
             eraseAnimations[2].SetActive(true);
         }
-        else if (index == 5 || index == 6) //Orange
+        else if (index == 8 || index == 9 || index == 10) //Orange
         {
             inOutloop[index].SetActive(false);
             eraseAnimations[3].SetActive(true);
         }
-        else if (index == 7 || index == 8) //Pink
+        else if (index == 11 || index == 12 || index == 13) //Pink
         {
             inOutloop[index].SetActive(false);
             eraseAnimations[4].SetActive(true);
