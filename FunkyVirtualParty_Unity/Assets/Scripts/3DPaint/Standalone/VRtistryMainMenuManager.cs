@@ -24,7 +24,8 @@ public class VRtistryMainMenuManager : MonoBehaviour
     [SerializeField] VRtistryGameManager gameManager;
 
     [SerializeField] Camera startingCamera;
-    [SerializeField] VideoPlayer animatedLogoVideo;
+
+    [SerializeField] GameObject animatedLogo;
 
     [SerializeField] GameObject[] clientIndicators;
 
@@ -58,7 +59,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
     {
         startingCamera.gameObject.SetActive(false);
-        animatedLogoVideo.Play();
+        animatedLogo.SetActive(true);
     }
 
     private void UpdateClientIndicators(ClientPlayer cp)
@@ -94,16 +95,24 @@ public class VRtistryMainMenuManager : MonoBehaviour
         gameCanvas.enabled = false;
 
         clientIndicators[0].transform.parent.gameObject.SetActive(true);
+
+        AnimatedLogoManager.instance.ResetAnimation();
     }
 
     [Button]
     public void PlayButtonClicked()
     {
+        AnimatedLogoManager.instance.EraseOut();
+        Invoke("PlayGame", 1);
+    }
+
+    void PlayGame()
+    {
         lobbyInfoCanvas.enabled = false;
         tutorialCanvas.enabled = true;
         gameCanvas.enabled = true;
 
-        if(!gameManager.gameSetup) gameManager.SetupGame();
+        if (!gameManager.gameSetup) gameManager.SetupGame();
         gameManager.StartGame();
         clientIndicators[0].transform.parent.gameObject.SetActive(false);
     }

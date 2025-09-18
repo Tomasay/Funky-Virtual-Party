@@ -22,7 +22,7 @@ public class AnimatedLogoManager : MonoBehaviour
 
     bool erased = false;
 
-    private void Start()
+    private void Awake()
     {
         if (instance)
         {
@@ -100,5 +100,17 @@ public class AnimatedLogoManager : MonoBehaviour
         }
 
         erased = true;
+    }
+
+    public void ResetAnimation()
+    {
+        index = -1;
+        erased = false;
+
+        blueDrawIntro.SetActive(true);
+        foreach (GameObject g in inOutloop)
+        {
+            g.SetActive(false);
+        }
     }
 }
