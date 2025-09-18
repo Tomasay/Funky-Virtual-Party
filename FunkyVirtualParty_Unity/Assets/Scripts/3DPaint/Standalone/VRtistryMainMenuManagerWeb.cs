@@ -10,8 +10,6 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     [SerializeField] Camera mainMenuCam, drawingPhaseCam;
     [SerializeField] Animator mainCamAnim;
 
-    [SerializeField] RawImage animatedLogo;
-
     [SerializeField] GameObject[] clientIndicators;
     [SerializeField] Canvas joinedAndWaitingCanvas;
     [SerializeField] ClientPlayerCustomizer clientCustomizer;
@@ -53,7 +51,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
     private void OnProperlyConnectedToRoom()
     {
-        animatedLogo.enabled = false; //TODO Setup animation so this gets erased nicely before zooming out
+        AnimatedLogoManager.instance.EraseOut();
         mainCamAnim.SetTrigger("Zoom Out");
 
         Invoke("EnableVRAvatarVisibility", 1);
