@@ -104,6 +104,10 @@ mergeInto(LibraryManager.library, {
 	ManuallyOpenKeyboard: function()
 	{
 		//Does not work on any browser for IOS, or any version of Firefox
+		const hasVK = typeof navigator !== "undefined" && navigator.virtualKeyboard && typeof navigator.virtualKeyboard.show === "function";
+		if(!hasVK){
+			return;
+		}
 
 		//Make sure dummy input is focused
 		document.getElementById("dummyInput").focus();
