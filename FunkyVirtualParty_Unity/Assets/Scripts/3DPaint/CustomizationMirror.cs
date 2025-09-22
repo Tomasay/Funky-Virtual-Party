@@ -17,6 +17,9 @@ public class CustomizationMirror : MonoBehaviour
     AvatarCustomizationReferences avatarRefs;
     CustomAvatars.RealtimeAvatar avatar;
 
+    [SerializeField]
+    float cameraLerpSpeed, cameraHeightOffset;
+
     private void Start()
     {
         RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
@@ -33,12 +36,12 @@ public class CustomizationMirror : MonoBehaviour
         {
             // Get direction to target but flatten on Y
             Vector3 direction = avatar.head.position - mirrorCam.transform.position;
-            direction.y = 0f; // Ignore vertical difference
+            direction.y += cameraHeightOffset;
 
             if (direction.sqrMagnitude > 0.001f) // Prevent zero-length vector
             {
                 Quaternion targetRotation = Quaternion.LookRotation(direction);
-                mirrorCam.transform.rotation = targetRotation;
+                mirrorCam.transform.rotation = Quaternion.Slerp(mirrorCam.transform.rotation, targetRotation, Time.deltaTime * cameraLerpSpeed);
             }
         }
     }
