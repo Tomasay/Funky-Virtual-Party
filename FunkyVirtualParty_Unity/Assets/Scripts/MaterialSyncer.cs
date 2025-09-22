@@ -52,13 +52,10 @@ public class MaterialSyncer : RealtimeComponent<MaterialSyncModel>
     {
         if (val.Equals("")) return;
 
-        Debug.Log("OnSetColorWithTweenChange: " + val);
-
         string[] vals = val.Split(',');
 
         if (ColorUtility.TryParseHtmlString(vals[1], out Color col) && float.TryParse(vals[2], out float f))
         {
-            Debug.Log("OnSetColorWithTweenChange Parsed: " + vals[0] + " " + vals[1] + " " + vals[2]);
             mat.DOColor(col, vals[0], f);
         }
     }

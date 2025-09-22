@@ -6,4 +6,5 @@ public class AvatarCustomizationReferences : MonoBehaviour
 {
     public GameObject[] hats, eyes, facialHair;
     public MaterialSyncer headMatSyncer, handsMatSyncer;
+    public GameObject UIPointerLeft, UIPointerRight, UIPointerPreviewRight;
 }
