@@ -11,4 +11,7 @@ public partial class MaterialSyncModel
 
     [RealtimeProperty(2, true, true)]
     private string _setColorWithTween; //"parameterName,#HTMLStringRGB,durationInSeconds"
+
+    [RealtimeProperty(3, true, true)]
+    private string _setSecondColorWithTween; //Second color param to prevent desync when changing multiple color vals
 }

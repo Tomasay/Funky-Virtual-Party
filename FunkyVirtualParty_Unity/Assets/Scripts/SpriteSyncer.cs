@@ -34,6 +34,9 @@ public class SpriteSyncer : RealtimeComponent<SpriteSyncModel>
             // Register for events
             currentModel.enabledDidChange += OnEnabledChange;
         }
+
+        //Update to match new data
+        sr.enabled = model.enabled;
     }
 
     #region Variable Callbacks

@@ -50,24 +50,31 @@ public class MeshSyncer : RealtimeComponent<MeshSyncModel>
                 {
                     currentModel.enabled = mr.enabled;
                 }
-                
             }
 
             // Register for events
             currentModel.enabledDidChange += OnEnabledChange;
         }
+
+        //Update to match new data
+        SetMeshEnabled(model.enabled);
     }
 
     #region Variable Callbacks
     void OnEnabledChange(MeshSyncModel previousModel, bool val)
     {
+        SetMeshEnabled(val);
+    }
+
+    void SetMeshEnabled(bool enabled)
+    {
         if (isSMR)
         {
-            smr.enabled = val;
+            smr.enabled = enabled;
         }
         else
         {
-            mr.enabled = val;
+            mr.enabled = enabled;
         }
     }
     #endregion

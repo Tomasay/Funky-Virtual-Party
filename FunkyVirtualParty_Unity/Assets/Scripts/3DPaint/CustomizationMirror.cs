@@ -132,7 +132,7 @@ public class CustomizationMirror : MonoBehaviour
 
         yield return new WaitForSeconds(0.1f);
 
-        avatarRefs.headMatSyncer.SetColorWithTween = "_OutlineColor" + ",#" + ColorUtility.ToHtmlStringRGBA(playerOutlineColors[colorIndex]) + ",0.25";
-        avatarRefs.handsMatSyncer.SetColorWithTween = "_OutlineColor" + ",#" + ColorUtility.ToHtmlStringRGBA(playerOutlineColors[colorIndex]) + ",0.25";
+        avatarRefs.headMatSyncer.SetSecondColorWithTween = "_OutlineColor" + ",#" + ColorUtility.ToHtmlStringRGBA(playerOutlineColors[colorIndex]) + ",0.25";
+        avatarRefs.handsMatSyncer.SetSecondColorWithTween = "_OutlineColor" + ",#" + ColorUtility.ToHtmlStringRGBA(playerOutlineColors[colorIndex]) + ",0.25";
     }
 }

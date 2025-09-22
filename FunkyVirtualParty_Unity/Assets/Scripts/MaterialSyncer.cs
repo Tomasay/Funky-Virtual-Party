@@ -11,6 +11,7 @@ public class MaterialSyncer : RealtimeComponent<MaterialSyncModel>
 
     public string SetColor { get => model.setColor; set => model.setColor = value; }
     public string SetColorWithTween { get => model.setColorWithTween; set => model.setColorWithTween = value; }
+    public string SetSecondColorWithTween { get => model.setSecondColorWithTween; set => model.setSecondColorWithTween = value; }
 
     protected override void OnRealtimeModelReplaced(MaterialSyncModel previousModel, MaterialSyncModel currentModel)
     {
@@ -19,6 +20,7 @@ public class MaterialSyncer : RealtimeComponent<MaterialSyncModel>
             // Unregister from events
             previousModel.setColorDidChange -= OnSetColorChange;
             previousModel.setColorWithTweenDidChange -= OnSetColorWithTweenChange;
+            previousModel.setSecondColorWithTweenDidChange -= OnSetColorWithTweenChange;
         }
 
         if (currentModel != null)
@@ -32,6 +34,7 @@ public class MaterialSyncer : RealtimeComponent<MaterialSyncModel>
             // Register for events
             currentModel.setColorDidChange += OnSetColorChange;
             currentModel.setColorWithTweenDidChange += OnSetColorWithTweenChange;
+            currentModel.setSecondColorWithTweenDidChange += OnSetColorWithTweenChange;
         }
     }
 
