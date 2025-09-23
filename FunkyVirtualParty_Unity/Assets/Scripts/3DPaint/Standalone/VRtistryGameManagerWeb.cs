@@ -101,6 +101,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     [SerializeField]
     GameObject initialEaselCanvas;
 
+    [SerializeField]
+    Slider leaderboardTimerSlider;
+
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
 
@@ -851,7 +854,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         currentLeaderboardCards.Add(vrCard);
 
         //Animate cards in
-        foreach (RectTransform rt in leaderboardParent.GetComponentsInChildren<RectTransform>())
+        RectTransform[] rts = (VRtistrySyncer.instance.State.Equals("gallery")) ? galleryLeaderboardParent.GetComponentsInChildren<RectTransform>() : leaderboardParent.GetComponentsInChildren<RectTransform>();
+        foreach (RectTransform rt in rts)
         {
             if (rt.gameObject.name.Contains("LeaderboardPlayerCardClient"))
             {
@@ -860,10 +864,13 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             }
         }
 
+        leaderboardTimerSlider.DOValue(1, ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
+
         yield return new WaitForSeconds(ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
 
         //Disable leaderboard
         leaderboardCanvas.enabled = false;
+        leaderboardTimerSlider.value = 0;
     }
 
     [Button]

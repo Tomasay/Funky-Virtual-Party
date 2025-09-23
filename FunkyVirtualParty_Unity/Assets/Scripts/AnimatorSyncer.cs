@@ -79,7 +79,7 @@ public class AnimatorSyncer : RealtimeComponent<AnimatorSyncModel>
             bool boolVal = bool.Parse(values[1]);
 
             ClientPlayer cp = transform.root.gameObject.GetComponent<ClientPlayer>();
-            Debug.Log(cp.syncer.Name + ": Setting bool " + boolName + " to " + boolVal);
+            //Debug.Log(cp.syncer.Name + ": Setting bool " + boolName + " to " + boolVal);
 
             anim.SetBool(boolName, boolVal);
         }
