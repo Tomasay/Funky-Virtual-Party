@@ -776,7 +776,6 @@ GameObject:
   - component: {fileID: 3755241299586870291}
   - component: {fileID: 1237625618096579581}
   - component: {fileID: 2103843289626713362}
-  - component: {fileID: 2601614650065951860}
   m_Layer: 8
   m_Name: Apple
   m_TagString: Untagged
@@ -872,23 +871,8 @@ MonoBehaviour:
   - componentID: 1
     component: {fileID: 2103843289626713362}
     isDeprecated: 0
-  - componentID: 2
-    component: {fileID: 2601614650065951860}
-    isDeprecated: 0
   _childViews: []
 --- !u!114 &2103843289626713362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386706311252194452}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc0aff1db1ea4754991508f9a65471cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2601614650065951860
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7598,6 +7582,9 @@ MonoBehaviour:
     component: {fileID: 1237625618096579581}
     isDeprecated: 0
   - componentID: 6
+    component: {fileID: 6040442585033037667}
+    isDeprecated: 0
+  - componentID: 7
     component: {fileID: 8859271059237675499}
     isDeprecated: 0
 --- !u!114 &187213795292565734
@@ -14822,6 +14809,8 @@ GameObject:
   m_Component:
   - component: {fileID: 6352106621735653789}
   - component: {fileID: 7493287516810992798}
+  - component: {fileID: 6040442585033037667}
+  - component: {fileID: 6620868863972397549}
   m_Layer: 8
   m_Name: Dali Stache
   m_TagString: Untagged
@@ -14896,6 +14885,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6040442585033037667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8830105130932789149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 6620868863972397549}
+    isDeprecated: 0
+  _childViews: []
+--- !u!114 &6620868863972397549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8830105130932789149}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc0aff1db1ea4754991508f9a65471cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8984870525530798214
 GameObject:
   m_ObjectHideFlags: 0

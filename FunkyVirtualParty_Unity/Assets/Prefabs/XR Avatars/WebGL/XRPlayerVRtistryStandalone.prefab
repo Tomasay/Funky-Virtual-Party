@@ -1826,6 +1826,9 @@ MonoBehaviour:
     component: {fileID: 7365207371096708507}
     isDeprecated: 0
   - componentID: 6
+    component: {fileID: 4807791031806436434}
+    isDeprecated: 0
+  - componentID: 7
     component: {fileID: 8308542868871324707}
     isDeprecated: 0
 --- !u!114 &6548020802115227175
@@ -2811,6 +2814,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5745104950942830473}
   - component: {fileID: 3427972146946187603}
+  - component: {fileID: 4807791031806436434}
+  - component: {fileID: 8459096486421253410}
   m_Layer: 8
   m_Name: Dali Stache
   m_TagString: Untagged
@@ -2885,6 +2890,40 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4807791031806436434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886200692539243644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -363599832, guid: c424820a8880b8845bda10ec0b41507e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _realtime: {fileID: 0}
+  _sceneViewUUID: 
+  _viewUUID: 
+  _sceneViewPreventOwnershipTakeover: 0
+  _sceneViewDestroyWhenLastClientLeaves: 1
+  _components:
+  - componentID: 1
+    component: {fileID: 8459096486421253410}
+    isDeprecated: 0
+  _childViews: []
+--- !u!114 &8459096486421253410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886200692539243644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc0aff1db1ea4754991508f9a65471cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5320540829826063176
 GameObject:
   m_ObjectHideFlags: 0
@@ -3921,7 +3960,6 @@ GameObject:
   - component: {fileID: 292816651235760891}
   - component: {fileID: 7365207371096708507}
   - component: {fileID: 6737741288287592585}
-  - component: {fileID: 4140596821577278055}
   m_Layer: 8
   m_Name: Apple
   m_TagString: Untagged
@@ -4017,23 +4055,8 @@ MonoBehaviour:
   - componentID: 1
     component: {fileID: 6737741288287592585}
     isDeprecated: 0
-  - componentID: 2
-    component: {fileID: 4140596821577278055}
-    isDeprecated: 0
   _childViews: []
 --- !u!114 &6737741288287592585
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5694468441633566294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc0aff1db1ea4754991508f9a65471cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4140596821577278055
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
