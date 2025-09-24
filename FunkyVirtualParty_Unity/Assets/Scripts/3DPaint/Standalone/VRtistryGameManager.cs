@@ -918,6 +918,15 @@ public class VRtistryGameManager : MonoBehaviour
         VRtistrySyncer.instance.State = "main menu";
         mainMenuManager.ReturnToMainMenu();
         DrawingsSyncer.instance.ResetDrawingsSyncer();
+
+#if !UNITY_WEBGL
+        yield return new WaitForSeconds(2);
+        fmodInstance.setParameterByName("VRtistryPhase", 0);
+        fmodInstance.setParameterByName("VRtistryClock", 0);
+        fmodInstance.setTimelinePosition(0);
+
+        fmodInstance.start();
+#endif
     }
 
     IEnumerator ShowLeaderboard()
