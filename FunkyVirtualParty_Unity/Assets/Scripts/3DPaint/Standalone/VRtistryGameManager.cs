@@ -944,7 +944,6 @@ public class VRtistryGameManager : MonoBehaviour
         playerResultsHeaderText.text = "";
         timerText.text = "";
         leaderboardParent.SetActive(true);
-        //if (ClientManager.instance) ClientManager.instance.Manager.Socket.Emit("MethodCallToServer", "ShowLeaderboard", "");
 
         //Sort player points
         Dictionary<int, int> unsortedDict = new Dictionary<int, int>();
