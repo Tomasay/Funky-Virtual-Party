@@ -14,7 +14,7 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public MeshSyncer[] phones; //Phone meshes corresponding to each phone anim
 
-    [SerializeField] FaceCamera faceCamera;
+    [SerializeField] RectTransform playerNameIndicatorArrow;
 
     protected override void LocalStart()
     {
@@ -36,6 +36,8 @@ public class VRtistryClientPlayer : ClientPlayer
         //Was having an occasional bug where player canvases would billboard to the wrong camera (mostly on IOS?)
         //Not entirely sure why that was happening, but this should prevent that
         Invoke("SetBubbleBillboardCamera", 1);
+
+        SetPlayerNameTextPosition();
     }
 
     void SetBubbleBillboardCamera()
@@ -43,7 +45,10 @@ public class VRtistryClientPlayer : ClientPlayer
         GameObject tryCamera = GameObject.Find("DrawingPhaseCamera");
         if (tryCamera && tryCamera.TryGetComponent(out Camera cam))
         {
-            faceCamera.cameraToLookAt = cam;
+            foreach (FaceCamera fc in GetComponentsInChildren<FaceCamera>())
+            {
+                fc.cameraToLookAt = cam;
+            }        
         }
     }
 
@@ -114,6 +119,39 @@ public class VRtistryClientPlayer : ClientPlayer
             rt.localPosition = pos;
             rt.localScale = new Vector3(scale, scale, scale);
         }
+    }
+
+    void SetPlayerNameTextPosition()
+    {
+        int id = realtimeView.ownerIDSelf - 1;
+
+#if UNITY_WEBGL
+        //Position
+        if (id == 0 || id == 6)
+        {
+            playerNameText.rectTransform.localPosition = new Vector3(0, -175, 0);
+            playerNameIndicatorArrow.Rotate(0, 0, 180);
+        }
+        else if (id == 1 || id == 7)
+        {
+            playerNameText.rectTransform.localPosition = new Vector3(0, -100, -25);
+            playerNameIndicatorArrow.Rotate(0, 0, 180);
+        }
+
+        //Font size
+        if (id%2 != 0)
+        {
+            playerNameText.fontSize = 28;
+        }
+#elif UNITY_ANDROID
+        //Position
+        if (id == 0 || id == 6 || id == 1 || id == 7)
+        {
+            playerNameText.rectTransform.localPosition = new Vector3(0, 35, 0);
+        }
+        playerNameText.fontSize = 28;
+#endif
+
     }
 
     public void SetSitAnim()
