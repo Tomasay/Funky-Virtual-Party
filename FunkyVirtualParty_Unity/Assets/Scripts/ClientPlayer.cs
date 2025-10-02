@@ -88,6 +88,8 @@ public class ClientPlayer : MonoBehaviour
 
     public int DebugPlayerIndex { get => debugPlayerIndex; }
 
+    internal bool billboardNameText = true;
+
     protected virtual void Awake()
     {
         if (clients == null)
@@ -181,7 +183,7 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (Camera.main)
+        if (billboardNameText && Camera.main)
         {
             playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
         }

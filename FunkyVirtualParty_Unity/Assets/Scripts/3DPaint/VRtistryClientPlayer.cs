@@ -16,6 +16,15 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] RectTransform playerNameIndicatorArrow;
 
+    protected override void Awake()
+    {
+#if UNITY_WEBGL
+        billboardNameText = false;
+#endif
+
+        base.Awake();
+    }
+
     protected override void LocalStart()
     {
         base.LocalStart();
@@ -129,19 +138,24 @@ public class VRtistryClientPlayer : ClientPlayer
         //Position
         if (id == 0 || id == 6)
         {
-            playerNameText.rectTransform.localPosition = new Vector3(0, -175, 0);
+            playerNameText.rectTransform.localPosition = new Vector3(0, -150, -85);
             playerNameIndicatorArrow.Rotate(0, 0, 180);
         }
         else if (id == 1 || id == 7)
         {
-            playerNameText.rectTransform.localPosition = new Vector3(0, -100, -25);
+            playerNameText.rectTransform.localPosition = new Vector3((id == 1) ? 10 : 0, -60, 85);
             playerNameIndicatorArrow.Rotate(0, 0, 180);
         }
 
-        //Font size
+        //Font size / Rotation
         if (id%2 != 0)
         {
             playerNameText.fontSize = 28;
+            playerNameText.rectTransform.localRotation = Quaternion.Euler(45, 180, 0);
+        }
+        else
+        {
+            playerNameText.rectTransform.localRotation = Quaternion.Euler(35, 0, 0);
         }
 #elif UNITY_ANDROID
         //Position
