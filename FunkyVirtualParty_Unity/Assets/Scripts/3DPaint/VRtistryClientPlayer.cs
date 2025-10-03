@@ -12,6 +12,8 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public AnswerOptionButton playerAnswer;
 
+    [SerializeField] public Image playerAnswerArrow;
+
     [SerializeField] public MeshSyncer[] phones; //Phone meshes corresponding to each phone anim
 
     [SerializeField] RectTransform playerNameIndicatorArrow;
@@ -20,6 +22,7 @@ public class VRtistryClientPlayer : ClientPlayer
     {
 #if UNITY_WEBGL
         billboardNameText = false;
+        Destroy((playerAnswer.transform as RectTransform).parent.GetComponent<FaceCamera>());
 #endif
 
         base.Awake();
@@ -35,16 +38,19 @@ public class VRtistryClientPlayer : ClientPlayer
         }
 
         SetSpawnRotation();
-        Invoke("SetupTextBubbleTransforms", 3);
     }
 
     protected override void Start()
     {
         base.Start();
 
+#if UNITY_ANDROID
         //Was having an occasional bug where player canvases would billboard to the wrong camera (mostly on IOS?)
         //Not entirely sure why that was happening, but this should prevent that
         Invoke("SetBubbleBillboardCamera", 1);
+#endif
+
+        Invoke("SetupTextBubbleTransforms", 3);
 
         SetPlayerNameTextPosition();
     }
@@ -63,70 +69,38 @@ public class VRtistryClientPlayer : ClientPlayer
 
     void SetupTextBubbleTransforms()
     {
-        foreach (ClientPlayer cp in clients)
+        int id = realtimeView.ownerIDSelf - 1;
+
+        RectTransform rt = (playerAnswer.transform as RectTransform);
+        RectTransform arrowRt = (playerAnswerArrow.transform as RectTransform);
+
+        //Scale/rot
+        if (id % 2 == 0)
         {
-            VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
-            RectTransform rt = (vcp.playerAnswer.transform as RectTransform);
-            Vector3 pos = rt.localPosition;
-            float scale = rt.localScale.x;
+            rt.localScale = new Vector3(0.14f, 0.14f, 0.14f);
+            rt.Rotate(35, 0, 0);
+        }
+        else
+        {
+            rt.localScale = new Vector3(0.12f, 0.12f, 0.12f);
+            rt.Rotate(45, 180, 0);
+        }
 
-            if (clients.Count > 4)
-            {
-                switch ((vcp.realtimeView.ownerIDSelf - 1))
-                {
-                    case 0: //Back Right
-                        scale = 0.14f;
-                        break;
-                    case 1: //Front Right
-                        break;
-                    case 2: //Back Left
-                        pos.y = 75;
-                        scale = 0.14f;
-                        break;
-                    case 3: //Front Left
-                        pos.y = 80;
-                        break;
-                    case 4: //Back Middle Right
-                        pos.y = 75;
-                        scale = 0.14f;
-                        break;
-                    case 5: //Front Middle Right
-                        pos.y = 80;
-                        break;
-                    case 6: //Back Left
-                        scale = 0.14f;
-                        break;
-                    case 7: //Front Left
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                switch ((vcp.realtimeView.ownerIDSelf - 1))
-                {
-                    case 0: //Back Right
-                        scale = 0.2f;
-                        break;
-                    case 1: //Front Right
-                        pos.x = -15;
-                        scale = 0.15f;
-                        break;
-                    case 2: //Back Left
-                        scale = 0.2f;
-                        break;
-                    case 3: //Front Left
-                        pos.x = 15;
-                        scale = 0.15f;
-                        break;
-                    default:
-                        break;
-                }
-            }
+        //Pos
+        if (id == 0 || id == 6) //Back right and back middle left
+        {
+            rt.localPosition = new Vector3(0, -180, -80);
+        }
+        else if (id == 1 || id == 7) //Front right and front middle left
+        {
+            rt.localPosition = new Vector3((id == 1) ? 10 : 0, -75, 90);
+        }
 
-            rt.localPosition = pos;
-            rt.localScale = new Vector3(scale, scale, scale);
+        //Arrow
+        if (id == 1 || id == 7 || id == 0 || id == 6)
+        {
+            arrowRt.localPosition = new Vector3(0, 178, 0);
+            arrowRt.Rotate(0, 0, 180);
         }
     }
 
