@@ -602,6 +602,7 @@ public class VRtistryGameManager : MonoBehaviour
 
                 //Get random answer
                 VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.ownerIDSelf;
+                //TEMP Custom answer for testing VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[ClientPlayer.clients.Count-1].realtimeView.ownerIDSelf;
 
                 //UI
                 headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
@@ -1068,6 +1069,22 @@ public class VRtistryGameManager : MonoBehaviour
 
     string GetPrompt()
     {
+        //TEMP custom prompts for testing
+        /*
+        if(currentRound == 1)
+        {
+            return "What sport could you totally beat VR player in?";
+        }
+        else if (currentRound == 2)
+        {
+            return "The worst costume you could wear to a halloween party";
+        }
+        else
+        {
+            return "Who is the most powerful videogame character you can think of?";
+        }
+        */
+
         //Split prompt text file into individual lines
         string[] prompts = promptList.ToString().Split('\n');
 
