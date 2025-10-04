@@ -12,7 +12,7 @@ public class CustomizationMirror : MonoBehaviour
     [SerializeField]
     Color[] playerColors, playerOutlineColors;
 
-    int hatIndex, eyesIndex = 1, facialHairIndex = 1, colorIndex;
+    int hatIndex, eyesIndex, facialHairIndex, colorIndex;
 
     AvatarCustomizationReferences avatarRefs;
     CustomAvatars.RealtimeAvatar avatar;
