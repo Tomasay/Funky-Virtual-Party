@@ -367,19 +367,19 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                     if (int.TryParse(ownerAndAnswer[0], out int id))
                     {
-                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
+                        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(id);
+                        AnswerOptionButton aob = (cp as VRtistryClientPlayer).playerAnswer;
                         aob.canvasGroup.alpha = 0;
                         aob.ResetPlayerIcons();
 
-                        aob.SetText(ownerAndAnswer[1]);
+                        aob.SetTextWithPlayerName(ownerAndAnswer[1], ClientPlayer.GetClientByCurrentOwnerID(id));
                         aob.playerID = ownerAndAnswer[0];
-                        if (int.TryParse(ownerAndAnswer[0], out int i))
-                        {
-                            //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
-                            aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
-                            aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
-                            (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
-                        }
+
+                        //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
+                        aob.SetBorderColor(cp.syncer.Color);
+                        aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                        (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
+
                         answerResults.Add(aob);
                     }
                 }
@@ -407,6 +407,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 }
                 break;
             case "results":
+                SetPlayerNamesVisibility(false);
+
                 leanDrag.enabled = false;
                 leanTouch.gameObject.SetActive(false);
                 tapAndHoldRotateTutorial.SetActive(false);
@@ -470,6 +472,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 StartCoroutine("DisplayLeaderboard");
                 break;
             case "gallery":
+                SetPlayerNamesVisibility(true);
+
                 DrawingsSyncer.instance.SetDrawingGalleryPositions();
                 Draw.Rotation = Quaternion.identity;
 
@@ -484,6 +488,14 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    void SetPlayerNamesVisibility(bool visible)
+    {
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            cp.playerNameText.gameObject.SetActive(visible);
         }
     }
 

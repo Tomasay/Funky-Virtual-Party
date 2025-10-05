@@ -77,29 +77,33 @@ public class VRtistryClientPlayer : ClientPlayer
         //Scale/rot
         if (id % 2 == 0)
         {
-            rt.localScale = new Vector3(0.14f, 0.14f, 0.14f);
-            rt.Rotate(35, 0, 0);
+            playerAnswer.initialScale = rt.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            rt.Rotate(45, 0, 0);
         }
         else
         {
-            rt.localScale = new Vector3(0.12f, 0.12f, 0.12f);
+            playerAnswer.initialScale = rt.localScale = new Vector3(0.12f, 0.12f, 0.12f);
             rt.Rotate(45, 180, 0);
         }
 
         //Pos
         if (id == 0 || id == 6) //Back right and back middle left
         {
-            rt.localPosition = new Vector3(0, -180, -80);
+            rt.localPosition = new Vector3((id == 0) ? 10 : -10, -115, -175);
         }
         else if (id == 1 || id == 7) //Front right and front middle left
         {
-            rt.localPosition = new Vector3((id == 1) ? 10 : 0, -75, 90);
+            rt.localPosition = new Vector3((id == 1) ? 10 : 0, -80, 90);
+        }
+        else if (id == 2 || id == 4) //Back left and back middle right
+        {
+            rt.localPosition = new Vector3((id == 2) ? -10 : 10, -20, 0);
         }
 
         //Arrow
         if (id == 1 || id == 7 || id == 0 || id == 6)
         {
-            arrowRt.localPosition = new Vector3(0, 178, 0);
+            arrowRt.localPosition = new Vector3(0, 225, 0);
             arrowRt.Rotate(0, 0, 180);
         }
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
+using Normal.Realtime;
 
 public class AnswerOptionButton : MonoBehaviour
 {
@@ -23,6 +24,7 @@ public class AnswerOptionButton : MonoBehaviour
     public CanvasGroup canvasGroup;
 
     public GameObject correctAnswerBanner;
+    public Vector3 initialScale;
     private float correctAnswerBannerInitialScale;
 
     //The player who wrote this answer
@@ -32,6 +34,7 @@ public class AnswerOptionButton : MonoBehaviour
 
     private void Awake()
     {
+        initialScale = (transform as RectTransform).localScale;
         if (correctAnswerBanner)
         {
             correctAnswerBannerInitialScale = (correctAnswerBanner.transform as RectTransform).localScale.x;
@@ -41,6 +44,11 @@ public class AnswerOptionButton : MonoBehaviour
     public void SetText(string txt)
     {
         answerText.text = txt;
+    }
+
+    public void SetTextWithPlayerName(string txt, ClientPlayer client)
+    {
+        answerText.text = "<size=80%><color=\"grey\">" + client.syncer.Name + ":</color></size>\n" + txt;
     }
 
     public void SetColor(Color col)
@@ -119,9 +127,10 @@ public class AnswerOptionButton : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
+        //Animate in bubble
         canvasGroup.alpha = 1;
-        (transform as RectTransform).parent.localScale = Vector3.zero;
-        (transform as RectTransform).parent.DOScale(1, 1).SetEase(Ease.OutElastic, 1.25f);
+        (transform as RectTransform).localScale = Vector3.zero;
+        (transform as RectTransform).DOScale(initialScale, 1).SetEase(Ease.OutElastic, 1.25f);
 
         yield return new WaitForSeconds(1);
 
