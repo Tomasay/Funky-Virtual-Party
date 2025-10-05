@@ -148,7 +148,7 @@ public class ClientPlayer : MonoBehaviour
         OnClientConnected.Invoke(this);
 
         initialOwnerID = realtimeView.ownerIDSelf;
-        Debug.Log("initialOwnerID: " + initialOwnerID);
+        //Debug.Log("initialOwnerID: " + initialOwnerID);
     }
 
     protected virtual void LocalStart()

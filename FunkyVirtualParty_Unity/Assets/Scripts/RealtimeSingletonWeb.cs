@@ -55,7 +55,10 @@ public class RealtimeSingletonWeb : MonoBehaviour
     GameObject loadingCircle;
 
     [SerializeField]
-    public TMP_Text[] scenePartyCodeLetters;
+    public TMP_Text scenePartyCodeLetters;
+
+    [SerializeField]
+    public TMP_Text[] scenePartyCodeLettersIndividuals;
 
     bool disconnectingDueToNoHost, disconnectingMaxPlayers, disconnectingMinigameInProgress;
 
@@ -273,9 +276,16 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SetScenePartyCodeText()
     {
-        for (int i = 0; i < scenePartyCodeLetters.Length; i++)
+        if(scenePartyCodeLetters)
         {
-            scenePartyCodeLetters[i].text = "" + realtime.room.name[i];
+            scenePartyCodeLetters.text = "Party Code: " + realtime.room.name;
+        }
+        if (scenePartyCodeLettersIndividuals.Length > 0)
+        {
+            for (int i = 0; i < scenePartyCodeLettersIndividuals.Length; i++)
+            {
+                scenePartyCodeLettersIndividuals[i].text = "" + realtime.room.name[i];
+            }
         }
     }
 
@@ -312,7 +322,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     public void SpawnPlayer()
     {
-        Debug.Log("SpawnPlayer");
         string currentScene = SceneManager.GetActiveScene().name;
 
         GameObject newPlayer = Realtime.Instantiate(currentScene + "Player", Realtime.InstantiateOptions.defaults);
