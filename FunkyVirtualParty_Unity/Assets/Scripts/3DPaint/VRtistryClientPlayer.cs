@@ -22,7 +22,7 @@ public class VRtistryClientPlayer : ClientPlayer
     {
 #if UNITY_WEBGL
         billboardNameText = false;
-        Destroy((playerAnswer.transform as RectTransform).parent.GetComponent<FaceCamera>());
+        Destroy((playerAnswer.transform as RectTransform).GetComponent<FaceCamera>());
 #endif
 
         base.Awake();
@@ -74,6 +74,7 @@ public class VRtistryClientPlayer : ClientPlayer
         RectTransform rt = (playerAnswer.transform as RectTransform);
         RectTransform arrowRt = (playerAnswerArrow.transform as RectTransform);
 
+#if UNITY_WEBGL
         //Scale/rot
         if (id % 2 == 0)
         {
@@ -106,6 +107,26 @@ public class VRtistryClientPlayer : ClientPlayer
             arrowRt.localPosition = new Vector3(0, 225, 0);
             arrowRt.Rotate(0, 0, 180);
         }
+#elif UNITY_ANDROID
+        //Pos/arrow scale
+        if (id == 0 || id == 6 || id == 1 || id == 7) //Back right and back middle left, Front right and front middle left
+        {
+            rt.localPosition = new Vector3(0, -110, -110);
+            arrowRt.localScale = new Vector3(3.5f, 2.5f, 2.5f);
+        }
+
+        //Arrow pos/rot
+        if (id == 0 || id == 6)
+        {
+            arrowRt.localPosition = new Vector3(-360, 170, 0);
+            arrowRt.localRotation = Quaternion.Euler(0, 0, 135);
+        }
+        else if (id == 1 || id == 7)
+        {
+            arrowRt.localPosition = new Vector3(360, 170, 0);
+            arrowRt.localRotation = Quaternion.Euler(0, 0, 45);
+        }
+#endif
     }
 
     void SetPlayerNameTextPosition()

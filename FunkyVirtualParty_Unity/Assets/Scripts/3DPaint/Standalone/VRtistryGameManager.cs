@@ -711,6 +711,8 @@ public class VRtistryGameManager : MonoBehaviour
 
                 break;
             case "results":
+                SetPlayerNamesVisibility(false);
+
                 vrPlayer.UIWarningArrow.SetActive(false);
 
                 headerText.text = "Displaying results";
@@ -729,15 +731,14 @@ public class VRtistryGameManager : MonoBehaviour
                         aob.ResetPlayerIcons();
                         aob.canvasGroup.alpha = 0;
 
-                        aob.SetText(ownerAndAnswer[1]);
+                        aob.SetTextWithPlayerName(ownerAndAnswer[1], ClientPlayer.GetClientByCurrentOwnerID(id));
                         aob.playerID = ownerAndAnswer[0];
-                        if (int.TryParse(ownerAndAnswer[0], out int i))
-                        {
-                            //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
-                            aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
-                            aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
-                            (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
-                        }
+
+                        //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
+                        aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
+                        aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                        (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
+
                         answerResults.Add(aob);
                     }
                 }
@@ -840,6 +841,14 @@ public class VRtistryGameManager : MonoBehaviour
                 break;
             default:
                 break;
+        }
+    }
+
+    void SetPlayerNamesVisibility(bool visible)
+    {
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            cp.playerNameText.gameObject.SetActive(visible);
         }
     }
 
@@ -1033,6 +1042,8 @@ public class VRtistryGameManager : MonoBehaviour
 
             currentRound++;
         }
+
+        SetPlayerNamesVisibility(true);
     }
 
     void PlayerAnswered(string answers)
