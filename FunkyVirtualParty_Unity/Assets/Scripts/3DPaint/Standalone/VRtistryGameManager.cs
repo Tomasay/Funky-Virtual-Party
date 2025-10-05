@@ -83,6 +83,11 @@ public class VRtistryGameManager : MonoBehaviour
     [SerializeField]
     string musicEventPath;
 
+    [SerializeField]
+    GameObject promptOptionButtonsPrefab, promptOptionButtonsParent;
+
+    List<GameObject> promptOptionButtons;
+
 #if !UNITY_WEBGL
     EventInstance fmodInstance;
 #endif
@@ -119,6 +124,8 @@ public class VRtistryGameManager : MonoBehaviour
         currentLeaderboardCards = new List<GameObject>();
 
         clientPulsateTweens = new List<Tween>();
+
+        promptOptionButtons = new List<GameObject>();
 
         armatureRTs = armature.transform.root.gameObject.GetComponentsInChildren<RealtimeTransform>();
         armaturePositions = new Vector3[armatureRTs.Length];
@@ -385,14 +392,14 @@ public class VRtistryGameManager : MonoBehaviour
 
                 if (VRtistrySyncer.instance.ClientAnswerTimer <= 0 && VRtistrySyncer.instance.VRCompletedTutorial)
                 {
-                    VRtistrySyncer.instance.State = "vr posing";
+                    VRtistrySyncer.instance.State = "vr picking prompt";
                 }
 
                 break;
             case "vr posing":
 
-                //Give a 2 second buffer for players to realize what's happening so they don't accidentally press a button too soon
-                if (Time.time > timeVRPosingStarted + 2)
+                //Give a second buffer for players to realize what's happening so they don't accidentally press a button too soon
+                if (Time.time > timeVRPosingStarted + 1)
                 {
                     //Set pose if any button is pressed
                     if (OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two) ||
@@ -476,6 +483,12 @@ public class VRtistryGameManager : MonoBehaviour
         tutorial.SkipButtonPressed();
     }
 
+    [Button]
+    public void PickFirstPromptOption()
+    {
+        promptOptionButtonClicked(1);
+    }
+
     public void OnTutorialCompleted()
     {
         vrPlayer.UIWarningArrow.SetActive(false);
@@ -487,7 +500,7 @@ public class VRtistryGameManager : MonoBehaviour
 
             if (answersSeparated.Length >= ClientPlayer.clients.Count)
             {
-                VRtistrySyncer.instance.State = "vr posing";
+                VRtistrySyncer.instance.State = "vr picking prompt";
             }
         }
 
@@ -586,6 +599,24 @@ public class VRtistryGameManager : MonoBehaviour
                 firstTimeClientsAnswering = false;
 
                 break;
+            case "vr picking prompt":
+                headerText.text = DONT_SAY_WARNING + "Pick a prompt to create:\n\n\n\n\n";
+
+                //Disable VR tools
+                paintBrush.CanPaintAir = false;
+                DropTool();
+                DropPalette();
+
+                //Instantiate option buttons
+                foreach (ClientPlayer cp in ClientPlayer.clients)
+                {
+                    GameObject newOption = Instantiate(promptOptionButtonsPrefab, promptOptionButtonsParent.transform);
+                    newOption.GetComponentInChildren<TMP_Text>().text = GetAnswerByOwnerID(cp.realtimeView.ownerIDSelf);
+                    newOption.GetComponent<Button>().onClick.AddListener(delegate { promptOptionButtonClicked(cp.realtimeView.ownerIDSelf); });
+                    promptOptionButtons.Add(newOption);
+                }
+
+                break;
             case "vr posing":
 #if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 1);
@@ -594,15 +625,6 @@ public class VRtistryGameManager : MonoBehaviour
                 vrPlayer.UIWarningArrow.SetActive(true);
 
                 solver.EnablePosing();
-
-                //Disable VR tools
-                paintBrush.CanPaintAir = false;
-                DropTool();
-                DropPalette();
-
-                //Get random answer
-                VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[Random.Range(0, ClientPlayer.clients.Count)].realtimeView.ownerIDSelf;
-                //TEMP Custom answer for testing VRtistrySyncer.instance.ChosenAnswerOwner = ClientPlayer.clients[ClientPlayer.clients.Count-1].realtimeView.ownerIDSelf;
 
                 //UI
                 headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
@@ -844,6 +866,18 @@ public class VRtistryGameManager : MonoBehaviour
         }
     }
 
+    void promptOptionButtonClicked(int answerOwnerID)
+    {
+        VRtistrySyncer.instance.ChosenAnswerOwner = answerOwnerID;
+        foreach (GameObject pob in promptOptionButtons)
+        {
+            Destroy(pob);
+        }
+        promptOptionButtons = new List<GameObject>();
+
+        VRtistrySyncer.instance.State = "vr posing";
+    }
+
     void SetPlayerNamesVisibility(bool visible)
     {
         foreach (ClientPlayer cp in ClientPlayer.clients)
@@ -1053,7 +1087,7 @@ public class VRtistryGameManager : MonoBehaviour
 
         if (answersSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial)
         {
-            VRtistrySyncer.instance.State = "vr posing";
+            VRtistrySyncer.instance.State = "vr picking prompt";
         }
     }
 
