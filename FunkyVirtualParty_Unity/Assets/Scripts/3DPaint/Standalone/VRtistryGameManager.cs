@@ -600,7 +600,7 @@ public class VRtistryGameManager : MonoBehaviour
 
                 break;
             case "vr picking prompt":
-                headerText.text = DONT_SAY_WARNING + "Pick a prompt to create:\n\n\n\n\n";
+                headerText.text = DONT_SAY_WARNING + "Pick a prompt:\n\n\n\n\n";
 
                 //Disable VR tools
                 paintBrush.CanPaintAir = false;
@@ -616,6 +616,9 @@ public class VRtistryGameManager : MonoBehaviour
                     promptOptionButtons.Add(newOption);
                 }
 
+                //Clear practice painting
+                paintTexture.Clear();
+
                 break;
             case "vr posing":
 #if !UNITY_WEBGL
@@ -628,9 +631,6 @@ public class VRtistryGameManager : MonoBehaviour
 
                 //UI
                 headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
-
-                //Clear practice painting
-                paintTexture.Clear();
 
                 timeVRPosingStarted = Time.time;
 

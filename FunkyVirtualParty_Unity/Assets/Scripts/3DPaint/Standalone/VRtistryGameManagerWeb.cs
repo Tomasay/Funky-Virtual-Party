@@ -284,6 +284,21 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 TriggerHaptic(200);
 #endif
                 break;
+
+            case "vr picking prompt":
+                inputTimerText.enabled = false;
+                blurTimerText.enabled = false;
+
+                //Show blurred view
+                inputCanvas.enabled = false;
+
+                blurHeaderText.text = "Waiting for VR player to pick a prompt...";
+
+                //Reset any painting from practicing
+                paintTexture.Clear();
+                DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
+
+                break;
             case "vr posing":
                 if (!paintBrush)
                 {
@@ -293,17 +308,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                     paintBrush.OnRevealAnimationComplete.AddListener(OnRevealAnimationComplete);
                 }
 
-                inputTimerText.enabled = false;
-                blurTimerText.enabled = false;
-
-                //Show blurred view
-                inputCanvas.enabled = false;
-
                 blurHeaderText.text = "Waiting for VR player to set a pose...";
-
-                //Reset any painting from practicing
-                paintTexture.Clear();
-                DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
                 break;
             case "vr painting":
                 blurWipUI.DOScale(1, 0.5f);

@@ -26,10 +26,16 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
         //GenerateFakeAnswers("The worst costume you could wear to a halloween party?", "minion", 5, onRequestCompleteTest);
     }
 
+    int errorMessageIndex = 0; //Count index to make sure consecutive error messages that are the same still trigger a callback
     public async void GenerateFakeAnswers(string question, string chosenAnswer, int numOfAnswersToGenerate, System.Action<string> onRequestCompleteCallback)
     {
+        errorMessageIndex++;
+
         if (disableFakeAnswers)
+        {
+            onRequestCompleteCallback.Invoke("AI request failed: decoy answers disabled" + errorMessageIndex);
             return;
+        }
 
         try
         {
@@ -100,7 +106,9 @@ public class GeminiFakeAnswersGenerator : MonoBehaviour
         }
         catch (System.Exception ex)
         {
-            Debug.LogError($"❌ AI request failed: {ex.Message}");
+            string errorMessage = ($"❌ AI request failed: {ex.Message}" + errorMessageIndex);
+            Debug.LogError(errorMessage);
+            onRequestCompleteCallback.Invoke(errorMessage);
         }
     }
 
