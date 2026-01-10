@@ -112,6 +112,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             previousModel.isPaletteEnabledDidChange -= OnIsPaletteEnabledChanged;
             previousModel.brushColorDidChange -= OnBrushColorChanged;
             previousModel.currentPromptDidChange -= OnPromptChanged;
+            previousModel.chosenAnswerOwnerDidChange -= OnChosenAnswerOwnerChanged;
         }
 
         if (currentModel != null)
@@ -136,6 +137,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             currentModel.isPaletteEnabledDidChange += OnIsPaletteEnabledChanged;
             currentModel.brushColorDidChange += OnBrushColorChanged;
             currentModel.currentPromptDidChange += OnPromptChanged;
+            currentModel.chosenAnswerOwnerDidChange += OnChosenAnswerOwnerChanged;
         }
     }
 
@@ -221,6 +223,17 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     private void OnPromptChanged(VRtistrySyncModel model, string value)
     {
         OnPromptChangedEvent.Invoke(value);
+    }
+
+    private void OnChosenAnswerOwnerChanged(VRtistrySyncModel model, int value)
+    {
+#if UNITY_WEBGL
+        ClientPlayer cp = RealtimeSingletonWeb.instance.LocalPlayer;
+        if (cp.realtimeView.ownerIDSelf == value)
+        {
+            cp.syncer.Score += ThreeDPaintGlobalVariables.POINTS_CLIENT_SELECTED_PROMPT;
+        }
+#endif
     }
     #endregion
 }

@@ -1099,7 +1099,7 @@ public class VRtistryGameManager : MonoBehaviour
         //Check to see if all players have guessed, if so move to next state
         string[] guessesSeparated = guesses.Split('\n');
 
-        if (guessesSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("clients guessing"))
+        if (guessesSeparated.Length >= (ClientPlayer.clients.Count - 1) && VRtistrySyncer.instance.State.Equals("clients guessing"))
         {
             VRtistrySyncer.instance.State = "vr guessing";
         }

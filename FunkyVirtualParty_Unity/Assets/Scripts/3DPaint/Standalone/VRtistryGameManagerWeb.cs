@@ -38,7 +38,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     VRtistryMainMenuManagerWeb mainMenuManager;
 
     [SerializeField]
-    TMP_Text inputHeaderText, blurHeaderText, guessingHeaderText;
+    TMP_Text inputHeaderText, blurHeaderText, guessingHeaderText, thisIsYourPromptText;
 
     [SerializeField]
     TMP_Text blurTimerText, inputTimerText;
@@ -326,8 +326,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 break;
             case "clients guessing":
                 tapAndHoldRotateLearned = false;
+                bool isLocalClientsPrompt = VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf;
 
-                guessingHeaderText.text = "What is it?";
+                thisIsYourPromptText.enabled = isLocalClientsPrompt;
+
+                guessingHeaderText.text = isLocalClientsPrompt ? "Waiting for other players to answer" : "What is it?";
 
                 (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
 
@@ -348,21 +351,25 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
 
-                //Answer buttons
-                answerButtonParent.SetActive(false);
-                answerButtonBG.SetActive(false);
-                foreach (string a in answersSeparated)
+                
+                if (!isLocalClientsPrompt)
                 {
-                    string[] ownerAndAnswer = a.Split(':');
+                    //Answer buttons
+                    answerButtonParent.SetActive(false);
+                    answerButtonBG.SetActive(false);
+                    foreach (string a in answersSeparated)
+                    {
+                        string[] ownerAndAnswer = a.Split(':');
 
-                    GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                    ab.transform.localScale = Vector3.zero;
-                    string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
-                    ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
-                    AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                    aob.SetText(ownerAndAnswer[1]);
-                    aob.playerID = ownerAndAnswer[0];
-                    answerButtons.Add(aob);
+                        GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                        ab.transform.localScale = Vector3.zero;
+                        string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
+                        ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                        AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                        aob.SetText(ownerAndAnswer[1]);
+                        aob.playerID = ownerAndAnswer[0];
+                        answerButtons.Add(aob);
+                    }
                 }
 
                 //Answer results
@@ -388,6 +395,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                         answerResults.Add(aob);
                     }
                 }
+
 
                 paintBrush.AnimatePaintingReveal();
                 break;
@@ -506,6 +514,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void CreatePlayerGuessButtons()
     {
+        thisIsYourPromptText.enabled = false;
+
         string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
 
         //If local player is the one who wrote the picked answer, show them someone else's answer
