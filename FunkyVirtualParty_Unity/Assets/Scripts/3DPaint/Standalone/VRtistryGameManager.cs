@@ -607,6 +607,8 @@ public class VRtistryGameManager : MonoBehaviour
                 DropTool();
                 DropPalette();
 
+                vrPlayer.UIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
+
                 //Instantiate option buttons
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
@@ -630,6 +632,7 @@ public class VRtistryGameManager : MonoBehaviour
                 solver.EnablePosing();
 
                 //UI
+                vrPlayer.UIPointerPreview.rayDrawDistance = 0;
                 headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 timeVRPosingStarted = Time.time;
