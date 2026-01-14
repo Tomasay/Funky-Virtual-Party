@@ -879,7 +879,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         //vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "";
         vrCard.GetComponentsInChildren<TMP_Text>()[1].text = "" + VRtistrySyncer.instance.VRPlayerPoints;
         vrCard.GetComponentsInChildren<TMP_Text>()[2].text = "" + (vrPlayerPos);
-        vrCard.transform.SetSiblingIndex(vrPlayerPos-1);
+        vrCard.transform.SetSiblingIndex(vrPlayerPos);
 
         currentLeaderboardCards.Add(vrCard);
 
