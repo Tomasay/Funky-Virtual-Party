@@ -113,11 +113,15 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     PaintBrush paintBrush;
 
+    List<float> leaderboardHeightsPrevRound = null;
+
     private void Awake()
     {
         currentLeaderboardCards = new List<GameObject>();
         answerButtons = new List<AnswerOptionButton>();
         answerResults = new List<AnswerOptionButton>();
+
+        leaderboardHeightsPrevRound = new List<float>();
 
         drawingModelStartingRot = drawingModel.transform.rotation;
 
@@ -893,6 +897,34 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 yield return new WaitForSeconds(0.125f);
             }
         }
+
+        /*TODO:Finish leaderboard lead change animations
+        //Animate lead changes from previous round
+        if (leaderboardHeightsPrevRound.Count > 0)
+        {
+            for (int i = 0; i < currentLeaderboardCards.Count(); i++)
+            {
+                float currentHeight = currentLeaderboardCards[i].transform.localPosition.y;
+
+                LayoutElement le = currentLeaderboardCards[i].AddComponent<LayoutElement>();
+                le.ignoreLayout = true;
+
+                Vector3 pos = currentLeaderboardCards[i].transform.localPosition;
+                pos.y = leaderboardHeightsPrevRound[i];
+                currentLeaderboardCards[i].transform.localPosition = pos;
+
+                currentLeaderboardCards[i].transform.DOLocalMoveY(currentHeight, 1);
+            }
+            yield return new WaitForSeconds(1);
+        }
+
+        //Store prev heights for next round
+        leaderboardHeightsPrevRound = new List<float>();
+        foreach (GameObject c in currentLeaderboardCards)
+        {
+            leaderboardHeightsPrevRound.Add(c.transform.localPosition.y);
+        }
+        */
 
         leaderboardTimerSlider.DOValue(1, ThreeDPaintGlobalVariables.LEADERBOARD_DISPLAY_TIME);
 
