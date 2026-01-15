@@ -390,10 +390,12 @@ public class VRtistryGameManager : MonoBehaviour
             case "clients answering":
                 VRtistrySyncer.instance.ClientAnswerTimer -= Time.deltaTime;
 
+                /*
                 if (VRtistrySyncer.instance.ClientAnswerTimer <= 0 && VRtistrySyncer.instance.VRCompletedTutorial)
                 {
                     VRtistrySyncer.instance.State = "vr picking prompt";
                 }
+                */
 
                 break;
             case "vr posing":

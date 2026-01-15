@@ -41,7 +41,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     TMP_Text inputHeaderText, blurHeaderText, guessingHeaderText, thisIsYourPromptText;
 
     [SerializeField]
-    TMP_Text blurTimerText, inputTimerText;
+    TMP_Text blurTimerText;
 
     [SerializeField]
     RectTransform blurWipUI;
@@ -103,6 +103,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     [SerializeField]
     Slider leaderboardTimerSlider;
+
+    [SerializeField]
+    GameObject lastPlayerAnsweringWarning;
 
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
@@ -194,12 +197,13 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 if (blurTimerText.enabled) blurTimerText.text = FormatTime(VRtistrySyncer.instance.DrawingTimer);
             }
         }
-        else
+
+        if (VRtistrySyncer.instance.State.Equals("clients answering") && VRtistrySyncer.instance.ClientAnswerTimer <= 0 && typingAnswer && !lastPlayerAnsweringWarning.activeSelf)
         {
-            if (VRtistrySyncer.instance.ClientAnswerTimer >= 0)
+            string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+            if (!VRtistrySyncer.instance.Answers.Equals("") && answersSeparated.Length == ClientPlayer.clients.Count - 1)
             {
-                if (inputTimerText.enabled) inputTimerText.text = FormatTime(VRtistrySyncer.instance.ClientAnswerTimer);
-                if (blurTimerText.enabled) blurTimerText.text = FormatTime(VRtistrySyncer.instance.ClientAnswerTimer);
+                lastPlayerAnsweringWarning.SetActive(true);
             }
         }
     }
@@ -211,8 +215,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
         {
-            inputTimerText.enabled = false;
-            blurTimerText.enabled = false;
             blurHeaderText.text = "Waiting for VR player to complete tutorial...";
         }
         else if (answersSeparated.Length != ClientPlayer.clients.Count)
@@ -273,8 +275,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 mainMenuManager.HideMainMenuUI();
                 ResetAnswerResultsBubbles();
 
-                inputTimerText.enabled = true;
-
                 //Enable phone anim for local player, which will then be synced for everyone else
                 VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
                 if (vcp && vcp.usingPhone == 0)
@@ -290,12 +290,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 break;
 
             case "vr picking prompt":
-                inputTimerText.enabled = false;
+                lastPlayerAnsweringWarning.SetActive(false);
                 blurTimerText.enabled = false;
-
                 //Show blurred view
                 inputCanvas.enabled = false;
-
+                
                 blurHeaderText.text = "Waiting for VR player to pick a prompt...";
 
                 //Reset any painting from practicing
@@ -339,7 +338,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
 
                 blurTimerText.enabled = false;
-                inputTimerText.enabled = false;
 
                 //Make sure there's no lingering drawings
                 paintBrush.CanPaintAir = false;
