@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class ThreeDPaintGlobalVariables : MonoBehaviour
 {
-    //Every player that correctly guesses what the VR player's drawing is
     public const int NUMBER_OF_ROUNDS = 3;
 
-    //Every player that correctly guesses what the VR player's drawing is
     public const int MINIMUM_NUMBER_OF_PLAYERS = 3;
 
-    //Every player that correctly guesses what the VR player's drawing is
+    //Points that the VR player gets per client that correctly guesses what the drawing is
     public const int POINTS_VR_CORRECT_GUESSES = 25;
 
     //Correctly guessing which player wrote the chosen answer

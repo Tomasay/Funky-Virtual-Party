@@ -107,6 +107,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     [SerializeField]
     GameObject lastPlayerAnsweringWarning;
 
+    [SerializeField]
+    Animator correctPlayerGuessAnimation;
+
     bool typingAnswer = false; //Is player typing their answer?
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
 
@@ -729,7 +732,10 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         if (clientGuessID == answerOwnerIDPlayerIsGuessing)
         {
             RealtimeSingletonWeb.instance.LocalPlayer.syncer.Score += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_PLAYER;
-            guessingHeaderText.text = "Correct!";
+
+            correctPlayerGuessAnimation.gameObject.SetActive(true);
+            correctPlayerGuessAnimation.SetTrigger("play");
+            guessingHeaderText.text = "";
         }
         else
         {
