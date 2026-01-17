@@ -636,6 +636,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
                 //Show guesses
                 string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
+                int correctGuesses = 0;
                 foreach (string g in guessesSeparated)
                 {
                     string[] ownerAndGuess = g.Split(':');
@@ -649,7 +650,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                             VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
                             vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
 
-                            VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_GUESSES;
+                            correctGuesses++;
                         }
                     }
                     else
@@ -663,6 +664,7 @@ public class ThreeDPaintGameManager : MonoBehaviour
                         }
                     }
                 }
+                VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.calculatePointsVrCorrectGuesses(correctGuesses);
 
                 //Header
                 playerResultsHeaderText.text = "";

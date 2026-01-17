@@ -8,11 +8,8 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
 
     public const int MINIMUM_NUMBER_OF_PLAYERS = 3;
 
-    //Points that the VR player gets per client that correctly guesses what the drawing is
-    public const int POINTS_VR_CORRECT_GUESSES = 25;
-
     //Correctly guessing which player wrote the chosen answer
-    public const int POINTS_VR_CORRECT_PLAYER = 75;
+    public const int POINTS_VR_CORRECT_PLAYER = 50;
 
     //Amount of points a client gets for having their guess selected as the prompt to draw
     public const int POINTS_CLIENT_SELECTED_PROMPT = 125;
@@ -21,7 +18,7 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
     public const int POINTS_CLIENT_CORRECT_GUESS = 100;
 
     //Client Correctly guessing what player wrote an answer
-    public const int POINTS_CLIENT_CORRECT_PLAYER = 25;
+    public const int POINTS_CLIENT_CORRECT_PLAYER = 50;
 
     //The amount of time the VR player gets to draw
     public const int DRAW_TIME_AMOUNT = 120;
@@ -34,4 +31,17 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
 
     //The amount of time the leaderboard is displayed for between rounds
     public const int LEADERBOARD_DISPLAY_TIME = 6;
+
+
+    //TOTAL Points that the VR player gets for clients that correctly guesses what the drawing is
+    public static int calculatePointsVrCorrectGuesses(int correctGuesses)
+    {
+        float basePoints = (100f / ((float)ClientPlayer.clients.Count-1)) * correctGuesses;
+
+        // Snap UP to nearest 25
+        int snappedUp = Mathf.CeilToInt(basePoints / 25f) * 25;
+
+        // Enforce minimum of 25
+        return (correctGuesses <= 0) ? 0 : Mathf.Max(25, snappedUp);
+    }
 }
