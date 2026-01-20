@@ -26,6 +26,7 @@ public class AnswerOptionButton : MonoBehaviour
     public GameObject correctAnswerBanner;
     public Vector3 initialScale;
     private float correctAnswerBannerInitialScale;
+    private Vector3 correctAnswerBannerInitialLocalPos;
 
     //The player who wrote this answer
     public string playerID;
@@ -38,6 +39,7 @@ public class AnswerOptionButton : MonoBehaviour
         if (correctAnswerBanner)
         {
             correctAnswerBannerInitialScale = (correctAnswerBanner.transform as RectTransform).localScale.x;
+            correctAnswerBannerInitialLocalPos = (correctAnswerBanner.transform as RectTransform).localPosition;
         }
     }
 
@@ -92,6 +94,15 @@ public class AnswerOptionButton : MonoBehaviour
             i.GetComponent<LayoutElement>().ignoreLayout = false;
             i.gameObject.SetActive(false);
         }
+
+        //Selected prompt banner
+        (correctAnswerBanner.transform as RectTransform).localScale = Vector3.one * correctAnswerBannerInitialScale;
+        (correctAnswerBanner.transform as RectTransform).localPosition = correctAnswerBannerInitialLocalPos;
+        SetImageAlpha(correctAnswerBanner.GetComponentsInChildren<Image>()[0], 1);
+        SetImageAlpha(correctAnswerBanner.GetComponentsInChildren<Image>()[1], 1);
+        correctAnswerBanner.GetComponentInChildren<TMP_Text>().text = "Selected Prompt";
+        correctAnswerBanner.GetComponentInChildren<TMP_Text>().color = Color.black;
+        correctAnswerBanner.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Normal;
     }
 
     public void AddPlayerIcon(int id)
@@ -158,10 +169,18 @@ public class AnswerOptionButton : MonoBehaviour
 
     IEnumerator AnimateScoresCoroutine()
     {
+        int correctGuesses = 0;
+
+        //Animate each player icon
         for (int i = 0; i < playerIcons.Length; i++)
         {
             if (playerIcons[i].gameObject.activeSelf)
             {
+                if (correctAnswerBanner.activeSelf)
+                {
+                    correctGuesses++;
+                }
+
                 //Scale player icon down
                 (playerIcons[i].transform as RectTransform).DOScale(0, 0.25f);
                 yield return new WaitForSeconds(0.25f);
@@ -210,6 +229,40 @@ public class AnswerOptionButton : MonoBehaviour
                 cp.playerNameText.DOColor(Color.black, 0.25f);
                 cp.playerNameText.transform.DOLocalMoveY(nameHeight, 0.25f);
             }
+        }
+
+        //Animate "selected prompt"
+        if (correctAnswerBanner.activeSelf)
+        {
+            yield return new WaitForSeconds(1);
+
+            (correctAnswerBanner.transform as RectTransform).DOScale(0, 0.25f);
+            yield return new WaitForSeconds(0.25f);
+
+            SetImageAlpha(correctAnswerBanner.GetComponentsInChildren<Image>()[0], 0);
+            SetImageAlpha(correctAnswerBanner.GetComponentsInChildren<Image>()[1], 0);
+
+            correctAnswerBanner.GetComponentInChildren<TMP_Text>().text = "" + ThreeDPaintGlobalVariables.POINTS_CLIENT_SELECTED_PROMPT;
+            correctAnswerBanner.GetComponentInChildren<TMP_Text>().color = Color.green;
+            correctAnswerBanner.GetComponentInChildren<TMP_Text>().fontStyle = FontStyles.Bold;
+            (correctAnswerBanner.transform as RectTransform).DOScale(1, 0.25f);
+
+            yield return new WaitForSeconds(1);
+
+            ClientPlayer cp = transform.root.GetComponent<ClientPlayer>();
+            (correctAnswerBanner.transform as RectTransform).DOMove(cp.transform.position, 0.5f);
+            correctAnswerBanner.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 0.5f);
+
+            yield return new WaitForSeconds(0.25f);
+
+            float nameHeight = cp.playerNameText.transform.localPosition.y;
+            cp.playerNameText.DOColor(Color.green, 0.25f);
+            cp.playerNameText.transform.DOLocalMoveY(nameHeight + 5, 0.25f);
+
+            yield return new WaitForSeconds(0.25f);
+
+            cp.playerNameText.DOColor(Color.black, 0.25f);
+            cp.playerNameText.transform.DOLocalMoveY(nameHeight, 0.25f);
         }
     }
 
