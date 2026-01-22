@@ -106,15 +106,13 @@ public class VRtistryGameManager : MonoBehaviour
 
     private float pointerPreviewDrawDistance;
 
-    List<Tween> clientPulsateTweens;
-
-    int[] numOfPointersOnClients; //How many pointers are currently on a client? Used to determine highlighting effects
-
     const string DONT_SAY_WARNING = "<sprite=0> <size=0.1px><color=#F6AC70><u><b>DON'T SAY THIS OUTLOUD!</b></u></color></size>\n";
 
     RealtimeTransform[] armatureRTs;
     Vector3[] armaturePositions;
     Quaternion[] armatureRotations;
+
+    RectTransform promptOptionRT;
 
     private void Awake()
     {
@@ -122,8 +120,6 @@ public class VRtistryGameManager : MonoBehaviour
 
         playerNameIcons = new List<GameObject>();
         currentLeaderboardCards = new List<GameObject>();
-
-        clientPulsateTweens = new List<Tween>();
 
         promptOptionButtons = new List<GameObject>();
 
@@ -145,6 +141,8 @@ public class VRtistryGameManager : MonoBehaviour
 
         canvasDefaultPos = (uiCanvas.transform as RectTransform).position;
         canvasDefaultRot = (uiCanvas.transform as RectTransform).rotation;
+
+        promptOptionRT = (promptOptionButtonsParent.transform as RectTransform);
 
 #if !UNITY_WEBGL
         fmodInstance = RuntimeManager.CreateInstance(musicEventPath);
@@ -207,8 +205,6 @@ public class VRtistryGameManager : MonoBehaviour
     public bool gameSetup = false;
     public void SetupGame()
     {
-        CreateClientPlayerButtons();
-
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
         VRtistrySyncer.instance.OnPlayerGuessedArt.AddListener(PlayerGuessedArt);
@@ -217,74 +213,6 @@ public class VRtistryGameManager : MonoBehaviour
         InvokeRepeating("Test", 1, 1);
 
         gameSetup = true;
-    }
-
-    public void CreateClientPlayerButtons()
-    {
-        numOfPointersOnClients = new int[ClientPlayer.clients.Count];
-
-        foreach (ClientPlayer cp in ClientPlayer.clients)
-        {
-            //Create a new button object
-            GameObject newButton = new GameObject("GeneratedButton", typeof(RectTransform), typeof(Button), typeof(Image));
-            Button b = newButton.GetComponent<Button>();
-            (cp as VRtistryClientPlayer).playerButton = b;
-            newButton.GetComponent<Image>().color = Color.clear;
-            FaceCamera faceCamera = newButton.AddComponent<FaceCamera>();
-            faceCamera.transformIsRect = true;
-
-            //Set it as a child of the canvas
-            newButton.transform.SetParent(uiCanvas.transform, false);
-
-            //Configure RectTransform
-            RectTransform buttonRect = newButton.GetComponent<RectTransform>();
-            buttonRect.sizeDelta = new Vector2(1, 2); // Default size for a button
-            buttonRect.position = cp.transform.position;
-
-            //Callbacks
-            EventTrigger eventTrigger = newButton.AddComponent<EventTrigger>();
-
-            EventTrigger.Entry entry = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerEnter
-            };
-
-            EventTrigger.Entry exit = new EventTrigger.Entry
-            {
-                eventID = EventTriggerType.PointerExit
-            };
-
-            entry.callback.AddListener(delegate {
-                //Pause all tweens. Keep highlighted player outlined, and remove outline from all other clients
-                int highlightedClientIndex = ClientPlayer.clients.IndexOf(cp);
-                numOfPointersOnClients[highlightedClientIndex]++;
-
-                for (int i = 0; i < clientPulsateTweens.Count; i++)
-                {
-                    clientPulsateTweens[i].Pause();
-                    ClientPlayer.clients[i].smr.material.SetColor("_OutlineColor", ClientPlayer.clients[i].outlineColor);
-                }
-                cp.smr.material.SetColor("_OutlineColor", Color.white);
-            });
-            exit.callback.AddListener(delegate {
-                int highlightedClientIndex = ClientPlayer.clients.IndexOf(cp);
-                numOfPointersOnClients[highlightedClientIndex]--;
-
-                for (int i = 0; i < clientPulsateTweens.Count; i++)
-                {
-                    if (numOfPointersOnClients[i] <= 0)
-                    {
-                        ClientPlayer.clients[i].smr.material.SetColor("_OutlineColor", ClientPlayer.clients[i].outlineColor);
-                        clientPulsateTweens[i].Play();
-                    }
-                }
-            });
-
-            eventTrigger.triggers.Add(entry);
-            eventTrigger.triggers.Add(exit);
-
-            newButton.SetActive(false);
-        }
     }
 
     //Temporary solution because ownership seems to randomly get taken by VR player, preventing clients from changing any values
@@ -376,15 +304,6 @@ public class VRtistryGameManager : MonoBehaviour
     float timeVRPosingStarted;
     private void Update()
     {
-        if (numOfPointersOnClients != null)
-        {
-            string s = "";
-            foreach (int i in numOfPointersOnClients)
-            {
-                s += i + ", ";
-            }
-        }
-
         switch (VRtistrySyncer.instance.State)
         {
             case "clients answering":
@@ -611,6 +530,9 @@ public class VRtistryGameManager : MonoBehaviour
 
                 vrPlayer.UIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
 
+                headerText.fontSize = 0.3f;
+                (promptOptionRT.offsetMin, promptOptionRT.offsetMax) = (new Vector2(promptOptionRT.offsetMin.x, 0), new Vector2(promptOptionRT.offsetMax.x, -0.5f));
+
                 //Instantiate option buttons
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
@@ -690,30 +612,37 @@ public class VRtistryGameManager : MonoBehaviour
                 //Show guesses
                 string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 int correctGuesses = 0;
+
+                List<int> clientGuessOptions = GetRandomClientIdsIncludingCorrect(VRtistrySyncer.instance.ChosenAnswerOwner, 3);
+
+                headerText.fontSize = 0.225f;
+                (promptOptionRT.offsetMin, promptOptionRT.offsetMax) = (new Vector2(promptOptionRT.offsetMin.x, -0.5f), new Vector2(promptOptionRT.offsetMax.x, -1));
+
+                foreach (int g in clientGuessOptions)
+                {
+                    VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(g) as VRtistryClientPlayer);
+
+                    GameObject newOption = Instantiate(promptOptionButtonsPrefab, promptOptionButtonsParent.transform);
+                    newOption.GetComponentInChildren<TMP_Text>().text = vcp.syncer.Name;
+                    newOption.GetComponent<Image>().color = vcp.syncer.Color;
+                    newOption.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(g)); });
+                    promptOptionButtons.Add(newOption);
+                }
+
                 foreach (string g in guessesSeparated)
                 {
                     string[] ownerAndGuess = g.Split(':');
 
-                    if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
+                    if (int.TryParse(ownerAndGuess[0], out int j))
                     {
-                        if (int.TryParse(ownerAndGuess[0], out int j))
+                        if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                         {
                             //AddPlayerToResults(j, true);
-
-                            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
-
                             correctGuesses++;
                         }
-                    }
-                    else
-                    {
-                        if (int.TryParse(ownerAndGuess[0], out int j))
+                        else
                         {
                             //AddPlayerToResults(j, false);
-
-                            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
                         }
                     }
                 }
@@ -721,7 +650,7 @@ public class VRtistryGameManager : MonoBehaviour
 
                 //Header
                 playerResultsHeaderText.text = "";
-                headerText.text = "The prompt was:\n<b>" + VRtistrySyncer.instance.CurrentPrompt + "</b>\nClick on the player you think wrote:\n<b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
+                headerText.text = "The prompt was:\n<b>" + VRtistrySyncer.instance.CurrentPrompt + "</b>\nClick on the player you think wrote:\n<b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "\n\n\n";
                 foreach (GameObject g in playerNameIcons)
                 {
                     g.GetComponentInChildren<Button>().interactable = true;
@@ -731,12 +660,6 @@ public class VRtistryGameManager : MonoBehaviour
                 vrPlayer.UIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
                 vrPlayer.leftHand.Release();
                 vrPlayer.rightHand.Release();
-
-                foreach (ClientPlayer cp in ClientPlayer.clients)
-                {
-                    (cp as VRtistryClientPlayer).SetButtonInteractable(true);
-                    clientPulsateTweens.Add(cp.smr.material.DOColor(Color.gray, "_OutlineColor", 1).SetLoops(9999, LoopType.Yoyo));
-                }
 
                 break;
             case "results":
@@ -1184,15 +1107,6 @@ public class VRtistryGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.VRPlayerGuess = playerID;
 
-        //Reset all client mats and pulsate tweens
-        for (int i = 0; i < ClientPlayer.clients.Count; i++)
-        {
-            clientPulsateTweens[i].Kill();
-            ClientPlayer.clients[i].smr.material.SetColor("_OutlineColor", ClientPlayer.clients[i].outlineColor);
-        }
-        clientPulsateTweens = new List<Tween>();
-        numOfPointersOnClients = new int[ClientPlayer.clients.Count];
-
         if (playerID.Equals(VRtistrySyncer.instance.ChosenAnswerOwner))
         {
             VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.POINTS_VR_CORRECT_PLAYER;
@@ -1204,12 +1118,11 @@ public class VRtistryGameManager : MonoBehaviour
         }
 
         //Remove client buttons
-        foreach (ClientPlayer cp in ClientPlayer.clients)
+        foreach (GameObject pob in promptOptionButtons)
         {
-            VRtistryClientPlayer vcp = (cp as VRtistryClientPlayer);
-            vcp.SetButtonInteractable(false);
-            vcp.playerButton.onClick.RemoveAllListeners();
+            Destroy(pob);
         }
+        promptOptionButtons = new List<GameObject>();
 
         yield return new WaitForSeconds(3);
 
@@ -1485,5 +1398,34 @@ public class VRtistryGameManager : MonoBehaviour
         int minutes = (int)time / 60;
         int seconds = (int)time - (minutes * 60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    // Returns `count` unique client IDs in random order, always containing `correctClient`.
+    public static List<int> GetRandomClientIdsIncludingCorrect(int correctClient, int count)
+    {
+        //Create list of client IDs
+        List<int> clients = new List<int>();
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
+        {
+            clients.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf);
+        }
+
+        if (count >= ClientPlayer.clients.Count)
+        {
+            return clients;
+        }
+
+        //Randomize order and reduce to count
+        clients.Sort((a, b) => UnityEngine.Random.Range(-1, 2));
+        clients = clients.Take(count).ToList();
+
+        //If list doesn't contain the correct clientID, replace one of them at random 
+        if (!clients.Contains(correctClient))
+        {
+            int randomIndex = Random.Range(0, clients.Count);
+            clients[randomIndex] = correctClient;
+        }
+
+        return clients;
     }
 }
