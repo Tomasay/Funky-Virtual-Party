@@ -613,7 +613,7 @@ public class VRtistryGameManager : MonoBehaviour
                 string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 int correctGuesses = 0;
 
-                List<int> clientGuessOptions = GetRandomClientIdsIncludingCorrect(VRtistrySyncer.instance.ChosenAnswerOwner, 3);
+                List<int> clientGuessOptions = ClientPlayer.GetRandomClientIdList(3, VRtistrySyncer.instance.ChosenAnswerOwner);
 
                 headerText.fontSize = 0.225f;
                 (promptOptionRT.offsetMin, promptOptionRT.offsetMax) = (new Vector2(promptOptionRT.offsetMin.x, -0.5f), new Vector2(promptOptionRT.offsetMax.x, -1));
@@ -1398,34 +1398,5 @@ public class VRtistryGameManager : MonoBehaviour
         int minutes = (int)time / 60;
         int seconds = (int)time - (minutes * 60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);
-    }
-
-    // Returns `count` unique client IDs in random order, always containing `correctClient`.
-    public static List<int> GetRandomClientIdsIncludingCorrect(int correctClient, int count)
-    {
-        //Create list of client IDs
-        List<int> clients = new List<int>();
-        for (int i = 0; i < ClientPlayer.clients.Count; i++)
-        {
-            clients.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf);
-        }
-
-        if (count >= ClientPlayer.clients.Count)
-        {
-            return clients;
-        }
-
-        //Randomize order and reduce to count
-        clients.Sort((a, b) => UnityEngine.Random.Range(-1, 2));
-        clients = clients.Take(count).ToList();
-
-        //If list doesn't contain the correct clientID, replace one of them at random 
-        if (!clients.Contains(correctClient))
-        {
-            int randomIndex = Random.Range(0, clients.Count);
-            clients[randomIndex] = correctClient;
-        }
-
-        return clients;
     }
 }

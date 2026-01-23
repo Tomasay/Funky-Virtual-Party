@@ -7,6 +7,7 @@ using TMPro;
 using UnityEngine.InputSystem;
 using Normal.Realtime;
 using UnityEngine.Events;
+using System.Linq;
 
 [Serializable]
 public class ClientInputData
@@ -459,5 +460,47 @@ public class ClientPlayer : MonoBehaviour
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Returns 'count' unique client IDs in random order
+    /// </summary>
+    /// <param name="count"># of client IDs to provide in list</param>
+    /// <param name="mustIncludeID">client ID that must be included in the list</param>
+    /// <param name="mustExcludeID">client ID that must be excluded in the list</param>
+    /// <returns></returns>
+    public static List<int> GetRandomClientIdList(int count, int mustIncludeID, int mustExcludeID = -1)
+    {
+        //Create list of client IDs
+        List<int> clients = new List<int>();
+        for (int i = 0; i < ClientPlayer.clients.Count; i++)
+        {
+            clients.Add(ClientPlayer.clients[i].realtimeView.ownerIDSelf);
+        }
+
+        //Remove excluded ID if provided
+        if(mustExcludeID > -1)
+        {
+            clients.Remove(mustExcludeID);
+        }
+
+        //If there are less items then count, just return the current list
+        if (count >= clients.Count)
+        {
+            return clients;
+        }
+
+        //Randomize order and reduce to count
+        clients.Sort((a, b) => UnityEngine.Random.Range(-1, 2));
+        clients = clients.Take(count).ToList();
+
+        //If list doesn't contain the correct clientID, replace one of them at random 
+        if (!clients.Contains(mustIncludeID))
+        {
+            int randomIndex = UnityEngine.Random.Range(0, clients.Count);
+            clients[randomIndex] = mustIncludeID;
+        }
+
+        return clients;
     }
 }

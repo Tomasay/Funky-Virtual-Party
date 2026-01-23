@@ -401,7 +401,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                     }
                 }
 
-
                 paintBrush.AnimatePaintingReveal();
                 break;
             case "vr guessing":
@@ -554,22 +553,21 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             }
         }
 
-        //Player Answer buttons, show everyone but self
-        foreach (string a in answersSeparated2)
+        //Player Answer buttons, show 3 options, excluding self
+        List<int> clientGuessOptions = ClientPlayer.GetRandomClientIdList(3, VRtistrySyncer.instance.ChosenAnswerOwner, RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf);
+        foreach (int g in clientGuessOptions)
         {
-            string[] ownerAndAnswer = a.Split(':');
+            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(g) as VRtistryClientPlayer);
 
-            if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-            {
-                GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                ab.transform.localScale = Vector3.zero;
-                ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerID)); });
-                AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
-                aob.playerID = ownerAndAnswer[0];
-                answerButtons.Add(aob);
-            }
+            GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+            ab.transform.localScale = Vector3.zero;
+            ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, g)); });
+            AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+            aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(g).syncer.Name);
+            aob.playerID = "" + g;
+            answerButtons.Add(aob);
         }
+
         StartCoroutine("AnimateAnswerButtonsIn");
     }
 
