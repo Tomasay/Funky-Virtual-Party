@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using Normal.Realtime;
 using UnityEngine.Events;
 using System.Linq;
+using DG.Tweening;
 
 [Serializable]
 public class ClientInputData
@@ -399,9 +400,16 @@ public class ClientPlayer : MonoBehaviour
     }
 
     //Sets player name visibility
-    public void SetPlayerNameVisibility(bool active)
+    public void SetPlayerNameVisibility(bool active, bool animate = false)
     {
-        playerNameText.enabled = active;
+        if (animate)
+        {
+            playerNameText.rectTransform.DOScale(active ? 1 : 0, 0.5f);
+        }
+        else
+        {
+            playerNameText.enabled = active;
+        }
     }
 
     //Sets player indicator

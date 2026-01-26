@@ -812,7 +812,7 @@ public class VRtistryGameManager : MonoBehaviour
     {
         foreach (ClientPlayer cp in ClientPlayer.clients)
         {
-            cp.playerNameText.gameObject.SetActive(visible);
+            cp.SetPlayerNameVisibility(visible, true);
         }
     }
 
