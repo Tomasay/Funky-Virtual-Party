@@ -5,6 +5,12 @@ using UnityEngine.UI;
 using TMPro;
 using DG.Tweening;
 using Normal.Realtime;
+using NaughtyAttributes;
+
+#if !UNITY_WEBGL
+using FMODUnity;
+using FMOD.Studio;
+#endif
 
 public class AnswerOptionButton : MonoBehaviour
 {
@@ -138,6 +144,8 @@ public class AnswerOptionButton : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
 
+        PlayPopWithPitch(0.5f);
+
         //Animate in bubble
         canvasGroup.alpha = 1;
         (transform as RectTransform).localScale = Vector3.zero;
@@ -145,11 +153,15 @@ public class AnswerOptionButton : MonoBehaviour
 
         yield return new WaitForSeconds(1);
 
-        foreach (Image i in playerIcons)
+        for (int i = 0; i < playerIcons.Length; i++)
         {
-            if (i.gameObject.activeSelf)
+            if (playerIcons[i].gameObject.activeSelf)
             {
-                (i.transform as RectTransform).DOScale(1, 1).SetEase(Ease.OutElastic, 1.25f);
+                (playerIcons[i].transform as RectTransform).DOScale(1, 1).SetEase(Ease.OutElastic, 1.25f);
+
+                //Pitch increase from 1 to 3 and loop goes on
+                float p = Mathf.Lerp(1f, 3f, ((float)i / (playerIcons.Length - 1)));
+                PlayPopWithPitch(p);
             }
             yield return new WaitForSeconds(0.25f);
         }
@@ -157,6 +169,7 @@ public class AnswerOptionButton : MonoBehaviour
         if(correctAnswerBanner.activeSelf)
         {
             (correctAnswerBanner.transform as RectTransform).DOScale(correctAnswerBannerInitialScale, 1).SetEase(Ease.OutElastic, 1.25f);
+            PlayPopWithPitch(1);
             yield return new WaitForSeconds(2);
             AnimateScores();
         }
@@ -271,5 +284,19 @@ public class AnswerOptionButton : MonoBehaviour
         Color col = i.color;
         col.a = a;
         i.color = col;
+    }
+
+    public void PlayPopWithPitch(float pitch)
+    {
+#if !UNITY_WEBGL
+        EventInstance instance = RuntimeManager.CreateInstance("event:/SFX/Pop");
+        instance.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+
+        // FMOD pitch is in semitones (0 = normal, +12 = one octave up, -12 = one octave down)
+        instance.setPitch(pitch);
+
+        instance.start();
+        instance.release(); // important for one-shots
+#endif
     }
 }

@@ -404,7 +404,7 @@ public class ClientPlayer : MonoBehaviour
     {
         if (animate)
         {
-            playerNameText.rectTransform.DOScale(active ? 1 : 0, 0.5f);
+            playerNameText.rectTransform.DOScale(active ? 1 : 0, 0.25f);
         }
         else
         {
