@@ -17,6 +17,9 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
     //Correctly guessing what the VR player drew
     public const int POINTS_CLIENT_CORRECT_GUESS = 100;
 
+    //Bonus points for first client to correctly guess what the VR player drew
+    public const int POINTS_CLIENT_FIRST_CORRECT_GUESS = 25;
+
     //Client Correctly guessing what player wrote an answer
     public const int POINTS_CLIENT_CORRECT_PLAYER = 50;
 

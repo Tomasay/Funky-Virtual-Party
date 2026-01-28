@@ -695,7 +695,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void SubmitArtGuess(int clientID, string clientGuessID)
     {
-        if (VRtistrySyncer.instance.ArtGuesses.Equals(""))
+        bool firstGuess = VRtistrySyncer.instance.ArtGuesses.Equals("");
+
+        if (firstGuess)
         {
             VRtistrySyncer.instance.ArtGuesses = clientID + ":" + clientGuessID;
         }
@@ -706,7 +708,10 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         if (int.TryParse(clientGuessID, out int j) && j == VRtistrySyncer.instance.ChosenAnswerOwner)
         {
-            RealtimeSingletonWeb.instance.LocalPlayer.syncer.Score += ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS;
+            //Award points if player is correct, also add first guess bonus if applicable
+            RealtimeSingletonWeb.instance.LocalPlayer.syncer.Score += (firstGuess ? 
+            ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS + ThreeDPaintGlobalVariables.POINTS_CLIENT_FIRST_CORRECT_GUESS :
+            ThreeDPaintGlobalVariables.POINTS_CLIENT_CORRECT_GUESS);
         }
 
         guessingHeaderText.text = "Waiting for other players to answer";

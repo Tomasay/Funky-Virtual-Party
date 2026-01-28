@@ -29,7 +29,7 @@ public class AnswerOptionButton : MonoBehaviour
     [SerializeField]
     public CanvasGroup canvasGroup;
 
-    public GameObject correctAnswerBanner;
+    public GameObject correctAnswerBanner, bonusPointsBanner;
     public Vector3 initialScale;
     private float correctAnswerBannerInitialScale;
     private Vector3 correctAnswerBannerInitialLocalPos;
@@ -183,6 +183,7 @@ public class AnswerOptionButton : MonoBehaviour
     IEnumerator AnimateScoresCoroutine()
     {
         int correctGuesses = 0;
+        GameObject correctGuessPlayer = null;
 
         //Animate each player icon
         for (int i = 0; i < playerIcons.Length; i++)
@@ -192,6 +193,11 @@ public class AnswerOptionButton : MonoBehaviour
                 if (correctAnswerBanner.activeSelf)
                 {
                     correctGuesses++;
+
+                    if(!correctGuessPlayer)
+                    {
+                        correctGuessPlayer = playerIcons[i].gameObject;
+                    }
                 }
 
                 //Scale player icon down
@@ -210,6 +216,13 @@ public class AnswerOptionButton : MonoBehaviour
                 yield return new WaitForSeconds(0.25f);
             }
         }
+
+        if (correctGuessPlayer)
+        {
+            AnimateBonusPoints(correctGuessPlayer, "First Guess", ThreeDPaintGlobalVariables.POINTS_CLIENT_FIRST_CORRECT_GUESS);
+            yield return new WaitForSeconds(2);
+        }
+
 
         yield return new WaitForSeconds(1);
 
@@ -263,20 +276,83 @@ public class AnswerOptionButton : MonoBehaviour
             yield return new WaitForSeconds(1);
 
             ClientPlayer cp = transform.root.GetComponent<ClientPlayer>();
+            
             (correctAnswerBanner.transform as RectTransform).DOMove(cp.transform.position, 0.5f);
             correctAnswerBanner.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 0.5f);
 
             yield return new WaitForSeconds(0.25f);
 
-            float nameHeight = cp.playerNameText.transform.localPosition.y;
-            cp.playerNameText.DOColor(Color.green, 0.25f);
-            cp.playerNameText.transform.DOLocalMoveY(nameHeight + 5, 0.25f);
-
-            yield return new WaitForSeconds(0.25f);
-
-            cp.playerNameText.DOColor(Color.black, 0.25f);
-            cp.playerNameText.transform.DOLocalMoveY(nameHeight, 0.25f);
+            AnimatePlayerPointCollect(cp);
         }
+    }
+
+    void AnimateBonusPoints(GameObject clientBubble, string bonusText, int bonusPoints)
+    {
+        StartCoroutine(AnimateBonusPointsCoroutine(clientBubble, bonusText, bonusPoints));
+    }
+
+    IEnumerator AnimateBonusPointsCoroutine(GameObject clientBubble, string bonusText, int bonusPoints)
+    {
+        bonusPointsBanner.SetActive(true);
+        RectTransform rt = (bonusPointsBanner.transform as RectTransform);
+        rt.localScale = Vector3.one * 2;
+        TMP_Text txt = bonusPointsBanner.GetComponentInChildren<TMP_Text>();
+
+        txt.text = bonusText;
+        txt.fontSize = 45;
+        txt.color = Color.black;
+        bonusPointsBanner.GetComponentsInChildren<Image>()[0].enabled = true;
+        bonusPointsBanner.GetComponentsInChildren<Image>()[1].enabled = true;
+
+        rt.position = (clientBubble.transform as RectTransform).position;
+        rt.DOLocalMoveX(-650, 0.5f);
+
+        PlayPopWithPitch(1);
+
+        yield return new WaitForSeconds(1.5f);
+
+        rt.DOScale(0, 0.25f);
+
+        yield return new WaitForSeconds(0.25f);
+
+        txt.text = "" + bonusPoints;
+        txt.fontSize = 100;
+        txt.color = Color.green;
+        bonusPointsBanner.GetComponentsInChildren<Image>()[0].enabled = false;
+        bonusPointsBanner.GetComponentsInChildren<Image>()[1].enabled = false;
+        rt.DOScale(2, 0.25f);
+
+        yield return new WaitForSeconds(1.25f);
+
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(int.Parse(clientBubble.name));
+
+        rt.DOMove(cp.transform.position, 0.5f);
+        correctAnswerBanner.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 0.5f);
+
+        yield return new WaitForSeconds(0.25f);
+
+        AnimatePlayerPointCollect(cp);
+
+        yield return new WaitForSeconds(0.25f);
+
+        bonusPointsBanner.SetActive(false);
+    }
+
+    void AnimatePlayerPointCollect(ClientPlayer cp)
+    {
+        StartCoroutine(AnimatePlayerPointCollectCoroutine(cp));
+    }
+
+    IEnumerator AnimatePlayerPointCollectCoroutine(ClientPlayer cp)
+    {
+        float nameHeight = cp.playerNameText.transform.localPosition.y;
+        cp.playerNameText.DOColor(Color.green, 0.25f);
+        cp.playerNameText.transform.DOLocalMoveY(nameHeight + 5, 0.25f);
+
+        yield return new WaitForSeconds(0.25f);
+
+        cp.playerNameText.DOColor(Color.black, 0.25f);
+        cp.playerNameText.transform.DOLocalMoveY(nameHeight, 0.25f);
     }
 
     void SetImageAlpha(Image i, float a)
