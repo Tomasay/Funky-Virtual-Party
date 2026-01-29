@@ -38,6 +38,7 @@ public class AnswerOptionButton : MonoBehaviour
     public string playerID;
 
     public TMP_Text AnswerText { get => answerText;}
+    public Image[] PlayerIcons { get => playerIcons; }
 
     private void Awake()
     {
@@ -185,21 +186,29 @@ public class AnswerOptionButton : MonoBehaviour
         int correctGuesses = 0;
         GameObject correctGuessPlayer = null;
 
+        for (int i = 0; i < playerIcons.Length; i++)
+        {
+            if (playerIcons[i].gameObject.activeSelf && correctAnswerBanner.activeSelf && !correctGuessPlayer)
+            {
+                correctGuesses++;
+                if (!correctGuessPlayer)
+                {
+                    correctGuessPlayer = playerIcons[i].gameObject;
+                }
+            }
+        }
+
+        if (correctGuessPlayer)
+        {
+            AnimateBonusPoints(correctGuessPlayer, "First Guess", ThreeDPaintGlobalVariables.POINTS_CLIENT_FIRST_CORRECT_GUESS);
+            yield return new WaitForSeconds(3.5f);
+        }
+
         //Animate each player icon
         for (int i = 0; i < playerIcons.Length; i++)
         {
             if (playerIcons[i].gameObject.activeSelf)
             {
-                if (correctAnswerBanner.activeSelf)
-                {
-                    correctGuesses++;
-
-                    if(!correctGuessPlayer)
-                    {
-                        correctGuessPlayer = playerIcons[i].gameObject;
-                    }
-                }
-
                 //Scale player icon down
                 (playerIcons[i].transform as RectTransform).DOScale(0, 0.25f);
                 yield return new WaitForSeconds(0.25f);
@@ -216,13 +225,6 @@ public class AnswerOptionButton : MonoBehaviour
                 yield return new WaitForSeconds(0.25f);
             }
         }
-
-        if (correctGuessPlayer)
-        {
-            AnimateBonusPoints(correctGuessPlayer, "First Guess", ThreeDPaintGlobalVariables.POINTS_CLIENT_FIRST_CORRECT_GUESS);
-            yield return new WaitForSeconds(2);
-        }
-
 
         yield return new WaitForSeconds(1);
 
@@ -305,7 +307,7 @@ public class AnswerOptionButton : MonoBehaviour
         bonusPointsBanner.GetComponentsInChildren<Image>()[1].enabled = true;
 
         rt.position = (clientBubble.transform as RectTransform).position;
-        rt.DOLocalMoveX(-650, 0.5f);
+        rt.DOLocalMoveX(rt.localPosition.x - 450, 0.5f);
 
         PlayPopWithPitch(1);
 
@@ -327,7 +329,7 @@ public class AnswerOptionButton : MonoBehaviour
         ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(int.Parse(clientBubble.name));
 
         rt.DOMove(cp.transform.position, 0.5f);
-        correctAnswerBanner.GetComponentInChildren<TMP_Text>().DOColor(Color.clear, 0.5f);
+        txt.DOColor(Color.clear, 0.5f);
 
         yield return new WaitForSeconds(0.25f);
 

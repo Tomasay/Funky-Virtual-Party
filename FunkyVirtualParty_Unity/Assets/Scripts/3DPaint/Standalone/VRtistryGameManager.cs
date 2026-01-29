@@ -478,6 +478,7 @@ public class VRtistryGameManager : MonoBehaviour
     }
 
     bool firstTimeClientsAnswering = true;
+    int correctGuesses = 0;
     void OnStateChanged(string state)
     {
         switch (state)
@@ -611,7 +612,7 @@ public class VRtistryGameManager : MonoBehaviour
 
                 //Show guesses
                 string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
-                int correctGuesses = 0;
+                correctGuesses = 0;
 
                 List<int> clientGuessOptions = ClientPlayer.GetRandomClientIdList(3, VRtistrySyncer.instance.ChosenAnswerOwner);
 
@@ -750,7 +751,13 @@ public class VRtistryGameManager : MonoBehaviour
                     aob.AnimateAnswers(correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2));
                 }
 
-                //3 Seconds are added to view answers to view answers that no one chose
+                //4 seconds are added for first-correct-guess bonus points
+                if (correctGuesses > 0)
+                {
+                    correctAnswerDelay += 4;
+                }
+
+                //3 Seconds are added to view answers that no one chose
                 if (answersWithNoGuesses.Count > 0)
                 {
                     Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2) + 3));
