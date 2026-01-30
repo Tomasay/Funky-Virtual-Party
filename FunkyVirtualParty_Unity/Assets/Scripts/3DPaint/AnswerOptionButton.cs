@@ -296,18 +296,18 @@ public class AnswerOptionButton : MonoBehaviour
     IEnumerator AnimateBonusPointsCoroutine(GameObject clientBubble, string bonusText, int bonusPoints)
     {
         bonusPointsBanner.SetActive(true);
-        RectTransform rt = (bonusPointsBanner.transform as RectTransform);
-        rt.localScale = Vector3.one * 2;
+        
         TMP_Text txt = bonusPointsBanner.GetComponentInChildren<TMP_Text>();
 
         txt.text = bonusText;
         txt.fontSize = 45;
-        txt.color = Color.black;
-        bonusPointsBanner.GetComponentsInChildren<Image>()[0].enabled = true;
-        bonusPointsBanner.GetComponentsInChildren<Image>()[1].enabled = true;
+        txt.color = Color.green;
 
+        RectTransform rt = (bonusPointsBanner.transform as RectTransform);
         rt.position = (clientBubble.transform as RectTransform).position;
         rt.DOLocalMoveX(rt.localPosition.x - 450, 0.5f);
+        rt.localScale = Vector3.zero;
+        rt.DOScale(2, 0.5f);
 
         PlayPopWithPitch(1);
 
@@ -319,9 +319,6 @@ public class AnswerOptionButton : MonoBehaviour
 
         txt.text = "" + bonusPoints;
         txt.fontSize = 100;
-        txt.color = Color.green;
-        bonusPointsBanner.GetComponentsInChildren<Image>()[0].enabled = false;
-        bonusPointsBanner.GetComponentsInChildren<Image>()[1].enabled = false;
         rt.DOScale(2, 0.25f);
 
         yield return new WaitForSeconds(1.25f);

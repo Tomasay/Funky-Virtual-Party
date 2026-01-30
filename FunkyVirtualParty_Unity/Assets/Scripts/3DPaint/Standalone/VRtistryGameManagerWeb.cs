@@ -252,6 +252,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         ClearPlayerResults();
     }
 
+    int correctGuesses = 0;
     protected void OnStateChange(string s)
     {
         switch (s)
@@ -404,6 +405,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 paintBrush.AnimatePaintingReveal();
                 break;
             case "vr guessing":
+                correctGuesses = 0;
                 Invoke("CreatePlayerGuessButtons", 0.5f);
 
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
@@ -414,11 +416,16 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 {
                     string[] ownerAndGuess = g.Split(':');
 
-                    if (int.TryParse(ownerAndGuess[0], out int i))
+                    if (int.TryParse(ownerAndGuess[0], out int j))
                     {
+                        if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
+                        {
+                            correctGuesses++;
+                        }
+
                         if (ownerAndGuess[1] != "decoy")
                         {
-                            AddPlayerToResults(i, ownerAndGuess[1]);
+                            AddPlayerToResults(j, ownerAndGuess[1]);
                         }
                     }
                 }
@@ -470,6 +477,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 int correctAnswerDelay = k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
                 correctAnswer.AnimateAnswers(correctAnswerDelay);
+
+                //4 seconds are added for first-correct-guess bonus points
+                if (correctGuesses > 0)
+                {
+                    correctAnswerDelay += 4;
+                }
 
                 //Display answers that got no guesses
                 foreach (AnswerOptionButton aob in answersWithNoGuesses)

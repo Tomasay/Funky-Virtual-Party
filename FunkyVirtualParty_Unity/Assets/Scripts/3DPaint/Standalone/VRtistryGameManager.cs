@@ -745,16 +745,16 @@ public class VRtistryGameManager : MonoBehaviour
                 int correctAnswerDelay = k * ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME;
                 correctAnswer.AnimateAnswers(correctAnswerDelay);
 
-                //Display answers that got no guesses
-                foreach (AnswerOptionButton aob in answersWithNoGuesses)
-                {
-                    aob.AnimateAnswers(correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2));
-                }
-
                 //4 seconds are added for first-correct-guess bonus points
                 if (correctGuesses > 0)
                 {
                     correctAnswerDelay += 4;
+                }
+
+                //Display answers that got no guesses
+                foreach (AnswerOptionButton aob in answersWithNoGuesses)
+                {
+                    aob.AnimateAnswers(correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2));
                 }
 
                 //3 Seconds are added to view answers that no one chose
