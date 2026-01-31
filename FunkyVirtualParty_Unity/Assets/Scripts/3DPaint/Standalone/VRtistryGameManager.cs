@@ -436,11 +436,11 @@ public class VRtistryGameManager : MonoBehaviour
             headerText.text = "Players are typing their answers \nUse this time to practice painting!";
 
             paintBrush.CanPaintAir = true;
+
+            vrPlayer.UIPointerPreview.rayDrawDistance = 0;
         }
 
         headerText.enabled = true;
-
-        vrPlayer.UIPointerPreview.rayDrawDistance = 0;
     }
 
     [Button]
