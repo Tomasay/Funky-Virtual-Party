@@ -248,14 +248,7 @@ public class AnswerOptionButton : MonoBehaviour
 
                 yield return new WaitForSeconds(0.5f);
 
-                float nameHeight = cp.playerNameText.transform.localPosition.y;
-                cp.playerNameText.DOColor(Color.green, 0.25f);
-                cp.playerNameText.transform.DOLocalMoveY(nameHeight + 5, 0.25f);
-
-                yield return new WaitForSeconds(0.25f);
-
-                cp.playerNameText.DOColor(Color.black, 0.25f);
-                cp.playerNameText.transform.DOLocalMoveY(nameHeight, 0.25f);
+                AnimatePlayerPointCollect(cp);
             }
         }
 
@@ -344,6 +337,7 @@ public class AnswerOptionButton : MonoBehaviour
 
     IEnumerator AnimatePlayerPointCollectCoroutine(ClientPlayer cp)
     {
+        /*Animate player name
         float nameHeight = cp.playerNameText.transform.localPosition.y;
         cp.playerNameText.DOColor(Color.green, 0.25f);
         cp.playerNameText.transform.DOLocalMoveY(nameHeight + 5, 0.25f);
@@ -352,6 +346,14 @@ public class AnswerOptionButton : MonoBehaviour
 
         cp.playerNameText.DOColor(Color.black, 0.25f);
         cp.playerNameText.transform.DOLocalMoveY(nameHeight, 0.25f);
+        */
+
+        //Animate player scale
+        float startingScale = cp.Anim.transform.localScale.x;
+
+        cp.Anim.transform.DOScale(startingScale + 0.025f, 0.25f);
+        yield return new WaitForSeconds(0.25f);
+        cp.Anim.transform.DOScale(startingScale , 0.25f);
     }
 
     void SetImageAlpha(Image i, float a)
