@@ -69,6 +69,9 @@ public partial class VRtistrySyncModel
 
     [RealtimeProperty(22, true, true)]
     private string _playerGuesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_WHO_THEY_GUESSED_ANSWERID"
+
+    [RealtimeProperty(23, true, true)]
+    private string _typedGuesses; //list of typed guesses separated by \n, format is "CLIENT_ID:CLIENT_GUESS"
 }
 
 

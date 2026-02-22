@@ -50,22 +50,22 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     P3dPaintableTexture paintTexture;
 
     [SerializeField]
-    Canvas joinedAndWaitingCanvas, inputCanvas, guessingCanvas, leaderboardCanvas;
+    Canvas joinedAndWaitingCanvas, inputCanvas, typedGuessCanvas, guessingCanvas, leaderboardCanvas;
 
     [SerializeField]
     GameObject playerInputParent;
 
     [SerializeField]
-    TMP_InputField answerInputField;
+    TMP_InputField answerInputField, typedGuessInputField;
 
     [SerializeField]
-    ButtonEvents answerInputButton;
+    ButtonEvents answerInputButton, typedGuessInputButton;
 
     [SerializeField]
     KeyboardActivator answerInputActivator;
 
     [SerializeField]
-    Button submitButton;
+    Button promptSubmitButton, guessSubmitButton;
 
     [SerializeField]
     GameObject answerButtonPrefab, answerButtonParent, answerButtonBG, answerResultsParent;
@@ -111,6 +111,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     Animator correctPlayerGuessAnimation;
 
     bool typingAnswer = false; //Is player typing their answer?
+    bool typingGuess = false;
     bool playersAnswering = false; //Are we still waiting for any player to submit their answer?
 
     List<AnswerOptionButton> answerButtons, answerResults;
@@ -178,6 +179,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         {
             answerInputField.ActivateInputField();
             answerInputField.caretPosition = answerInputField.text.Length;
+        }
+
+        if (typingGuess)
+        {
+            typedGuessInputField.ActivateInputField();
+            typedGuessInputField.caretPosition = typedGuessInputField.text.Length;
         }
 
         if ((VRtistrySyncer.instance.State.Equals("clients guessing") || VRtistrySyncer.instance.State.Equals("vr guessing")) && paintBrush.RevealAnimationComplete)
@@ -253,6 +260,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     }
 
     int correctGuesses = 0;
+    bool isLocalClientsPrompt;
     protected void OnStateChange(string s)
     {
         switch (s)
@@ -331,12 +339,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 drawingPhaseCamera.gameObject.SetActive(true);
                 guessingPhaseCamera.gameObject.SetActive(false);
                 break;
-            case "clients guessing":
+            case "clients typing guess":
                 tapAndHoldRotateLearned = false;
-                bool isLocalClientsPrompt = VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf;
 
+                isLocalClientsPrompt = VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf;
                 thisIsYourPromptText.enabled = isLocalClientsPrompt;
-
                 guessingHeaderText.text = isLocalClientsPrompt ? "Waiting for other players to answer" : "What is it?";
 
                 (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
@@ -348,12 +355,16 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 playersAnswering = false;
 
-                guessingCanvas.enabled = true;
-
                 blurWipUI.DOScale(0, 0.5f);
 
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);
+
+                typedGuessCanvas.enabled = true;
+                break;
+            case "clients guessing":
+                typedGuessCanvas.enabled = false;
+                guessingCanvas.enabled = true;
 
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
 
@@ -664,7 +675,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     public void CheckAnswerInput(string input)
     {
-        submitButton.interactable = (input.Length > 0);
+        promptSubmitButton.interactable = (input.Length > 0);
+    }
+
+    public void CheckTypedGuessInput(string input)
+    {
+        guessSubmitButton.interactable = (input.Length > 0);
     }
 
     TMP_InputField currentField;
@@ -704,6 +720,27 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         inputCanvas.enabled = false;
         playerInputParent.SetActive(false);
+    }
+
+    public void SubmitTypedGuess()
+    {
+        if (VRtistrySyncer.instance.Answers.Equals(""))
+        {
+            VRtistrySyncer.instance.TypedGuesses = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + typedGuessInputField.text);
+        }
+        else
+        {
+            VRtistrySyncer.instance.TypedGuesses += ("\n" + RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + typedGuessInputField.text);
+        }
+
+        typingGuess = false;
+        (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
+#if UNITY_WEBGL && !UNITY_EDITOR
+        CloseInputKeyboard();
+#endif
+        typedGuessInputField.DeactivateInputField();
+
+        typedGuessCanvas.enabled = false;
     }
 
     void SubmitArtGuess(int clientID, string clientGuessID)

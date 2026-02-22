@@ -207,6 +207,7 @@ public class VRtistryGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
+        VRtistrySyncer.instance.OnPlayerTypedGuess.AddListener(PlayerTypedGuess);
         VRtistrySyncer.instance.OnPlayerGuessedArt.AddListener(PlayerGuessedArt);
         VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
 
@@ -225,6 +226,7 @@ public class VRtistryGameManager : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChanged);
         VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerAnswered);
+        VRtistrySyncer.instance.OnPlayerTypedGuess.RemoveListener(PlayerTypedGuess);
         VRtistrySyncer.instance.OnPlayerGuessedArt.RemoveListener(PlayerGuessedArt);
         VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
 
@@ -352,7 +354,7 @@ public class VRtistryGameManager : MonoBehaviour
 
                 if (VRtistrySyncer.instance.DrawingTimer <= 0)
                 {
-                    VRtistrySyncer.instance.State = "clients guessing";
+                    VRtistrySyncer.instance.State = "clients typing guess";
                 }
                 break;
             case "clients guessing":
@@ -388,6 +390,23 @@ public class VRtistryGameManager : MonoBehaviour
     void OnDecoyAnswersGenerated(string decoyAnswers)
     {
         VRtistrySyncer.instance.DecoyAnswers = decoyAnswers;
+    }
+
+    [Button]
+    public void SimulateRound()
+    {
+        StartCoroutine("SimulateRoundCoroutine");
+    }
+
+    IEnumerator SimulateRoundCoroutine()
+    {
+        PressSkipButton();
+        yield return new WaitForSeconds(0.5f);
+        PickFirstPromptOption();
+        yield return new WaitForSeconds(0.5f);
+        StartCoroutine("StartPoseCountdownTimer", 1);
+        yield return new WaitForSeconds(3);
+        FinishedPaintingEarly();
     }
 
     [Button]
@@ -446,7 +465,7 @@ public class VRtistryGameManager : MonoBehaviour
     [Button]
     public void FinishedPaintingEarly()
     {
-        VRtistrySyncer.instance.State = "clients guessing";
+        VRtistrySyncer.instance.State = "clients typing guess";
     }
 
     [Button]
@@ -574,7 +593,7 @@ public class VRtistryGameManager : MonoBehaviour
                 timerText.enabled = true;
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
                 break;
-            case "clients guessing":
+            case "clients typing guess":
                 //Network paint texture, pose data, and title
                 DrawingsSyncer.instance.Drawings.Last().Value.paintTexture = paintTexture.GetPngData();
                 DrawingsSyncer.instance.StorePoseData(armature);
@@ -591,7 +610,7 @@ public class VRtistryGameManager : MonoBehaviour
                 decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), numOfDecoysToGenerate, OnDecoyAnswersGenerated);
 #endif
 
-                VRtistrySyncer.instance.ArtGuesses = "";
+                VRtistrySyncer.instance.TypedGuesses = "";
 
                 //Disable VR tools
                 paintBrush.CanPaintAir = false;
@@ -606,6 +625,11 @@ public class VRtistryGameManager : MonoBehaviour
                 SceneChangerSyncer.instance.FadeOutManual();
                 vrPlayer.Ahp.maxMoveSpeed = 0;
                 StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
+                break;
+            case "clients guessing":
+                
+                VRtistrySyncer.instance.ArtGuesses = "";
+
                 break;
             case "vr guessing":
                 vrPlayer.UIWarningArrow.SetActive(true);
@@ -1025,6 +1049,17 @@ public class VRtistryGameManager : MonoBehaviour
         if (answersSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial)
         {
             VRtistrySyncer.instance.State = "vr picking prompt";
+        }
+    }
+
+    void PlayerTypedGuess(string guesses)
+    {
+        //Check to see if all players have guessed, if so move to next state
+        string[] guessesSeparated = guesses.Split('\n');
+
+        if (guessesSeparated.Length >= (ClientPlayer.clients.Count - 1) && VRtistrySyncer.instance.State.Equals("clients typing guess"))
+        {
+            VRtistrySyncer.instance.State = "clients guessing";
         }
     }
 
