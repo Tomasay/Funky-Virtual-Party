@@ -106,6 +106,10 @@ public class ClientManagerNormcore : MonoBehaviour
             newCode += GetRandomLetter();
         }
 
+#if UNITY_EDITOR
+        newCode = "TEST";
+#endif
+
         partyCodeText.text = "Party Code: " + newCode;
 
         return newCode;

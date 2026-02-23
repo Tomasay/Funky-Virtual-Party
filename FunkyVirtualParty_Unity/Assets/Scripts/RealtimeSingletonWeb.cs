@@ -10,6 +10,10 @@ using System.Runtime.InteropServices;
 using DG.Tweening;
 using NaughtyAttributes;
 
+#if UNITY_EDITOR
+using ParrelSync;
+#endif
+
 public class RealtimeSingletonWeb : MonoBehaviour
 {
     private static RealtimeSingletonWeb Instance = null;
@@ -119,6 +123,12 @@ public class RealtimeSingletonWeb : MonoBehaviour
         realtimeAvatarManager.avatarDestroyed += AvatarManager_avatarDestroyed;
 
         DontDestroyOnLoad(gameObject);
+
+#if UNITY_EDITOR
+        nameInput.text = ClonesManager.GetArgument();
+        partyCodeInput.text = "TEST";
+        Invoke("SubmitButtonPressed", 1);
+#endif
     }
 
     private void AvatarManager_avatarDestroyed(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
