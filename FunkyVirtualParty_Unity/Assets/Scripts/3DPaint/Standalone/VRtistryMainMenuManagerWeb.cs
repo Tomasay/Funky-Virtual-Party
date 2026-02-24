@@ -17,12 +17,16 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     [SerializeField] Canvas joinedAndWaitingCanvas, faceDrawCanvas;
     [SerializeField] ClientPlayerCustomizer clientCustomizer;
 
-    [SerializeField] Button submitFaceDrawingButton;
     [SerializeField] AnimationClip clientSitAnim;
 
     [SerializeField] P3dPaintableTexture proxyFacePaintTexture;
+    [SerializeField] P3dPaintSphere paintSphere;
 
-    [SerializeField] Button enableCustomizationsButton;
+    [SerializeField] Button enableCustomizationsButton, submitFaceDrawingButton;
+
+    [SerializeField] Button[] faceDrawColorButtons;
+    Image currentSelectedFaceColor;
+    int selectedColorRotateSpeed = 25;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")]
@@ -45,6 +49,16 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
         clientCustomizer.OnCustomizationEnabled.AddListener(OnClientCustomizerEnabled);
         clientCustomizer.OnCustomizationDisabled.AddListener(OnClientCustomizerDisabled);
+
+        currentSelectedFaceColor = faceDrawColorButtons[0].gameObject.GetComponentsInChildren<Image>()[1];
+    }
+
+    private void Update()
+    {
+        if(currentSelectedFaceColor)
+        {
+            currentSelectedFaceColor.transform.Rotate(0, 0, selectedColorRotateSpeed * Time.deltaTime);
+        }
     }
 
     private void OnDestroy()
@@ -93,6 +107,29 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         vcp.Anim.speed = 0;
 
         vcp.TogglePhone();
+
+        Invoke("EnableFaceDrawSubmitButton", 0.5f);
+    }
+
+    public void ChangeFaceDrawColor(GameObject button)
+    {
+        if(ColorUtility.TryParseHtmlString(button.name, out Color col))
+        {
+            paintSphere.Color = col;
+
+            foreach (Button b in faceDrawColorButtons)
+            {
+                bool isSelectedButton = (b.gameObject == button);
+
+                Color c = b.image.color;
+                c.a = isSelectedButton ? 0 : 1;
+                b.image.color = c;
+
+                Image img = b.gameObject.GetComponentsInChildren<Image>()[1];
+                img.enabled = isSelectedButton;
+                if (isSelectedButton) currentSelectedFaceColor = img;
+            }
+        }
     }
 
     public void OnFaceDrawSubmitted()
@@ -111,16 +148,27 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
         vcp.TogglePhone();
 
+        AnimateButton(submitFaceDrawingButton, false);
         Invoke("EnableCustomizationButton", 2);
+    }
+
+    void EnableFaceDrawSubmitButton()
+    {
+        AnimateButton(submitFaceDrawingButton, true);
     }
 
     void EnableCustomizationButton()
     {
-        enableCustomizationsButton.gameObject.SetActive(true);
+        AnimateButton(enableCustomizationsButton, true);
+    }
 
-        RectTransform rt = enableCustomizationsButton.transform as RectTransform;
+    void AnimateButton(Button b, bool enabled)
+    {
+        if(enabled) b.gameObject.SetActive(enabled);
+        RectTransform rt = b.transform as RectTransform;
         rt.localScale = Vector3.zero;
-        rt.DOScale(1, 0.25f);
+        rt.DOScale(enabled ? 1 : 0, 0.25f);
+        if (!enabled) b.gameObject.SetActive(enabled);
     }
 
     void DisableFaceDrawCanvas()
