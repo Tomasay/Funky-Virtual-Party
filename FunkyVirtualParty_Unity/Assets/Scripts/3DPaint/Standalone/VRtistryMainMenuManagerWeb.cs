@@ -22,6 +22,8 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
     [SerializeField] P3dPaintableTexture proxyFacePaintTexture;
 
+    [SerializeField] Button enableCustomizationsButton;
+
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")]
     private static extern void SetInteractiveWidgetOverlay();
@@ -93,16 +95,6 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         vcp.TogglePhone();
     }
 
-    [Button]
-    void ManualSetAnim()
-    {
-        VRtistryClientPlayer vcp = RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer;
-        // Formula: (1f / totalFrames) * desiredFrame
-        float normalizedTime = (1f / (clientSitAnim.length * clientSitAnim.frameRate)) * 1;
-        vcp.Anim.Play("Sitting1", 0, normalizedTime);
-        vcp.Anim.speed = 0;
-    }
-
     public void OnFaceDrawSubmitted()
     {
         mainCamAnim.SetTrigger("Zoom Out");
@@ -118,6 +110,17 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         RealtimeSingletonWeb.instance.LocalPlayer.syncer.FaceDrawing = proxyFacePaintTexture.GetPngData();
 
         vcp.TogglePhone();
+
+        Invoke("EnableCustomizationButton", 2);
+    }
+
+    void EnableCustomizationButton()
+    {
+        enableCustomizationsButton.gameObject.SetActive(true);
+
+        RectTransform rt = enableCustomizationsButton.transform as RectTransform;
+        rt.localScale = Vector3.zero;
+        rt.DOScale(1, 0.25f);
     }
 
     void DisableFaceDrawCanvas()

@@ -50,8 +50,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
     [SerializeField]
     Camera mainMenuCam;
 
-    [SerializeField] Button enableCustomizationsButton;
-
     [SerializeField]
     Canvas joinRoomCanvas, controllerCanvas, logoCanvas;
 
@@ -281,7 +279,6 @@ public class RealtimeSingletonWeb : MonoBehaviour
         }
 
         if(controllerCanvas) controllerCanvas.enabled = true;
-        enableCustomizationsButton.gameObject.SetActive(true);
     }
 
     public void SetScenePartyCodeText()
