@@ -6,6 +6,7 @@ using Normal.Realtime;
 using System.Runtime.InteropServices;
 using DG.Tweening;
 using PaintIn3D;
+using NaughtyAttributes;
 
 public class VRtistryMainMenuManagerWeb : MonoBehaviour
 {
@@ -85,6 +86,19 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
         // Formula: (1f / totalFrames) * desiredFrame
         float normalizedTime = (1f / (clientSitAnim.length * clientSitAnim.frameRate)) * 1;
+        vcp.Anim.SetBool("UsingPhone" + vcp.usingPhone, false);
+        vcp.Anim.Play("Sitting1", 0, normalizedTime);
+        vcp.Anim.speed = 0;
+
+        vcp.TogglePhone();
+    }
+
+    [Button]
+    void ManualSetAnim()
+    {
+        VRtistryClientPlayer vcp = RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer;
+        // Formula: (1f / totalFrames) * desiredFrame
+        float normalizedTime = (1f / (clientSitAnim.length * clientSitAnim.frameRate)) * 1;
         vcp.Anim.Play("Sitting1", 0, normalizedTime);
         vcp.Anim.speed = 0;
     }
@@ -102,6 +116,8 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         vcp.Anim.speed = 1;
 
         RealtimeSingletonWeb.instance.LocalPlayer.syncer.FaceDrawing = proxyFacePaintTexture.GetPngData();
+
+        vcp.TogglePhone();
     }
 
     void DisableFaceDrawCanvas()

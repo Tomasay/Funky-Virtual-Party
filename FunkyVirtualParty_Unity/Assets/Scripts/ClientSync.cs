@@ -23,6 +23,8 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     public UnityEvent OnDeath;
 
+    public UnityEvent OnFaceDrawingChangedEvent;
+
     #region Properties
     public Color Color { get => model.color; set => model.color = value; }
     public string Name { get => model.name; set => model.name = value; }
@@ -43,6 +45,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     private void Awake()
     {
         OnDeath = new UnityEvent();
+        OnFaceDrawingChangedEvent = new UnityEvent();
     }
 
     protected override void OnRealtimeModelReplaced(ClientSyncModel previousModel, ClientSyncModel currentModel)
@@ -79,7 +82,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
             //Delay by 1 sec so paint texture has a chance to initialize
             if (facePaintTexture && model.faceDrawing != null) Invoke("ApplyFace", 1);
-            Debug.Log("model.faceDrawing: " + model.faceDrawing);
             if (model.isReady) ClientPlayer.OnReadyUp.Invoke(cp);
 
             // Register for events
@@ -149,7 +151,6 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     void OnDeathTriggerChanged(ClientSyncModel previousModel, bool val)
     {
-        Debug.Log("Death trigger changed: " + val);
         if (val)
         {
             OnDeath.Invoke();
@@ -159,7 +160,11 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     void OnFaceDrawingChanged(ClientSyncModel previousModel, byte[] val)
     {
-        if(facePaintTexture) facePaintTexture.LoadFromData(val);
+        if (facePaintTexture && val.Length > 0)
+        {
+            facePaintTexture.LoadFromData(val);
+            OnFaceDrawingChangedEvent.Invoke();
+        }
     }
     #endregion
 

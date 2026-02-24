@@ -38,7 +38,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
         RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
         RealtimeSingleton.instance.Realtime.didConnectToRoom += Realtime_didConnectToRoom;
 
-        ClientPlayer.OnClientConnected.AddListener(UpdateClientIndicators);
+        ClientPlayer.OnClientConnected.AddListener(OnClientConnected);
         ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicatorsDelayed); //Adding delay so that Client count is accurate
     }
 
@@ -46,13 +46,12 @@ public class VRtistryMainMenuManager : MonoBehaviour
     {
         RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
 
-        ClientPlayer.OnClientConnected.RemoveListener(UpdateClientIndicators);
+        ClientPlayer.OnClientConnected.RemoveListener(OnClientConnected);
         ClientPlayer.OnClientDisconnected.RemoveListener(UpdateClientIndicatorsDelayed);
     }
 
     private void Realtime_didConnectToRoom(Realtime realtime)
     {
-
         RealtimeSingleton.instance.Realtime.didConnectToRoom -= Realtime_didConnectToRoom;
     }
 
@@ -62,10 +61,17 @@ public class VRtistryMainMenuManager : MonoBehaviour
         animatedLogo.SetActive(true);
     }
 
+    void OnClientConnected(ClientPlayer cp)
+    {
+        //Default to false because client will be drawing face
+        playButton.interactable = false;
+        cp.syncer.OnFaceDrawingChangedEvent.AddListener(OnClientsFaceDrawingFinished);
+
+        UpdateClientIndicators(cp);
+    }
+
     private void UpdateClientIndicators(ClientPlayer cp)
     {
-        //TODO: Toggle play button based on # of clients compared to ThreeDPaintGlobalVariables.MINIMUM_NUMBER_OF_PLAYERS
-
         foreach (GameObject ci in clientIndicators)
         {
             ci.SetActive(true);
@@ -77,6 +83,19 @@ public class VRtistryMainMenuManager : MonoBehaviour
         }
     }
 
+    void OnClientsFaceDrawingFinished()
+    {
+        //If all clients are done drawing their faces, make play button interactable again
+        foreach (ClientPlayer cp in ClientPlayer.clients)
+        {
+            if(cp.syncer.FaceDrawing.Length == 0)
+            {
+                return;
+            }
+        }
+        playButton.interactable = true;
+    }
+
     void UpdateClientIndicatorsDelayed(ClientPlayer cp)
     {
         StartCoroutine(UpdateClientIndicatorsDelayedCoroutine(cp));
@@ -84,7 +103,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
 
     IEnumerator UpdateClientIndicatorsDelayedCoroutine(ClientPlayer cp)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1);
         UpdateClientIndicators(cp);
     }
 
