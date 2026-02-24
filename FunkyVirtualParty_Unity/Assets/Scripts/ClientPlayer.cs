@@ -218,10 +218,10 @@ public class ClientPlayer : MonoBehaviour
         syncer.Color = availableColors[UnityEngine.Random.Range(0, availableColors.Count)];
 
         //Head shapes
-        syncer.HeadType = UnityEngine.Random.Range(-1, smr.sharedMesh.blendShapeCount);
+        //syncer.HeadType = UnityEngine.Random.Range(-1, smr.sharedMesh.blendShapeCount);
 
         //Height
-        syncer.Height = UnityEngine.Random.Range(-0.2f, 0.75f);
+        //syncer.Height = UnityEngine.Random.Range(-0.2f, 0.75f);
 
         //Hat, default none
         syncer.HatIndex = -1;
@@ -233,10 +233,10 @@ public class ClientPlayer : MonoBehaviour
         syncer.Color = color;
 
         //Head shape
-        syncer.HeadType = headShape;
+        //syncer.HeadType = headShape;
 
         //Height
-        syncer.Height = height;
+        //syncer.Height = height;
 
         //Hat, default none
         syncer.HatIndex = hatIndex;
@@ -276,8 +276,8 @@ public class ClientPlayer : MonoBehaviour
             syncer.Color = newCol;
         }
 
-        syncer.HeadType = headShape;
-        syncer.Height = height;
+        //syncer.HeadType = headShape;
+        //syncer.Height = height;
 
         bool newHat = (syncer.HatIndex != hatIndex);
 

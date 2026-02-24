@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Normal.Realtime;
 using System.Runtime.InteropServices;
+using DG.Tweening;
+using PaintIn3D;
 
 public class VRtistryMainMenuManagerWeb : MonoBehaviour
 {
@@ -11,8 +13,13 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     [SerializeField] Animator mainCamAnim;
 
     [SerializeField] GameObject[] clientIndicators;
-    [SerializeField] Canvas joinedAndWaitingCanvas;
+    [SerializeField] Canvas joinedAndWaitingCanvas, faceDrawCanvas;
     [SerializeField] ClientPlayerCustomizer clientCustomizer;
+
+    [SerializeField] Button submitFaceDrawingButton;
+    [SerializeField] AnimationClip clientSitAnim;
+
+    [SerializeField] P3dPaintableTexture proxyFacePaintTexture;
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")]
@@ -52,7 +59,9 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     private void OnProperlyConnectedToRoom()
     {
         AnimatedLogoManager.instance.EraseOut();
-        mainCamAnim.SetTrigger("Zoom Out");
+        mainCamAnim.SetTrigger("Zoom In");
+
+        Invoke("EnableFaceDrawCanvas", 1);
 
         Invoke("EnableVRAvatarVisibility", 1);
 
@@ -61,6 +70,43 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 #if UNITY_WEBGL && !UNITY_EDITOR
         SetInteractiveWidgetOverlay();
 #endif
+    }
+
+    void EnableFaceDrawCanvas()
+    {
+        faceDrawCanvas.gameObject.SetActive(true);
+        RectTransform faceDrawCanvasRectTransform = faceDrawCanvas.transform as RectTransform;
+        faceDrawCanvasRectTransform.localScale = Vector3.zero;
+        faceDrawCanvasRectTransform.DOScale(1, 0.5f);
+
+        VRtistryClientPlayer vcp = RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer;
+        vcp.faceDrawCam.enabled = true;
+        //vcp.Anim.enabled = false;
+
+        // Formula: (1f / totalFrames) * desiredFrame
+        float normalizedTime = (1f / (clientSitAnim.length * clientSitAnim.frameRate)) * 1;
+        vcp.Anim.Play("Sitting1", 0, normalizedTime);
+        vcp.Anim.speed = 0;
+    }
+
+    public void OnFaceDrawSubmitted()
+    {
+        mainCamAnim.SetTrigger("Zoom Out");
+
+        RectTransform faceDrawCanvasRectTransform = faceDrawCanvas.transform as RectTransform;
+        faceDrawCanvasRectTransform.DOScale(0, 0.5f);
+        Invoke("DisableFaceDrawCanvas", 0.5f);
+
+        VRtistryClientPlayer vcp = RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer;
+        vcp.faceDrawCam.enabled = false;
+        vcp.Anim.speed = 1;
+
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.FaceDrawing = proxyFacePaintTexture.GetPngData();
+    }
+
+    void DisableFaceDrawCanvas()
+    {
+        faceDrawCanvas.gameObject.SetActive(false);
     }
 
     void OnClientCustomizerEnabled()

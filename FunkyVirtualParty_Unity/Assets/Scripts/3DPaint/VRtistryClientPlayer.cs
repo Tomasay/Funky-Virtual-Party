@@ -18,6 +18,8 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] RectTransform playerNameIndicatorArrow;
 
+    [SerializeField] public Camera faceDrawCam;
+
     protected override void Awake()
     {
 #if UNITY_WEBGL

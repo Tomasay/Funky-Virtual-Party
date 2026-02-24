@@ -4,6 +4,8 @@ using UnityEngine;
 using Normal.Realtime;
 using TMPro;
 using UnityEngine.Events;
+using PaintIn3D;
+using NaughtyAttributes;
 
 public class ClientSync : RealtimeComponent<ClientSyncModel>
 {
@@ -15,6 +17,9 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
 
     [SerializeField]
     TMP_Text nameText;
+
+    [SerializeField]
+    P3dPaintableTexture facePaintTexture;
 
     public UnityEvent OnDeath;
 
@@ -31,6 +36,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public bool IsDebugPlayer { get => model.isDebugPlayer; set => model.isDebugPlayer = value; }
     public int IsDancing { get => model.isDancing; set => model.isDancing = value; }
     public int Score { get => model.score; set => model.score = value; }
+    public byte[] FaceDrawing { get => model.faceDrawing; set => model.faceDrawing = value; }
 
     #endregion
 
@@ -53,6 +59,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             previousModel.heightDidChange -= OnHeightChanged;
             previousModel.isReadyDidChange -= OnReadyUpChanged;
             previousModel.onDeathTriggerDidChange -= OnDeathTriggerChanged;
+            previousModel.faceDrawingDidChange -= OnFaceDrawingChanged;
         }
 
         if (currentModel != null)
@@ -67,8 +74,12 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             cp.ChangeColor(model.color);
             nameText.text = model.name;
             cp.UpdateHat(model.hatIndex, false);
-            cp.UpdateHeadType(model.headType);
-            cp.UpdateHeight(model.height);
+            //cp.UpdateHeadType(model.headType);
+            //cp.UpdateHeight(model.height);
+
+            //Delay by 1 sec so paint texture has a chance to initialize
+            if (facePaintTexture && model.faceDrawing != null) Invoke("ApplyFace", 1);
+            Debug.Log("model.faceDrawing: " + model.faceDrawing);
             if (model.isReady) ClientPlayer.OnReadyUp.Invoke(cp);
 
             // Register for events
@@ -81,7 +92,14 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             currentModel.heightDidChange += OnHeightChanged;
             currentModel.isReadyDidChange += OnReadyUpChanged;
             currentModel.onDeathTriggerDidChange += OnDeathTriggerChanged;
+            currentModel.faceDrawingDidChange += OnFaceDrawingChanged;
         }
+    }
+
+    [Button]
+    void ApplyFace()
+    {
+        facePaintTexture.LoadFromData(model.faceDrawing);
     }
 
     #region Variable Callbacks
@@ -137,6 +155,11 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             OnDeath.Invoke();
             Invoke("SetOnDeathFalse", 0.5f);
         }
+    }
+
+    void OnFaceDrawingChanged(ClientSyncModel previousModel, byte[] val)
+    {
+        if(facePaintTexture) facePaintTexture.LoadFromData(val);
     }
     #endregion
 
