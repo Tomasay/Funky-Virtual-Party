@@ -41,9 +41,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     TMP_Text inputHeaderText, blurHeaderText, guessingHeaderText, typedGuessHeaderText, thisIsYourPromptText;
 
     [SerializeField]
-    Image typedGuessHeaderTextBG;
-
-    [SerializeField]
     GameObject guessInputThisIsYourPrompt;
 
     [SerializeField]
@@ -352,7 +349,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 isLocalClientsPrompt = VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf;
                 playerGuessInputParent.SetActive(!isLocalClientsPrompt);
                 guessInputThisIsYourPrompt.SetActive(isLocalClientsPrompt);
-                typedGuessHeaderTextBG.enabled = !isLocalClientsPrompt;
                 typedGuessHeaderText.text = isLocalClientsPrompt ? "Waiting for other players to answer" : "What is it?";
 
                 (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
@@ -787,7 +783,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         }
 
         typingGuess = false;
-        (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
+        
 #if UNITY_WEBGL && !UNITY_EDITOR
         CloseInputKeyboard();
 #endif

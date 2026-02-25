@@ -63,6 +63,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         enableCustomizationButton.gameObject.SetActive(false);
 
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(false);
+        (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).SetPlayerNameIndicatorArrowVisibility(false);
 
         OnCustomizationEnabled.Invoke();
     }
@@ -88,6 +89,7 @@ public class ClientPlayerCustomizer : MonoBehaviour
         enableCustomizationButton.gameObject.SetActive(true);
 
         RealtimeSingletonWeb.instance.LocalPlayer.SetPlayerNameVisibility(true);
+        (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).SetPlayerNameIndicatorArrowVisibility(true);
 
         OnCustomizationDisabled.Invoke();
     }

@@ -93,7 +93,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
                 return;
             }
         }
-        playButton.interactable = true;
+        playButton.interactable = ClientPlayer.clients.Count >= ThreeDPaintGlobalVariables.MINIMUM_NUMBER_OF_PLAYERS;
     }
 
     void UpdateClientIndicatorsDelayed(ClientPlayer cp)

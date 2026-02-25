@@ -169,6 +169,11 @@ public class VRtistryClientPlayer : ClientPlayer
 
     }
 
+    public void SetPlayerNameIndicatorArrowVisibility(bool active)
+    {
+        playerNameIndicatorArrow.gameObject.SetActive(active);
+    }
+
     public void SetSitAnim()
     {
         animSyncer.Trigger = "Sit1";
