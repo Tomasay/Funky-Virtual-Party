@@ -14,6 +14,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public UnityEvent StartedPainting, StoppedPainting, StartedDrawing, StoppedDrawing, PaletteMirrored;
     public UnityEvent<bool> brushEnabledChanged, paletteEnabledChanged;
     public UnityEvent<Color> brushColorChanged;
+    public UnityEvent<int> chosenClientToRoastChanged;
 
     public string State { get => model.state; set => model.state = value; }
     public string Answers { get => model.answers; set => model.answers = value; }
@@ -33,6 +34,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
     public bool IsPaletteMirrored { get => model.isPaletteMirrored; set => model.isPaletteMirrored = value; }
     public bool IsBrushEnabled { get => model.isBrushEnabled; set => model.isBrushEnabled = value; }
     public bool IsPaletteEnabled { get => model.isPaletteEnabled; set => model.isPaletteEnabled = value; }
+    public int ChosenClientToRoast { get => model.chosenClientToRoast; set => model.chosenClientToRoast = value; }
 
     public Color BrushColor { get => model.brushColor; set => model.brushColor = value; }
 
@@ -57,6 +59,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
 
         brushEnabledChanged = new UnityEvent<bool>();
         paletteEnabledChanged = new UnityEvent<bool>();
+        chosenClientToRoastChanged = new UnityEvent<int>();
 
         brushColorChanged = new UnityEvent<Color>();
 
@@ -116,6 +119,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             previousModel.brushColorDidChange -= OnBrushColorChanged;
             previousModel.currentPromptDidChange -= OnPromptChanged;
             previousModel.chosenAnswerOwnerDidChange -= OnChosenAnswerOwnerChanged;
+            previousModel.chosenClientToRoastDidChange -= OnChosenClientToRoastChanged;
         }
 
         if (currentModel != null)
@@ -142,6 +146,7 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             currentModel.brushColorDidChange += OnBrushColorChanged;
             currentModel.currentPromptDidChange += OnPromptChanged;
             currentModel.chosenAnswerOwnerDidChange += OnChosenAnswerOwnerChanged;
+            currentModel.chosenClientToRoastDidChange += OnChosenClientToRoastChanged;
         }
     }
 
@@ -246,6 +251,11 @@ public class VRtistrySyncer : RealtimeComponent<VRtistrySyncModel>
             cp.syncer.Score += ThreeDPaintGlobalVariables.POINTS_CLIENT_SELECTED_PROMPT;
         }
 #endif
+    }
+
+    private void OnChosenClientToRoastChanged(VRtistrySyncModel model, int value)
+    {
+        chosenClientToRoastChanged.Invoke(value);
     }
     #endregion
 }

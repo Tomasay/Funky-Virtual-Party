@@ -511,4 +511,10 @@ public class ClientPlayer : MonoBehaviour
 
         return clients;
     }
+
+    public static int GetRandomClientID()
+    {
+        int randomIndex = UnityEngine.Random.Range(0, clients.Count);
+        return clients[randomIndex].realtimeView.ownerIDSelf;
+    }
 }

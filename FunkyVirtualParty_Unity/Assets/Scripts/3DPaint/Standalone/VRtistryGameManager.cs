@@ -33,7 +33,7 @@ public class VRtistryGameManager : MonoBehaviour
     TMP_Text headerText, playerResultsHeaderText, timerText, poseCountdownText;
 
     [SerializeField]
-    P3dPaintableTexture paintTexture;
+    P3dPaintableTexture paintTexture, mannequinFaceTexture;
 
     [SerializeField]
     GameObject leaderboardParent, leaderboardPlayerCardPrefab;
@@ -815,6 +815,12 @@ public class VRtistryGameManager : MonoBehaviour
                     Invoke("SetLeaderboardState", (correctAnswerDelay + (ThreeDPaintGlobalVariables.PLAYER_ANSWER_ANIMATION_TIME * 2)));
                 }
 
+                //Pick client to roast for next round, if it is round 1
+                if(currentRound == 1)
+                {
+                    VRtistrySyncer.instance.ChosenClientToRoast = ClientPlayer.GetRandomClientID();
+                }
+
                 break;
             case "leaderboard":
                 StartCoroutine("ShowLeaderboard");
@@ -849,6 +855,39 @@ public class VRtistryGameManager : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    [Button]
+    void TestRoast()
+    {
+        VRtistrySyncer.instance.ChosenClientToRoast = ClientPlayer.GetRandomClientID();
+        Invoke("ApplyRoast", 1);
+    }
+
+    void ApplyRoast()
+    {
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
+        mannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
+
+        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+        
+        Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
+        mat.color = Color.HSVToRGB(H, S - 0.5f, V);
+        mat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
+        mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
+    }
+
+    [Button]
+    void ClearRoast()
+    {
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
+        mannequinFaceTexture.Clear();
+
+        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+        mat.color = Color.white;
+        Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
+        mat.SetColor("_ColorDim", new Color(0.7f, 0.7f, 0.7f));
+        mat.SetColor("_OutlineColor", Color.black);
     }
 
     void promptOptionButtonClicked(int answerOwnerID)
