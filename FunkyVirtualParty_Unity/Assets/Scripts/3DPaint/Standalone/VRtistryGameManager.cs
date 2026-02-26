@@ -700,11 +700,33 @@ public class VRtistryGameManager : MonoBehaviour
 
                 //Answer results
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+                string[] typedGuessesSeparated = VRtistrySyncer.instance.TypedGuesses.Split('\n');
+                foreach (string g in typedGuessesSeparated)
+                {
+                    string[] ownerAndAnswer = g.Split(':');
+
+                    if (int.TryParse(ownerAndAnswer[0], out int id))
+                    {
+                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
+                        aob.ResetPlayerIcons();
+                        aob.canvasGroup.alpha = 0;
+
+                        aob.SetTextWithPlayerName(ownerAndAnswer[1], ClientPlayer.GetClientByCurrentOwnerID(id));
+                        aob.playerID = ownerAndAnswer[0];
+
+                        //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
+                        aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
+                        aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                        (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
+
+                        answerResults.Add(aob);
+                    }
+                }
                 foreach (string a in answersSeparated)
                 {
                     string[] ownerAndAnswer = a.Split(':');
 
-                    if (int.TryParse(ownerAndAnswer[0], out int id))
+                    if (int.TryParse(ownerAndAnswer[0], out int id) && VRtistrySyncer.instance.ChosenAnswerOwner == id)
                     {
                         AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
                         aob.ResetPlayerIcons();
