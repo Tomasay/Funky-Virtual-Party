@@ -62,7 +62,7 @@ public class VRtistryGameManager : MonoBehaviour
     Material clientMat;
 
     [SerializeField]
-    GeminiFakeAnswersGenerator decoyAnswersGenerator;
+    //GeminiFakeAnswersGenerator decoyAnswersGenerator;
 
     List<AnswerOptionButton> answerResults;
 
@@ -605,9 +605,11 @@ public class VRtistryGameManager : MonoBehaviour
 #endif
 
 #if !UNITY_WEBGL
+                /*
                 int numOfDecoysToGenerate = 8 - ClientPlayer.clients.Count;
                 if (numOfDecoysToGenerate < 0 || numOfDecoysToGenerate > 7) numOfDecoysToGenerate = 0;
                 decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), numOfDecoysToGenerate, OnDecoyAnswersGenerated);
+                */
 #endif
 
                 VRtistrySyncer.instance.TypedGuesses = "";
