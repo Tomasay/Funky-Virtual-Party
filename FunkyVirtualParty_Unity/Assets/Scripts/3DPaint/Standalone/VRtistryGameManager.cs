@@ -668,6 +668,11 @@ public class VRtistryGameManager : MonoBehaviour
                 {
                     VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(g) as VRtistryClientPlayer);
 
+                    if (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == vcp.realtimeView.ownerIDSelf)
+                    {
+                        continue;
+                    }
+
                     GameObject newOption = Instantiate(promptOptionButtonsPrefab, promptOptionButtonsParent.transform);
                     newOption.GetComponentInChildren<TMP_Text>().text = vcp.syncer.Name;
                     newOption.GetComponent<Image>().color = vcp.syncer.Color;
