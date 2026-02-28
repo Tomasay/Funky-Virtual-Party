@@ -6,7 +6,11 @@ public class ThreeDPaintGlobalVariables : MonoBehaviour
 {
     public const int NUMBER_OF_ROUNDS = 3;
 
+#if UNITY_EDITOR
     public const int MINIMUM_NUMBER_OF_PLAYERS = 2;
+#else
+    public const int MINIMUM_NUMBER_OF_PLAYERS = 3;
+#endif
 
     //Correctly guessing which player wrote the chosen answer
     public const int POINTS_VR_CORRECT_PLAYER = 50;
