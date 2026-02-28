@@ -399,6 +399,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 guessingHeaderText.text = isLocalClientsPrompt ? "Waiting for other players to answer" : "What is it?";
 
                 string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
+                Debug.Log("Answers: " + VRtistrySyncer.instance.Answers);
+                foreach (string test in answersSeparated)
+                {
+                    Debug.Log("Answer: " + test);
+                }
                 string[] typedGuessesSeparated = VRtistrySyncer.instance.TypedGuesses.Split('\n');
 
                 if (!isLocalClientsPrompt)
@@ -822,6 +827,15 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     public void SubmitTypedGuess()
     {
+        //Check if client inputted correct guess exactly
+        string correctGuess = GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
+        if (typedGuessInputField.text.ToLower().Equals(correctGuess.ToLower()))
+        {
+            typedGuessHeaderText.text = "You guessed the right answer!\n" +
+                                            "Type another guess";
+            return;
+        }
+
         if (VRtistrySyncer.instance.TypedGuesses.Equals(""))
         {
             VRtistrySyncer.instance.TypedGuesses = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + typedGuessInputField.text);
