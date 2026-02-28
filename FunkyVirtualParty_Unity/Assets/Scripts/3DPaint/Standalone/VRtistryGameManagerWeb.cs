@@ -50,7 +50,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     RectTransform blurWipUI;
 
     [SerializeField]
-    P3dPaintableTexture paintTexture;
+    P3dPaintableTexture paintTexture, mannequinFaceTexture;
 
     [SerializeField]
     Canvas joinedAndWaitingCanvas, inputCanvas, typedGuessCanvas, guessingCanvas, leaderboardCanvas;
@@ -124,6 +124,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     PaintBrush paintBrush;
 
     List<float> leaderboardHeightsPrevRound = null;
+
+    int currentRound = 0;
 
     private void Awake()
     {
@@ -243,13 +245,16 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             return;
         }
 
-        inputCanvas.enabled = true;
+        bool isLocalClientGettingRoasted = (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf);
+
+        inputCanvas.enabled = !isLocalClientGettingRoasted;
         answerInputField.text = "";
         typedGuessInputField.text = "";
-        blurHeaderText.text = "";
+        blurHeaderText.text = isLocalClientGettingRoasted ? blurHeaderText.text = "This prompt is about you!\n\n" +
+                                                                                  "Waiting for other players to answer" : "";
         inputHeaderText.text = p; //Set prompt text
-        playerPromptInputParent.SetActive(true); //Enable input
-        playersAnswering = true;
+        playerPromptInputParent.SetActive(!isLocalClientGettingRoasted); //Enable input
+        playersAnswering = !isLocalClientGettingRoasted;
 
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
@@ -257,6 +262,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         //Reset any painting from previous round
         paintTexture.Clear();
+        if (currentRound == 3) ClearRoast();
         DrawingsSyncer.instance.paintSyncer.ResetStoredHitLines();
 
         //Reset results from previous round
@@ -285,24 +291,35 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 galleryCamera.gameObject.SetActive(false);
                 break;
             case "clients answering":
+                currentRound++;
+
                 joinedAndWaitingCanvas.enabled = false;
                 initialEaselCanvas.SetActive(false);
                 ToggleSculptStand(true);
                 mainMenuManager.HideMainMenuUI();
                 ResetAnswerResultsBubbles();
 
-                //Enable phone anim for local player, which will then be synced for everyone else
-                VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
-                if (vcp && vcp.usingPhone == 0)
+                if(currentRound == 2)
                 {
-                    vcp.TogglePhone();
+                    ApplyRoast();
                 }
 
-                answerInputButton.onClick.Invoke();
+                bool isLocalClientGettingRoasted = (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf);
+                if(!isLocalClientGettingRoasted)
+                {
+                    answerInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
-                ManuallyOpenKeyboard();
-                TriggerHaptic(200);
+                    ManuallyOpenKeyboard();
+                    TriggerHaptic(200);
 #endif
+
+                    //Enable phone anim for local player, which will then be synced for everyone else
+                    VRtistryClientPlayer vcp = (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer);
+                    if (vcp && vcp.usingPhone == 0)
+                    {
+                        vcp.TogglePhone();
+                    }
+                }
                 break;
 
             case "vr picking prompt":
@@ -368,6 +385,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 typedGuessCanvas.enabled = true;
 
                 paintBrush.AnimatePaintingReveal();
+
+                typedGuessInputButton.onClick.Invoke();
+#if UNITY_WEBGL && !UNITY_EDITOR
+                ManuallyOpenKeyboard();
+                TriggerHaptic(200);
+#endif
                 break;
             case "clients guessing":
                 typedGuessCanvas.enabled = false;
@@ -576,10 +599,36 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 break;
             case "game over":
+                currentRound = 0;
                 break;
             default:
                 break;
         }
+    }
+
+    void ApplyRoast()
+    {
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
+        mannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
+
+        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+
+        Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
+        mat.color = Color.HSVToRGB(H, S - 0.5f, V);
+        mat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
+        mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
+    }
+
+    void ClearRoast()
+    {
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
+        mannequinFaceTexture.Clear();
+
+        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+        mat.color = Color.white;
+        Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
+        mat.SetColor("_ColorDim", new Color(0.7f, 0.7f, 0.7f));
+        mat.SetColor("_OutlineColor", Color.black);
     }
 
     void SetPlayerNamesVisibility(bool visible)

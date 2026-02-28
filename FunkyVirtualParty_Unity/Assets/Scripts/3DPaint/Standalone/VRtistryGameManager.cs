@@ -24,7 +24,7 @@ public class VRtistryGameManager : MonoBehaviour
     VRtistryMainMenuManager mainMenuManager;
 
     [SerializeField]
-    TextAsset promptList;
+    TextAsset promptList, clientThemedPromptList;
 
     [SerializeField]
     Canvas uiCanvas;
@@ -518,10 +518,10 @@ public class VRtistryGameManager : MonoBehaviour
                 //Instantiate new drawing
                 uint key = (uint)DrawingsSyncer.instance.Drawings.Count;
                 DrawingsSyncer.instance.Drawings.Add(key, new DrawingModel());
-                Debug.Log("Added Drawing with key: " + key);
 
                 //Clear previous painting
                 paintTexture.Clear();
+                if (currentRound == 3) ClearRoast();
 
                 VRtistrySyncer.instance.VRPlayerGuess = -1;
                 VRtistrySyncer.instance.PlayerGuesses = "";
@@ -534,8 +534,22 @@ public class VRtistryGameManager : MonoBehaviour
                     vrPlayer.Ahp.maxMoveSpeed = 3;
                 }
 
-                //Display text that players are answering
-                headerText.text = "Players are typing their answers \nUse this time to practice painting!";
+                if (currentRound == 2)
+                {
+                    ApplyRoast();
+
+                    //Display text that players are answering
+                    string clientChosenName = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast).syncer.Name;
+                    headerText.text = "<u>Client Themed Round</u>\n\n" +
+                       "Players are typing their answers about " + clientChosenName + "\n" +
+                                "Use this time to practice painting!";
+                }
+                else
+                {
+                    //Display text that players are answering
+                    headerText.text = "Players are typing their answers\n" +
+                                      "Use this time to practice painting!";
+                }
 
                 firstTimeClientsAnswering = false;
 
@@ -556,6 +570,11 @@ public class VRtistryGameManager : MonoBehaviour
                 //Instantiate option buttons
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
+                    if(currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == cp.realtimeView.ownerIDSelf)
+                    {
+                        continue;
+                    }
+
                     GameObject newOption = Instantiate(promptOptionButtonsPrefab, promptOptionButtonsParent.transform);
                     newOption.GetComponentInChildren<TMP_Text>().text = GetAnswerByOwnerID(cp.realtimeView.ownerIDSelf);
                     newOption.GetComponent<Button>().onClick.AddListener(delegate { promptOptionButtonClicked(cp.realtimeView.ownerIDSelf); });
@@ -857,13 +876,6 @@ public class VRtistryGameManager : MonoBehaviour
         }
     }
 
-    [Button]
-    void TestRoast()
-    {
-        VRtistrySyncer.instance.ChosenClientToRoast = ClientPlayer.GetRandomClientID();
-        Invoke("ApplyRoast", 1);
-    }
-
     void ApplyRoast()
     {
         ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
@@ -877,7 +889,6 @@ public class VRtistryGameManager : MonoBehaviour
         mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
     }
 
-    [Button]
     void ClearRoast()
     {
         ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
@@ -1088,17 +1099,17 @@ public class VRtistryGameManager : MonoBehaviour
         }
         else
         {
+            currentRound++;
+
             //Disable leaderboard
             leaderboardParent.SetActive(false);
             ClearPlayerAnswers();
 
             //Setup next round
-            VRtistrySyncer.instance.CurrentPrompt = GetPrompt();
+            VRtistrySyncer.instance.CurrentPrompt = currentRound == 2 ? GetClientThemedPrompt() : GetPrompt();
             VRtistrySyncer.instance.State = "clients answering";
             VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
             VRtistrySyncer.instance.Answers = "";
-
-            currentRound++;
         }
 
         SetPlayerNamesVisibility(true);
@@ -1109,7 +1120,8 @@ public class VRtistryGameManager : MonoBehaviour
         //Check to see if all players have answered, if so move to next state
         string[] answersSeparated = answers.Split('\n');
 
-        if (answersSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial)
+        int clientAnswersNeededToProceed = (currentRound == 2) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
+        if (answersSeparated.Length >= clientAnswersNeededToProceed && VRtistrySyncer.instance.VRCompletedTutorial)
         {
             VRtistrySyncer.instance.State = "vr picking prompt";
         }
@@ -1175,6 +1187,25 @@ public class VRtistryGameManager : MonoBehaviour
             newPrompt = prompts[Random.Range(0, prompts.Length)];
         }
         while (newPrompt.StartsWith("//"));
+
+        return newPrompt;
+    }
+
+    string GetClientThemedPrompt()
+    {
+        //Split prompt text file into individual lines
+        string[] prompts = clientThemedPromptList.ToString().Split('\n');
+
+        //Get prompt at random, excluding comments
+        string newPrompt;
+        do
+        {
+            newPrompt = prompts[Random.Range(0, prompts.Length)];
+        }
+        while (newPrompt.StartsWith("//"));
+
+        //Replace PLAYER_NAME with client's name
+        newPrompt = newPrompt.Replace("PLAYER_NAME", ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast).syncer.Name);
 
         return newPrompt;
     }
