@@ -887,9 +887,24 @@ public class VRtistryGameManager : MonoBehaviour
         mannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
 
         Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-        
+
         Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
-        mat.color = Color.HSVToRGB(H, S - 0.5f, V);
+        string col = ColorUtility.ToHtmlStringRGBA(cp.syncer.Color);
+
+        //Orange and Cyan appear too dark for some reason, idk man
+        if (col.Equals("FF7F00FF")) 
+        {
+            mat.color = Color.HSVToRGB(H + 0.035f, S, V);
+        }
+        else if (col.Equals("007F7FFF"))
+        {
+            mat.color = Color.HSVToRGB(H, S, V + 0.2f);
+        }
+        else
+        {
+            mat.color = cp.syncer.Color;
+        }
+
         mat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
         mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
     }
