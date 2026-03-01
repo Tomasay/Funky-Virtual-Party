@@ -30,7 +30,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
 #if UNITY_WEBGL && !UNITY_EDITOR
     [DllImport("__Internal")]
-    private static extern void SetInteractiveWidgetOverlay();
+    private static extern void SetInteractiveWidgetOverlay(bool isOverlay);
 #endif
 
     void Start()
@@ -85,7 +85,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.RemoveListener(OnProperlyConnectedToRoom);
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        SetInteractiveWidgetOverlay();
+        SetInteractiveWidgetOverlay(true);
 #endif
     }
 

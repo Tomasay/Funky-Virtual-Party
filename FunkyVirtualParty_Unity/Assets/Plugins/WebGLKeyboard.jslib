@@ -97,9 +97,9 @@ mergeInto(LibraryManager.library, {
 			navigator.vibrate(hapticTime);
 		}
 	},
-	SetInteractiveWidgetOverlay: function ()
+	SetInteractiveWidgetOverlay: function (isOverlay)
 	{
-	    window.overlayKeyboard = true;
+	    window.overlayKeyboard = isOverlay;
 	},
 	ManuallyOpenKeyboard: function()
 	{

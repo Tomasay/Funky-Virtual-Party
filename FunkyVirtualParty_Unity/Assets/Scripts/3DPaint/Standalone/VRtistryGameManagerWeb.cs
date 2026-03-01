@@ -29,6 +29,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     [DllImport("__Internal")]
     private static extern void ManuallyOpenKeyboard();
+
+    [DllImport("__Internal")]
+    private static extern void SetInteractiveWidgetOverlay(bool isOverlay);
 #endif
 
     [SerializeField]
@@ -225,16 +228,21 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void PlayerSubmittedAnswer(string answers)
     {
+        bool isLocalClientGettingRoasted = (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf);
+
         //Check to see if all players have answered and if we're waiting on vr player
         string[] answersSeparated = answers.Split('\n');
 
-        if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
+        if (!isLocalClientGettingRoasted)
         {
-            blurHeaderText.text = "Waiting for VR player to complete tutorial...";
-        }
-        else if (answersSeparated.Length != ClientPlayer.clients.Count)
-        {
-            blurHeaderText.text = "Waiting for all players to submit their answer...";
+            if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
+            {
+                blurHeaderText.text = "Waiting for VR player to complete tutorial...";
+            }
+            else if (answersSeparated.Length != ClientPlayer.clients.Count)
+            {
+                blurHeaderText.text = "Waiting for all players to submit their answer...";
+            }
         }
     }
 
@@ -309,6 +317,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 {
                     answerInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
+                    SetInteractiveWidgetOverlay(true);
                     ManuallyOpenKeyboard();
                     TriggerHaptic(200);
 #endif
@@ -386,11 +395,15 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 paintBrush.AnimatePaintingReveal();
 
-                typedGuessInputButton.onClick.Invoke();
+                if (!isLocalClientsPrompt)
+                {
+                    //typedGuessInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
-                ManuallyOpenKeyboard();
-                TriggerHaptic(200);
+                    SetInteractiveWidgetOverlay(false);
+                    //ManuallyOpenKeyboard();
+                    //TriggerHaptic(200);
 #endif
+                }
                 break;
             case "clients guessing":
                 typedGuessCanvas.enabled = false;
@@ -766,6 +779,14 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         typingAnswer = true;
     }
 
+    public void OpenKeyboardGuess()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+                    ManuallyOpenKeyboard();
+#endif
+        typingGuess = true;
+    }
+
     public void UpdateText(string input)
     {
         answerInputField.text = input;
@@ -866,8 +887,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         CloseInputKeyboard();
 #endif
         typedGuessInputField.DeactivateInputField();
+        playerGuessInputParent.SetActive(false);
 
-        typedGuessCanvas.enabled = false;
+        typedGuessHeaderText.text = "Waiting for other players to answer";
     }
 
     void SubmitArtGuess(int clientID, string clientGuessID)
