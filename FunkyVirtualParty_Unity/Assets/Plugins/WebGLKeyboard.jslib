@@ -124,5 +124,16 @@ mergeInto(LibraryManager.library, {
 			input.removeAttribute("contenteditable");
 			input.removeAttribute("virtualkeyboardpolicy");
 		}, 100);
+	},
+	GetKeyboardHeightInUnityCanvasPixels: function (unityCanvasHeight)
+	{
+	    const hasVK = typeof navigator !== "undefined" && navigator.virtualKeyboard && typeof navigator.virtualKeyboard.show === "function";
+		if(!hasVK || window.lastKeyboardHeight == null){
+			return 0;
+		}
+
+		//return unityCanvasHeight * (navigator.virtualKeyboard.boundingRect.height / window.innerHeight);
+		//Use last stored keyboard height stored from event in html file, because grabbing this value immediately when the keyboard is opened can result in 0
+		return unityCanvasHeight * (window.lastKeyboardHeight / window.innerHeight);
 	}
 });

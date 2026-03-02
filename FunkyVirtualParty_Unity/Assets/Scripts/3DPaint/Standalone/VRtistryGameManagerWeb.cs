@@ -31,7 +31,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     private static extern void ManuallyOpenKeyboard();
 
     [DllImport("__Internal")]
-    private static extern void SetInteractiveWidgetOverlay(bool isOverlay);
+    private static extern float GetKeyboardHeightInUnityCanvasPixels(float unityCanvasHeight);
 #endif
 
     [SerializeField]
@@ -279,6 +279,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     int correctGuesses = 0;
     bool isLocalClientsPrompt;
+
     protected void OnStateChange(string s)
     {
         switch (s)
@@ -317,7 +318,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 {
                     answerInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
-                    SetInteractiveWidgetOverlay(true);
                     ManuallyOpenKeyboard();
                     TriggerHaptic(200);
 #endif
@@ -397,12 +397,17 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 if (!isLocalClientsPrompt)
                 {
-                    //typedGuessInputButton.onClick.Invoke();
+                    typedGuessInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
-                    SetInteractiveWidgetOverlay(false);
-                    //ManuallyOpenKeyboard();
-                    //TriggerHaptic(200);
+                    ManuallyOpenKeyboard();
+                    TriggerHaptic(200);
+
+                    RectTransform rt = playerGuessInputParent.transform as RectTransform;
+                    Vector3 pos = rt.anchoredPosition;
+                    pos.y = GetKeyboardHeightInUnityCanvasPixels(3120);
+                    if(pos.y != 0) rt.anchoredPosition = pos;
 #endif
+
                 }
                 break;
             case "clients guessing":
