@@ -33,6 +33,9 @@ public class VRtistryMainMenuManager : MonoBehaviour
 
     [SerializeField] Button playButton;
 
+    [SerializeField] GameObject playGameTooltip;
+    float playGameTooltipScale;
+
     private void Start()
     {
         RealtimeSingleton.instance.realtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
@@ -40,6 +43,10 @@ public class VRtistryMainMenuManager : MonoBehaviour
 
         ClientPlayer.OnClientConnected.AddListener(OnClientConnected);
         ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicatorsDelayed); //Adding delay so that Client count is accurate
+
+        RectTransform rt = playGameTooltip.transform as RectTransform;
+        playGameTooltipScale = rt.localScale.x;
+        rt.localScale = Vector3.zero;
     }
 
     private void OnDestroy()
@@ -59,6 +66,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
     {
         startingCamera.gameObject.SetActive(false);
         animatedLogo.SetActive(true);
+        UpdatePlayTooltipText();
     }
 
     void OnClientConnected(ClientPlayer cp)
@@ -67,6 +75,7 @@ public class VRtistryMainMenuManager : MonoBehaviour
         playButton.interactable = false;
         cp.syncer.OnFaceDrawingChangedEvent.AddListener(OnClientsFaceDrawingFinished);
 
+        UpdatePlayTooltipText();
         UpdateClientIndicators(cp);
     }
 
@@ -94,6 +103,16 @@ public class VRtistryMainMenuManager : MonoBehaviour
             }
         }
         playButton.interactable = ClientPlayer.clients.Count >= ThreeDPaintGlobalVariables.MINIMUM_NUMBER_OF_PLAYERS;
+
+        if (!playButton.interactable)
+        {
+            UpdatePlayTooltipText();
+        }
+        else
+        {
+            RectTransform rt = playGameTooltip.transform as RectTransform;
+            rt.DOScale(0, 0.25f);
+        }
     }
 
     void UpdateClientIndicatorsDelayed(ClientPlayer cp)
@@ -134,6 +153,37 @@ public class VRtistryMainMenuManager : MonoBehaviour
         if (!gameManager.gameSetup) gameManager.SetupGame();
         gameManager.StartGame();
         clientIndicators[0].transform.parent.gameObject.SetActive(false);
+    }
+
+    void UpdatePlayTooltipText()
+    {
+        int numOfPlayersNeededToJoin = ThreeDPaintGlobalVariables.MINIMUM_NUMBER_OF_PLAYERS - ClientPlayer.clients.Count;
+        if (numOfPlayersNeededToJoin > 0)
+        {
+            playGameTooltip.GetComponentInChildren<TMP_Text>().text = "Need " + numOfPlayersNeededToJoin + " more player to join!";
+        }
+        else
+        {
+            playGameTooltip.GetComponentInChildren<TMP_Text>().text = "Waiting for players to draw their face!";
+        }
+    }
+
+    public void OnPlayGamePointerEntered()
+    {
+        if (!playButton.interactable)
+        {
+            RectTransform rt = playGameTooltip.transform as RectTransform;
+            rt.DOScale(playGameTooltipScale, 0.25f);
+        }
+    }
+
+    public void OnPlayGamePointerExited()
+    {
+        if (!playButton.interactable)
+        {
+            RectTransform rt = playGameTooltip.transform as RectTransform;
+            rt.DOScale(0, 0.25f);
+        }
     }
 
     public void SettingsButtonClicked()
