@@ -437,7 +437,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                         GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
                         ab.transform.localScale = Vector3.zero;
                         string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
-                        ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                        ab.GetComponentInChildren<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
                         AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                         aob.SetText(ownerAndAnswer[1]);
                         aob.playerID = ownerAndAnswer[0];
@@ -454,7 +454,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                             GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
                             ab.transform.localScale = Vector3.zero;
                             string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
-                            ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                            ab.GetComponentInChildren<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
                             AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                             aob.SetText(ownerAndAnswer[1]);
                             aob.playerID = ownerAndAnswer[0];
@@ -722,7 +722,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
             GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
             ab.transform.localScale = Vector3.zero;
-            ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, g)); });
+            ab.GetComponentInChildren<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, g)); });
             AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
             aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(g).syncer.Name);
             aob.playerID = "" + g;
@@ -752,7 +752,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
                 ab.transform.localScale = Vector3.zero;
                 ab.transform.SetSiblingIndex(Random.Range(0, ab.transform.childCount)); //Randomize sibling index so decoy answers are not always the last ones
-                ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
+                ab.GetComponentInChildren<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "decoy"); });
                 AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
                 aob.SetText(d);
                 aob.playerID = "decoy";
@@ -765,6 +765,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     IEnumerator AnimateAnswerButtonsIn()
     {
+        UpdateAnswersLayout();
+
         //Animate buttons in
         answerButtonParent.transform.localScale = Vector3.one;
         answerButtonParent.SetActive(true);
@@ -1175,5 +1177,46 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         int minutes = (int)time / 60;
         int seconds = (int)time - (minutes * 60);
         return string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
+
+    void UpdateAnswersLayout()
+    {
+        RectTransform rt;
+        AnswerOptionButton[] aobs = answerButtonParent.GetComponentsInChildren<AnswerOptionButton>(true);
+        GridLayoutGroup answersGridLayoutGroup = answerButtonParent.GetComponent<GridLayoutGroup>();
+
+        //BG height & Spacing
+        rt = (answerButtonBG.transform as RectTransform);
+        Vector2 spacing = answersGridLayoutGroup.spacing;
+        if (aobs.Length <= 2)
+        {
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, 400);
+            spacing.y = 150;
+        }
+        else if (aobs.Length == 3 || aobs.Length == 4)
+        {
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, 700);
+            spacing.y = 125;
+        }
+        else if (aobs.Length == 5 || aobs.Length == 6)
+        {
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, 700);
+            spacing.y = 150;
+        }
+        else if (aobs.Length >= 5)
+        {
+            rt.sizeDelta = new Vector2(rt.sizeDelta.x, 800);
+            spacing.y = 75;
+        }
+        answersGridLayoutGroup.spacing = spacing;
+
+        //If answers are odd, center last one
+        if (aobs.Length % 2 != 0)
+        {
+            rt = aobs[aobs.Length-1].GetComponentInChildren<Button>().transform as RectTransform;
+            Vector3 pos = rt.localPosition;
+            pos.x = 175f;
+            rt.localPosition = pos;
+        }
     }
 }

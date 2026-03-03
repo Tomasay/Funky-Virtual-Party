@@ -47,6 +47,8 @@ public class VRtistryMainMenuManager : MonoBehaviour
         RectTransform rt = playGameTooltip.transform as RectTransform;
         playGameTooltipScale = rt.localScale.x;
         rt.localScale = Vector3.zero;
+
+        playGameTooltip.GetComponentInChildren<TMP_Text>().text = "Need " + ThreeDPaintGlobalVariables.MINIMUM_NUMBER_OF_PLAYERS + " more player to join!";
     }
 
     private void OnDestroy()
@@ -66,7 +68,6 @@ public class VRtistryMainMenuManager : MonoBehaviour
     {
         startingCamera.gameObject.SetActive(false);
         animatedLogo.SetActive(true);
-        UpdatePlayTooltipText();
     }
 
     void OnClientConnected(ClientPlayer cp)
