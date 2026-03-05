@@ -127,13 +127,16 @@ mergeInto(LibraryManager.library, {
 	},
 	GetKeyboardHeightInUnityCanvasPixels: function (unityCanvasHeight)
 	{
-	    const hasVK = typeof navigator !== "undefined" && navigator.virtualKeyboard && typeof navigator.virtualKeyboard.show === "function";
-		if(!hasVK || window.lastKeyboardHeight == null){
+		if(window.lastKeyboardHeight == null){
 			return 0;
 		}
 
-		//return unityCanvasHeight * (navigator.virtualKeyboard.boundingRect.height / window.innerHeight);
 		//Use last stored keyboard height stored from event in html file, because grabbing this value immediately when the keyboard is opened can result in 0
 		return unityCanvasHeight * (window.lastKeyboardHeight / window.innerHeight);
+	},
+	HasVirtualKeyboard: function ()
+	{
+		//Does not work on any browser for IOS, or any version of Firefox
+		return (typeof navigator !== "undefined" && navigator.virtualKeyboard && typeof navigator.virtualKeyboard.show === "function");
 	}
 });

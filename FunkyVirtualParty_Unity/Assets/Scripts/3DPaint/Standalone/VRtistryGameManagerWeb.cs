@@ -32,6 +32,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     [DllImport("__Internal")]
     private static extern float GetKeyboardHeightInUnityCanvasPixels(float unityCanvasHeight);
+
+    [DllImport("__Internal")]
+    private static extern bool HasVirtualKeyboard();
 #endif
 
     [SerializeField]
@@ -143,6 +146,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         answerInputButton.onPointerDown.AddListener(ButtonPointerDown);
         answerInputButton.onPointerUp.AddListener(ButtonPointerUp);
 
+        typedGuessInputButton.onPointerDown.AddListener(ButtonPointerDown);
+        typedGuessInputButton.onPointerUp.AddListener(ButtonPointerUp);
+
         guessingCanvas.enabled = false;
 
         LeanTouch.OnFingerDown += LeanTouch_OnFingerDown;
@@ -177,6 +183,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         answerInputButton.onPointerDown.RemoveListener(ButtonPointerDown);
         answerInputButton.onPointerUp.RemoveListener(ButtonPointerUp);
+
+        typedGuessInputButton.onPointerDown.RemoveListener(ButtonPointerDown);
+        typedGuessInputButton.onPointerUp.RemoveListener(ButtonPointerUp);
 
         LeanTouch.OnFingerDown -= LeanTouch_OnFingerDown;
     }
@@ -397,15 +406,20 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
                 if (!isLocalClientsPrompt)
                 {
-                    typedGuessInputButton.onClick.Invoke();
 #if UNITY_WEBGL && !UNITY_EDITOR
-                    ManuallyOpenKeyboard();
-                    TriggerHaptic(200);
-
-                    RectTransform rt = playerGuessInputParent.transform as RectTransform;
-                    Vector3 pos = rt.anchoredPosition;
-                    pos.y = GetKeyboardHeightInUnityCanvasPixels(3120);
-                    if(pos.y != 0) rt.anchoredPosition = pos;
+                    if(HasVirtualKeyboard())
+                    {
+                        typedGuessInputButton.onClick.Invoke();
+                        ManuallyOpenKeyboard();
+                        TriggerHaptic(200);
+                    }
+                    else
+                    {
+                        SetTypedGuessInputHeight(0);
+                    }
+#endif
+#if UNITY_WEBGL && UNITY_EDITOR
+                    typedGuessInputButton.onClick.Invoke();
 #endif
 
                 }
@@ -788,9 +802,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     public void OpenKeyboardGuess()
     {
-#if UNITY_WEBGL && !UNITY_EDITOR
-                    ManuallyOpenKeyboard();
-#endif
         typingGuess = true;
     }
 
@@ -897,6 +908,14 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         playerGuessInputParent.SetActive(false);
 
         typedGuessHeaderText.text = "Waiting for other players to answer";
+    }
+
+    public void SetTypedGuessInputHeight(float h)
+    {
+        RectTransform rt = playerGuessInputParent.transform as RectTransform;
+        Vector3 pos = rt.anchoredPosition;
+        pos.y = h;
+        rt.anchoredPosition = pos;
     }
 
     void SubmitArtGuess(int clientID, string clientGuessID)
