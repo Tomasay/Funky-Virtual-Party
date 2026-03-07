@@ -71,6 +71,7 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             if (currentModel.isFreshModel)
             {
                 currentModel.isDancing = -1;
+                currentModel.hatIndex = -1;
             }
 
             //Update to match new data

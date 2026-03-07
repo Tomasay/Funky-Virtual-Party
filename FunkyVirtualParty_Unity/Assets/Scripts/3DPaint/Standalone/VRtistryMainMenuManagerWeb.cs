@@ -15,14 +15,15 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
 
     [SerializeField] GameObject[] clientIndicators;
     [SerializeField] Canvas joinedAndWaitingCanvas, faceDrawCanvas;
-    [SerializeField] ClientPlayerCustomizer clientCustomizer;
+    //[SerializeField] ClientPlayerCustomizer clientCustomizer;
 
     [SerializeField] AnimationClip clientSitAnim;
 
     [SerializeField] P3dPaintableTexture proxyFacePaintTexture;
     [SerializeField] P3dPaintSphere paintSphere;
 
-    [SerializeField] Button enableCustomizationsButton, submitFaceDrawingButton;
+    //[SerializeField] Button enableCustomizationsButton;
+    [SerializeField] Button submitFaceDrawingButton;
 
     [SerializeField] Button[] faceDrawColorButtons;
     Image currentSelectedFaceColor;
@@ -47,8 +48,8 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         ClientPlayer.OnClientConnected.AddListener(UpdateClientIndicators);
         ClientPlayer.OnClientDisconnected.AddListener(UpdateClientIndicatorsDelayed); //Adding delay so that Client count is accurate
 
-        clientCustomizer.OnCustomizationEnabled.AddListener(OnClientCustomizerEnabled);
-        clientCustomizer.OnCustomizationDisabled.AddListener(OnClientCustomizerDisabled);
+        //clientCustomizer.OnCustomizationEnabled.AddListener(OnClientCustomizerEnabled);
+        //clientCustomizer.OnCustomizationDisabled.AddListener(OnClientCustomizerDisabled);
 
         currentSelectedFaceColor = faceDrawColorButtons[0].gameObject.GetComponentsInChildren<Image>()[1];
     }
@@ -69,8 +70,8 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         ClientPlayer.OnClientConnected.RemoveListener(UpdateClientIndicators);
         ClientPlayer.OnClientDisconnected.RemoveListener(UpdateClientIndicatorsDelayed);
 
-        clientCustomizer.OnCustomizationEnabled.RemoveListener(OnClientCustomizerEnabled);
-        clientCustomizer.OnCustomizationDisabled.RemoveListener(OnClientCustomizerDisabled);
+        //clientCustomizer.OnCustomizationEnabled.RemoveListener(OnClientCustomizerEnabled);
+        //clientCustomizer.OnCustomizationDisabled.RemoveListener(OnClientCustomizerDisabled);
     }
 
     private void OnProperlyConnectedToRoom()
@@ -149,7 +150,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         vcp.TogglePhone();
 
         AnimateButton(submitFaceDrawingButton, false);
-        Invoke("EnableCustomizationButton", 2);
+        //Invoke("EnableCustomizationButton", 2);
     }
 
     void EnableFaceDrawSubmitButton()
@@ -157,10 +158,12 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         AnimateButton(submitFaceDrawingButton, true);
     }
 
+    /*
     void EnableCustomizationButton()
     {
         AnimateButton(enableCustomizationsButton, true);
     }
+    */
 
     void AnimateButton(Button b, bool enabled)
     {
@@ -176,6 +179,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         faceDrawCanvas.gameObject.SetActive(false);
     }
 
+    /*
     void OnClientCustomizerEnabled()
     {
         clientIndicators[0].transform.parent.gameObject.SetActive(false);
@@ -187,6 +191,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         clientIndicators[0].transform.parent.gameObject.SetActive(true);
         joinedAndWaitingCanvas.enabled = true;
     }
+    */
 
     private void EnableVRAvatarVisibility()
     {
@@ -235,8 +240,8 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
         mainMenuCam.gameObject.SetActive(false);
         drawingPhaseCam.gameObject.SetActive(true);
 
-        clientCustomizer.DisableCustomization();
-        clientCustomizer.canvas.enabled = false;
+        //clientCustomizer.DisableCustomization();
+        //clientCustomizer.canvas.enabled = false;
 
         joinedAndWaitingCanvas.enabled = false;
 
