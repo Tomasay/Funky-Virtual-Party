@@ -199,6 +199,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
         }
 #endif
 
+        if (cam.CompareTag("UI Camera")) return;
+
         using (Draw.Command(cam, UnityEngine.Rendering.Universal.RenderPassEvent.AfterRenderingOpaques))
         {
             bool isVRPlayerPracticing = (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering");
