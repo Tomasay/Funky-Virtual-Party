@@ -204,7 +204,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             typedGuessInputField.caretPosition = typedGuessInputField.text.Length;
         }
 
-        if ((VRtistrySyncer.instance.State.Equals("clients guessing") || VRtistrySyncer.instance.State.Equals("vr guessing")) && paintBrush.RevealAnimationComplete)
+        if ((VRtistrySyncer.instance.State.Equals("clients typing guess")  || VRtistrySyncer.instance.State.Equals("clients guessing") || VRtistrySyncer.instance.State.Equals("vr guessing")) && paintBrush.RevealAnimationComplete)
         {
             if (tapAndHoldRotateLearned)
             {
