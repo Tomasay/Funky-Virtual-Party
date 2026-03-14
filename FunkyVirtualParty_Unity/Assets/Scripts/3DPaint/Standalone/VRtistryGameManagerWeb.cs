@@ -859,6 +859,26 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     public void SubmitAnswer()
     {
+        //Check if this exact answer has already been submitted by any client
+        if (!VRtistrySyncer.instance.Answers.Equals(""))
+        {
+            foreach (string entry in VRtistrySyncer.instance.Answers.Split('\n'))
+            {
+                int colonIndex = entry.IndexOf(':');
+                if (colonIndex >= 0)
+                {
+                    string existingAnswer = entry[(colonIndex + 1)..];
+                    if (existingAnswer.ToLower().Equals(answerInputField.text.ToLower()))
+                    {
+                        string prompt = inputHeaderText.text;
+                        inputHeaderText.text = "Someone already submitted that answer!\nType another answer";
+                        StartCoroutine(RestoreAnswerHeader(prompt));
+                        return;
+                    }
+                }
+            }
+        }
+
         if (VRtistrySyncer.instance.Answers.Equals(""))
         {
             VRtistrySyncer.instance.Answers = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + answerInputField.text);
@@ -879,6 +899,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         playerPromptInputParent.SetActive(false);
     }
 
+    private IEnumerator RestoreAnswerHeader(string prompt)
+    {
+        yield return new WaitForSeconds(3f);
+        inputHeaderText.text = prompt;
+    }
+
     public void SubmitTypedGuess()
     {
         //Check if client inputted correct guess exactly
@@ -888,6 +914,24 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             typedGuessHeaderText.text = "You guessed the right answer!\n" +
                                             "Type another guess";
             return;
+        }
+
+        //Check if this exact guess has already been submitted by any client
+        if (!VRtistrySyncer.instance.TypedGuesses.Equals(""))
+        {
+            foreach (string entry in VRtistrySyncer.instance.TypedGuesses.Split('\n'))
+            {
+                int colonIndex = entry.IndexOf(':');
+                if (colonIndex >= 0)
+                {
+                    string existingGuess = entry[(colonIndex + 1)..];
+                    if (existingGuess.ToLower().Equals(typedGuessInputField.text.ToLower()))
+                    {
+                        typedGuessHeaderText.text = "Someone already guessed that!\nType another guess";
+                        return;
+                    }
+                }
+            }
         }
 
         if (VRtistrySyncer.instance.TypedGuesses.Equals(""))
