@@ -1011,7 +1011,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         }
         else
         {
-            guessingHeaderText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner).syncer.Name + " wrote \n" + GetAnswerByOwnerID(answerOwnerIDPlayerIsGuessing);
+            guessingHeaderText.text = "Wrong! " + ClientPlayer.GetClientByCurrentOwnerID(answerOwnerIDPlayerIsGuessing).syncer.Name + " wrote \n" + GetAnswerByOwnerID(answerOwnerIDPlayerIsGuessing);
         }
 
         (answerButtonParent.transform as RectTransform).DOScale(0, 0.25f);
