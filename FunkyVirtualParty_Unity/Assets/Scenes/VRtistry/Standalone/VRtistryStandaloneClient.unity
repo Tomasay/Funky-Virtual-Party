@@ -8,8 +8,8 @@ OcclusionCullingSettings:
     smallestOccluder: 5
     smallestHole: 0.25
     backfaceThreshold: 100
-  m_SceneGUID: 00000000000000000000000000000000
-  m_OcclusionCullingData: {fileID: 0}
+  m_SceneGUID: d1f9431bdaa276b4ea86f04c6b0cad15
+  m_OcclusionCullingData: {fileID: 36300000, guid: 700ca53ddc77db248b58b792da054dba, type: 2}
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
@@ -5364,18 +5364,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   OnPromptChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPlayerAnswered:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPlayerTypedGuess:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPlayerGuessedArt:
-    m_PersistentCalls:
-      m_Calls: []
-  OnPlayerGuessedPlayer:
     m_PersistentCalls:
       m_Calls: []
   OnDecoyAnswersChanged:
@@ -27746,6 +27734,7 @@ MonoBehaviour:
   loadingCircle: {fileID: 1480744542}
   scenePartyCodeLetters: {fileID: 1311279811}
   scenePartyCodeLettersIndividuals: []
+  exitPlayModeOnVRHostDisconnect: 1
   LocalPlayerSpawned:
     m_PersistentCalls:
       m_Calls: []
