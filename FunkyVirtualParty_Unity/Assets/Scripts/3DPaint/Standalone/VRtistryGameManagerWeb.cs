@@ -160,9 +160,9 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
-        VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerSubmittedAnswer);
         VRtistrySyncer.instance.OnDecoyAnswersChanged.AddListener(SetDecoyAnswers);
-        VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
+        ClientSync.OnAnyVrtistryAnswerChanged.AddListener(PlayerSubmittedAnswer);
+        ClientSync.OnAnyVrtistryPlayerGuessChanged.AddListener(PlayerGuessedPlayer);
     }
 
     private void LeanTouch_OnFingerDown(LeanFinger obj)
@@ -178,8 +178,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.RemoveListener(SetNewPrompt);
-        VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerSubmittedAnswer);
-        VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
+        ClientSync.OnAnyVrtistryAnswerChanged.RemoveListener(PlayerSubmittedAnswer);
+        ClientSync.OnAnyVrtistryPlayerGuessChanged.RemoveListener(PlayerGuessedPlayer);
 
         answerInputButton.onPointerDown.RemoveListener(ButtonPointerDown);
         answerInputButton.onPointerUp.RemoveListener(ButtonPointerUp);
@@ -227,28 +227,28 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         if (VRtistrySyncer.instance.State.Equals("clients answering") && VRtistrySyncer.instance.ClientAnswerTimer <= 0 && typingAnswer && !lastPlayerAnsweringWarning.activeSelf)
         {
-            string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-            if (!VRtistrySyncer.instance.Answers.Equals("") && answersSeparated.Length == ClientPlayer.clients.Count - 1)
+            int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+            if (answeredCount == ClientPlayer.clients.Count - 1)
             {
                 lastPlayerAnsweringWarning.SetActive(true);
             }
         }
     }
 
-    void PlayerSubmittedAnswer(string answers)
+    void PlayerSubmittedAnswer()
     {
         bool isLocalClientGettingRoasted = (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf);
 
-        //Check to see if all players have answered and if we're waiting on vr player
-        string[] answersSeparated = answers.Split('\n');
-
         if (!isLocalClientGettingRoasted)
         {
-            if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
+            int neededCount = (currentRound == 2) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
+            int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+
+            if (answeredCount >= neededCount && VRtistrySyncer.instance.VRCompletedTutorial == false)
             {
                 blurHeaderText.text = "Waiting for VR player to complete tutorial...";
             }
-            else if (answersSeparated.Length != ClientPlayer.clients.Count)
+            else if (answeredCount < neededCount)
             {
                 blurHeaderText.text = "Waiting for all players to submit their answer...";
             }
@@ -310,6 +310,12 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 break;
             case "clients answering":
                 currentRound++;
+
+                //Reset per-client guess properties for the new round
+                RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryAnswer = "";
+                RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryTypedGuess = "";
+                RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryArtGuess = -1;
+                RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryPlayerGuess = -1;
 
                 joinedAndWaitingCanvas.enabled = false;
                 initialEaselCanvas.SetActive(false);
@@ -430,13 +436,19 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 thisIsYourPromptText.enabled = isLocalClientsPrompt;
                 guessingHeaderText.text = isLocalClientsPrompt ? "Waiting for other players to answer" : "What is it?";
 
-                string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-                Debug.Log("Answers: " + VRtistrySyncer.instance.Answers);
+                string[] answersSeparated = ClientPlayer.clients
+                    .Where(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer))
+                    .Select(cp => cp.realtimeView.ownerIDSelf + ":" + cp.syncer.VrtistryAnswer)
+                    .ToArray();
+                Debug.Log("Answers: " + string.Join("\n", answersSeparated));
                 foreach (string test in answersSeparated)
                 {
                     Debug.Log("Answer: " + test);
                 }
-                string[] typedGuessesSeparated = VRtistrySyncer.instance.TypedGuesses.Split('\n');
+                string[] typedGuessesSeparated = ClientPlayer.clients
+                    .Where(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryTypedGuess))
+                    .Select(cp => cp.realtimeView.ownerIDSelf + ":" + cp.syncer.VrtistryTypedGuess)
+                    .ToArray();
 
                 if (!isLocalClientsPrompt)
                 {
@@ -532,23 +544,18 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
 
                 //All players have guessed, so add guesses to results
-                string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
-                foreach (string g in guessesSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndGuess = g.Split(':');
+                    int artGuess = cp.syncer.VrtistryArtGuess;
+                    if (artGuess == -1) continue;
 
-                    if (int.TryParse(ownerAndGuess[0], out int j))
+                    int guesserID = cp.realtimeView.ownerIDSelf;
+                    if (GetAnswerByOwnerID(artGuess).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                     {
-                        if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
-                        {
-                            correctGuesses++;
-                        }
-
-                        if (ownerAndGuess[1] != "decoy")
-                        {
-                            AddPlayerToResults(j, ownerAndGuess[1]);
-                        }
+                        correctGuesses++;
                     }
+
+                    AddPlayerToResults(guesserID, "" + artGuess);
                 }
                 break;
             case "results":
@@ -695,36 +702,27 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     {
         thisIsYourPromptText.enabled = false;
 
-        string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
+        int localOwnerID = RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf;
 
         //If local player is the one who wrote the picked answer, show them someone else's answer
-        if (VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+        if (VRtistrySyncer.instance.ChosenAnswerOwner == localOwnerID)
         {
-            foreach (string a in answersSeparated2)
+            ClientPlayer otherCP = ClientPlayer.clients.FirstOrDefault(cp =>
+                cp.realtimeView.ownerIDSelf != localOwnerID && !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+            if (otherCP != null)
             {
-                string[] ownerAndAnswer = a.Split(':');
-
-                if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-                {
-                    guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                    answerOwnerIDPlayerIsGuessing = ownerID;
-                    break;
-                }
+                guessingHeaderText.text = "Who do you think wrote " + otherCP.syncer.VrtistryAnswer + "?";
+                answerOwnerIDPlayerIsGuessing = otherCP.realtimeView.ownerIDSelf;
             }
         }
         //Else, show them the owner of the picked answer
         else
         {
-            foreach (string a in answersSeparated2)
+            ClientPlayer chosenCP = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
+            if (chosenCP != null)
             {
-                string[] ownerAndAnswer = a.Split(':');
-
-                if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID == VRtistrySyncer.instance.ChosenAnswerOwner)
-                {
-                    guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                    answerOwnerIDPlayerIsGuessing = ownerID;
-                    break;
-                }
+                guessingHeaderText.text = "Who do you think wrote " + chosenCP.syncer.VrtistryAnswer + "?";
+                answerOwnerIDPlayerIsGuessing = chosenCP.realtimeView.ownerIDSelf;
             }
         }
 
@@ -860,33 +858,19 @@ public class VRtistryGameManagerWeb : MonoBehaviour
     public void SubmitAnswer()
     {
         //Check if this exact answer has already been submitted by any client
-        if (!VRtistrySyncer.instance.Answers.Equals(""))
+        foreach (ClientPlayer other in ClientPlayer.clients)
         {
-            foreach (string entry in VRtistrySyncer.instance.Answers.Split('\n'))
+            string existingAnswer = other.syncer.VrtistryAnswer;
+            if (!string.IsNullOrEmpty(existingAnswer) && existingAnswer.ToLower().Equals(answerInputField.text.ToLower()))
             {
-                int colonIndex = entry.IndexOf(':');
-                if (colonIndex >= 0)
-                {
-                    string existingAnswer = entry[(colonIndex + 1)..];
-                    if (existingAnswer.ToLower().Equals(answerInputField.text.ToLower()))
-                    {
-                        string prompt = inputHeaderText.text;
-                        inputHeaderText.text = "Someone already submitted that answer!\nType another answer";
-                        StartCoroutine(RestoreAnswerHeader(prompt));
-                        return;
-                    }
-                }
+                string prompt = inputHeaderText.text;
+                inputHeaderText.text = "Someone already submitted that answer!\nType another answer";
+                StartCoroutine(RestoreAnswerHeader(prompt));
+                return;
             }
         }
 
-        if (VRtistrySyncer.instance.Answers.Equals(""))
-        {
-            VRtistrySyncer.instance.Answers = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + answerInputField.text);
-        }
-        else
-        {
-            VRtistrySyncer.instance.Answers += ("\n" + RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + answerInputField.text);
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryAnswer = answerInputField.text;
 
         typingAnswer = false;
         (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
@@ -917,31 +901,17 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         }
 
         //Check if this exact guess has already been submitted by any client
-        if (!VRtistrySyncer.instance.TypedGuesses.Equals(""))
+        foreach (ClientPlayer other in ClientPlayer.clients)
         {
-            foreach (string entry in VRtistrySyncer.instance.TypedGuesses.Split('\n'))
+            string existingGuess = other.syncer.VrtistryTypedGuess;
+            if (!string.IsNullOrEmpty(existingGuess) && existingGuess.ToLower().Equals(typedGuessInputField.text.ToLower()))
             {
-                int colonIndex = entry.IndexOf(':');
-                if (colonIndex >= 0)
-                {
-                    string existingGuess = entry[(colonIndex + 1)..];
-                    if (existingGuess.ToLower().Equals(typedGuessInputField.text.ToLower()))
-                    {
-                        typedGuessHeaderText.text = "Someone already guessed that!\nType another guess";
-                        return;
-                    }
-                }
+                typedGuessHeaderText.text = "Someone already guessed that!\nType another guess";
+                return;
             }
         }
 
-        if (VRtistrySyncer.instance.TypedGuesses.Equals(""))
-        {
-            VRtistrySyncer.instance.TypedGuesses = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + typedGuessInputField.text);
-        }
-        else
-        {
-            VRtistrySyncer.instance.TypedGuesses += ("\n" + RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + typedGuessInputField.text);
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryTypedGuess = typedGuessInputField.text;
 
         typingGuess = false;
         
@@ -964,16 +934,10 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void SubmitArtGuess(int clientID, string clientGuessID)
     {
-        bool firstGuess = VRtistrySyncer.instance.ArtGuesses.Equals("");
+        bool firstGuess = ClientPlayer.clients.All(cp => cp.syncer.VrtistryArtGuess == -1);
 
-        if (firstGuess)
-        {
-            VRtistrySyncer.instance.ArtGuesses = clientID + ":" + clientGuessID;
-        }
-        else
-        {
-            VRtistrySyncer.instance.ArtGuesses += "\n" + clientID + ":" + clientGuessID;
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryArtGuess =
+            int.TryParse(clientGuessID, out int parsedGuessID) ? parsedGuessID : -1;
 
         if (int.TryParse(clientGuessID, out int j) && j == VRtistrySyncer.instance.ChosenAnswerOwner)
         {
@@ -989,10 +953,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         ClearPlayerAnswers();
     }
 
-    void PlayerGuessedPlayer(string guesses)
+    void PlayerGuessedPlayer()
     {
         //Check to see if VR is only player left to guess
-        if (VRtistrySyncer.instance.VRPlayerGuess == -1 && guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        int playerGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryPlayerGuess != -1);
+        if (VRtistrySyncer.instance.VRPlayerGuess == -1 && playerGuessCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
         {
             guessingHeaderText.text = "Waiting for VR player to answer";
         }
@@ -1022,14 +987,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         guessingHeaderText.text = "Waiting for other players to answer";
 
         //Sync their answer once they have had 3 seconds to see if they were right
-        if (VRtistrySyncer.instance.PlayerGuesses.Equals(""))
-        {
-            VRtistrySyncer.instance.PlayerGuesses = clientID + ":" + clientGuessID;
-        }
-        else
-        {
-            VRtistrySyncer.instance.PlayerGuesses += "\n" + clientID + ":" + clientGuessID;
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryPlayerGuess = clientGuessID;
 
         (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
     }
@@ -1086,20 +1044,8 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     string GetAnswerByOwnerID(int ID)
     {
-        string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
-        //Answer buttons
-        foreach (string a in answersSeparated)
-        {
-            string[] ownerAndAnswer = a.Split(':');
-
-            if (int.TryParse(ownerAndAnswer[0], out int i) && ID == i)
-            {
-                return ownerAndAnswer[1];
-            }
-        }
-
-        return "";
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(ID);
+        return cp != null ? cp.syncer.VrtistryAnswer : "";
     }
 
     IEnumerator DisplayLeaderboard()

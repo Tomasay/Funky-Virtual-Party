@@ -45,6 +45,18 @@ public partial class ClientSyncModel
 
     [RealtimeProperty(13, true, true)]
     private byte[] _faceDrawing;
+
+    [RealtimeProperty(14, true, true)]
+    private string _vrtistryAnswer; // Raw text answer to the round prompt
+
+    [RealtimeProperty(15, true, true)]
+    private string _vrtistryTypedGuess; // Raw text typed decoy guess
+
+    [RealtimeProperty(16, true, true)]
+    private int _vrtistryArtGuess; // ownerIDSelf of the answer this client picked as art guess (-1 = not submitted)
+
+    [RealtimeProperty(17, true, true)]
+    private int _vrtistryPlayerGuess; // ownerIDSelf of the player this client thinks wrote the chosen answer (-1 = not submitted)
 }
 
 

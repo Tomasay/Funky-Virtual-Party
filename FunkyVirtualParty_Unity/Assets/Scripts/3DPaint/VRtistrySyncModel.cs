@@ -17,64 +17,50 @@ public partial class VRtistrySyncModel
     private string _currentPrompt; //The current prompt that was chosen from list of answers
 
     [RealtimeProperty(4, true, true)]
-    private string _answers; //list of client answers separated by \n, format is "CLIENT_ID:CLIENT_ANSWER"
-
-    [RealtimeProperty(5, true, true)]
     private int _playersGuessed; //The amount of players who have guessed what the drawing is in the current phase
 
-    [RealtimeProperty(6, true, true)]
+    [RealtimeProperty(5, true, true)]
     private int _chosenAnswerOwner; //Client ID of who's answer was chosen to give to the VR player as a prompt
 
-    [RealtimeProperty(7, true, true)]
+    [RealtimeProperty(6, true, true)]
     private bool _isPainting; //Is the VR player spraying paint
 
-    [RealtimeProperty(8, true, true)]
+    [RealtimeProperty(7, true, true)]
     private bool _isDrawing; //Is the VR player drawing with the paint brush
 
-    [RealtimeProperty(9, true, true)]
+    [RealtimeProperty(8, true, true)]
     private Vector3 _drawingIncrement; //The latest point from brush drawing lines
 
-    [RealtimeProperty(10, true, true)]
+    [RealtimeProperty(9, true, true)]
     private Color _brushColor;
 
-    [RealtimeProperty(12, true, true)]
+    [RealtimeProperty(10, true, true)]
     private bool _isPaletteMirrored;
 
-    [RealtimeProperty(13, true, true)]
+    [RealtimeProperty(11, true, true)]
     private int _vrPlayerGuess; //The client ID that the vr player thinks wrote the answer
 
-    [RealtimeProperty(14, true, true)]
+    [RealtimeProperty(12, true, true)]
     private int _vrPlayerPoints;
 
-    [RealtimeProperty(15, true, true)]
+    [RealtimeProperty(13, true, true)]
     private bool _vrCompletedTutorial;
 
-    [RealtimeProperty(16, true, true)]
-    private string _artGuesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_ANSWERID"
-
-    [RealtimeProperty(17, true, true)]
+    [RealtimeProperty(14, true, true)]
     private float _clientAnswerTimer; //Time left for clients to submit an answer to the prompt
 
-    [RealtimeProperty(18, true, true)]
+    [RealtimeProperty(15, true, true)]
     private float _drawingTimer; //Time left for vr player to finish drawing
 
-    [RealtimeProperty(19, true, true)]
+    [RealtimeProperty(16, true, true)]
     private bool _isBrushEnabled; //Is the brush enabled and in the VR player's hand?
 
-    [RealtimeProperty(20, true, true)]
+    [RealtimeProperty(17, true, true)]
     private bool _isPaletteEnabled; //Is the palette enabled and visible. Set when vr player grabs/drops
 
-    [RealtimeProperty(21, true, true)]
+    [RealtimeProperty(18, true, true)]
     private string _decoyAnswers; //list of decoy answers separated by commas
 
-    [RealtimeProperty(22, true, true)]
-    private string _playerGuesses; //list of client guesses separated by \n, format is "CLIENT_ID:CLIENT_WHO_THEY_GUESSED_ANSWERID"
-
-    [RealtimeProperty(23, true, true)]
-    private string _typedGuesses; //list of typed guesses separated by \n, format is "CLIENT_ID:CLIENT_GUESS"
-
-    [RealtimeProperty(24, true, true)]
+    [RealtimeProperty(19, true, true)]
     private int _chosenClientToRoast;
 }
-
-

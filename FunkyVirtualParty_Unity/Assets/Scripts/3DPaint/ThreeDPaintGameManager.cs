@@ -186,9 +186,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
 #endif
 
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
-        VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
-        VRtistrySyncer.instance.OnPlayerGuessedArt.AddListener(PlayerGuessedArt);
-        VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
+        ClientSync.OnAnyVrtistryAnswerChanged.AddListener(PlayerAnswered);
+        ClientSync.OnAnyVrtistryArtGuessChanged.AddListener(PlayerGuessedArt);
+        ClientSync.OnAnyVrtistryPlayerGuessChanged.AddListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed += RealtimeAvatarManager_avatarDestroyed;
@@ -273,9 +273,9 @@ public class ThreeDPaintGameManager : MonoBehaviour
     private void OnDestroy()
     {
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChanged);
-        VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerAnswered);
-        VRtistrySyncer.instance.OnPlayerGuessedArt.RemoveListener(PlayerGuessedArt);
-        VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
+        ClientSync.OnAnyVrtistryAnswerChanged.RemoveListener(PlayerAnswered);
+        ClientSync.OnAnyVrtistryArtGuessChanged.RemoveListener(PlayerGuessedArt);
+        ClientSync.OnAnyVrtistryPlayerGuessChanged.RemoveListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed -= RealtimeAvatarManager_avatarDestroyed;
@@ -458,14 +458,10 @@ public class ThreeDPaintGameManager : MonoBehaviour
         vrPlayer.UIWarningArrow.SetActive(false);
         VRtistrySyncer.instance.VRCompletedTutorial = true;
 
-        if (!VRtistrySyncer.instance.Answers.Equals(""))
+        int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+        if (answeredCount >= ClientPlayer.clients.Count)
         {
-            string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
-            if (answersSeparated.Length >= ClientPlayer.clients.Count)
-            {
-                VRtistrySyncer.instance.State = "vr posing";
-            }
+            VRtistrySyncer.instance.State = "vr posing";
         }
 
         if (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering")
@@ -545,7 +541,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 paintTexture.Clear();
 
                 VRtistrySyncer.instance.VRPlayerGuess = -1;
-                VRtistrySyncer.instance.PlayerGuesses = "";
 
                 VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
 
@@ -615,8 +610,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 decoyAnswersGenerator.GenerateFakeAnswers(VRtistrySyncer.instance.CurrentPrompt, GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner), numOfDecoysToGenerate, OnDecoyAnswersGenerated);
 #endif
 
-                VRtistrySyncer.instance.ArtGuesses = "";
-
                 //Disable VR tools
                 paintBrush.CanPaintAir = false;
 
@@ -635,33 +628,18 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 vrPlayer.UIWarningArrow.SetActive(true);
 
                 //Show guesses
-                string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 int correctGuesses = 0;
-                foreach (string g in guessesSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndGuess = g.Split(':');
+                    int artGuess = cp.syncer.VrtistryArtGuess;
+                    int guesserID = cp.realtimeView.ownerIDSelf;
 
-                    if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
+                    VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(guesserID) as VRtistryClientPlayer);
+                    vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(guesserID)); vcp.smr.material = clientMat; });
+
+                    if (artGuess != -1 && GetAnswerByOwnerID(artGuess).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                     {
-                        if (int.TryParse(ownerAndGuess[0], out int j))
-                        {
-                            //AddPlayerToResults(j, true);
-
-                            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
-
-                            correctGuesses++;
-                        }
-                    }
-                    else
-                    {
-                        if (int.TryParse(ownerAndGuess[0], out int j))
-                        {
-                            //AddPlayerToResults(j, false);
-
-                            VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(j) as VRtistryClientPlayer);
-                            vcp.playerButton.onClick.AddListener(delegate { StartCoroutine(GuessPlayerVR(j)); vcp.smr.material = clientMat; });
-                        }
+                        correctGuesses++;
                     }
                 }
                 VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.calculatePointsVrCorrectGuesses(correctGuesses);
@@ -694,42 +672,30 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 vrPlayer.UIPointerPreview.rayDrawDistance = 0;
 
                 //Answer results
-                string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-                foreach (string a in answersSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndAnswer = a.Split(':');
+                    string answer = cp.syncer.VrtistryAnswer;
+                    if (string.IsNullOrEmpty(answer)) continue;
+                    int id = cp.realtimeView.ownerIDSelf;
 
-                    if (int.TryParse(ownerAndAnswer[0], out int id))
-                    {
-                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
-                        aob.ResetPlayerIcons();
-                        aob.canvasGroup.alpha = 0;
-
-                        aob.SetText(ownerAndAnswer[1]);
-                        aob.playerID = ownerAndAnswer[0];
-                        if (int.TryParse(ownerAndAnswer[0], out int i))
-                        {
-                            //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
-                            aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
-                            aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
-                            (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
-                        }
-                        answerResults.Add(aob);
-                    }
+                    AnswerOptionButton aob = (cp as VRtistryClientPlayer).playerAnswer;
+                    aob.ResetPlayerIcons();
+                    aob.canvasGroup.alpha = 0;
+                    aob.SetText(answer);
+                    aob.playerID = "" + id;
+                    aob.SetBorderColor(cp.syncer.Color);
+                    aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                    (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
+                    answerResults.Add(aob);
                 }
 
                 //All players have guessed, so add guesses to results
-                string[] leaderboardGuessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
-                foreach (string g in leaderboardGuessesSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndGuess = g.Split(':');
-
-                    if (int.TryParse(ownerAndGuess[0], out int i))
+                    int artGuess = cp.syncer.VrtistryArtGuess;
+                    if (artGuess != -1)
                     {
-                        if (ownerAndGuess[1] != "decoy")
-                        {
-                            AddPlayerToResults(i, ownerAndGuess[1]);
-                        }
+                        AddPlayerToResults(cp.realtimeView.ownerIDSelf, "" + artGuess);
                     }
                 }
 
@@ -787,8 +753,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
             case "leaderboard":
                 StartCoroutine("ShowLeaderboard");
 
-                VRtistrySyncer.instance.ArtGuesses = "";
-
                 break;
             case "gallery":
                 vrPlayer.UIWarningArrow.SetActive(false);
@@ -803,8 +767,6 @@ public class ThreeDPaintGameManager : MonoBehaviour
                 DrawingsSyncer.instance.SetDrawingGalleryPositions();
 
                 StartCoroutine("ShowLeaderboard");
-
-                VRtistrySyncer.instance.ArtGuesses = "";
 
                 StartCoroutine(SetVRPlayerPos(vrPlayerGallerySpawnPos.position, 0));
 
@@ -852,20 +814,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
 
     string GetAnswerByOwnerID(int ID)
     {
-        string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
-        //Answer buttons
-        foreach (string a in answersSeparated)
-        {
-            string[] ownerAndAnswer = a.Split(':');
-
-            if (int.TryParse(ownerAndAnswer[0], out int i) && ID == i)
-            {
-                return ownerAndAnswer[1];
-            }
-        }
-
-        return "";
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(ID);
+        return cp != null ? cp.syncer.VrtistryAnswer : "";
     }
 
     IEnumerator StartGame()
@@ -981,38 +931,33 @@ public class ThreeDPaintGameManager : MonoBehaviour
             VRtistrySyncer.instance.CurrentPrompt = GetPrompt();
             VRtistrySyncer.instance.State = "clients answering";
             VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
-            VRtistrySyncer.instance.Answers = "";
 
             currentRound++;
         }
     }
 
-    void PlayerAnswered(string answers)
+    void PlayerAnswered()
     {
-        //Check to see if all players have answered, if so move to next state
-        string[] answersSeparated = answers.Split('\n');
-
-        if (answersSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial)
+        int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+        if (answeredCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial)
         {
             VRtistrySyncer.instance.State = "vr posing";
         }
     }
 
-    void PlayerGuessedArt(string guesses)
+    void PlayerGuessedArt()
     {
-        //Check to see if all players have guessed, if so move to next state
-        string[] guessesSeparated = guesses.Split('\n');
-
-        if (guessesSeparated.Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("clients guessing"))
+        int artGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryArtGuess != -1);
+        if (artGuessCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("clients guessing"))
         {
             VRtistrySyncer.instance.State = "vr guessing";
         }
     }
 
-    void PlayerGuessedPlayer(string guesses)
+    void PlayerGuessedPlayer()
     {
-        //Check to see if all players have guessed, if so move to next state
-        if (VRtistrySyncer.instance.VRPlayerGuess != -1 && guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        int playerGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryPlayerGuess != -1);
+        if (VRtistrySyncer.instance.VRPlayerGuess != -1 && playerGuessCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
         {
             VRtistrySyncer.instance.State = "results";
         }
@@ -1101,7 +1046,8 @@ public class ThreeDPaintGameManager : MonoBehaviour
             headerText.text = "Waiting for clients to submit guesses";
 
             //If all clients have also guessed, move to results phase
-            if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+            int playerGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryPlayerGuess != -1);
+            if (playerGuessCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
             {
                 VRtistrySyncer.instance.State = "results";
             }

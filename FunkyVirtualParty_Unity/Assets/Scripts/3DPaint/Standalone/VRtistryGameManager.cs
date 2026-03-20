@@ -206,10 +206,10 @@ public class VRtistryGameManager : MonoBehaviour
     public void SetupGame()
     {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChanged);
-        VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerAnswered);
-        VRtistrySyncer.instance.OnPlayerTypedGuess.AddListener(PlayerTypedGuess);
-        VRtistrySyncer.instance.OnPlayerGuessedArt.AddListener(PlayerGuessedArt);
-        VRtistrySyncer.instance.OnPlayerGuessedPlayer.AddListener(PlayerGuessedPlayer);
+        ClientSync.OnAnyVrtistryAnswerChanged.AddListener(PlayerAnswered);
+        ClientSync.OnAnyVrtistryTypedGuessChanged.AddListener(PlayerTypedGuess);
+        ClientSync.OnAnyVrtistryArtGuessChanged.AddListener(PlayerGuessedArt);
+        ClientSync.OnAnyVrtistryPlayerGuessChanged.AddListener(PlayerGuessedPlayer);
 
         InvokeRepeating("Test", 1, 1);
 
@@ -225,10 +225,10 @@ public class VRtistryGameManager : MonoBehaviour
     private void OnDestroy()
     {
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChanged);
-        VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerAnswered);
-        VRtistrySyncer.instance.OnPlayerTypedGuess.RemoveListener(PlayerTypedGuess);
-        VRtistrySyncer.instance.OnPlayerGuessedArt.RemoveListener(PlayerGuessedArt);
-        VRtistrySyncer.instance.OnPlayerGuessedPlayer.RemoveListener(PlayerGuessedPlayer);
+        ClientSync.OnAnyVrtistryAnswerChanged.RemoveListener(PlayerAnswered);
+        ClientSync.OnAnyVrtistryTypedGuessChanged.RemoveListener(PlayerTypedGuess);
+        ClientSync.OnAnyVrtistryArtGuessChanged.RemoveListener(PlayerGuessedArt);
+        ClientSync.OnAnyVrtistryPlayerGuessChanged.RemoveListener(PlayerGuessedPlayer);
 
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed -= RealtimeAvatarManager_avatarDestroyed;
@@ -426,7 +426,8 @@ public class VRtistryGameManager : MonoBehaviour
     [Button]
     public void PickFirstPromptOption()
     {
-        promptOptionButtonClicked(1);
+        if (promptOptionButtons.Count > 0)
+            promptOptionButtons[0].GetComponent<Button>().onClick.Invoke();
     }
 
     public void OnTutorialCompleted()
@@ -434,14 +435,11 @@ public class VRtistryGameManager : MonoBehaviour
         vrPlayer.UIWarningArrow.SetActive(false);
         VRtistrySyncer.instance.VRCompletedTutorial = true;
 
-        if (!VRtistrySyncer.instance.Answers.Equals(""))
+        int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+        int neededCount = (currentRound == 2) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
+        if (answeredCount >= neededCount)
         {
-            string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
-            if (answersSeparated.Length >= ClientPlayer.clients.Count)
-            {
-                VRtistrySyncer.instance.State = "vr picking prompt";
-            }
+            VRtistrySyncer.instance.State = "vr picking prompt";
         }
 
         if (VRtistrySyncer.instance.State == "" || VRtistrySyncer.instance.State == "clients answering")
@@ -524,7 +522,6 @@ public class VRtistryGameManager : MonoBehaviour
                 if (currentRound == 3) ClearRoast();
 
                 VRtistrySyncer.instance.VRPlayerGuess = -1;
-                VRtistrySyncer.instance.PlayerGuesses = "";
 
                 VRtistrySyncer.instance.ClientAnswerTimer = ThreeDPaintGlobalVariables.CLIENT_ANSWER_TIME_AMOUNT;
 
@@ -631,8 +628,6 @@ public class VRtistryGameManager : MonoBehaviour
                 */
 #endif
 
-                VRtistrySyncer.instance.TypedGuesses = "";
-
                 //Disable VR tools
                 paintBrush.CanPaintAir = false;
 
@@ -648,15 +643,10 @@ public class VRtistryGameManager : MonoBehaviour
                 StartCoroutine(SetVRPlayerPos(vrPlayer.spawnPos, 1));
                 break;
             case "clients guessing":
-                
-                VRtistrySyncer.instance.ArtGuesses = "";
-
                 break;
             case "vr guessing":
                 vrPlayer.UIWarningArrow.SetActive(true);
 
-                //Show guesses
-                string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
                 correctGuesses = 0;
 
                 List<int> clientGuessOptions = ClientPlayer.GetRandomClientIdList(3, VRtistrySyncer.instance.ChosenAnswerOwner);
@@ -680,21 +670,12 @@ public class VRtistryGameManager : MonoBehaviour
                     promptOptionButtons.Add(newOption);
                 }
 
-                foreach (string g in guessesSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndGuess = g.Split(':');
-
-                    if (int.TryParse(ownerAndGuess[0], out int j))
+                    int artGuess = cp.syncer.VrtistryArtGuess;
+                    if (artGuess != -1 && GetAnswerByOwnerID(artGuess).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
                     {
-                        if (int.TryParse(ownerAndGuess[1], out int i) && GetAnswerByOwnerID(i).Equals(GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner)))
-                        {
-                            //AddPlayerToResults(j, true);
-                            correctGuesses++;
-                        }
-                        else
-                        {
-                            //AddPlayerToResults(j, false);
-                        }
+                        correctGuesses++;
                     }
                 }
                 VRtistrySyncer.instance.VRPlayerPoints += ThreeDPaintGlobalVariables.calculatePointsVrCorrectGuesses(correctGuesses);
@@ -722,64 +703,49 @@ public class VRtistryGameManager : MonoBehaviour
 
                 vrPlayer.UIPointerPreview.rayDrawDistance = 0;
 
-                //Answer results
-                string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-                string[] typedGuessesSeparated = VRtistrySyncer.instance.TypedGuesses.Split('\n');
-                foreach (string g in typedGuessesSeparated)
+                //Answer results — typed guesses (non-drawer clients)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndAnswer = g.Split(':');
+                    string typedGuess = cp.syncer.VrtistryTypedGuess;
+                    if (string.IsNullOrEmpty(typedGuess)) continue;
 
-                    if (int.TryParse(ownerAndAnswer[0], out int id))
-                    {
-                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
-                        aob.ResetPlayerIcons();
-                        aob.canvasGroup.alpha = 0;
-
-                        aob.SetTextWithPlayerName(ownerAndAnswer[1], ClientPlayer.GetClientByCurrentOwnerID(id));
-                        aob.playerID = ownerAndAnswer[0];
-
-                        //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
-                        aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
-                        aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
-                        (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
-
-                        answerResults.Add(aob);
-                    }
+                    int id = cp.realtimeView.ownerIDSelf;
+                    AnswerOptionButton aob = (cp as VRtistryClientPlayer).playerAnswer;
+                    aob.ResetPlayerIcons();
+                    aob.canvasGroup.alpha = 0;
+                    aob.SetTextWithPlayerName(typedGuess, cp);
+                    aob.playerID = "" + id;
+                    aob.SetBorderColor(cp.syncer.Color);
+                    aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                    (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
+                    answerResults.Add(aob);
                 }
-                foreach (string a in answersSeparated)
-                {
-                    string[] ownerAndAnswer = a.Split(':');
 
-                    if (int.TryParse(ownerAndAnswer[0], out int id) && VRtistrySyncer.instance.ChosenAnswerOwner == id)
+                //Correct answer (drawer's original prompt answer)
+                {
+                    int drawerId = VRtistrySyncer.instance.ChosenAnswerOwner;
+                    ClientPlayer drawer = ClientPlayer.GetClientByCurrentOwnerID(drawerId);
+                    if (drawer != null)
                     {
-                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
+                        AnswerOptionButton aob = (drawer as VRtistryClientPlayer).playerAnswer;
                         aob.ResetPlayerIcons();
                         aob.canvasGroup.alpha = 0;
-
-                        aob.SetTextWithPlayerName(ownerAndAnswer[1], ClientPlayer.GetClientByCurrentOwnerID(id));
-                        aob.playerID = ownerAndAnswer[0];
-
-                        //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
-                        aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
-                        aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                        aob.SetTextWithPlayerName(drawer.syncer.VrtistryAnswer, drawer);
+                        aob.playerID = "" + drawerId;
+                        aob.SetBorderColor(drawer.syncer.Color);
+                        aob.correctAnswerBanner.SetActive(true);
                         (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
-
                         answerResults.Add(aob);
                     }
                 }
 
-                //All players have guessed, so add guesses to results
-                string[] leaderboardGuessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
-                foreach (string g in leaderboardGuessesSeparated)
+                //Add player icons to the answer each client chose
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndGuess = g.Split(':');
-
-                    if (int.TryParse(ownerAndGuess[0], out int i))
+                    int artGuess = cp.syncer.VrtistryArtGuess;
+                    if (artGuess != -1)
                     {
-                        if (ownerAndGuess[1] != "decoy")
-                        {
-                            AddPlayerToResults(i, ownerAndGuess[1]);
-                        }
+                        AddPlayerToResults(cp.realtimeView.ownerIDSelf, "" + artGuess);
                     }
                 }
 
@@ -849,8 +815,6 @@ public class VRtistryGameManager : MonoBehaviour
             case "leaderboard":
                 StartCoroutine("ShowLeaderboard");
 
-                VRtistrySyncer.instance.ArtGuesses = "";
-
                 break;
             case "gallery":
                 vrPlayer.UIWarningArrow.SetActive(false);
@@ -865,8 +829,6 @@ public class VRtistryGameManager : MonoBehaviour
                 DrawingsSyncer.instance.SetDrawingGalleryPositions();
 
                 StartCoroutine("ShowLeaderboard");
-
-                VRtistrySyncer.instance.ArtGuesses = "";
 
                 StartCoroutine(SetVRPlayerPos(vrPlayerGallerySpawnPos.position, 0));
 
@@ -974,20 +936,8 @@ public class VRtistryGameManager : MonoBehaviour
 
     string GetAnswerByOwnerID(int ID)
     {
-        string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
-        //Answer buttons
-        foreach (string a in answersSeparated)
-        {
-            string[] ownerAndAnswer = a.Split(':');
-
-            if (int.TryParse(ownerAndAnswer[0], out int i) && ID == i)
-            {
-                return ownerAndAnswer[1];
-            }
-        }
-
-        return "";
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(ID);
+        return cp != null ? cp.syncer.VrtistryAnswer : "";
     }
 
     public void StartGame()
@@ -1111,10 +1061,7 @@ public class VRtistryGameManager : MonoBehaviour
 
         if (currentRound == ThreeDPaintGlobalVariables.NUMBER_OF_ROUNDS)
         {
-            //Setup for potential next game
-            VRtistrySyncer.instance.Answers = "";
             currentRound = 1;
-
             VRtistrySyncer.instance.State = "game over";
         }
         else
@@ -1129,51 +1076,44 @@ public class VRtistryGameManager : MonoBehaviour
             VRtistrySyncer.instance.CurrentPrompt = currentRound == 2 ? GetClientThemedPrompt() : GetPrompt();
             VRtistrySyncer.instance.State = "clients answering";
             VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
-            VRtistrySyncer.instance.Answers = "";
         }
 
         SetPlayerNamesVisibility(true);
     }
 
-    void PlayerAnswered(string answers)
+    void PlayerAnswered()
     {
-        //Check to see if all players have answered, if so move to next state
-        string[] answersSeparated = answers.Split('\n');
-
         int clientAnswersNeededToProceed = (currentRound == 2) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
-        if (answersSeparated.Length >= clientAnswersNeededToProceed && VRtistrySyncer.instance.VRCompletedTutorial)
+        int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+        if (answeredCount >= clientAnswersNeededToProceed && VRtistrySyncer.instance.VRCompletedTutorial)
         {
             VRtistrySyncer.instance.State = "vr picking prompt";
         }
     }
 
-    void PlayerTypedGuess(string guesses)
+    void PlayerTypedGuess()
     {
-        //Check to see if all players have guessed, if so move to next state
-        string[] guessesSeparated = guesses.Split('\n');
-
-        if (guessesSeparated.Length >= (ClientPlayer.clients.Count - 1) && VRtistrySyncer.instance.State.Equals("clients typing guess"))
+        int typedGuessCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryTypedGuess));
+        if (typedGuessCount >= (ClientPlayer.clients.Count - 1) && VRtistrySyncer.instance.State.Equals("clients typing guess"))
         {
             VRtistrySyncer.instance.State = "clients guessing";
         }
     }
 
-    void PlayerGuessedArt(string guesses)
+    void PlayerGuessedArt()
     {
-        //Check to see if all players have guessed, if so move to next state
-        string[] guessesSeparated = guesses.Split('\n');
-
-        if (guessesSeparated.Length >= (ClientPlayer.clients.Count - 1) && VRtistrySyncer.instance.State.Equals("clients guessing"))
+        int artGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryArtGuess != -1);
+        if (artGuessCount >= (ClientPlayer.clients.Count - 1) && VRtistrySyncer.instance.State.Equals("clients guessing"))
         {
             VRtistrySyncer.instance.State = "vr guessing";
         }
     }
 
-    void PlayerGuessedPlayer(string guesses)
+    void PlayerGuessedPlayer()
     {
-        //Check to see if all players have guessed, if so move to next state
-        Debug.Log("VRPlayerGuess: " + VRtistrySyncer.instance.VRPlayerGuess + "  Player guesses: " + guesses.Split('\n').Length + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
-        if (VRtistrySyncer.instance.VRPlayerGuess != -1 && guesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+        int playerGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryPlayerGuess != -1);
+        Debug.Log("VRPlayerGuess: " + VRtistrySyncer.instance.VRPlayerGuess + "  Player guesses: " + playerGuessCount + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
+        if (VRtistrySyncer.instance.VRPlayerGuess != -1 && playerGuessCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
         {
             VRtistrySyncer.instance.State = "results";
         }
@@ -1287,8 +1227,8 @@ public class VRtistryGameManager : MonoBehaviour
             headerText.text = "Waiting for clients to submit guesses";
 
             //If all clients have also guessed, move to results phase
-            //Debug.Log("Player guesses: " + VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length + "/" + ClientPlayer.clients.Count + "   state: " + VRtistrySyncer.instance.State);
-            if (VRtistrySyncer.instance.PlayerGuesses.Split('\n').Length >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
+            int playerGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryPlayerGuess != -1);
+            if (playerGuessCount >= ClientPlayer.clients.Count && VRtistrySyncer.instance.State.Equals("vr guessing"))
             {
                 VRtistrySyncer.instance.State = "results";
             }
@@ -1298,7 +1238,8 @@ public class VRtistryGameManager : MonoBehaviour
     [Button]
     public void GuessFirstPlayer()
     {
-        StartCoroutine(GuessPlayerVR(1));
+        if (promptOptionButtons.Count > 0)
+            promptOptionButtons[0].GetComponent<Button>().onClick.Invoke();
     }
 
     void GrabTool()

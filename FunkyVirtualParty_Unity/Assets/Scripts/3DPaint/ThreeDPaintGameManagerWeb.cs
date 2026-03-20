@@ -135,7 +135,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
-        VRtistrySyncer.instance.OnPlayerAnswered.AddListener(PlayerSubmittedAnswer);
+        ClientSync.OnAnyVrtistryAnswerChanged.AddListener(PlayerSubmittedAnswer);
         VRtistrySyncer.instance.OnDecoyAnswersChanged.AddListener(SetDecoyAnswers);
     }
 
@@ -143,7 +143,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
     {
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.RemoveListener(SetNewPrompt);
-        VRtistrySyncer.instance.OnPlayerAnswered.RemoveListener(PlayerSubmittedAnswer);
+        ClientSync.OnAnyVrtistryAnswerChanged.RemoveListener(PlayerSubmittedAnswer);
 
         answerInputButton.onPointerDown.RemoveListener(ButtonPointerDown);
         answerInputButton.onPointerUp.RemoveListener(ButtonPointerUp);
@@ -191,18 +191,17 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         }
     }
 
-    void PlayerSubmittedAnswer(string answers)
+    void PlayerSubmittedAnswer()
     {
-        //Check to see if all players have answered and if we're waiting on vr player
-        string[] answersSeparated = answers.Split('\n');
+        int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
 
-        if (answersSeparated.Length == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
+        if (answeredCount == ClientPlayer.clients.Count && VRtistrySyncer.instance.VRCompletedTutorial == false)
         {
             inputTimerText.enabled = false;
             blurTimerText.enabled = false;
             blurHeaderText.text = "Waiting for VR player to complete tutorial...";
         }
-        else if(answersSeparated.Length != ClientPlayer.clients.Count)
+        else if (answeredCount != ClientPlayer.clients.Count)
         {
             blurHeaderText.text = "Waiting for all players to submit their answer...";
         }
@@ -226,6 +225,12 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         drawingModel.transform.rotation = drawingModelStartingRot;
         Draw.Rotation = Quaternion.identity;
         if (paintBrush) paintBrush.ResetRevealAnimation();
+
+        //Reset per-client guess properties for the new round
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryAnswer = "";
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryTypedGuess = "";
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryArtGuess = -1;
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryPlayerGuess = -1;
 
         //Clear answers from previous round
         ClearPlayerAnswers();
@@ -311,97 +316,79 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 drawingPhaseCamera.gameObject.SetActive(false);
                 guessingPhaseCamera.gameObject.SetActive(true);
 
-                string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
                 //Answer buttons
                 answerButtonParent.SetActive(false);
-                foreach (string a in answersSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndAnswer = a.Split(':');
+                    string answer = cp.syncer.VrtistryAnswer;
+                    if (string.IsNullOrEmpty(answer)) continue;
+                    int ownerID = cp.realtimeView.ownerIDSelf;
 
                     GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                    string guessGuessOwner = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + ownerAndAnswer[0]);
-                    ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerAndAnswer[0]); });
+                    ab.GetComponent<Button>().onClick.AddListener(delegate { SubmitArtGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, "" + ownerID); });
                     AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                    aob.SetText(ownerAndAnswer[1]);
-                    aob.playerID = ownerAndAnswer[0];
+                    aob.SetText(answer);
+                    aob.playerID = "" + ownerID;
                     answerButtons.Add(aob);
                 }
 
                 //Answer results
-                foreach (string a in answersSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndAnswer = a.Split(':');
+                    string answer = cp.syncer.VrtistryAnswer;
+                    if (string.IsNullOrEmpty(answer)) continue;
+                    int id = cp.realtimeView.ownerIDSelf;
 
-                    if (int.TryParse(ownerAndAnswer[0], out int id))
-                    {
-                        AnswerOptionButton aob = (ClientPlayer.GetClientByCurrentOwnerID(id) as VRtistryClientPlayer).playerAnswer;
-                        aob.canvasGroup.alpha = 0;
-                        aob.ResetPlayerIcons();
-
-                        aob.SetText(ownerAndAnswer[1]);
-                        aob.playerID = ownerAndAnswer[0];
-                        if (int.TryParse(ownerAndAnswer[0], out int i))
-                        {
-                            //aob.SetBorderColor((i == VRtistrySyncer.instance.ChosenAnswerOwner) ? Color.green : Color.black);
-                            aob.SetBorderColor(ClientPlayer.GetClientByCurrentOwnerID(id).syncer.Color);
-                            aob.correctAnswerBanner.SetActive(i == VRtistrySyncer.instance.ChosenAnswerOwner);
-                            (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
-                        }
-                        answerResults.Add(aob);
-                    }
+                    AnswerOptionButton aob = (cp as VRtistryClientPlayer).playerAnswer;
+                    aob.canvasGroup.alpha = 0;
+                    aob.ResetPlayerIcons();
+                    aob.SetText(answer);
+                    aob.playerID = "" + id;
+                    aob.SetBorderColor(cp.syncer.Color);
+                    aob.correctAnswerBanner.SetActive(id == VRtistrySyncer.instance.ChosenAnswerOwner);
+                    (aob.correctAnswerBanner.transform as RectTransform).localScale = Vector3.zero;
+                    answerResults.Add(aob);
                 }
 
                 paintBrush.AnimatePaintingReveal();
                 break;
             case "vr guessing":
-                string[] answersSeparated2 = VRtistrySyncer.instance.Answers.Split('\n');
+                int localOwnerID = RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf;
 
                 //If local player is the one who wrote the picked answer, show them someone else's answer
-                if (VRtistrySyncer.instance.ChosenAnswerOwner == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
+                if (VRtistrySyncer.instance.ChosenAnswerOwner == localOwnerID)
                 {
-                    foreach (string a in answersSeparated2)
+                    ClientPlayer otherCP = ClientPlayer.clients.FirstOrDefault(cp =>
+                        cp.realtimeView.ownerIDSelf != localOwnerID && !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
+                    if (otherCP != null)
                     {
-                        string[] ownerAndAnswer = a.Split(':');
-
-                        if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-                        {
-                            guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                            answerOwnerIDPlayerIsGuessing = ownerID;
-                            break;
-                        }
+                        guessingHeaderText.text = "Who do you think wrote " + otherCP.syncer.VrtistryAnswer + "?";
+                        answerOwnerIDPlayerIsGuessing = otherCP.realtimeView.ownerIDSelf;
                     }
                 }
                 //Else, show them the owner of the picked answer
                 else
                 {
-                    foreach (string a in answersSeparated2)
+                    ClientPlayer chosenCP = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner);
+                    if (chosenCP != null)
                     {
-                        string[] ownerAndAnswer = a.Split(':');
-
-                        if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID == VRtistrySyncer.instance.ChosenAnswerOwner)
-                        {
-                            guessingHeaderText.text = "Who do you think wrote " + ownerAndAnswer[1] + "?";
-                            answerOwnerIDPlayerIsGuessing = ownerID;
-                            break;
-                        }
+                        guessingHeaderText.text = "Who do you think wrote " + chosenCP.syncer.VrtistryAnswer + "?";
+                        answerOwnerIDPlayerIsGuessing = chosenCP.realtimeView.ownerIDSelf;
                     }
                 }
 
                 //Player Answer buttons, show everyone but self
-                foreach (string a in answersSeparated2)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndAnswer = a.Split(':');
+                    int ownerID = cp.realtimeView.ownerIDSelf;
+                    if (ownerID == localOwnerID) continue;
 
-                    if (int.TryParse(ownerAndAnswer[0], out int ownerID) && ownerID  != RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf)
-                    {
-                        GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
-                        ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf, ownerID)); });
-                        AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
-                        aob.SetText(ClientPlayer.GetClientByCurrentOwnerID(ownerID).syncer.Name);
-                        aob.playerID = ownerAndAnswer[0];
-                        answerButtons.Add(aob);
-                    }
+                    GameObject ab = Instantiate(answerButtonPrefab, answerButtonParent.transform);
+                    ab.GetComponent<Button>().onClick.AddListener(delegate { StartCoroutine(SubmitPlayerGuess(localOwnerID, ownerID)); });
+                    AnswerOptionButton aob = ab.GetComponent<AnswerOptionButton>();
+                    aob.SetText(cp.syncer.Name);
+                    aob.playerID = "" + ownerID;
+                    answerButtons.Add(aob);
                 }
 
                 blurHeaderText.text = "VR player is guessing who wrote the selected answer";
@@ -410,17 +397,12 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
                 tapAndHoldRotateTutorial.SetActive(false);
 
                 //All players have guessed, so add guesses to results
-                string[] guessesSeparated = VRtistrySyncer.instance.ArtGuesses.Split('\n');
-                foreach (string g in guessesSeparated)
+                foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    string[] ownerAndGuess = g.Split(':');
-
-                    if (int.TryParse(ownerAndGuess[0], out int i))
+                    int artGuess = cp.syncer.VrtistryArtGuess;
+                    if (artGuess != -1)
                     {
-                        if (ownerAndGuess[1] != "decoy")
-                        {
-                            AddPlayerToResults(i, ownerAndGuess[1]);
-                        }
+                        AddPlayerToResults(cp.realtimeView.ownerIDSelf, "" + artGuess);
                     }
                 }
                 break;
@@ -593,14 +575,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     public void SubmitAnswer()
     {
-        if (VRtistrySyncer.instance.Answers.Equals(""))
-        {
-            VRtistrySyncer.instance.Answers = (RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + answerInputField.text);
-        }
-        else
-        {
-            VRtistrySyncer.instance.Answers += ("\n" + RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf + ":" + answerInputField.text);
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryAnswer = answerInputField.text;
 
         typingAnswer = false;
         (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
@@ -615,14 +590,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     void SubmitArtGuess(int clientID, string clientGuessID)
     {
-        if(VRtistrySyncer.instance.ArtGuesses.Equals(""))
-        {
-            VRtistrySyncer.instance.ArtGuesses = clientID + ":" + clientGuessID;
-        }
-        else
-        {
-            VRtistrySyncer.instance.ArtGuesses += "\n" + clientID + ":" + clientGuessID;
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryArtGuess =
+            int.TryParse(clientGuessID, out int parsedID) ? parsedID : -1;
 
         if (int.TryParse(clientGuessID, out int j) && j == VRtistrySyncer.instance.ChosenAnswerOwner)
         {
@@ -654,14 +623,7 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
         guessingHeaderText.text = "Waiting for other players to answer";
 
         //Sync their answer once they have had 3 seconds to see if they were right
-        if (VRtistrySyncer.instance.PlayerGuesses.Equals(""))
-        {
-            VRtistrySyncer.instance.PlayerGuesses = clientID + ":" + clientGuessID;
-        }
-        else
-        {
-            VRtistrySyncer.instance.PlayerGuesses += "\n" + clientID + ":" + clientGuessID;
-        }
+        RealtimeSingletonWeb.instance.LocalPlayer.syncer.VrtistryPlayerGuess = clientGuessID;
 
         (RealtimeSingletonWeb.instance.LocalPlayer as VRtistryClientPlayer).TogglePhone();
     }
@@ -708,20 +670,8 @@ public class ThreeDPaintGameManagerWeb : MonoBehaviour
 
     string GetAnswerByOwnerID(int ID)
     {
-        string[] answersSeparated = VRtistrySyncer.instance.Answers.Split('\n');
-
-        //Answer buttons
-        foreach (string a in answersSeparated)
-        {
-            string[] ownerAndAnswer = a.Split(':');
-
-            if(int.TryParse(ownerAndAnswer[0], out int i) &&  ID == i)
-            {
-                return ownerAndAnswer[1];
-            }
-        }
-
-        return "";
+        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(ID);
+        return cp != null ? cp.syncer.VrtistryAnswer : "";
     }
 
     IEnumerator DisplayLeaderboard()

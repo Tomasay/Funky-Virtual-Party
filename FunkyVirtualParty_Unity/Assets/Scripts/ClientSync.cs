@@ -40,6 +40,18 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
     public int Score { get => model.score; set => model.score = value; }
     public byte[] FaceDrawing { get => model.faceDrawing; set => model.faceDrawing = value; }
 
+    public string VrtistryAnswer { get => model.vrtistryAnswer; set => model.vrtistryAnswer = value; }
+    public string VrtistryTypedGuess { get => model.vrtistryTypedGuess; set => model.vrtistryTypedGuess = value; }
+    public int VrtistryArtGuess { get => model.vrtistryArtGuess; set => model.vrtistryArtGuess = value; }
+    public int VrtistryPlayerGuess { get => model.vrtistryPlayerGuess; set => model.vrtistryPlayerGuess = value; }
+
+    // Static events fired whenever any client changes their VRtistry guess properties.
+    // The VR host subscribes to these to trigger count checks without race conditions.
+    public static UnityEvent OnAnyVrtistryAnswerChanged = new UnityEvent();
+    public static UnityEvent OnAnyVrtistryTypedGuessChanged = new UnityEvent();
+    public static UnityEvent OnAnyVrtistryArtGuessChanged = new UnityEvent();
+    public static UnityEvent OnAnyVrtistryPlayerGuessChanged = new UnityEvent();
+
     #endregion
 
     private void Awake()
@@ -63,6 +75,10 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             previousModel.isReadyDidChange -= OnReadyUpChanged;
             previousModel.onDeathTriggerDidChange -= OnDeathTriggerChanged;
             previousModel.faceDrawingDidChange -= OnFaceDrawingChanged;
+            previousModel.vrtistryAnswerDidChange -= OnVrtistryAnswerChanged;
+            previousModel.vrtistryTypedGuessDidChange -= OnVrtistryTypedGuessChanged;
+            previousModel.vrtistryArtGuessDidChange -= OnVrtistryArtGuessChanged;
+            previousModel.vrtistryPlayerGuessDidChange -= OnVrtistryPlayerGuessChanged;
         }
 
         if (currentModel != null)
@@ -72,6 +88,8 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             {
                 currentModel.isDancing = -1;
                 currentModel.hatIndex = -1;
+                currentModel.vrtistryArtGuess = -1;
+                currentModel.vrtistryPlayerGuess = -1;
             }
 
             //Update to match new data
@@ -96,6 +114,10 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             currentModel.isReadyDidChange += OnReadyUpChanged;
             currentModel.onDeathTriggerDidChange += OnDeathTriggerChanged;
             currentModel.faceDrawingDidChange += OnFaceDrawingChanged;
+            currentModel.vrtistryAnswerDidChange += OnVrtistryAnswerChanged;
+            currentModel.vrtistryTypedGuessDidChange += OnVrtistryTypedGuessChanged;
+            currentModel.vrtistryArtGuessDidChange += OnVrtistryArtGuessChanged;
+            currentModel.vrtistryPlayerGuessDidChange += OnVrtistryPlayerGuessChanged;
         }
     }
 
@@ -166,6 +188,26 @@ public class ClientSync : RealtimeComponent<ClientSyncModel>
             facePaintTexture.LoadFromData(val);
             OnFaceDrawingChangedEvent.Invoke();
         }
+    }
+
+    void OnVrtistryAnswerChanged(ClientSyncModel previousModel, string val)
+    {
+        if (!string.IsNullOrEmpty(val)) OnAnyVrtistryAnswerChanged.Invoke();
+    }
+
+    void OnVrtistryTypedGuessChanged(ClientSyncModel previousModel, string val)
+    {
+        if (!string.IsNullOrEmpty(val)) OnAnyVrtistryTypedGuessChanged.Invoke();
+    }
+
+    void OnVrtistryArtGuessChanged(ClientSyncModel previousModel, int val)
+    {
+        if (val != -1) OnAnyVrtistryArtGuessChanged.Invoke();
+    }
+
+    void OnVrtistryPlayerGuessChanged(ClientSyncModel previousModel, int val)
+    {
+        if (val != -1) OnAnyVrtistryPlayerGuessChanged.Invoke();
     }
     #endregion
 
