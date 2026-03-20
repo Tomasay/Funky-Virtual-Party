@@ -264,7 +264,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         bool isLocalClientGettingRoasted = (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == RealtimeSingletonWeb.instance.LocalPlayer.realtimeView.ownerIDSelf);
 
-        inputCanvas.enabled = !isLocalClientGettingRoasted;
+        SetInputCanvas(!isLocalClientGettingRoasted);
         answerInputField.text = "";
         typedGuessInputField.text = "";
         blurHeaderText.text = isLocalClientGettingRoasted ? blurHeaderText.text = "This prompt is about you!\n\n" +
@@ -284,6 +284,14 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
         //Reset results from previous round
         ClearPlayerResults();
+    }
+
+    //A bit hacky, but flips the camera up when the canvas is enabled so that occlusion culling can kick in and occlude 3d models on screen
+    //By default fullscreen UI does not affect occlusion culling, so all 3d models including characters render while typing input otherwise
+    void SetInputCanvas(bool enabled)
+    {
+        inputCanvas.enabled = enabled;
+        drawingPhaseCamera.transform.rotation = Quaternion.Euler(enabled ? -40 : 40, -90, 0);
     }
 
     int correctGuesses = 0;
@@ -349,9 +357,6 @@ public class VRtistryGameManagerWeb : MonoBehaviour
             case "vr picking prompt":
                 lastPlayerAnsweringWarning.SetActive(false);
                 blurTimerText.enabled = false;
-                //Show blurred view
-                inputCanvas.enabled = false;
-                
                 blurHeaderText.text = "Waiting for VR player to pick a prompt...";
 
                 //Reset any painting from practicing
@@ -879,7 +884,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 #endif
         answerInputField.DeactivateInputField();
 
-        inputCanvas.enabled = false;
+        SetInputCanvas(false);
         playerPromptInputParent.SetActive(false);
     }
 
