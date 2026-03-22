@@ -234,7 +234,13 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
         if(SceneManager.GetActiveScene().name.Equals("VRtistryStandaloneClient"))
         {
-            //TODO: setup system to check if game is in progress for standalone
+            Debug.Log("State: " + VRtistrySyncer.instance.State);
+            if(!(VRtistrySyncer.instance.State.Equals("main menu") || VRtistrySyncer.instance.State.Equals("")))
+            {
+                disconnectingMinigameInProgress = true;
+                realtime.Disconnect();
+                return;
+            }
         }
         else if (!SceneChangerSyncer.instance.CurrentScene.Equals("MainMenu") && !SceneChangerSyncer.instance.CurrentScene.Equals(""))
         {

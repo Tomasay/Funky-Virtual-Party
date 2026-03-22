@@ -158,6 +158,11 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     private void Start()
     {
+        RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.AddListener(SubscribeToGameEvents);
+    }
+
+    void SubscribeToGameEvents()
+    {
         VRtistrySyncer.instance.OnStateChangeEvent.AddListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.AddListener(SetNewPrompt);
         VRtistrySyncer.instance.OnDecoyAnswersChanged.AddListener(SetDecoyAnswers);
@@ -176,6 +181,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     private void OnDestroy()
     {
+        RealtimeSingletonWeb.instance.ProperlyConnectedToRoom.RemoveListener(SubscribeToGameEvents);
         VRtistrySyncer.instance.OnStateChangeEvent.RemoveListener(OnStateChange);
         VRtistrySyncer.instance.OnPromptChangedEvent.RemoveListener(SetNewPrompt);
         ClientSync.OnAnyVrtistryAnswerChanged.RemoveListener(PlayerSubmittedAnswer);
