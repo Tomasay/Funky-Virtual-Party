@@ -426,7 +426,7 @@ public class VRtistryGameManagerWeb : MonoBehaviour
                     }
                     else
                     {
-                        SetTypedGuessInputHeight(0);
+                        //SetTypedGuessInputHeight(0);
                     }
 #endif
 #if UNITY_WEBGL && UNITY_EDITOR
