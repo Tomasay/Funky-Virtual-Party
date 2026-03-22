@@ -62,6 +62,9 @@ public class RealtimeSingletonWeb : MonoBehaviour
     [SerializeField]
     public TMP_Text[] scenePartyCodeLettersIndividuals;
 
+    [SerializeField]
+    Canvas disconnectedCanvas;
+
     bool disconnectingDueToNoHost, disconnectingMaxPlayers, disconnectingMinigameInProgress;
 
 #if UNITY_EDITOR
@@ -145,7 +148,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
                 if (exitPlayModeOnVRHostDisconnect)
                     UnityEditor.EditorApplication.isPlaying = false;
 #else
-                ReloadPage();
+                disconnectedCanvas.enabled = true;
 #endif
             }
             else
@@ -154,6 +157,13 @@ public class RealtimeSingletonWeb : MonoBehaviour
             }
 #endif
         }
+    }
+
+    public void CallReloadPage()
+    {
+#if UNITY_WEBGL
+        ReloadPage();
+#endif
     }
 
     private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
