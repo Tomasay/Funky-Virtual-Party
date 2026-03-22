@@ -149,6 +149,7 @@ public class RealtimeSingletonWeb : MonoBehaviour
                     UnityEditor.EditorApplication.isPlaying = false;
 #else
                 disconnectedCanvas.enabled = true;
+                if(keyboardController) keyboardController.CloseKeyboard();
 #endif
             }
             else
