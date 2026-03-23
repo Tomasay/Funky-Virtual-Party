@@ -8830,8 +8830,8 @@ MonoBehaviour:
   stateLimit: 10
   saveLoad: 0
   saveName: 
-  width: 512
-  height: 512
+  width: 1024
+  height: 1024
   texture: {fileID: 0}
   color: {r: 1, g: 1, b: 1, a: 0}
   format: 0
@@ -12434,7 +12434,7 @@ GameObject:
   m_Component:
   - component: {fileID: 932920093}
   - component: {fileID: 932920092}
-  - component: {fileID: 932920091}
+  - component: {fileID: 932920094}
   m_Layer: 0
   m_Name: Paint
   m_TagString: Untagged
@@ -12442,46 +12442,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &932920091
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 932920090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 724ff6f732015ec4e8fecdb3d889fb82, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  layers:
-    serializedVersion: 2
-    m_Bits: 4096
-  group:
-    index: 0
-  targetModel: {fileID: 0}
-  targetTexture: {fileID: 0}
-  blendMode:
-    Index: 0
-    Color: {r: 1, g: 1, b: 1, a: 1}
-    Texture: {fileID: 0}
-    Kernel: 1
-    Channels: {x: 1, y: 1, z: 1, w: 1}
-  color: {r: 0, g: 0, b: 0, a: 1}
-  opacity: 1
-  angle: 0
-  scale: {x: 1, y: 1, z: 1}
-  radius: 0.015
-  hardness: 10
-  tileTexture: {fileID: 0}
-  tileTransform: {fileID: 0}
-  tileOpacity: 1
-  tileTransition: 4
-  modifiers:
-    modifiers: []
-  references:
-    version: 2
-    RefIds: []
 --- !u!114 &932920092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12512,7 +12472,7 @@ MonoBehaviour:
   mouseOffset: 0
   touchOffset: 0
   storeStates: 0
-  showPreview: 1
+  showPreview: 0
   priority: 0
   frequency: 5
   interval: 3
@@ -12536,6 +12496,62 @@ Transform:
   m_Father: {fileID: 744456803}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &932920094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932920090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b36498e7e45483f478ff74ab3f1cb21c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  layers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  targetModel: {fileID: 0}
+  group:
+    index: 0
+  targetTexture: {fileID: 0}
+  blendMode:
+    Index: 0
+    Color: {r: 1, g: 1, b: 1, a: 1}
+    Texture: {fileID: 0}
+    Kernel: 1
+    Channels: {x: 1, y: 1, z: 1, w: 1}
+  texture: {fileID: 2800000, guid: cef142ece1c594e45b88044c30ec914f, type: 3}
+  shape: {fileID: 0}
+  shapeChannel: 3
+  color: {r: 0, g: 0, b: 0, a: 1}
+  opacity: 1
+  angle: 0
+  scale: {x: 1, y: 1, z: 1}
+  radius: 0.01
+  hardness: 3
+  wrapping: 1
+  normalFront: 1
+  normalBack: 0
+  normalFade: 0.01
+  tileTexture: {fileID: 0}
+  tileTransform: {fileID: 0}
+  tileOpacity: 1
+  tileTransition: 4
+  modifiers:
+    modifiers:
+    - rid: 4855077737621618688
+  references:
+    version: 2
+    RefIds:
+    - rid: 4855077737621618688
+      type: {class: P3dModifyAngleRandom, ns: PaintIn3D, asm: PaintIn3D}
+      data:
+        preview: 0
+        unique: 1
+        min: -180
+        max: 180
+        blend: 0
 --- !u!1 &939597607
 GameObject:
   m_ObjectHideFlags: 0
@@ -19379,7 +19395,7 @@ MonoBehaviour:
   faceDrawCanvas: {fileID: 744456806}
   clientSitAnim: {fileID: -203655887218126122, guid: 04caa182051e7fa4c8f7830d2517a235, type: 3}
   proxyFacePaintTexture: {fileID: 710111327}
-  paintSphere: {fileID: 932920091}
+  paintDecal: {fileID: 932920094}
   submitFaceDrawingButton: {fileID: 1693949689}
   faceDrawColorButtons:
   - {fileID: 1754764059}
@@ -26398,8 +26414,8 @@ MonoBehaviour:
   stateLimit: 10
   saveLoad: 0
   saveName: 
-  width: 512
-  height: 512
+  width: 1024
+  height: 1024
   texture: {fileID: 0}
   color: {r: 1, g: 1, b: 1, a: 0}
   format: 0

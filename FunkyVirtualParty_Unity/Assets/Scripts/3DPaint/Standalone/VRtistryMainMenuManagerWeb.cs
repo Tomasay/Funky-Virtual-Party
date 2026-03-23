@@ -20,7 +20,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     [SerializeField] AnimationClip clientSitAnim;
 
     [SerializeField] P3dPaintableTexture proxyFacePaintTexture;
-    [SerializeField] P3dPaintSphere paintSphere;
+    [SerializeField] P3dPaintDecal paintDecal;
 
     //[SerializeField] Button enableCustomizationsButton;
     [SerializeField] Button submitFaceDrawingButton;
@@ -116,7 +116,7 @@ public class VRtistryMainMenuManagerWeb : MonoBehaviour
     {
         if(ColorUtility.TryParseHtmlString(button.name, out Color col))
         {
-            paintSphere.Color = col;
+            paintDecal.Color = col;
 
             foreach (Button b in faceDrawColorButtons)
             {
