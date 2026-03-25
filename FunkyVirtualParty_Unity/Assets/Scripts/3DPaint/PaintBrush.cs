@@ -83,6 +83,14 @@ public class PaintBrush : ImmediateModeShapeDrawer
 
     bool revealAirPaintComplete, revealCollisionPaintComplete, revealAnimationComplete;
 
+    public CanvasGroup outOfBoundsCanvasGroup;
+
+    public BoxCollider paintingOutOfBounds;
+
+    private Tween outOfBoundsTween;
+    private bool wasOutOfBoundsDuringPaint = false;
+    private bool wasAirPainting = false;
+
     public bool RevealAnimationComplete { get => revealAnimationComplete; }
 
     private const float LINE_THICKNESS = 0.01f;
@@ -154,7 +162,24 @@ public class PaintBrush : ImmediateModeShapeDrawer
     void Update()
     {
 #if !UNITY_WEBGL
-        if (isPaintingAir && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
+        bool enforceBounds = VRtistrySyncer.instance.State == "vr painting";
+        bool outOfBounds = enforceBounds && IsOutOfBounds();
+
+        // Flash when entering out-of-bounds while painting, OR when starting to paint while already out of bounds
+        if (outOfBounds && isPaintingAir && (!wasOutOfBoundsDuringPaint || !wasAirPainting))
+        {
+            FlashOutOfBoundsVisual();
+        }
+        wasOutOfBoundsDuringPaint = outOfBounds;
+        wasAirPainting = isPaintingAir;
+
+        // Suppress collision painting when out of bounds
+        if (enforceBounds && paintHitBetween.enabled != !outOfBounds && !isPaintingAir)
+        {
+            paintHitBetween.enabled = !outOfBounds;
+        }
+
+        if (!outOfBounds && isPaintingAir && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             OnDraw.Invoke();
@@ -521,5 +546,28 @@ public class PaintBrush : ImmediateModeShapeDrawer
     {
         tipMeshSyncer.Enabled = visible;
         baseMeshSyncer.Enabled = visible;
+    }
+
+    private bool IsOutOfBounds()
+    {
+        if (paintingOutOfBounds == null || tip == null) return false;
+        Vector3 localPos = paintingOutOfBounds.transform.InverseTransformPoint(tip.position) - paintingOutOfBounds.center;
+        Vector3 halfSize = paintingOutOfBounds.size * 0.5f;
+        return Mathf.Abs(localPos.x) > halfSize.x || Mathf.Abs(localPos.y) > halfSize.y || Mathf.Abs(localPos.z) > halfSize.z;
+    }
+
+    [Button]
+    public void FlashOutOfBoundsVisual()
+    {
+        if (outOfBoundsCanvasGroup == null) return;
+
+        outOfBoundsTween?.Kill();
+        outOfBoundsCanvasGroup.alpha = 0f;
+
+        outOfBoundsTween = DOTween.Sequence()
+            .Append(outOfBoundsCanvasGroup.DOFade(1.0f, 0.4f))
+            .Append(outOfBoundsCanvasGroup.DOFade(0f, 0.4f))
+            .SetLoops(3)
+            .OnComplete(() => outOfBoundsCanvasGroup.alpha = 0f);
     }
 }

@@ -92,6 +92,12 @@ public class VRtistryGameManager : MonoBehaviour
     EventInstance fmodInstance;
 #endif
 
+    [SerializeField]
+    CanvasGroup outOfBoundsCanvasGroup;
+
+    [SerializeField]
+    BoxCollider paintingOutOfBounds;
+
     PaintBrush paintBrush;
 
     PaintPalette paintPalette;
@@ -166,6 +172,8 @@ public class VRtistryGameManager : MonoBehaviour
 
         paintBrush = Realtime.Instantiate("PaintBrush", Vector3.zero, Quaternion.identity, options).GetComponent<PaintBrush>();
         paintBrush.LinesParent = linesParent;
+        paintBrush.outOfBoundsCanvasGroup = outOfBoundsCanvasGroup;
+        paintBrush.paintingOutOfBounds = paintingOutOfBounds;
 #if !UNITY_WEBGL
         paintBrush.gm = this;
 #endif
