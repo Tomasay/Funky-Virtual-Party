@@ -15,10 +15,12 @@ public class VRtistryVRPlayerController : VRPlayerController
     public Transform cameraHead, trackerOffsetsParent, leftController, rightController, leftHandGrabPoint, rightHandGrabPoint, leftHandRef, rightHandRef;
 
     [SerializeField]
-    public GameObject UIPointer, UIWarningArrow;
+    public GameObject UIWarningArrow;
+
+    public HandCanvasPointer leftUIPointer, rightUIPointer;
 
     [SerializeField]
-    public PointerVisualizer UIPointerPreview;
+    public PointerVisualizer leftUIPointerPreview, rightUIPointerPreview;
 
     [HideInInspector]
     public Vector3 spawnPos;
@@ -54,8 +56,11 @@ public class VRtistryVRPlayerController : VRPlayerController
 
     private void OnDestroy()
     {
-        UIPointer.GetComponent<HandCanvasPointer>().StartSelect.RemoveAllListeners();
-        UIPointer.GetComponent<HandCanvasPointer>().StopSelect.RemoveAllListeners();
+        leftUIPointer.GetComponent<HandCanvasPointer>().StartSelect.RemoveAllListeners();
+        leftUIPointer.GetComponent<HandCanvasPointer>().StopSelect.RemoveAllListeners();
+
+        rightUIPointer.GetComponent<HandCanvasPointer>().StartSelect.RemoveAllListeners();
+        rightUIPointer.GetComponent<HandCanvasPointer>().StopSelect.RemoveAllListeners();
     }
 
     public void SetCanvas(GameObject c)

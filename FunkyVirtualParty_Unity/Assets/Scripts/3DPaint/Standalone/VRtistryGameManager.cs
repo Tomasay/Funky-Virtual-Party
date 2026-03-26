@@ -256,12 +256,9 @@ public class VRtistryGameManager : MonoBehaviour
         vrPlayer.leftHand.GetComponent<HandAdvancedOptions>().ignoreHandCollider.Add(mannequinUVs.GetComponent<MeshCollider>());
         vrPlayer.rightHand.GetComponent<HandAdvancedOptions>().ignoreHandCollider.Add(mannequinUVs.GetComponent<MeshCollider>());
 
-        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.AddListener(OnStartPoint);
-        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.AddListener(OnStopPoint);
-
         vrPlayer.SetCanvas(uiCanvas.gameObject);
 
-        pointerPreviewDrawDistance = vrPlayer.UIPointerPreview.rayDrawDistance;
+        pointerPreviewDrawDistance = vrPlayer.leftUIPointerPreview.rayDrawDistance;
     }
 
     private void RealtimeAvatarManager_avatarDestroyed(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -269,19 +266,6 @@ public class VRtistryGameManager : MonoBehaviour
         //These have to go on the avatar's destriy event to ensure that the hands still exist
         vrPlayer.leftHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
         vrPlayer.rightHand.GetComponent<HandPublicEvents>().OnGrab.RemoveListener(OnGrabbed);
-        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StartPoint.RemoveListener(OnStartPoint);
-        vrPlayer.UIPointer.GetComponent<HandCanvasPointer>().StopPoint.RemoveListener(OnStopPoint);
-    }
-
-    void OnStartPoint(Vector3 vec, GameObject g)
-    {
-        paintBrush.CanPaintAir = false;
-    }
-
-    void OnStopPoint(Vector3 vec, GameObject g)
-    {
-        paintBrush.CanPaintAir = (VRtistrySyncer.instance.State.Equals("clients answering") || VRtistrySyncer.instance.State.Equals("vr painting"));
-        if (!VRtistrySyncer.instance.VRCompletedTutorial && ((int)tutorial.CurrentStage) < 2) paintBrush.CanPaintAir = false;
     }
 
     bool shouldToolsBeVisible = false; //Should tools be marked visible when hands reconnect?
@@ -462,7 +446,8 @@ public class VRtistryGameManager : MonoBehaviour
 
             paintBrush.CanPaintAir = true;
 
-            vrPlayer.UIPointerPreview.rayDrawDistance = 0;
+            vrPlayer.leftUIPointerPreview.rayDrawDistance = 0;
+            vrPlayer.rightUIPointerPreview.rayDrawDistance = 0;
         }
 
         headerText.enabled = true;
@@ -567,7 +552,8 @@ public class VRtistryGameManager : MonoBehaviour
                 DropTool();
                 DropPalette();
 
-                vrPlayer.UIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
+                vrPlayer.leftUIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
+                vrPlayer.rightUIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
 
                 headerText.fontSize = 0.3f;
                 (promptOptionRT.offsetMin, promptOptionRT.offsetMax) = (new Vector2(promptOptionRT.offsetMin.x, 0), new Vector2(promptOptionRT.offsetMax.x, -0.5f));
@@ -600,7 +586,8 @@ public class VRtistryGameManager : MonoBehaviour
                 solver.EnablePosing();
 
                 //UI
-                vrPlayer.UIPointerPreview.rayDrawDistance = 0;
+                vrPlayer.leftUIPointerPreview.rayDrawDistance = 0;
+                vrPlayer.rightUIPointerPreview.rayDrawDistance = 0;
                 headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
 
                 timeVRPosingStarted = Time.time;
@@ -613,6 +600,8 @@ public class VRtistryGameManager : MonoBehaviour
                 paintBrush.CanPaintAir = true;
 
                 //UI
+                vrPlayer.leftUIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
+                vrPlayer.rightUIPointer.enabled = false;
                 headerText.text = DONT_SAY_WARNING + "Your prompt is: <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\n\n";
                 timerText.enabled = true;
                 finishedPaintingEarlyButton.gameObject.SetActive(true);
@@ -638,6 +627,11 @@ public class VRtistryGameManager : MonoBehaviour
 
                 //Disable VR tools
                 paintBrush.CanPaintAir = false;
+
+                //UI
+                vrPlayer.leftUIPointerPreview.rayDrawDistance = 0;
+                vrPlayer.rightUIPointerPreview.rayDrawDistance = 0;
+                vrPlayer.rightUIPointer.enabled = true;
 
                 //Display all answers
                 headerText.text = "Clients are guessing what your art is";
@@ -697,7 +691,8 @@ public class VRtistryGameManager : MonoBehaviour
                 }
 
                 //UX
-                vrPlayer.UIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
+                vrPlayer.leftUIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
+                vrPlayer.rightUIPointerPreview.rayDrawDistance = pointerPreviewDrawDistance;
                 vrPlayer.leftHand.Release();
                 vrPlayer.rightHand.Release();
 
@@ -709,7 +704,8 @@ public class VRtistryGameManager : MonoBehaviour
 
                 headerText.text = "Displaying results";
 
-                vrPlayer.UIPointerPreview.rayDrawDistance = 0;
+                vrPlayer.leftUIPointerPreview.rayDrawDistance = 0;
+                vrPlayer.rightUIPointerPreview.rayDrawDistance = 0;
 
                 //Answer results — typed guesses (non-drawer clients)
                 foreach (ClientPlayer cp in ClientPlayer.clients)
