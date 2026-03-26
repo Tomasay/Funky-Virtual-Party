@@ -30,7 +30,10 @@ public class VRtistryGameManager : MonoBehaviour
     Canvas uiCanvas;
 
     [SerializeField]
-    TMP_Text headerText, playerResultsHeaderText, timerText, poseCountdownText;
+    TMP_Text headerText, playerResultsHeaderText, timerText;
+
+    [SerializeField]
+    Slider countdownSlider;
 
     [SerializeField]
     P3dPaintableTexture paintTexture, mannequinFaceTexture;
@@ -295,7 +298,7 @@ public class VRtistryGameManager : MonoBehaviour
         GrabPalette();
     }
 
-    float timeVRPosingStarted;
+    float poseHoldTimer;
     private void Update()
     {
         switch (VRtistrySyncer.instance.State)
@@ -313,18 +316,25 @@ public class VRtistryGameManager : MonoBehaviour
                 break;
             case "vr posing":
 
-                //Give a second buffer for players to realize what's happening so they don't accidentally press a button too soon
-                if (Time.time > timeVRPosingStarted + 1)
+                bool anyButtonHeld = OVRInput.Get(OVRInput.Button.One) || OVRInput.Get(OVRInput.Button.Two) ||
+                    OVRInput.Get(OVRInput.Button.Three) || OVRInput.Get(OVRInput.Button.Four) ||
+                    OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || OVRInput.Get(OVRInput.RawButton.RIndexTrigger) ||
+                    OVRInput.Get(OVRInput.RawButton.LHandTrigger) || OVRInput.Get(OVRInput.RawButton.RHandTrigger);
+
+                if (anyButtonHeld)
                 {
-                    //Set pose if any button is pressed
-                    if (OVRInput.GetDown(OVRInput.Button.One) || OVRInput.GetDown(OVRInput.Button.Two) ||
-                       OVRInput.GetDown(OVRInput.Button.Three) || OVRInput.GetDown(OVRInput.Button.Four) ||
-                       OVRInput.Get(OVRInput.RawButton.LIndexTrigger) || OVRInput.Get(OVRInput.RawButton.RIndexTrigger) ||
-                       OVRInput.Get(OVRInput.RawButton.LHandTrigger) || OVRInput.Get(OVRInput.RawButton.RHandTrigger))
+                    poseHoldTimer += Time.deltaTime;
+                    if(countdownSlider.transform.parent.localScale == Vector3.zero) countdownSlider.transform.parent.DOScale(1, 0.25f);
+                    countdownSlider.value = poseHoldTimer / 3.0f;
+                    if (poseHoldTimer >= 3f)
                     {
-                        //Invoke("SetPose", 0.1f);
                         SetPose();
                     }
+                }
+                else
+                {
+                    poseHoldTimer = 0f;
+                    countdownSlider.value = poseHoldTimer;
                 }
 
                 break;
@@ -462,29 +472,13 @@ public class VRtistryGameManager : MonoBehaviour
     [Button]
     void SetPose()
     {
-        StartCoroutine("StartPoseCountdownTimer", 3);
-    }
-
-    IEnumerator StartPoseCountdownTimer(int countdown)
-    {
-        headerText.text = "Locking in your pose. Hold still!\n\n";
-        poseCountdownText.enabled = true;
-
-        for (int i = countdown; i > 0; i--)
-        {
-            poseCountdownText.text = "" + i;
-            poseCountdownText.transform.localScale = new Vector3(1, 1, 1);
-            poseCountdownText.transform.DOScale(2, 0.25f);
-            yield return new WaitForSeconds(1);
-        }
-
-        yield return new WaitForSeconds(1);
-        poseCountdownText.enabled = false;
-
         solver.SetPose();
 
         GrabToolsStart();
         VRtistrySyncer.instance.State = "vr painting";
+
+        countdownSlider.gameObject.SetActive(false);
+        countdownSlider.transform.parent.localScale = Vector3.zero;
     }
 
     bool firstTimeClientsAnswering = true;
@@ -580,17 +574,17 @@ public class VRtistryGameManager : MonoBehaviour
 #if !UNITY_WEBGL
                 fmodInstance.setParameterByName("VRtistryPhase", 1);
 #endif
-
                 vrPlayer.UIWarningArrow.SetActive(true);
 
                 solver.EnablePosing();
 
                 //UI
+                countdownSlider.gameObject.SetActive(true);
                 vrPlayer.leftUIPointerPreview.rayDrawDistance = 0;
                 vrPlayer.rightUIPointerPreview.rayDrawDistance = 0;
-                headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nStart by posing your creation! Press any button on your controllers to lock in your pose";
+                headerText.text = DONT_SAY_WARNING + "Your prompt is:\n <b>" + GetAnswerByOwnerID(VRtistrySyncer.instance.ChosenAnswerOwner) + "</b>\nPose your creation! Hold any button on your controllers to lock in your pose";
 
-                timeVRPosingStarted = Time.time;
+                poseHoldTimer = 0f;
 
                 break;
             case "vr painting":
@@ -1280,6 +1274,8 @@ public class VRtistryGameManager : MonoBehaviour
         src.weight = 1;
         pc.AddSource(src);
         pc.constraintActive = true;
+        paintBrush.transform.SetPositionAndRotation(src.sourceTransform.position, src.sourceTransform.rotation);
+        Physics.SyncTransforms();
 
         //Grab proper tool
         if (isToolHandLeft)
@@ -1308,6 +1304,7 @@ public class VRtistryGameManager : MonoBehaviour
             vrPlayer.rightHand.ForceReleaseGrab();
         }
 
+        VRtistrySyncer.instance.IsBrushEnabled = false;
         paintBrush.SetActive(false);
 
         shouldToolsBeVisible = false;
