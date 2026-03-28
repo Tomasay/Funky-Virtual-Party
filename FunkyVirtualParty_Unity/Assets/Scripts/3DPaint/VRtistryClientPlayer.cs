@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Normal.Realtime;
+using DG.Tweening;
 
 public class VRtistryClientPlayer : ClientPlayer
 {
@@ -62,6 +63,13 @@ public class VRtistryClientPlayer : ClientPlayer
 
         faceBillboarder.forwardDirection = (realtimeView.ownerIDSelf % 2 == 0) ? ForwardDirection.Left : ForwardDirection.Right;
         syncer.OnFaceDrawingChangedEvent.AddListener(OnFaceDrawingChanged);
+
+        // If this player already has face drawing data (e.g. we joined after they drew their face),
+        // ApplyFaceMat won't be triggered by the event. Apply it after ClientSync's 1s ApplyFace delay.
+        if (syncer.FaceDrawing != null && syncer.FaceDrawing.Length > 0)
+        {
+            Invoke("ApplyFaceMat", 1.2f);
+        }
     }
 
     protected override void OnDestroy()
@@ -73,6 +81,7 @@ public class VRtistryClientPlayer : ClientPlayer
 
     void OnFaceDrawingChanged()
     {
+        faceMesh.transform.localScale = Vector3.zero;
         Invoke("ApplyFaceMat", 0.1f);
     }
 
@@ -82,6 +91,7 @@ public class VRtistryClientPlayer : ClientPlayer
         Texture prevTex = mats[0].mainTexture;
         mats[0] = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
         faceMesh.materials = mats;
+        faceMesh.transform.DOScale(1, 0.25f);
     }
 
     void SetBubbleBillboardCamera()
