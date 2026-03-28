@@ -163,7 +163,7 @@ public class ClientPlayer : MonoBehaviour
         playerInput.actions["Action"].started += Action;
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         playerInput.actions["Action"].started -= Action;
 

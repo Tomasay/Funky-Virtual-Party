@@ -36,7 +36,10 @@ public class VRtistryGameManager : MonoBehaviour
     Slider countdownSlider;
 
     [SerializeField]
-    P3dPaintableTexture paintTexture, mannequinFaceTexture;
+    P3dPaintableTexture paintTexture, gallerySecondMannequinPaintTexture, mannequinFaceTexture, gallerySecondMannequinFaceTexture;
+
+    [SerializeField]
+    MeshRenderer mannequinFaceMesh, gallerySecondMannequinFaceMesh;
 
     [SerializeField]
     GameObject leaderboardParent, leaderboardPlayerCardPrefab;
@@ -406,7 +409,7 @@ public class VRtistryGameManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         PickFirstPromptOption();
         yield return new WaitForSeconds(0.5f);
-        StartCoroutine("StartPoseCountdownTimer", 1);
+        SetPose();
         yield return new WaitForSeconds(3);
         FinishedPaintingEarly();
     }
@@ -845,8 +848,10 @@ public class VRtistryGameManager : MonoBehaviour
     {
         ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
         mannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
+        gallerySecondMannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
 
         Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+        Material galMat = gallerySecondMannequinPaintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
 
         Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
         string col = ColorUtility.ToHtmlStringRGBA(cp.syncer.Color);
@@ -855,18 +860,38 @@ public class VRtistryGameManager : MonoBehaviour
         if (col.Equals("FF7F00FF")) 
         {
             mat.color = Color.HSVToRGB(H + 0.035f, S, V);
+            galMat.color = Color.HSVToRGB(H + 0.035f, S, V);
         }
         else if (col.Equals("007F7FFF"))
         {
             mat.color = Color.HSVToRGB(H, S, V + 0.2f);
+            galMat.color = Color.HSVToRGB(H, S, V + 0.2f);
         }
         else
         {
             mat.color = cp.syncer.Color;
+            galMat.color = cp.syncer.Color;
         }
 
         mat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
         mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
+        galMat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
+        galMat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
+
+        Invoke("ApplyFaceMat", 0.5f);
+    }
+
+    void ApplyFaceMat()
+    {
+        Material[] mats = mannequinFaceMesh.materials;
+        Texture prevTex = mats[0].mainTexture;
+        mats[0] = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
+        mannequinFaceMesh.materials = mats;
+
+        mats = gallerySecondMannequinFaceMesh.materials;
+        prevTex = mats[0].mainTexture;
+        mats[0] = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
+        gallerySecondMannequinFaceMesh.materials = mats;
     }
 
     void ClearRoast()

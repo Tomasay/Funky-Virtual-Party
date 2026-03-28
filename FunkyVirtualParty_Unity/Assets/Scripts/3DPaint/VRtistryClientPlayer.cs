@@ -20,6 +20,10 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] public Camera faceDrawCam;
 
+    [SerializeField] FaceBillboarder faceBillboarder;
+
+    [SerializeField] MeshRenderer faceMesh;
+
     protected override void Awake()
     {
 #if UNITY_WEBGL
@@ -55,6 +59,29 @@ public class VRtistryClientPlayer : ClientPlayer
         Invoke("SetupTextBubbleTransforms", 3);
 
         SetPlayerNameTextPosition();
+
+        faceBillboarder.forwardDirection = (realtimeView.ownerIDSelf % 2 == 0) ? ForwardDirection.Left : ForwardDirection.Right;
+        syncer.OnFaceDrawingChangedEvent.AddListener(OnFaceDrawingChanged);
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        syncer.OnFaceDrawingChangedEvent.RemoveListener(OnFaceDrawingChanged);
+    }
+
+    void OnFaceDrawingChanged()
+    {
+        Invoke("ApplyFaceMat", 0.1f);
+    }
+
+    void ApplyFaceMat()
+    {
+        Material[] mats = faceMesh.materials;
+        Texture prevTex = mats[0].mainTexture;
+        mats[0] = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
+        faceMesh.materials = mats;
     }
 
     void SetBubbleBillboardCamera()
