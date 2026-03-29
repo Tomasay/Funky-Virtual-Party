@@ -127,6 +127,8 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     {
         foreach (Transform t in armature.GetComponentsInChildren<Transform>())
         {
+            if (t.name == "FACE" || t.name == "Mannequin Client Face") continue;
+
             JointModel newJointInfo = new JointModel();
             newJointInfo.pos = t.localPosition;
             newJointInfo.rot = t.localRotation;
@@ -142,8 +144,11 @@ public class DrawingsSyncer : RealtimeComponent<DrawingsModel>
     /// <param name="drawingIndex">The index of the drawing to use the pose data from</param>
     public void ApplyPoseData(GameObject armature, int drawingIndex)
     {
-        Transform[] transforms = armature.GetComponentsInChildren<Transform>();
-        for (int i = 1; i < Drawings[(uint)drawingIndex].poseData.Count; i++)
+        Transform[] transforms = System.Array.FindAll(
+            armature.GetComponentsInChildren<Transform>(),
+            t => t.name != "FACE" && t.name != "Mannequin Client Face");
+        int poseCount = Drawings[(uint)drawingIndex].poseData.Count;
+        for (int i = 1; i < poseCount && i < transforms.Length; i++)
         {
             transforms[i].localPosition = Drawings[(uint)drawingIndex].poseData[i].pos;
             transforms[i].localRotation = Drawings[(uint)drawingIndex].poseData[i].rot;
