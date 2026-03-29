@@ -4,12 +4,13 @@ Shader "Custom/UnlitAlphaOnTop"
     {
         [NoScaleOffset] _MainTex ("Albedo (RGB) Alpha (A)", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
+        _StencilRef ("Stencil Ref", Int) = 1
     }
     SubShader
     {
         Tags { "RenderType"="Transparent" "Queue"="Geometry+2" }
 
-        // Pass 1: render over the mannequin (where stencil = 1)
+        // Pass 1: render over own body (where stencil matches this player's ID)
         Pass
         {
             Blend SrcAlpha OneMinusSrcAlpha
@@ -19,7 +20,7 @@ Shader "Custom/UnlitAlphaOnTop"
 
             Stencil
             {
-                Ref 1
+                Ref [_StencilRef]
                 Comp Equal
             }
 
@@ -46,7 +47,7 @@ Shader "Custom/UnlitAlphaOnTop"
             ENDCG
         }
 
-        // Pass 2: render normally everywhere else (where stencil != 1)
+        // Pass 2: render normally everywhere else (where stencil doesn't match this player's ID)
         Pass
         {
             Blend SrcAlpha OneMinusSrcAlpha
@@ -56,7 +57,7 @@ Shader "Custom/UnlitAlphaOnTop"
 
             Stencil
             {
-                Ref 1
+                Ref [_StencilRef]
                 Comp NotEqual
             }
 

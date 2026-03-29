@@ -1,5 +1,9 @@
 Shader "Custom/StencilWriter"
 {
+    Properties
+    {
+        _StencilRef ("Stencil Ref", Int) = 1
+    }
     SubShader
     {
         Tags { "RenderType"="Opaque" "Queue"="Geometry+1" }
@@ -12,7 +16,7 @@ Shader "Custom/StencilWriter"
 
             Stencil
             {
-                Ref 1
+                Ref [_StencilRef]
                 Comp Always
                 Pass Replace
             }

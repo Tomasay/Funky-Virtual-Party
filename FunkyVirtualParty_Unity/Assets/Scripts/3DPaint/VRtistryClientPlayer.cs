@@ -64,6 +64,11 @@ public class VRtistryClientPlayer : ClientPlayer
         faceBillboarder.forwardDirection = (realtimeView.ownerIDSelf % 2 == 0) ? ForwardDirection.Left : ForwardDirection.Right;
         syncer.OnFaceDrawingChangedEvent.AddListener(OnFaceDrawingChanged);
 
+        // Give each player a unique stencil ID so their face only renders on top of their own body
+        Material[] bodyMats = smr.materials;
+        bodyMats[1].SetInt("_StencilRef", realtimeView.ownerIDSelf + 1);
+        smr.materials = bodyMats;
+
         // If this player already has face drawing data (e.g. we joined after they drew their face),
         // ApplyFaceMat won't be triggered by the event. Apply it after ClientSync's 1s ApplyFace delay.
         if (syncer.FaceDrawing != null && syncer.FaceDrawing.Length > 0)
@@ -89,7 +94,11 @@ public class VRtistryClientPlayer : ClientPlayer
     {
         Material[] mats = faceMesh.materials;
         Texture prevTex = mats[0].mainTexture;
-        mats[0] = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
+        Material faceMat = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
+        int stencilRef = realtimeView.ownerIDSelf + 1;
+        faceMat.SetInt("_StencilRef", stencilRef);
+        mats[0] = faceMat;
+        mats[1].SetInt("_StencilRef", stencilRef);
         faceMesh.materials = mats;
         faceMesh.transform.DOScale(1, 0.25f);
     }
