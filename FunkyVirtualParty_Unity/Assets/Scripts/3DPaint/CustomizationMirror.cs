@@ -10,6 +10,9 @@ public class CustomizationMirror : MonoBehaviour
     Camera mirrorCam;
 
     [SerializeField]
+    Renderer mirrorRenderer;
+
+    [SerializeField]
     Color[] playerColors, playerOutlineColors;
 
     int hatIndex, eyesIndex, facialHairIndex, colorIndex;
@@ -19,6 +22,8 @@ public class CustomizationMirror : MonoBehaviour
 
     [SerializeField]
     float cameraLerpSpeed, cameraHeightOffset;
+
+    readonly Plane[] frustumPlanes = new Plane[6];
 
     private void Start()
     {
@@ -32,7 +37,14 @@ public class CustomizationMirror : MonoBehaviour
 
     private void Update()
     {
-        if(avatar)
+        if (mirrorRenderer != null && Camera.main != null)
+        {
+            GeometryUtility.CalculateFrustumPlanes(Camera.main, frustumPlanes);
+            mirrorCam.enabled = GeometryUtility.TestPlanesAABB(frustumPlanes, mirrorRenderer.bounds);
+            Debug.Log("mirrorCam.enabled: " + mirrorCam.enabled);
+        }
+
+        if (avatar && mirrorCam.enabled)
         {
             // Get direction to target but flatten on Y
             Vector3 direction = avatar.head.position - mirrorCam.transform.position;
