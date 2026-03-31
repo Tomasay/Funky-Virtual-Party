@@ -69,6 +69,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
     int currentPointCount;
 
     private bool canPaintAir = false;
+    private Rigidbody playerRb;
 
     public bool IsInHand { get => isInHand; set => isInHand = value; }
     public bool CanPaintAir { get => canPaintAir; set { canPaintAir = value; if (!value) { isPaintingAir = false; if (HapticsManager.instance) { HapticsManager.instance.StopHaptics(true); HapticsManager.instance.StopHaptics(false); } } } }
@@ -156,6 +157,8 @@ public class PaintBrush : ImmediateModeShapeDrawer
         newSource.weight = 1;
         constraint.AddSource(newSource);
         constraint.constraintActive = true;
+
+        playerRb = avatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>();
     }
 #endif
 
@@ -179,7 +182,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
             paintHitBetween.enabled = !outOfBounds;
         }
 
-        if (!outOfBounds && isPaintingAir && (rb.velocity.magnitude > 0.025f || RealtimeSingleton.instance.VRAvatar.GetComponentInChildren<AutoHandPlayer>().GetComponent<Rigidbody>().velocity.magnitude > 1) && currentPointCount < maxPointCount)
+        if (!outOfBounds && isPaintingAir && (rb.velocity.magnitude > 0.025f || (playerRb != null && playerRb.velocity.magnitude > 1)) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             OnDraw.Invoke();

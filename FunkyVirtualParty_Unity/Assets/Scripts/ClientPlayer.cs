@@ -92,6 +92,8 @@ public class ClientPlayer : MonoBehaviour
 
     internal bool billboardNameText = true;
 
+    private Camera mainCamera;
+
     protected virtual void Awake()
     {
         if (clients == null)
@@ -137,6 +139,8 @@ public class ClientPlayer : MonoBehaviour
     protected virtual void Start()
     {
         DontDestroyOnLoad(gameObject);
+
+        mainCamera = Camera.main;
 
         if (syncer.IsDebugPlayer)
         {
@@ -185,9 +189,9 @@ public class ClientPlayer : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (billboardNameText && Camera.main)
+        if (billboardNameText && mainCamera)
         {
-            playerNameText.transform.LookAt(2 * transform.position - Camera.main.transform.position);
+            playerNameText.transform.LookAt(2 * transform.position - mainCamera.transform.position);
         }
 
         CheckInput();

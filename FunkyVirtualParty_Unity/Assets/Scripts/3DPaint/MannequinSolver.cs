@@ -39,8 +39,16 @@ public class MannequinSolver : MonoBehaviour
     bool updatePose = false;
     public bool poseHeightAdjusted;
 
+    private Transform[] cachedFollowTransforms;
+    private Transform[] cachedMannequinTransforms;
+    private Quaternion leftHandRotQuat;
+    private Quaternion rightHandRotQuat;
+
     private void Start()
     {
+        colliderMesh = new Mesh();
+        leftHandRotQuat = Quaternion.Euler(leftHandRotationOffset);
+        rightHandRotQuat = Quaternion.Euler(rightHandRotationOffset);
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated += RealtimeAvatarManager_avatarCreated;
     }
 
@@ -57,6 +65,9 @@ public class MannequinSolver : MonoBehaviour
         followIK.solver.spine.headTarget = vrPlayer.cameraHead;
         followIK.solver.leftArm.target = vrPlayer.leftHandRef;
         followIK.solver.rightArm.target = vrPlayer.rightHandRef;
+
+        cachedFollowTransforms = followIK.references.GetTransforms();
+        cachedMannequinTransforms = mannequinIK.references.GetTransforms();
     }
 
     private void Update()
@@ -65,19 +76,17 @@ public class MannequinSolver : MonoBehaviour
         {
             followIK.solver.locomotion.offset = vrPlayer.transform.position - character.position;
 
-            Transform[] followTransforms = followIK.references.GetTransforms();
-            Transform[] mannequinTransforms = mannequinIK.references.GetTransforms();
-            for (int i = 1; i < followTransforms.Length; i++)
+            for (int i = 1; i < cachedFollowTransforms.Length; i++)
             {
-                mannequinTransforms[i].localPosition = followTransforms[i].localPosition;
-                mannequinTransforms[i].localRotation = followTransforms[i].localRotation;
+                cachedMannequinTransforms[i].localPosition = cachedFollowTransforms[i].localPosition;
+                cachedMannequinTransforms[i].localRotation = cachedFollowTransforms[i].localRotation;
             }
 
             vrPlayer.leftHandRef.position = vrPlayer.leftController.position;
-            vrPlayer.leftHandRef.rotation = vrPlayer.leftController.rotation * Quaternion.Euler(leftHandRotationOffset);
+            vrPlayer.leftHandRef.rotation = vrPlayer.leftController.rotation * leftHandRotQuat;
 
             vrPlayer.rightHandRef.position = vrPlayer.rightController.position;
-            vrPlayer.rightHandRef.rotation = vrPlayer.rightController.rotation * Quaternion.Euler(rightHandRotationOffset);
+            vrPlayer.rightHandRef.rotation = vrPlayer.rightController.rotation * rightHandRotQuat;
 
             character.position = vrPlayer.trackerOffsetsParent.position;
         }
@@ -121,7 +130,6 @@ public class MannequinSolver : MonoBehaviour
 
     public void BakeMesh()
     {
-        colliderMesh = new Mesh();
         skinnedMeshRenderer.BakeMesh(colliderMesh, true);
         meshCollider.sharedMesh = null;
         meshCollider.sharedMesh = colliderMesh;
