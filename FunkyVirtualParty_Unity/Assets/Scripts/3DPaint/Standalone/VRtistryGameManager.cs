@@ -110,6 +110,8 @@ public class VRtistryGameManager : MonoBehaviour
 
     int currentRound = 1;
 
+    const int ROAST_ROUND = 2;
+
     HandType toolHand = HandType.right;
 
     bool needToGrabPalette;
@@ -247,7 +249,8 @@ public class VRtistryGameManager : MonoBehaviour
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarCreated -= RealtimeAvatarManager_avatarCreated;
         RealtimeSingleton.instance.RealtimeAvatarManager.avatarDestroyed -= RealtimeAvatarManager_avatarDestroyed;
 
-        RealtimeSingleton.instance.RealtimeAvatarManager.localAvatar.OnHandMeshVisibilityChanged.RemoveListener(OnHandVisibilityChanged);
+        if (RealtimeSingleton.instance.RealtimeAvatarManager.localAvatar != null)
+            RealtimeSingleton.instance.RealtimeAvatarManager.localAvatar.OnHandMeshVisibilityChanged.RemoveListener(OnHandVisibilityChanged);
     }
 
     private void RealtimeAvatarManager_avatarCreated(CustomAvatars.RealtimeAvatarManager avatarManager, CustomAvatars.RealtimeAvatar avatar, bool isLocalAvatar)
@@ -441,7 +444,7 @@ public class VRtistryGameManager : MonoBehaviour
         VRtistrySyncer.instance.VRCompletedTutorial = true;
 
         int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
-        int neededCount = (currentRound == 2) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
+        int neededCount = (currentRound == ROAST_ROUND) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
         if (answeredCount >= neededCount)
         {
             VRtistrySyncer.instance.State = "vr picking prompt";
@@ -521,7 +524,7 @@ public class VRtistryGameManager : MonoBehaviour
                     vrPlayer.Ahp.maxMoveSpeed = 3;
                 }
 
-                if (currentRound == 2)
+                if (currentRound == ROAST_ROUND)
                 {
                     ApplyRoast();
 
@@ -558,7 +561,7 @@ public class VRtistryGameManager : MonoBehaviour
                 //Instantiate option buttons
                 foreach (ClientPlayer cp in ClientPlayer.clients)
                 {
-                    if(currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == cp.realtimeView.ownerIDSelf)
+                    if(currentRound == ROAST_ROUND && VRtistrySyncer.instance.ChosenClientToRoast == cp.realtimeView.ownerIDSelf)
                     {
                         continue;
                     }
@@ -657,7 +660,7 @@ public class VRtistryGameManager : MonoBehaviour
                 {
                     VRtistryClientPlayer vcp = (ClientPlayer.GetClientByCurrentOwnerID(g) as VRtistryClientPlayer);
 
-                    if (currentRound == 2 && VRtistrySyncer.instance.ChosenClientToRoast == vcp.realtimeView.ownerIDSelf)
+                    if (currentRound == ROAST_ROUND && VRtistrySyncer.instance.ChosenClientToRoast == vcp.realtimeView.ownerIDSelf)
                     {
                         continue;
                     }
@@ -850,29 +853,25 @@ public class VRtistryGameManager : MonoBehaviour
         mannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
         gallerySecondMannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
 
-        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-        Material galMat = gallerySecondMannequinPaintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-
         Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
         string col = ColorUtility.ToHtmlStringRGBA(cp.syncer.Color);
 
+        Color fillColor;
         //Orange and Cyan appear too dark for some reason, idk man
-        if (col.Equals("FF7F00FF")) 
-        {
-            mat.color = Color.HSVToRGB(H + 0.035f, S, V);
-            galMat.color = Color.HSVToRGB(H + 0.035f, S, V);
-        }
+        if (col.Equals("FF7F00FF"))
+            fillColor = Color.HSVToRGB(H + 0.035f, S, V);
         else if (col.Equals("007F7FFF"))
-        {
-            mat.color = Color.HSVToRGB(H, S, V + 0.2f);
-            galMat.color = Color.HSVToRGB(H, S, V + 0.2f);
-        }
+            fillColor = Color.HSVToRGB(H, S, V + 0.2f);
         else
-        {
-            mat.color = cp.syncer.Color;
-            galMat.color = cp.syncer.Color;
-        }
+            fillColor = cp.syncer.Color;
 
+        paintTexture.Color = fillColor;
+        paintTexture.Clear();
+        gallerySecondMannequinPaintTexture.Color = fillColor;
+        gallerySecondMannequinPaintTexture.Clear();
+
+        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+        Material galMat = gallerySecondMannequinPaintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
         mat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
         mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
         galMat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.2f));
@@ -896,12 +895,14 @@ public class VRtistryGameManager : MonoBehaviour
 
     void ClearRoast()
     {
-        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
         mannequinFaceTexture.Clear();
 
+        paintTexture.Color = Color.white;
+        paintTexture.Clear();
+        gallerySecondMannequinPaintTexture.Color = Color.white;
+        gallerySecondMannequinPaintTexture.Clear();
+
         Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-        mat.color = Color.white;
-        Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
         mat.SetColor("_ColorDim", new Color(0.7f, 0.7f, 0.7f));
         mat.SetColor("_OutlineColor", Color.black);
     }
@@ -1096,7 +1097,7 @@ public class VRtistryGameManager : MonoBehaviour
             ClearPlayerAnswers();
 
             //Setup next round
-            VRtistrySyncer.instance.CurrentPrompt = currentRound == 2 ? GetClientThemedPrompt() : GetPrompt();
+            VRtistrySyncer.instance.CurrentPrompt = currentRound == ROAST_ROUND ? GetClientThemedPrompt() : GetPrompt();
             VRtistrySyncer.instance.State = "clients answering";
             VRtistrySyncer.instance.DrawingTimer = ThreeDPaintGlobalVariables.DRAW_TIME_AMOUNT;
         }
@@ -1106,7 +1107,7 @@ public class VRtistryGameManager : MonoBehaviour
 
     void PlayerAnswered()
     {
-        int clientAnswersNeededToProceed = (currentRound == 2) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
+        int clientAnswersNeededToProceed = (currentRound == ROAST_ROUND) ? ClientPlayer.clients.Count - 1 : ClientPlayer.clients.Count;
         int answeredCount = ClientPlayer.clients.Count(cp => !string.IsNullOrEmpty(cp.syncer.VrtistryAnswer));
         if (answeredCount >= clientAnswersNeededToProceed && VRtistrySyncer.instance.VRCompletedTutorial)
         {
@@ -1150,7 +1151,7 @@ public class VRtistryGameManager : MonoBehaviour
         {
             return "What sport could you totally beat VR player in?";
         }
-        else if (currentRound == 2)
+        else if (currentRound == ROAST_ROUND)
         {
             return "The worst costume you could wear to a halloween party";
         }

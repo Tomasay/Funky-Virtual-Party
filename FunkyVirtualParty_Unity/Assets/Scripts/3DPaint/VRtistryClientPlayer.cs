@@ -25,6 +25,8 @@ public class VRtistryClientPlayer : ClientPlayer
 
     [SerializeField] MeshRenderer faceMesh;
 
+    [SerializeField] Shader faceShader;
+
     protected override void Awake()
     {
 #if UNITY_WEBGL
@@ -94,7 +96,7 @@ public class VRtistryClientPlayer : ClientPlayer
     {
         Material[] mats = faceMesh.materials;
         Texture prevTex = mats[0].mainTexture;
-        Material faceMat = new Material(Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
+        Material faceMat = new Material(faceShader != null ? faceShader : Shader.Find("Custom/UnlitAlphaOnTop")) { mainTexture = prevTex };
         int stencilRef = realtimeView.ownerIDSelf + 1;
         faceMat.SetInt("_StencilRef", stencilRef);
         mats[0] = faceMat;

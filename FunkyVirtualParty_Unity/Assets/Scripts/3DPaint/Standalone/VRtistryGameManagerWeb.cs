@@ -670,29 +670,25 @@ public class VRtistryGameManagerWeb : MonoBehaviour
         mannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
         gallerySecondMannequinFaceTexture.LoadFromData(cp.syncer.FaceDrawing);
 
-        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-        Material galMat = gallerySecondMannequinPaintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-
         Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
         string col = ColorUtility.ToHtmlStringRGBA(cp.syncer.Color);
 
+        Color fillColor;
         //Orange and Cyan appear too dark for some reason, idk man
         if (col.Equals("FF7F00FF"))
-        {
-            mat.color = Color.HSVToRGB(H + 0.035f, S, V);
-            galMat.color = Color.HSVToRGB(H + 0.035f, S, V);
-        }
+            fillColor = Color.HSVToRGB(H + 0.035f, S, V);
         else if (col.Equals("007F7FFF"))
-        {
-            mat.color = Color.HSVToRGB(H, S, V + 0.2f);
-            galMat.color = Color.HSVToRGB(H, S, V + 0.2f);
-        }
+            fillColor = Color.HSVToRGB(H, S, V + 0.2f);
         else
-        {
-            mat.color = cp.syncer.Color;
-            galMat.color = cp.syncer.Color;
-        }
+            fillColor = cp.syncer.Color;
 
+        paintTexture.Color = fillColor;
+        paintTexture.Clear();
+        gallerySecondMannequinPaintTexture.Color = fillColor;
+        gallerySecondMannequinPaintTexture.Clear();
+
+        Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
+        Material galMat = gallerySecondMannequinPaintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
         mat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.25f));
         mat.SetColor("_OutlineColor", Color.HSVToRGB(H, S, V - 0.75f));
         galMat.SetColor("_ColorDim", Color.HSVToRGB(H, S, V - 0.25f));
@@ -716,12 +712,14 @@ public class VRtistryGameManagerWeb : MonoBehaviour
 
     void ClearRoast()
     {
-        ClientPlayer cp = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast);
         mannequinFaceTexture.Clear();
 
+        paintTexture.Color = Color.white;
+        paintTexture.Clear();
+        gallerySecondMannequinPaintTexture.Color = Color.white;
+        gallerySecondMannequinPaintTexture.Clear();
+
         Material mat = paintTexture.gameObject.GetComponent<SkinnedMeshRenderer>().material;
-        mat.color = Color.white;
-        Color.RGBToHSV(cp.syncer.Color, out float H, out float S, out float V);
         mat.SetColor("_ColorDim", new Color(0.7f, 0.7f, 0.7f));
         mat.SetColor("_OutlineColor", Color.black);
     }
