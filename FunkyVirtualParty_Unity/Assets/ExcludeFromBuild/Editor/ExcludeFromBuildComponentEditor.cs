@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -42,6 +41,11 @@ namespace Kamgam.ExcludeFromBuild
         public override void OnInspectorGUI()
         {
             var data = ExcludeFromBuildData.GetOrCreateData();
+
+            if (comp.GameObject && comp.IsRootOfPrefabAsset(comp.gameObject))
+            {
+                EditorGUILayout.HelpBox(ExcludeFromBuildComponent.PREFAB_ROOT_ERROR, MessageType.Error);
+            }
             
             serializedObject.Update();
             bool hasChanged = false;

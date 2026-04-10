@@ -9,6 +9,9 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Threading;
 using System.Linq;
+#if UNITY_6000_0_OR_NEWER
+using UnityEditor.Build.Profile;
+#endif
 
 namespace Kamgam.ExcludeFromBuild
 {
@@ -223,7 +226,13 @@ namespace Kamgam.ExcludeFromBuild
                 int numOfStreamingAssets = data.ExcludedObjects.Count(o => o.Path.Contains("StreamingAssets"));
                 if (numOfStreamingAssets == 1)
                 {
-                    bool openManual = !EditorUtility.DisplayDialog("IMPORTANT message on StreamingAssets", "TLDR:\nStreamingAssets are excluded just fine but may still show up in build reports.\n\nLONG READ:\nThis message is for those of you who are using a Build Report tool to check the size after the build.\n\nIf you do then please notice that the files in /StreamingAssets may still be listed even if you exclude them from the build.\n\nRest assured that they are in fact excluded, no matter what the Build Report tells you!\n\nThere is a more detailed explanation in the Manual as to why that is.\n\nSorry for the inconvenience.", "Okay, got it", "Open Manual");
+                    bool openManual = !EditorUtility.DisplayDialog("IMPORTANT message on StreamingAssets", "TLDR:\n" +
+                        "StreamingAssets are excluded just fine but may still show up in build reports.\n\n" +
+                        "LONG READ:\nThis message is for those of you who are using a Build Report tool to check the size after the build.\n\n" +
+                        "If you do then please notice that the files in /StreamingAssets may still be listed even if you exclude them from the build.\n\n" +
+                        "Rest assured that they are in fact excluded, no matter what the Build Report tells you!\n\n" +
+                        "There is a more detailed explanation in the Manual as to why that is.\n\n" +
+                        "Sorry for the inconvenience.", "Okay, got it", "Open Manual");
                     if (openManual)
                     {
                         ExcludeFromBuildWindow.OpenManual();
@@ -294,11 +303,13 @@ namespace Kamgam.ExcludeFromBuild
                 LogMessage("Excluding the whole /Assets folder is not such a good idea :D", LogLevel.Warning);
                 return;
             }
-            if (!settings.AllowEditorExclusion && (path.EndsWith("/Editor") || path.EndsWith("\\Editor") || path.Contains("/Editor/") || path.Contains("\\Editor\\")))
-            {
-                LogMessage("Editor folders are not included in the build anyways. Ignoring.", LogLevel.Warning);
-                return;
-            }
+            // Removed as a fix for Editor folder that are part of the build due to assembly definitions.
+            // See: https://discussions.unity.com/t/player-build-error-with-editor-folders/715126/2
+            //if (!settings.AllowEditorExclusion && (path.EndsWith("/Editor") || path.EndsWith("\\Editor") || path.Contains("/Editor/") || path.Contains("\\Editor\\")))
+            //{
+            //    LogMessage("Editor folders are not included in the build anyways. Ignoring.", LogLevel.Warning);
+            //    return;
+            //}
 
             if (obj == data)
             {
@@ -576,7 +587,7 @@ namespace Kamgam.ExcludeFromBuild
             if (!ExcludeFromBuildSettings.GetOrCreateSettings().DelayBuildStart)
                 SessionState.EraseBool("DontDelayBuildAgain");
 
-            // Don't aboert if testing and test-aware is on (in that case the files are already excluded)
+            // Don't abort if testing and test-aware is on (in that case the files are already excluded)
             if (ExcludeFromBuildSettings.GetOrCreateSettings().TestAwareBuild && ExcludeFromBuildWindow.IsTesting)
                 return;
 
@@ -658,7 +669,7 @@ namespace Kamgam.ExcludeFromBuild
             var data = ExcludeFromBuildData.GetOrCreateData();
             SessionState.SetInt(PreBuildGroupSessionKey, data.CurrentGroup.Id);
 
-            if (!data.CurrentGroup.MatchesAllCtriteria(EditorUserBuildSettings.activeBuildTarget))
+            if (!data.CurrentGroup.MatchesAllCriteria(EditorUserBuildSettings.activeBuildTarget))
             {
                 var newGroup = data.GetFirstGroupMatchingTarget(EditorUserBuildSettings.activeBuildTarget);
                 if (newGroup == null)
@@ -804,21 +815,65 @@ namespace Kamgam.ExcludeFromBuild
 
         public static void RevertExcludedFileAndDirNames()
         {
+            var data = ExcludeFromBuildData.GetOrCreateData();
+            
+            // Revert the current group first.
+            bool hasRevertedCurrentGroup = false;
+            if (data.GroupHasActiveExclusions(data.CurrentGroup))
+            {
+                hasRevertedCurrentGroup = true;
+                RevertExcludedFileAndDirNames(data.CurrentGroup.Id);
+            }
+
+            // Check if there are still exclusions left after reverting the current group.
+            var otherGroupsWithActiveExclusions = data.GetGroupsWithActiveExclusions();
+            foreach (var group in otherGroupsWithActiveExclusions)
+            {
+                RevertExcludedFileAndDirNames(group.Id);   
+            }
+            
+            // Ensure prefab asset exclusions are reverted if no group was reverted. RevertExcludedFileAndDirNames() usually does this already.
+            if (!hasRevertedCurrentGroup && otherGroupsWithActiveExclusions.Count == 0)
+            {
+                LogMessage("No file exclusion revert required because nothing was excluded (except for Prefabs which are checked next). Current group is '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
+
+                if (!string.IsNullOrEmpty(data.PreProcessedPrefabPaths))
+                {
+                    PrefabPreProcessor.PostProcess();
+                }
+                else
+                {
+                    LogMessage("No prefab exclusion revert necessary as not prefabs have been changed.");
+                }
+            }
+        }
+
+        public static void RevertExcludedFileAndDirNames(int groupId)
+        {
             var settings = ExcludeFromBuildSettings.GetOrCreateSettings();
 
-            string projectDir = Path.GetFullPath(Path.Combine(Application.dataPath, "../")).Replace("\\", "/");
             var data = ExcludeFromBuildData.GetOrCreateData();
 
             // Ensure that the correct group is being reverted.
-            int excludedGroupId = SessionState.GetInt(PreBuildGroupActuallyExcludedSessionKey, -1);
-            if (excludedGroupId >= 0)
+            int initialGroupId = data.CurrentGroup != null ? data.CurrentGroup.Id : -1;
+            if (groupId < 0)
+            {
+                int excludedGroupId = SessionState.GetInt(PreBuildGroupActuallyExcludedSessionKey, -1);
+                if (excludedGroupId >= 0)
+                {
+                    SessionState.EraseInt(PreBuildGroupActuallyExcludedSessionKey);
+                    if (data.CurrentGroup.Id != excludedGroupId)
+                    {
+                        data.SetCurrentGroupById(excludedGroupId);
+                        LogMessage("Changing group for revert to '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
+                    }
+                }
+            }
+            else
             {
                 SessionState.EraseInt(PreBuildGroupActuallyExcludedSessionKey);
-                if (data.CurrentGroup.Id != excludedGroupId)
-                {
-                    data.SetCurrentGroupById(excludedGroupId);
-                    LogMessage("Changing group for revert to '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
-                }
+                data.SetCurrentGroupById(groupId);
+                LogMessage("Setting group for revert to '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
             }
 
             LogMessage("Reverting group '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
@@ -829,10 +884,12 @@ namespace Kamgam.ExcludeFromBuild
             if (data.HasStreamingAssets())
             {
                 hiddenAssetsDir = Application.dataPath + "/" + HiddenAssetsDirName;
+                // We create the dir here only to delete it later. TODO: Investigate if still necessary.
                 if (!Directory.Exists(hiddenAssetsDir))
                     Directory.CreateDirectory(hiddenAssetsDir);
             }
 
+            string projectDir = Path.GetFullPath(Path.Combine(Application.dataPath, "../")).Replace("\\", "/");
             foreach (var obj in data.ExcludedObjects)
             {
                 LogMessage("Reverting '" + obj.AssetPath + "'.");
@@ -862,15 +919,24 @@ namespace Kamgam.ExcludeFromBuild
             }
 
             // Ensure that the correct group is active after all is set and done.
-            int activeGroupId = SessionState.GetInt(PreBuildGroupSessionKey, -1);
-            if (activeGroupId >= 0)
+            if (groupId < 0)
+            {
+                int activeGroupId = SessionState.GetInt(PreBuildGroupSessionKey, -1);
+                if (activeGroupId >= 0)
+                {
+                    SessionState.EraseInt(PreBuildGroupSessionKey);
+                    if (data.CurrentGroup.Id != activeGroupId)
+                    {
+                        data.SetCurrentGroupById(activeGroupId);
+                        LogMessage("Reverting active group to '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
+                    }
+                }
+            }
+            else
             {
                 SessionState.EraseInt(PreBuildGroupSessionKey);
-                if (data.CurrentGroup.Id != activeGroupId)
-                {
-                    data.SetCurrentGroupById(activeGroupId);
-                    LogMessage("Reverting active group to '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
-                }
+                data.SetCurrentGroupById(groupId);
+                LogMessage("Setting active group to '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
             }
 
             AssetDatabase.Refresh();
@@ -882,6 +948,12 @@ namespace Kamgam.ExcludeFromBuild
                 RevertDisabledScenes();
 
             AssetDatabase.Refresh();
+
+            if (groupId >= 0 && data.CurrentGroup.Id != initialGroupId)
+            {
+                data.SetCurrentGroupById(initialGroupId);
+                LogMessage("Setting active group to '" + data.GetGroupById(initialGroupId).Name + "'.", LogLevel.Message);
+            }
         }
 
         static bool rename(string path, string extension, bool add, bool ignoreMissing = false)
@@ -1065,7 +1137,10 @@ namespace Kamgam.ExcludeFromBuild
             // If TestAwareBuild is active and a test is running then don't execute the revert logic.
             var settings = ExcludeFromBuildSettings.GetOrCreateSettings();
             if (!(settings.TestAwareBuild && ExcludeFromBuildWindow.IsTesting))
+            {
                 RevertExcludedFileAndDirNames();
+                ExcludeFromBuildWindow.IsTesting = false;
+            }
         }
 
         public void OnProcessScene(Scene scene, BuildReport report)
@@ -1089,6 +1164,10 @@ namespace Kamgam.ExcludeFromBuild
             }
         }
 
+        /// <summary>
+        /// Checks the currently active group for hidden (already excluded) objects.
+        /// </summary>
+        /// <returns></returns>
         public static bool ExcludedObjectsAreHidden()
         {
             var data = ExcludeFromBuildData.GetOrCreateData();
@@ -1098,6 +1177,175 @@ namespace Kamgam.ExcludeFromBuild
                     return true;
             }
             return false;
+        }
+        
+        /// <summary>
+        /// Checks all groups for hidden (already excluded) objects.
+        /// </summary>
+        /// <returns></returns>
+        public static bool AnyExcludedObjectsAreHidden()
+        {
+            var data = ExcludeFromBuildData.GetOrCreateData();
+            foreach (var group in data.Groups)
+            {
+                if (ExcludeFromBuildData.GroupHasExcludedObjects(group))
+                {
+                    if (File.Exists(group.ExcludedObjects[0].AssetPath + "~") || Directory.Exists(group.ExcludedObjects[0].AssetPath + "~"))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        
+        
+        public static void OnActiveBuildTargetChanged(BuildTarget newTarget)
+        {
+            //Debug.Log("  #   Target changed " + EditorApplication.timeSinceStartup);
+            TryExecuteAutoExclusion(newTarget);
+        }
+        
+        public static void OnPlatformSettingsDevelopmentChanged(bool newDevelopmentBuildValue)
+        {
+            //Debug.Log("  #   Development changed "  + newDevelopmentBuildValue +  " " + EditorApplication.timeSinceStartup);
+            var newTarget = EditorUserBuildSettings.activeBuildTarget;
+            TryExecuteAutoExclusion(newTarget);
+        }
+        
+#if UNITY_6000_0_OR_NEWER
+        public static void OnBuildProfileChanged(BuildProfile newProfile)
+        {
+            //Debug.Log("  #   Profile changed to "  + ((newProfile == null) ? "null" : newProfile.name) +  " " + EditorApplication.timeSinceStartup);
+            var newTarget = EditorUserBuildSettings.activeBuildTarget;
+            TryExecuteAutoExclusion(newTarget);
+        }
+#endif
+
+        public static void TryExecuteAutoExclusion(BuildTarget newBuildTarget)
+        {
+            var data = ExcludeFromBuildData.GetOrCreateData();
+            bool useAutoExclusion = CheckAutoExclusion(newBuildTarget);
+            if (useAutoExclusion)
+            {
+                data.CurrentGroup = data.GetFirstGroupMatchingTarget(newBuildTarget);
+                data.ForceSave();
+                ExcludeFromBuildWindow.ForceRepaint();
+                ExecuteAutoExclusion();
+            }
+            else
+            {
+                if (!ExcludeFromBuildWindow.IsTesting)
+                {
+                    data.CurrentGroup = data.GetFirstGroupMatchingTarget(newBuildTarget);
+                    data.ForceSave();
+                    ExcludeFromBuildWindow.ForceRepaint();
+                }
+                else
+                {
+                    var matchingGroup = data.GetFirstGroupMatchingTarget(newBuildTarget);
+                    var matchingGroupName = matchingGroup == null ? "None" : matchingGroup.Name; 
+                    LogMessage($"An exclusion test ('{data.CurrentGroup.Name}') is running an thus the current group can not be changed. You will have to stop the test and change the group to '{matchingGroupName}' manually.", LogLevel.Warning);
+                }
+            }
+        }
+
+        public static bool CheckAutoExclusion(BuildTarget newTarget)
+        {
+            var settings = ExcludeFromBuildSettings.GetOrCreateSettings();
+            if (settings.AutoExcludeAfterBuildConfigChange == ExcludeFromBuildSettings.AutoExcludeAfterBuildConfigChangeBehaviour.Never)
+                return false;
+
+            var data = ExcludeFromBuildData.GetOrCreateData();
+            var matchingGroup = data.GetFirstGroupMatchingTarget(newTarget);
+
+            // Check if anything need to be changed.
+            bool groupAlreadyExcluded = false;
+            bool groupsNeedToBeReverted = false;
+            if (ExcludeFromBuildWindow.IsTesting || data.AnyGroupHasExcludedObjects)
+            {
+                // Revert all groups that are not the group that matches the current build configs.
+                var groupsWithExcludedFiles = data.GetGroupsWithActiveExclusions();
+                foreach (var group in groupsWithExcludedFiles)
+                {
+                    if (matchingGroup != null && group.Id == matchingGroup.Id)
+                    {
+                        groupAlreadyExcluded = groupsWithExcludedFiles.Contains(group);
+                    }
+                    else
+                    {
+                        groupsNeedToBeReverted = true;
+                    }
+                }
+            }
+
+            // Ask for confirmation if needed (if mode is Ask AND changes are needed)
+            if (settings.AutoExcludeAfterBuildConfigChange == ExcludeFromBuildSettings.AutoExcludeAfterBuildConfigChangeBehaviour.Ask
+                && (groupsNeedToBeReverted || !groupAlreadyExcluded))
+            {
+                bool abort = EditorUtility.DisplayDialog(
+                    "Execute Build Exclusions?",
+                    "Do you want to execute the exclusions for the new build configuration now (group: " +
+                    (matchingGroup == null ? "None" : matchingGroup.Name) + ")?",
+                    "No", "Yes (may trigger a recompile)");
+                if (abort)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static void ExecuteAutoExclusion()
+        {
+            var settings = ExcludeFromBuildSettings.GetOrCreateSettings();
+            if (settings.AutoExcludeAfterBuildConfigChange == ExcludeFromBuildSettings.AutoExcludeAfterBuildConfigChangeBehaviour.Never)
+                return;
+            
+            var data = ExcludeFromBuildData.GetOrCreateData();
+            
+            var matchingGroup = data.GetFirstGroupMatchingTarget();
+            
+            // Revert previous exclusions.
+            bool groupAlreadyExcluded = false;
+            if (data.AnyGroupHasExcludedObjects)
+            {
+                // Revert all groups that are not the group that matches the current build configs.
+                var groupsWithExcludedFiles = data.GetGroupsWithActiveExclusions();
+                foreach (var group in groupsWithExcludedFiles)
+                {
+                    if (matchingGroup != null && group.Id == data.CurrentGroup.Id)
+                    {
+                        groupAlreadyExcluded = true;
+                    }
+                    else
+                    {
+                        RevertExcludedFileAndDirNames(group.Id);    
+                    }
+                }
+            }
+
+            // Exclude group if not already excluded.
+            // Do it only if necessary (there is a matching group and that group has some exclusions).
+            if (!groupAlreadyExcluded && matchingGroup != null && matchingGroup.ExcludedObjects != null && matchingGroup.ExcludedObjects.Count > 0)
+            {
+                bool succeeded = ApplyExcludedFileAndDirNames();
+                if (succeeded)
+                {
+                    EditorApplication.delayCall += () =>
+                    {
+                        AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                        EditorUtility.RequestScriptReload();
+                    };
+                }
+                else
+                {
+                    ExcludeFromBuildWindow.ShowStartTextFailedMessage();
+                }
+            }
+            
+            if (data.GetGroupsWithActiveExclusions().Count == 0)
+                ExcludeFromBuildWindow.IsTesting = false;
+            
+            LogMessage("Finished with active group '" + data.CurrentGroup.Name + "'.", LogLevel.Message);
         }
     }
 }

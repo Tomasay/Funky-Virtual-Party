@@ -51,6 +51,18 @@ namespace FMODUnity
         Development,
     }
 
+    public enum ScreenPosition
+    {
+        TopLeft,
+        TopCenter,
+        TopRight,
+        BottomLeft,
+        BottomCenter,
+        BottomRight,
+        Center,
+        VR,
+    }
+
     public interface IEditorSettings
     {
 #if UNITY_EDITOR
@@ -81,11 +93,9 @@ namespace FMODUnity
     // in the same asset as the Settings object using AssetDatabase.AddObjectToAsset.
     public class Settings : ScriptableObject
     {
-#if UNITY_EDITOR
         [FormerlySerializedAs("SwitchSettingsMigration")]
         [SerializeField]
         private bool switchSettingsMigration = false;
-#endif
 
         internal const string SettingsAssetName = "FMODStudioSettings";
 
@@ -234,11 +244,9 @@ namespace FMODUnity
         [NonSerialized]
         public Platform PlayInEditorPlatform;
 
-#if UNITY_EDITOR
         // We store a persistent list so we don't try to re-migrate platforms if the user deletes them.
         [SerializeField]
         internal List<Legacy.Platform> MigratedPlatforms = new List<Legacy.Platform>();
-#endif
 
         // A collection of templates for constructing known platforms.
         internal static List<PlatformTemplate> PlatformTemplates = new List<PlatformTemplate>();
@@ -290,9 +298,24 @@ namespace FMODUnity
                     }
 #endif
                 }
+                else
+                {
+#if UNITY_EDITOR
+                    if (AssetDatabase.GetAssetPath(instance).StartsWith("Packages"))
+                    {
+                        RuntimeUtils.DebugLogError($"[FMOD] {SettingsAssetName} initialization failed. {SettingsAssetName} located in \"Packages\" folder. Please delete {SettingsAssetName} in file explorer.");
+                        instance = CreateInstance<Settings>();
+                    }
+#endif
+                }
 
                 isInitializing = false;
             }
+        }
+
+        internal static bool IsInitialized()
+        {
+            return !(instance == null || isInitializing);
         }
 
         internal static IEditorSettings EditorSettings

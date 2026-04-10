@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Build;
 #if UNITY_6000_0_OR_NEWER
+using UnityEditor.Build;
 using UnityEditor.Build.Profile;
 #endif
 using UnityEngine;
@@ -56,6 +57,30 @@ namespace Kamgam.ExcludeFromBuild
             /// </summary>
             public StandaloneBuildSubtarget StandaloneSubTarget = StandaloneBuildSubtarget.Player;
 
+#if UNITY_6000_0_OR_NEWER
+            public bool IncludesDefaultBuildProfile;
+            
+            /// <summary>
+            /// The build profiles that this group should be used for. If empty then profiles are not taken into account.
+            /// </summary>
+            public List<BuildProfile> BuildProfiles = new List<BuildProfile>();
+            
+            public void DefragBuildProfiles()
+            {
+                if (BuildProfiles == null)
+                {
+                    BuildProfiles = new List<BuildProfile>();
+                    return;
+                }
+
+                for (int i = BuildProfiles.Count - 1; i >= 0; i--)
+                {
+                    if (BuildProfiles[i] == null)
+                        BuildProfiles.RemoveAt(i);
+                }
+            }
+#endif
+            
             /// <summary>
             /// A comma separated list of defines which act as a filter in addition to BuildTargets.<br />
             /// Defines are combined with AND logic. All specified defines need to exists for this to be a positive match.
@@ -190,9 +215,20 @@ namespace Kamgam.ExcludeFromBuild
 #pragma warning restore CS0618 // Type or member is obsolete
             }
 
-            public bool MatchesAllCtriteria(BuildTarget target)
+            // Typo Backwards Compativility.
+            [Obsolete("Please use MatchesAllCriteria(..) instead (typo fixed).")]
+            public bool MatchesAllCtriteria(BuildTarget target) => MatchesAllCriteria(target);
+
+            public bool MatchesAllCriteria(BuildTarget target)
             {
-                return MatchesBuildTarget(target) && MatchesDefines() && MatchesStandaloneSubTarget() && MatchesBuildConfiguration();
+                return MatchesBuildTarget(target) 
+                       && MatchesDefines() 
+                       && MatchesStandaloneSubTarget() 
+                       && MatchesBuildConfiguration()
+#if UNITY_6000_0_OR_NEWER
+                       && MatchesBuildProfiles()
+#endif
+                       ;
             }
 
             public bool MatchesBuildTarget(BuildTarget target)
@@ -215,6 +251,26 @@ namespace Kamgam.ExcludeFromBuild
                     return BuildConfiguration == BuildConfiguration.Release;
                 }
             }
+            
+#if UNITY_6000_0_OR_NEWER
+            public bool MatchesBuildProfiles()
+            {
+                BuildProfile currentProfile = BuildProfileUtils.GetCurrentBuildProfile();
+                    
+                if (currentProfile == null && IncludesDefaultBuildProfile)
+                    return true;
+                
+                DefragBuildProfiles();
+
+                bool anyProfileAllowed = !IncludesDefaultBuildProfile && (BuildProfiles == null || BuildProfiles.Count == 0);
+                if (currentProfile != null && !anyProfileAllowed)
+                {
+                    return BuildProfiles.Contains(currentProfile);
+                }
+
+                return anyProfileAllowed;
+            }
+#endif
 
             /// <summary>
             /// Defines are combined with AND logic. All specified defines need to exists for this to be a positive match.
@@ -247,10 +303,12 @@ namespace Kamgam.ExcludeFromBuild
             protected bool containsDefine(string definesString, string defineName)
             {
                 return definesString == defineName
-                    || definesString.Contains("," + defineName)
-                    || definesString.Contains(";" + defineName) // Unity 6+ changed the format from "," to ";" separated.
-                    || definesString.Contains(defineName + ",")
-                    || definesString.Contains(defineName + ";");  // Unity 6+ changed the format from "," to ";" separated. 
+                       || definesString.Contains("," + defineName+ ",")
+                       || definesString.Contains(";" + defineName+ ";")
+                       || definesString.EndsWith("," + defineName)
+                       || definesString.EndsWith(";" + defineName) // Unity 6+ changed the format from "," to ";" separated.
+                       || definesString.StartsWith(defineName + ",")
+                       || definesString.StartsWith(defineName + ";");  // Unity 6+ changed the format from "," to ";" separated. 
             }
 
             protected string getCurrentBuildTargetDefinesString()
@@ -379,6 +437,12 @@ namespace Kamgam.ExcludeFromBuild
             }
         }
 
+        public void ForceSave()
+        {
+            EditorUtility.SetDirty(this);
+            AssetDatabase.SaveAssetIfDirty(this);
+        }
+
         public void SetCurrentGroupById(int groupId)
         {
             CurrentGroup = GetGroupById(groupId);
@@ -391,7 +455,26 @@ namespace Kamgam.ExcludeFromBuild
                 return CurrentGroup.ExcludedObjects;
             }
         }
-        public bool HasExcludedObjects => ExcludedObjects != null && ExcludedObjects.Count > 0;
+        public bool HasExcludedObjects => GroupHasExcludedObjects(CurrentGroup);
+
+        public bool AnyGroupHasExcludedObjects
+        {
+            get
+            {
+                foreach (var group in Groups)
+                {
+                    if (GroupHasExcludedObjects(group))
+                        return true;
+                }
+
+                return false;
+            }
+        }
+
+        public static bool GroupHasExcludedObjects(Group group)
+        {
+            return group.ExcludedObjects != null && group.ExcludedObjects.Count > 0;
+        }
 
         /// <summary>
         /// Sort by path to ensure parent directories are handled BEFORE their children.
@@ -409,13 +492,18 @@ namespace Kamgam.ExcludeFromBuild
             return string.Compare(a.Path, b.Path, true, System.Globalization.CultureInfo.InvariantCulture);
         }
 
-        public void OnActiveBuildTargetChanged(BuildTarget previousTarget, BuildTarget newTarget)
-        {
-            CurrentGroup = GetFirstGroupMatchingTarget(newTarget);
-        }
+        public static ExcludeFromBuildData s_cachedData;
 
         public static ExcludeFromBuildData GetOrCreateData()
         {
+            return GetOrCreateData(false);
+        }
+
+        public static ExcludeFromBuildData GetOrCreateData(bool useCache)
+        {
+            if (useCache && s_cachedData != null)
+                return s_cachedData;
+            
             var data = AssetDatabase.LoadAssetAtPath<ExcludeFromBuildData>(DataFilePath);
             if (data == null)
             {
@@ -423,6 +511,9 @@ namespace Kamgam.ExcludeFromBuild
                 AssetDatabase.CreateAsset(data, DataFilePath);
                 AssetDatabase.SaveAssets();
             }
+
+            s_cachedData = data;
+            
             return data;
         }
 
@@ -457,6 +548,11 @@ namespace Kamgam.ExcludeFromBuild
             _ignoreActiveGroup = false;
         }
 
+        public Group GetFirstGroupMatchingTarget()
+        {
+            return GetFirstGroupMatchingTarget(EditorUserBuildSettings.activeBuildTarget);
+        }
+
         public Group GetFirstGroupMatchingTarget(BuildTarget target)
         {
             if (!HasGroups)
@@ -470,7 +566,7 @@ namespace Kamgam.ExcludeFromBuild
                     if (Groups[i].Id != currentGroupId)
                         continue;
 
-                    if (Groups[i].MatchesAllCtriteria(target))
+                    if (Groups[i].MatchesAllCriteria(target))
                     {
                         return Groups[i];
                     }
@@ -485,7 +581,7 @@ namespace Kamgam.ExcludeFromBuild
                 if (Groups[i].Name.ToLower() == "default")
                     continue;
 
-                if (Groups[i].MatchesAllCtriteria(target))
+                if (Groups[i].MatchesAllCriteria(target))
                 {
                     if (Groups[i].GetSpecificityRating() > specificity)
                     {
@@ -503,7 +599,7 @@ namespace Kamgam.ExcludeFromBuild
             specificGroup = null;
             for (int i = 0; i < Groups.Count; i++)
             {
-                if (Groups[i].MatchesAllCtriteria(target))
+                if (Groups[i].MatchesAllCriteria(target))
                 {
                     if (Groups[i].GetSpecificityRating() > specificity)
                     {
@@ -531,6 +627,40 @@ namespace Kamgam.ExcludeFromBuild
             }
 
             return null;
+        }
+        
+        /// <summary>
+        /// Usually it should only be one.
+        /// </summary>
+        /// <returns></returns>
+        public List<Group> GetGroupsWithActiveExclusions()
+        {
+            var groupIds = new List<Group>();
+                
+            foreach (var group in Groups)
+            {
+                if (GroupHasActiveExclusions(group))
+                {
+                    groupIds.Add(group);
+                }
+            }
+
+            return groupIds;
+        }
+
+        public bool GroupHasActiveExclusions(Group group)
+        {
+            if (GroupHasExcludedObjects(group))
+            {
+                // Check only the first file.
+                if (System.IO.File.Exists(group.ExcludedObjects[0].AssetPath + "~") ||
+                    System.IO.Directory.Exists(group.ExcludedObjects[0].AssetPath + "~"))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void Clear()

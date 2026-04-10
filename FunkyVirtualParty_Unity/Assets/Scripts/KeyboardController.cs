@@ -106,47 +106,57 @@ public class KeyboardController : MonoBehaviour
     }
 
 
-#if !UNITY_EDITOR && UNITY_WEBGL
     public void ButtonPointerDown()
     {
+#if !UNITY_EDITOR && UNITY_WEBGL
         SetPointerDownOnButton(true);
+#endif
     }
 
     public void ButtonPointerUp()
     {
+#if !UNITY_EDITOR && UNITY_WEBGL
         StartCoroutine("ButtonDown");
+#endif
     }
 
     IEnumerator ButtonDown()
     {
         yield return new WaitForSeconds(1);
+#if !UNITY_EDITOR && UNITY_WEBGL
         SetPointerDownOnButton(false);
+#endif
     }
 
     public void CloseKeyboard()
     {
+#if !UNITY_EDITOR && UNITY_WEBGL
         CloseInputKeyboard();
         if (currentField)
         {
             currentField.DeactivateInputField();
             currentField = null;
         }
+#endif
     }
 
     public void UpdateText(string input)
     {
+#if !UNITY_EDITOR && UNITY_WEBGL
         currentField.text = input;
 
         if (currentField == codeField)
         {
             codeField.text = currentField.text.ToUpper();
         }
+#endif
     }
 
     public void SetField(TMP_InputField f)
     {
+#if !UNITY_EDITOR && UNITY_WEBGL
         currentField = f;
         UpdateInputFieldText(f.text);
-    }
 #endif
+    }
 }

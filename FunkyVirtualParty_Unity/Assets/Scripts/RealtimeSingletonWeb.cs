@@ -67,10 +67,8 @@ public class RealtimeSingletonWeb : MonoBehaviour
 
     bool disconnectingDueToNoHost, disconnectingMaxPlayers, disconnectingMinigameInProgress;
 
-#if UNITY_EDITOR
     [SerializeField]
     bool exitPlayModeOnVRHostDisconnect = true;
-#endif
 
 
     public UnityEvent LocalPlayerSpawned;

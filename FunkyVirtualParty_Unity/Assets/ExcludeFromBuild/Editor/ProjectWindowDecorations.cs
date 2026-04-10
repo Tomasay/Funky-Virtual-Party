@@ -32,8 +32,8 @@ namespace Kamgam.ExcludeFromBuild
 #if UNITY_2020_1_OR_NEWER
                 rect.x = rect.x + (isFolder ? 10 : 12);
                 rect.y = rect.y + (isFolder ? 2 : 0);
-                rect.width = Mathf.Min(10, rect.height * 0.33f);
-                rect.height = Mathf.Min(10, rect.height * 0.33f);
+                rect.width = Mathf.Min(10, rect.height * 0.50f);
+                rect.height = Mathf.Min(10, rect.height * 0.50f);
 #else
                 rect.x = rect.x + (isFolder ? 6 : 8); 
                 rect.y = rect.y - (isFolder ? 2 : 3);

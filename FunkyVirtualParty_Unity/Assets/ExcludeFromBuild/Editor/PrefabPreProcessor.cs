@@ -49,18 +49,40 @@ namespace Kamgam.ExcludeFromBuild
                     var excludeComps = prefab.GetComponentsInChildren<ExcludeFromBuildComponent>(includeInactive: true);
                     if (excludeComps.Length > 0)
                     {
+                        // Before executing check if we even need to execute on this prefab. If not then skip.
+                        bool needsExecution = false;
+                        foreach (var comp in excludeComps)
+                        {
+                            if (comp.CheckConditions(data.CurrentGroup.Id))
+                            {
+                                needsExecution = true;
+                                break;
+                            }
+                        }
+
+                        if (!needsExecution)
+                        {
+                            LogMessage("Prefab PreProcessing, skipping '" + prefabPath + "' because none of the exclude component in that prefab would execute.");    
+                            continue;
+                        }
+
                         // Make a hidden copy of the prefab file.
                         string backupPath = Path.Combine(Path.GetDirectoryName(prefabPath), Path.GetFileNameWithoutExtension(prefabPath) + ".prefab" + BACKUP_EXTENSION);
 
-                        LogMessage("Prefab PreProcessing on " + prefabPath);
+                        LogMessage("Prefab PreProcessing (creating copy) of " + prefabPath);
 
                         File.Copy(prefabPath, backupPath, overwrite: false);
                         paths += backupPath + ":";
 
-                        // Execute exclusions
-                        foreach (var comp in excludeComps)
+                        using (var editingScope = new PrefabUtility.EditPrefabContentsScope(prefabPath))
                         {
-                            comp.Execute(data.CurrentGroup.Id);
+                            var scopedExcludeComps = editingScope.prefabContentsRoot.GetComponentsInChildren<ExcludeFromBuildComponent>(includeInactive: true);
+
+                            // Execute exclusions
+                            foreach (var comp in scopedExcludeComps)
+                            {
+                                comp.Execute(data.CurrentGroup.Id, editingScope.prefabContentsRoot);
+                            }
                         }
                     }
                 }
@@ -99,6 +121,8 @@ namespace Kamgam.ExcludeFromBuild
             }
 
             SavePaths("");
+            
+            AssetDatabase.Refresh();
         }
     }
 }

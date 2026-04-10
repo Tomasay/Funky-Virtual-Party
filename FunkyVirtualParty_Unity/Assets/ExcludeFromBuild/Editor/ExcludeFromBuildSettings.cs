@@ -5,7 +5,7 @@ namespace Kamgam.ExcludeFromBuild
 {
     public class ExcludeFromBuildSettings : ScriptableObject
     {
-        public const string Version = "1.6.3";
+        public const string Version = "2.0.6";
         public const string SettingsFilePath = "Assets/ExcludeFromBuildSettings.asset";
 
         public enum SceneFileBehaviour { NeverUpdateBuildSettings, AlwaysAsk, AlwaysUpdateBuildSettings }
@@ -70,6 +70,19 @@ namespace Kamgam.ExcludeFromBuild
             "NOTICE: Sadly this ONLY works if used in combination with 'BuildStartDelayInSec' enabled. It's under investigation.\n\n" +
             "You can also call it manually before the build via: ExcludeFromBuildController.DisableExcludedScenes() and RevertDisabledScenes() afterwards to revert.";
 
+        public enum AutoExcludeAfterBuildConfigChangeBehaviour
+        {
+            Never,
+            Ask,
+            Always
+        }
+        [SerializeField, Tooltip(_AutoExcludeAfterBuildConfigChange)]
+        public AutoExcludeAfterBuildConfigChangeBehaviour AutoExcludeAfterBuildConfigChange = AutoExcludeAfterBuildConfigChangeBehaviour.Never;
+        public const string _AutoExcludeAfterBuildConfigChange = "[EXPERIMENTAL FEATURE] If the build target, platform or 'Developement Build' settings changed then automatically start an exclusion test?\n\n" +
+                                                                 "NOTICE: In build you will have to enable test-aware builds to retain the exclusions.\n" +
+                                                                 "This may trigger a recompile after the first recompile after the platform change. Be patient.\n" +
+                                                                 "It will also undo any exclusions currently present (from the previous build config) before it applies the new exclusions.";
+        
         protected static ExcludeFromBuildSettings cachedSettings;
 
         public static ExcludeFromBuildSettings GetOrCreateSettings()
@@ -106,6 +119,7 @@ namespace Kamgam.ExcludeFromBuild
                     cachedSettings.DetectDebugAsDefine = true;
                     cachedSettings.PreProcessPrefabs = false;
                     cachedSettings.AutoDisableExcludedScenes = false;
+                    cachedSettings.AutoExcludeAfterBuildConfigChange = AutoExcludeAfterBuildConfigChangeBehaviour.Never;
                     AssetDatabase.CreateAsset(cachedSettings, SettingsFilePath);
                     AssetDatabase.SaveAssets();
 
@@ -197,7 +211,7 @@ namespace Kamgam.ExcludeFromBuild
                     GUILayout.Label(ExcludeFromBuildSettings._IgnoreMissingAssetsTooltips, style);
                     GUILayout.EndVertical();
 
-                    EditorGUILayout.PropertyField(settings.FindProperty("DelayBuildStart"), new GUIContent("Delay Build Start:"));
+                    EditorGUILayout.PropertyField(settings.FindProperty("DelayBuildStart"), new GUIContent("Delay Build:"));
                     GUILayout.BeginVertical(EditorStyles.helpBox);
                     GUILayout.Label(ExcludeFromBuildSettings._DelayBuildStartTooltip, style);
                     GUILayout.EndVertical();
@@ -217,6 +231,11 @@ namespace Kamgam.ExcludeFromBuild
                     GUILayout.Label(ExcludeFromBuildSettings._AutoDisableExcludedScenesTooltip, style);
                     GUILayout.EndVertical();
 
+                    EditorGUILayout.PropertyField(settings.FindProperty("AutoExcludeAfterBuildConfigChange"), new GUIContent("Auto Exclude After Build Config Change:"));
+                    GUILayout.BeginVertical(EditorStyles.helpBox);
+                    GUILayout.Label(ExcludeFromBuildSettings._AutoExcludeAfterBuildConfigChange, style);
+                    GUILayout.EndVertical();
+                    
                     settings.ApplyModifiedProperties();
                 },
 

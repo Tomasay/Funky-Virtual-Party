@@ -149,6 +149,9 @@
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local_fragment _EMISSION
             #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
+            #if UNITY_VERSION >= 600000
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #endif
 
             // -------------------------------------
             // Universal Pipeline keywords
@@ -162,23 +165,28 @@
             #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
             #pragma multi_compile _ SHADOWS_SHADOWMASK
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
             #if VERSION_GREATER_EQUAL(12, 0)
             #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
-            #pragma multi_compile_fragment _ _LIGHT_LAYERS
+            #pragma multi_compile _ _LIGHT_LAYERS
             #pragma multi_compile_fragment _ _LIGHT_COOKIES
-            #pragma multi_compile _ _CLUSTERED_RENDERING
             #endif
             #if UNITY_VERSION >= 202220 && UNITY_VERSION < 600000
-            #pragma multi_compile _ _FORWARD_PLUS
             #pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
             #endif
             #if UNITY_VERSION >= 600000
-            #pragma multi_compile _ _FORWARD_PLUS
+            #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
+            #pragma multi_compile _ EVALUATE_SH_MIXED EVALUATE_SH_VERTEX
+            #define _ENVIRONMENTREFLECTIONS_OFF 1 // Fixes flickering when Probe Blending is enabled on Renderer.
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
             #include_with_pragmas "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl"
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
+            #else
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #endif
+            #if UNITY_VERSION >= 60000012
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #endif
 
             // -------------------------------------
@@ -197,8 +205,8 @@
             #pragma multi_compile_instancing
             #pragma instancing_options renderinglayer
             #if defined(FLAT_KIT_DOTS_INSTANCING_ON)
-            #pragma target 4.5							// Uncomment to enable DOTs instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON	// Uncomment to enable DOTs instancing
+            #pragma target 4.5
+            #pragma multi_compile _ DOTS_INSTANCING_ON
             #endif
 
             // Detail map.
@@ -344,117 +352,6 @@
             ENDHLSL
         }
 
-        Pass
-        {
-            Name "Outline (Legacy)"
-            Tags{"LightMode" = "SRPDefaultUnlit"}
-
-            Cull Front
-
-            HLSLPROGRAM
-            #include "LibraryUrp/StylizedInput.hlsl"
-
-            #pragma vertex VertexProgram
-            #pragma fragment FragmentProgram
-
-            #pragma multi_compile _ DR_OUTLINE_ON
-            #pragma multi_compile _ DR_OUTLINE_SMOOTH_NORMALS
-            #pragma multi_compile __ _OUTLINESPACE_SCREEN _OUTLINESPACE_OBJECT
-            #pragma multi_compile_fog
-
-			/* start CurvedWorld */
-			//#define CURVEDWORLD_BEND_TYPE_CLASSICRUNNER_X_POSITIVE
-			//#define CURVEDWORLD_BEND_ID_1
-			//#pragma shader_feature_local CURVEDWORLD_DISABLED_ON
-			//#pragma shader_feature_local CURVEDWORLD_NORMAL_TRANSFORMATION_ON
-			//#include "Assets/Amazing Assets/Curved World/Shaders/Core/CurvedWorldTransform.cginc"
-			/* end CurvedWorld */
-
-            struct VertexInput
-            {
-                float4 position : POSITION;
-                float3 normal : NORMAL;
-            	#if defined(DR_OUTLINE_SMOOTH_NORMALS)
-                float4 uv2 : TEXCOORD2;
-                #endif
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-            };
-
-            struct VertexOutput
-            {
-                float4 position : SV_POSITION;
-                float fogCoord : TEXCOORD1;
-
-                UNITY_VERTEX_INPUT_INSTANCE_ID
-                UNITY_VERTEX_OUTPUT_STEREO
-            };
-
-            float4 ObjectToClipPos(float4 pos)
-            {
-                return mul(UNITY_MATRIX_VP, mul(UNITY_MATRIX_M, float4(pos.xyz, 1)));
-            }
-
-            float4 ObjectToClipDir(float3 dir)
-            {
-                return mul(UNITY_MATRIX_VP, mul(UNITY_MATRIX_M, float4(dir.xyz, 0)));
-            }
-
-            VertexOutput VertexProgram(VertexInput v)
-            {
-                #if defined(CURVEDWORLD_IS_INSTALLED) && !defined(CURVEDWORLD_DISABLED_ON)
-                    CURVEDWORLD_TRANSFORM_VERTEX(v.position)
-                #endif
-
-                UNITY_SETUP_INSTANCE_ID(v);
-
-                VertexOutput o = (VertexOutput)0;
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-
-	            #if defined(DR_OUTLINE_ON)
-            		#if defined(DR_OUTLINE_SMOOTH_NORMALS)
-            			float3 objectScale = abs(UNITY_MATRIX_M[0].xyz) + abs(UNITY_MATRIX_M[1].xyz) + abs(UNITY_MATRIX_M[2].xyz);
-            			v.normal = v.uv2.xyz / objectScale;
-            		#endif
-            	
-            		#if defined(_OUTLINESPACE_OBJECT)
-            			float3 offset = v.normal * _OutlineWidth * 0.01;
-		                float4 clipPosition = ObjectToClipPos(v.position * _OutlineScale + float4(offset, 0)); 
-					#else
-		                float4 clipPosition = ObjectToClipPos(v.position * _OutlineScale);
-		                const float3 clipNormal = ObjectToClipDir(v.normal).xyz;
-						const float2 aspectRatio = float2(_ScreenParams.x / _ScreenParams.y, 1);
-		                const half cameraDistanceImpact = lerp(clipPosition.w, 4.0, _CameraDistanceImpact);
-		                const float2 offset = normalize(clipNormal.xy) / aspectRatio * _OutlineWidth * cameraDistanceImpact * 0.005;
-		                clipPosition.xy += offset;
-            		#endif
-
-            		// Depth offset
-		            {
-			            const half outlineDepthOffset = _OutlineDepthOffset * .1;
-                    	#if UNITY_REVERSED_Z
-                    	clipPosition.z -= outlineDepthOffset;
-                    	#else
-                    	clipPosition.z += outlineDepthOffset * (1.0 - UNITY_NEAR_CLIP_VALUE);
-                    	#endif
-		            }
-
-	                o.position = clipPosition;
-	                o.fogCoord = ComputeFogFactor(o.position.z);
-                #endif
-            	
-                return o;
-            }
-
-            half4 FragmentProgram(VertexOutput i) : SV_TARGET
-            {
-                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
-                half4 color = _OutlineColor;
-                color.rgb = MixFog(color.rgb, i.fogCoord);
-                return color;
-            }
-            ENDHLSL
-        }
-
         // All the following passes are from URP SimpleLit.shader.
         // UsePass "Universal Render Pipeline/Simple Lit/..." - not included in build and produces z-buffer glitches in
         // local and global outlines combination.
@@ -479,8 +376,8 @@
             // GPU Instancing
             #pragma multi_compile_instancing
             #if defined(FLAT_KIT_DOTS_INSTANCING_ON)
-            #pragma target 4.5							// Uncomment to enable DOTs instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON	// Uncomment to enable DOTs instancing
+            #pragma target 4.5
+            #pragma multi_compile _ DOTS_INSTANCING_ON
             #endif
 
             // -------------------------------------
@@ -531,15 +428,28 @@
             #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local_fragment _EMISSION
             #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
+            #if UNITY_VERSION >= 600000
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #endif
 
             // -------------------------------------
             // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE _MAIN_LIGHT_SHADOWS_SCREEN
             //#pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             //#pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
             #pragma multi_compile_fragment _ _LIGHT_LAYERS
+            #if UNITY_VERSION >= 600000
+            #define _ENVIRONMENTREFLECTIONS_OFF 1 // Fixes flickering when Probe Blending is enabled on Renderer.
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT_LOW _SHADOWS_SOFT_MEDIUM _SHADOWS_SOFT_HIGH
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
+            #else
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #endif
+            #if UNITY_VERSION >= 60000012
+            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
+            #endif
 
             // -------------------------------------
             // Unity defined keywords
@@ -549,15 +459,17 @@
             #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
             #pragma multi_compile _ SHADOWS_SHADOWMASK
             #pragma multi_compile_fragment _ _GBUFFER_NORMALS_OCT
+            #if UNITY_VERSION >= 600000
             #pragma multi_compile_fragment _ _RENDER_PASS_ENABLED
+            #endif
 
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
             #pragma instancing_options renderinglayer
             #if defined(FLAT_KIT_DOTS_INSTANCING_ON)
-            #pragma target 4.5							// Uncomment to enable DOTs instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON	// Uncomment to enable DOTs instancing
+            #pragma target 4.5
+            #pragma multi_compile _ DOTS_INSTANCING_ON
             #endif
 
             #pragma vertex LitPassVertexSimple
@@ -598,8 +510,8 @@
             // GPU Instancing
             #pragma multi_compile_instancing
             #if defined(FLAT_KIT_DOTS_INSTANCING_ON)
-            #pragma target 4.5							// Uncomment to enable DOTs instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON	// Uncomment to enable DOTs instancing
+            #pragma target 4.5
+            #pragma multi_compile _ DOTS_INSTANCING_ON
             #endif
 
             #include "LibraryUrp/StylizedInput.hlsl"
@@ -647,8 +559,8 @@
             // GPU Instancing
             #pragma multi_compile_instancing
             #if defined(FLAT_KIT_DOTS_INSTANCING_ON)
-            #pragma target 4.5							// Uncomment to enable DOTs instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON	// Uncomment to enable DOTs instancing
+            #pragma target 4.5
+            #pragma multi_compile _ DOTS_INSTANCING_ON
             #endif
 
             #include "LibraryUrp/StylizedInput.hlsl"

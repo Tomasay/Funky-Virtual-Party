@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
+#if UNITY_6000_0_OR_NEWER
+using UnityEditor.Build.Profile;
+#endif
 using UnityEngine;
 
 namespace Kamgam.ExcludeFromBuild
@@ -185,6 +188,103 @@ namespace Kamgam.ExcludeFromBuild
             // Dropdown
             return (ExcludeFromBuildData.StandaloneBuildSubtarget)EditorGUILayout.EnumPopup(subTarget, options);
         }
+        
+        
+        
+#if UNITY_6000_0_OR_NEWER
+        // Build Profiles Multi Select
+        
+        static List<BuildProfile> tmpBuildProfileValues = new List<BuildProfile>();
+        static ExcludeFromBuildData.Group tmpBuildProfileGroup;
+        static List<string> tmpBuildProfileOptionsLabels = new List<string>();
+        
+        public static void DrawBuildProfilesMultiSelect(ExcludeFromBuildData.Group group, string text, string tooltip, Color? labelTextColor = null, bool drawLabel = true, params GUILayoutOption[] options)
+        {
+            DrawBuildProfilesMultiSelect(group, new GUIContent(text, tooltip), labelTextColor, drawLabel, options);
+        }
+        
+        public static void DrawBuildProfilesMultiSelect(ExcludeFromBuildData.Group group, GUIContent content, Color? labelTextColor = null, bool drawLabel = true, params GUILayoutOption[] options)
+        {
+            var selection = group.BuildProfiles;
+            
+            // values
+            BuildProfileUtils.GetAllBuildProfiles(tmpBuildProfileValues);
+
+            // labels
+            tmpBuildProfileOptionsLabels.Clear();
+            tmpBuildProfileValues.ForEach(p => tmpBuildProfileOptionsLabels.Add(p.name));
+            
+            string buttonLabel = "Any ▾";
+            if (group.BuildProfiles != null)
+            {
+                int count = group.BuildProfiles.Count + (group.IncludesDefaultBuildProfile ? 1 : 0);
+                if (group.IncludesDefaultBuildProfile && count == 1)
+                    buttonLabel = "Default ▾";
+                else if (!group.IncludesDefaultBuildProfile && count == 1)
+                    buttonLabel = selection[0].name + " ▾";
+                else if (count == tmpBuildProfileValues.Count + 1)
+                    buttonLabel = "All ▾";
+                else if (count > 1)
+                    buttonLabel = "Mixed ▾";
+            }
+
+            if (drawLabel)
+            {
+                var style = new GUIStyle(GUI.skin.label);
+                if (labelTextColor.HasValue)
+                    style.normal.textColor = labelTextColor.Value;
+                GUILayout.Label(content, style);
+            }
+
+            if (GUILayout.Button(new GUIContent(buttonLabel, content.tooltip), options))
+            {
+                tmpBuildProfileGroup = group;
+
+                var selectedMenu = new GenericMenu();
+                selectedMenu.AddItem(new GUIContent("Any"), false, onBuildProfilesMultiSelectSelected, -2);
+                selectedMenu.AddSeparator("");
+                selectedMenu.AddItem(new GUIContent("Default"), group.IncludesDefaultBuildProfile, onBuildProfilesMultiSelectSelected, -1);
+                for (var i = 0; i < tmpBuildProfileValues.Count; ++i)
+                {
+                    var menuString = tmpBuildProfileOptionsLabels[i];
+                    bool selected = group.BuildProfiles.Contains(tmpBuildProfileValues[i]);
+                    selectedMenu.AddItem(new GUIContent(menuString), selected, onBuildProfilesMultiSelectSelected, i);
+                }
+
+                selectedMenu.ShowAsContext();
+            }
+        }
+
+        static void onBuildProfilesMultiSelectSelected(object userData)
+        {
+            var index = (int)userData;
+            if (index == -2)
+            {
+                // Nothing -> Any
+                tmpBuildProfileGroup.BuildProfiles.Clear();
+                tmpBuildProfileGroup.IncludesDefaultBuildProfile = false;
+            }
+            else if (index == -1)
+            {
+                // Default
+                tmpBuildProfileGroup.IncludesDefaultBuildProfile = !tmpBuildProfileGroup.IncludesDefaultBuildProfile;
+            }
+            else
+            {
+                var value = tmpBuildProfileValues[index];
+
+                if (tmpBuildProfileGroup.BuildProfiles.Contains(value))
+                {
+                    tmpBuildProfileGroup.BuildProfiles.Remove(value);
+                }
+                else
+                {
+                    tmpBuildProfileGroup.BuildProfiles.Add(value);
+                }
+
+            }
+        }
+#endif
 
         public static void DrawLabel(GUIContent content, Color? labelTextColor, params GUILayoutOption[] options)
         {

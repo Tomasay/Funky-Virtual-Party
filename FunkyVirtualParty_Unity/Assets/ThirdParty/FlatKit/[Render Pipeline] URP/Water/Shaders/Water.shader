@@ -16,12 +16,13 @@
         _CrestSize("Size{Crest}", Range(0, 1)) = 0.1
         _CrestSharpness("Sharp transition{Crest}", Range(0, 1)) = 0.1
 
-        [KeywordEnum(None, Round, Grid, Pointy)] _WaveMode ("[FOLDOUT(Wave Geometry){6}]Shape{Wave}", Float) = 1.0
+        [KeywordEnum(None, Round, Grid, Pointy)] _WaveMode ("[FOLDOUT(Wave Geometry){7}]Shape{Wave}", Float) = 1.0
         _WaveSpeed("[!_WAVEMODE_NONE]Speed{Wave}", Float) = 0.5
         _WaveAmplitude("[!_WAVEMODE_NONE]Amplitude{Wave}", Float) = 0.25
         _WaveFrequency("[!_WAVEMODE_NONE]Frequency{Wave}", Float) = 1.0
         _WaveDirection("[!_WAVEMODE_NONE]Direction{Wave}", Range(-1.0, 1.0)) = 0
-        _WaveNoise("[!_WAVEMODE_NONE]Noise{Wave}", Range(0, 1)) = 0.25
+        [KeywordEnum(UV, World Space)] _NoiseSource ("Tiling Source{Wave}", Float) = 1.0
+        _WaveNoise("[!_WAVEMODE_NONE]Noise{Wave}", Range(0, 2)) = 0.25
 
         [KeywordEnum(None, Gradient Noise, Texture)] _FoamMode ("[FOLDOUT(Foam){12}]Source{Foam}", Float) = 1.0
         [NoScaleOffset] _NoiseMap("[_FOAMMODE_TEXTURE]Texture{Foam}", 2D) = "white" {}
@@ -66,19 +67,27 @@
         Lighting Off
         ZWrite[_ZWrite]
 
-    	HLSLINCLUDE
-    	#include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Version.hlsl"
-    	ENDHLSL
+        HLSLINCLUDE
+        #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Version.hlsl"
+        ENDHLSL
 
         Pass
         {
             HLSLPROGRAM
+    	    // #define FLAT_KIT_DOTS_INSTANCING_ON // Uncomment to enable DOTS instancing
             #pragma prefer_hlslcc gles
+    	    
+            #if defined(FLAT_KIT_DOTS_INSTANCING_ON)
+            #pragma target 4.5
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+            #else
             #pragma target 2.0
+    	    #endif
 
             #pragma shader_feature_local _COLORMODE_LINEAR _COLORMODE_GRADIENT_TEXTURE
             #pragma shader_feature_local _FOAMMODE_NONE _FOAMMODE_GRADIENT_NOISE _FOAMMODE_TEXTURE
             #pragma shader_feature_local _WAVEMODE_NONE _WAVEMODE_ROUND _WAVEMODE_GRID _WAVEMODE_POINTY
+            #pragma shader_feature_local __ _NOISESOURCE_WORLD_SPACE
 
             // -------------------------------------
             // Universal Pipeline keywords
@@ -89,38 +98,24 @@
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #endif
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
-            #pragma multi_compile _ SHADOWS_SHADOWMASK
             #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
-            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
             #if VERSION_GREATER_EQUAL(12, 0)
-            #pragma multi_compile_fragment _ _DBUFFER_MRT1 _DBUFFER_MRT2 _DBUFFER_MRT3
             #pragma multi_compile_fragment _ _LIGHT_LAYERS
             #pragma multi_compile_fragment _ _LIGHT_COOKIES
-            #pragma multi_compile _ _CLUSTERED_RENDERING
             #endif
             #if UNITY_VERSION >= 202220 && UNITY_VERSION < 600000
             #pragma multi_compile _ _FORWARD_PLUS
-            #pragma multi_compile_fragment _ _WRITE_RENDERING_LAYERS
             #endif
             #if UNITY_VERSION >= 600000
-            #pragma multi_compile _ _FORWARD_PLUS
+            #pragma multi_compile _ _CLUSTER_LIGHT_LOOP
             #include_with_pragmas "Packages/com.unity.render-pipelines.core/ShaderLibrary/FoveatedRenderingKeywords.hlsl"
-            #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ProbeVolumeVariants.hlsl"
             #include_with_pragmas "Packages/com.unity.render-pipelines.universal/ShaderLibrary/RenderingLayers.hlsl"
             #endif
 
             // -------------------------------------
             // Unity defined keywords
-            #pragma multi_compile _ DIRLIGHTMAP_COMBINED
-            #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
-            #if UNITY_VERSION >= 202220
-            #pragma multi_compile _ DYNAMICLIGHTMAP_ON
-            #pragma multi_compile_fragment _ DEBUG_DISPLAY
-            #pragma multi_compile_fragment _ LOD_FADE_CROSSFADE
-            #endif
 
             //--------------------------------------
             // GPU Instancing
@@ -252,8 +247,12 @@
             {
                 float s = 0;
 
-                #if !defined(_WAVEMODE_NONE)
+                #if defined(_WAVEMODE_GRID)
+                #if defined(_NOISESOURCE_WORLD_SPACE)
+                    float2 noise_uv = position.xz * _WaveFrequency;
+                #else // _NOISESOURCE_WORLD_SPACE
                     float2 noise_uv = texcoord * _WaveFrequency;
+                #endif // _NOISESOURCE_WORLD_SPACE
                     float noise01 = GradientNoise(noise_uv, 1.0);
                     float noise = (noise01 * 2.0 - 1.0) * _WaveNoise;
 

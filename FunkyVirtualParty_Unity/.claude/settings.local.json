@@ -8,7 +8,9 @@
       "Bash(git log:*)",
       "Bash(xargs grep:*)",
       "Bash(find c:GithubFunky-Virtual-PartyFunkyVirtualParty_UnityAssets -name *SyncModel*.cs)",
-      "Bash(find c:GithubFunky-Virtual-PartyFunkyVirtualParty_UnityAssetsNormal -name *.cs)"
+      "Bash(find c:GithubFunky-Virtual-PartyFunkyVirtualParty_UnityAssetsNormal -name *.cs)",
+      "Bash(grep -i \"m_Script:.*guid: c424820a8880b8845bda10ec0b41507e\" /c/Github/Funky-Virtual-Party/FunkyVirtualParty_Unity/Assets/Scripts/**/*.meta)",
+      "Bash(find /c/Github/Funky-Virtual-Party/FunkyVirtualParty_Unity/Assets/Scripts -name \"*.meta\" -exec grep -l \"c424820a8880b8845bda10ec0b41507e\" {} \\\\;)"
     ]
   }
 }

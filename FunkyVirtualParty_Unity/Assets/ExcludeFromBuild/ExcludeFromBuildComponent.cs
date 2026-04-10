@@ -2,6 +2,7 @@
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.SceneManagement;
 #endif
 
 namespace Kamgam.ExcludeFromBuild
@@ -14,6 +15,9 @@ namespace Kamgam.ExcludeFromBuild
     {
 #if UNITY_EDITOR
         public string GUID;
+
+        public const string PREFAB_ROOT_ERROR =
+            "You can not exclude the ROOT game object of a prefab from within the prefab. Please add the prefab file to your exclusion list and remove the GameObject exclusion on this object or change it to a component only exclusion. This will be ignored during exclusion.";
 
         [System.NonSerialized]
         public const string SessionActiveGroupIdKey = "Kamgam.EFB.ActiveGroupId";
@@ -37,21 +41,50 @@ namespace Kamgam.ExcludeFromBuild
 
         public void Execute(int activeGroupId = -1)
         {
-            // Abort and warn if activeGroup is unkown
+            Execute(activeGroupId, null);
+        }
+
+        public bool CheckConditions(int activeGroupId)
+        {
+            // Don't execute if activeGroup is unknown.
             if (activeGroupId < 0)
             {
-                Debug.LogWarning("ExcludeFromBuildComponent: Active group of '" + this.name + "' is unknown. Aborting.");
-                return;
+                Debug.LogWarning("ExcludeFromBuildComponent: Active group of '" + this.name + "' is unknown. Will not exclude.");
+                return false;
             }
 
-            // skip if the group does not match
+            // Don't execute if the group does not match.
             if (!AllGroups && activeGroupId >= 0 && !GroupIds.Contains(activeGroupId))
+                return false;
+
+            return true;
+        }
+        
+        public void Execute(int activeGroupId, GameObject editScopeRoot)
+        {
+            if (!CheckConditions(activeGroupId))
                 return;
 
             if (GameObject)
             {
-                if(this.gameObject != null)
-                    DestroyImmediate(this.gameObject, allowDestroyingAssets: true);
+                if (this.gameObject != null)
+                {
+                    GameObject prefabStageRoot = null;
+                    var stage = PrefabStageUtility.GetCurrentPrefabStage();
+                    if (stage != null)
+                        prefabStageRoot = stage.prefabContentsRoot;
+                    if ((editScopeRoot != null && editScopeRoot == gameObject) 
+                        || PrefabUtility.IsOutermostPrefabInstanceRoot(gameObject)
+                        || IsRootOfPrefabAsset(gameObject)
+                        || (prefabStageRoot != null && gameObject == prefabStageRoot))
+                    {
+                        Debug.LogError("Ignoring Exclusion on '" + gameObject.name + "'. " + PREFAB_ROOT_ERROR);
+                    }
+                    else
+                    {
+                        DestroyImmediate(this.gameObject, allowDestroyingAssets: true);
+                    }
+                }
             }
             else if (Components != null && Components.Count > 0)
             {
@@ -120,6 +153,16 @@ namespace Kamgam.ExcludeFromBuild
             {
                 GUID = System.Guid.NewGuid().ToString();
             }
+        }
+        
+        public bool IsRootOfPrefabAsset(GameObject go)
+        {
+            var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+            
+            if (prefabStage == null)
+                return false;
+
+            return go == prefabStage.prefabContentsRoot;
         }
 #endif
     }

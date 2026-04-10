@@ -6,6 +6,10 @@
 
 // NOTE: Do not ifdef the properties here as SRP batcher can not handle different layouts.
 
+// Textures and samplers must be declared outside the constant buffer for SRP Batcher / GPU Resident Drawer compatibility.
+sampler2D _CelStepTexture;
+sampler2D _CelCurveTexture;
+
 #ifndef FLATKIT_TERRAIN
 #if _FORWARD_PLUS && UNITY_VERSION < 600000
 CBUFFER_START(UnityPerMaterialNoBatching)
@@ -47,12 +51,10 @@ float _FlatRimLightAlign;
 
 // --- _CELPRIMARYMODE_STEPS
 half4 _ColorDimSteps;
-sampler2D _CelStepTexture;
 // --- _CELPRIMARYMODE_STEPS
 
 // --- _CELPRIMARYMODE_CURVE
 half4 _ColorDimCurve;
-sampler2D _CelCurveTexture;
 // --- _CELPRIMARYMODE_CURVE
 
 // --- DR_CEL_EXTRA_ON

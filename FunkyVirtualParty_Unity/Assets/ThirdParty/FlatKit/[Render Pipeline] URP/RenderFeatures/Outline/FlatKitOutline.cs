@@ -1,75 +1,140 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+
+#if UNITY_2022_3_OR_NEWER
+using ExternPropertyAttributes;
 
 namespace FlatKit {
 public class FlatKitOutline : ScriptableRendererFeature {
-    class OutlinePass : ScriptableRenderPass {
-        private ScriptableRenderer _renderer;
-        private RenderTargetHandle _destination;
-        private readonly Material _outlineMaterial = null;
-        private RenderTargetHandle _temporaryColorTexture;
-        private readonly ProfilingSampler _profilingSampler = new ProfilingSampler("Outline");
+    [Tooltip("To create new settings use 'Create > FlatKit > Outline Settings'.")]
+    [Expandable]
+    public OutlineSettings settings;
 
-        public OutlinePass(Material outlineMaterial) {
-            _outlineMaterial = outlineMaterial;
+    private Material _effectMaterial;
+    private ScreenRenderPass _fullScreenPass;
+    private bool _requiresColor;
+    private bool _injectedBeforeTransparents;
+    private ScriptableRenderPassInput _requirements = ScriptableRenderPassInput.Color;
+
+    private const string ShaderName = "Hidden/FlatKit/OutlineWrap";
+    private static int edgeColor => Shader.PropertyToID("_EdgeColor");
+    private static int thickness => Shader.PropertyToID("_Thickness");
+    private static int depthThresholdMin => Shader.PropertyToID("_DepthThresholdMin");
+    private static int depthThresholdMax => Shader.PropertyToID("_DepthThresholdMax");
+    private static int normalThresholdMin => Shader.PropertyToID("_NormalThresholdMin");
+    private static int normalThresholdMax => Shader.PropertyToID("_NormalThresholdMax");
+    private static int colorThresholdMin => Shader.PropertyToID("_ColorThresholdMin");
+    private static int colorThresholdMax => Shader.PropertyToID("_ColorThresholdMax");
+    private static int fadeRangeStart => Shader.PropertyToID("_FadeRangeStart");
+    private static int fadeRangeEnd => Shader.PropertyToID("_FadeRangeEnd");
+
+    public override void Create() {
+        // Settings.
+        {
+            if (settings == null) return;
+            settings.onSettingsChanged = null;
+            settings.onReset = null;
+            settings.onSettingsChanged += SetMaterialProperties;
+            settings.onReset += SetMaterialProperties;
         }
 
-        public void Setup(ScriptableRenderer source, RenderTargetHandle destination) {
-            _renderer = source;
-            _destination = destination;
-        }
-
-#if UNITY_2020_3_OR_NEWER
-        public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData) {
-            ConfigureClear(ClearFlag.None, Color.white);
-        }
-#else
-        public override void Configure(CommandBuffer cmd,
-            RenderTextureDescriptor cameraTextureDescriptor) {
-            ConfigureClear(ClearFlag.None, Color.white);
-        }
+        // Material.
+        {
+#if UNITY_EDITOR
+            settings.effectMaterial = SubAssetMaterial.GetOrCreate(settings, ShaderName);
+            if (settings.effectMaterial == null) return;
 #endif
+            _effectMaterial = settings.effectMaterial;
+            SetMaterialProperties();
+        }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) {
-            CommandBuffer cmd = CommandBufferPool.Get();
+        {
+            _fullScreenPass = new ScreenRenderPass {
+                renderPassEvent = settings.renderEvent,
+            };
 
-            using (new ProfilingScope(cmd, _profilingSampler)) {
-                RenderTextureDescriptor opaqueDescriptor = renderingData.cameraData.cameraTargetDescriptor;
-                opaqueDescriptor.depthBufferBits = 0;
+            _requirements = ScriptableRenderPassInput.Color; // Needed for the full-screen blit.
+            if (settings.useDepth) _requirements |= ScriptableRenderPassInput.Depth;
+            if (settings.useNormals) _requirements |= ScriptableRenderPassInput.Normal;
+            if (settings.fadeWithDistance) _requirements |= ScriptableRenderPassInput.Depth;
+            ScriptableRenderPassInput modifiedRequirements = _requirements;
 
-                if (_destination == RenderTargetHandle.CameraTarget) {
-                    cmd.GetTemporaryRT(_temporaryColorTexture.id, opaqueDescriptor, FilterMode.Point);
-                    cmd.Blit(_renderer.cameraColorTarget, _temporaryColorTexture.Identifier(), _outlineMaterial, 0);
-                    cmd.Blit(_temporaryColorTexture.Identifier(), _renderer.cameraColorTarget);
-                } else {
-                    cmd.Blit(_renderer.cameraColorTarget, _destination.Identifier(), _outlineMaterial, 0);
-                }
+            _requiresColor = (_requirements & ScriptableRenderPassInput.Color) != 0;
+            _injectedBeforeTransparents = settings.renderEvent <= RenderPassEvent.BeforeRenderingTransparents;
+
+            if (_requiresColor && !_injectedBeforeTransparents) {
+                modifiedRequirements ^= ScriptableRenderPassInput.Color;
             }
 
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
-        }
-
-#if UNITY_2020_3_OR_NEWER
-        public override void OnCameraCleanup(CommandBuffer cmd) {
-#else
-        public override void FrameCleanup(CommandBuffer cmd) {
-#endif
-            if (_destination == RenderTargetHandle.CameraTarget) {
-                cmd.ReleaseTemporaryRT(_temporaryColorTexture.id);
-            }
+            _fullScreenPass.ConfigureInput(modifiedRequirements);
         }
     }
 
-    [Header("Create > FlatKit > Outline Settings")]
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData) {
+        if (settings == null || !settings.applyInSceneView && renderingData.cameraData.isSceneViewCamera) return;
+        if (renderingData.cameraData.isPreviewCamera) return;
+        if (renderingData.cameraData.renderType == CameraRenderType.Overlay) return;
+        if (_effectMaterial == null) return;
+
+        _fullScreenPass.Setup(_effectMaterial, _requiresColor, _injectedBeforeTransparents, "Flat Kit Outline",
+            renderingData);
+        renderer.EnqueuePass(_fullScreenPass);
+    }
+
+    protected override void Dispose(bool disposing) {
+        _fullScreenPass?.Dispose();
+    }
+
+    private void SetMaterialProperties() {
+        if (_effectMaterial == null) return;
+
+        const string depthKeyword = "OUTLINE_USE_DEPTH";
+        RendererFeatureUtils.SetKeyword(_effectMaterial, depthKeyword, settings.useDepth);
+
+        const string normalsKeyword = "OUTLINE_USE_NORMALS";
+        RendererFeatureUtils.SetKeyword(_effectMaterial, normalsKeyword, settings.useNormals);
+
+        const string colorKeyword = "OUTLINE_USE_COLOR";
+        RendererFeatureUtils.SetKeyword(_effectMaterial, colorKeyword, settings.useColor);
+
+        const string outlineOnlyKeyword = "OUTLINE_ONLY";
+        RendererFeatureUtils.SetKeyword(_effectMaterial, outlineOnlyKeyword, settings.outlineOnly);
+
+        const string resolutionInvariantKeyword = "RESOLUTION_INVARIANT_THICKNESS";
+        RendererFeatureUtils.SetKeyword(_effectMaterial, resolutionInvariantKeyword, settings.resolutionInvariant);
+
+        const string fadeWithDistanceKeyword = "OUTLINE_FADE_OUT";
+        RendererFeatureUtils.SetKeyword(_effectMaterial, fadeWithDistanceKeyword, settings.fadeWithDistance);
+
+        _effectMaterial.SetColor(edgeColor, settings.edgeColor);
+        _effectMaterial.SetFloat(thickness, settings.thickness);
+
+        _effectMaterial.SetFloat(depthThresholdMin, settings.minDepthThreshold);
+        _effectMaterial.SetFloat(depthThresholdMax, settings.maxDepthThreshold);
+
+        _effectMaterial.SetFloat(normalThresholdMin, settings.minNormalsThreshold);
+        _effectMaterial.SetFloat(normalThresholdMax, settings.maxNormalsThreshold);
+
+        _effectMaterial.SetFloat(colorThresholdMin, settings.minColorThreshold);
+        _effectMaterial.SetFloat(colorThresholdMax, settings.maxColorThreshold);
+
+        _effectMaterial.SetFloat(fadeRangeStart, settings.fadeRangeStart);
+        _effectMaterial.SetFloat(fadeRangeEnd, settings.fadeRangeEnd);
+    }
+}
+}
+#else
+namespace FlatKit {
+public class FlatKitOutline : ScriptableRendererFeature {
+    [Tooltip("To create new settings use 'Create > FlatKit > Outline Settings'.")]
     public OutlineSettings settings;
 
-    private Material _material = null;
-    private OutlinePass _outlinePass;
-    private RenderTargetHandle _outlineTexture;
+    [SerializeField, HideInInspector]
+    private Material _effectMaterial;
 
-    private static readonly string ShaderName = "Hidden/FlatKit/OutlineFilter";
+    private BlitTexturePass _blitTexturePass;
+
+    private static readonly string OutlineShaderName = "Hidden/FlatKit/OutlineFilter";
     private static readonly int EdgeColor = Shader.PropertyToID("_EdgeColor");
     private static readonly int Thickness = Shader.PropertyToID("_Thickness");
     private static readonly int DepthThresholdMin = Shader.PropertyToID("_DepthThresholdMin");
@@ -80,104 +145,109 @@ public class FlatKitOutline : ScriptableRendererFeature {
     private static readonly int ColorThresholdMax = Shader.PropertyToID("_ColorThresholdMax");
 
     public override void Create() {
-        if (settings == null) {
-            Debug.LogWarning("[FlatKit] Missing Outline Settings");
-            return;
-        }
-
 #if UNITY_EDITOR
-        ShaderIncludeUtilities.AddAlwaysIncludedShader(ShaderName);
-#endif
-
-        InitMaterial();
-
-        _outlinePass = new OutlinePass(_material) {
-            renderPassEvent = settings.renderEvent
-        };
-
-        _outlineTexture.Init("_OutlineTexture");
-    }
-
-    public override void AddRenderPasses(ScriptableRenderer renderer,
-        ref RenderingData renderingData) {
-#if UNITY_EDITOR
-        if (renderingData.cameraData.isPreviewCamera) {
-            return;
+        if (_effectMaterial == null) {
+            SubAssetMaterial.AlwaysInclude(BlitTexturePass.CopyEffectShaderName);
+            SubAssetMaterial.AlwaysInclude(OutlineShaderName);
         }
 #endif
 
         if (settings == null) {
-            Debug.LogWarning("[FlatKit] Missing Outline Settings");
             return;
         }
 
-        InitMaterial();
-
-        _outlinePass.Setup(renderer, RenderTargetHandle.CameraTarget);
-        renderer.EnqueuePass(_outlinePass);
-    }
-
-    private void InitMaterial() {
-        if (_material == null) {
-            var shader = Shader.Find(ShaderName);
-            if (shader == null) {
-                return;
-            }
-
-            _material = new Material(shader);
+        if (!CreateMaterials()) {
+            return;
         }
 
-        if (_material == null) {
-            Debug.LogWarning("[FlatKit] Missing Outline Material");
-        }
+        SetMaterialProperties();
 
-        UpdateShader();
+        _blitTexturePass ??=
+            new BlitTexturePass(_effectMaterial, settings.useDepth, settings.useNormals, useColor: true);
     }
 
-    private void UpdateShader() {
-        if (_material == null) {
+    protected override void Dispose(bool disposing) {
+        _blitTexturePass.Dispose();
+    }
+
+    public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData) {
+#if UNITY_EDITOR
+        if (renderingData.cameraData.isPreviewCamera) return;
+        if (!settings.applyInSceneView && renderingData.cameraData.cameraType == CameraType.SceneView) return;
+#endif
+        if (renderingData.cameraData.renderType == CameraRenderType.Overlay) return;
+
+        SetMaterialProperties();
+
+        _blitTexturePass.Setup(renderingData);
+        _blitTexturePass.renderPassEvent = settings.renderEvent;
+
+        renderer.EnqueuePass(_blitTexturePass);
+    }
+
+    private bool CreateMaterials() {
+        if (_effectMaterial == null) {
+            var effectShader = Shader.Find(OutlineShaderName);
+            var blitShader = Shader.Find(BlitTexturePass.CopyEffectShaderName);
+            if (effectShader == null || blitShader == null) return false;
+            _effectMaterial = UnityEngine.Rendering.CoreUtils.CreateEngineMaterial(effectShader);
+        }
+
+        return _effectMaterial != null;
+    }
+
+    private void SetMaterialProperties() {
+        if (_effectMaterial == null) {
             return;
         }
 
         const string depthKeyword = "OUTLINE_USE_DEPTH";
         if (settings.useDepth) {
-            _material.EnableKeyword(depthKeyword);
+            _effectMaterial.EnableKeyword(depthKeyword);
         } else {
-            _material.DisableKeyword(depthKeyword);
+            _effectMaterial.DisableKeyword(depthKeyword);
         }
 
         const string normalsKeyword = "OUTLINE_USE_NORMALS";
         if (settings.useNormals) {
-            _material.EnableKeyword(normalsKeyword);
+            _effectMaterial.EnableKeyword(normalsKeyword);
         } else {
-            _material.DisableKeyword(normalsKeyword);
+            _effectMaterial.DisableKeyword(normalsKeyword);
         }
 
         const string colorKeyword = "OUTLINE_USE_COLOR";
         if (settings.useColor) {
-            _material.EnableKeyword(colorKeyword);
+            _effectMaterial.EnableKeyword(colorKeyword);
         } else {
-            _material.DisableKeyword(colorKeyword);
+            _effectMaterial.DisableKeyword(colorKeyword);
         }
 
         const string outlineOnlyKeyword = "OUTLINE_ONLY";
         if (settings.outlineOnly) {
-            _material.EnableKeyword(outlineOnlyKeyword);
+            _effectMaterial.EnableKeyword(outlineOnlyKeyword);
         } else {
-            _material.DisableKeyword(outlineOnlyKeyword);
+            _effectMaterial.DisableKeyword(outlineOnlyKeyword);
         }
 
-        _material.SetColor(EdgeColor, settings.edgeColor);
-        _material.SetFloat(Thickness, settings.thickness);
+        const string resolutionInvariantKeyword = "RESOLUTION_INVARIANT_THICKNESS";
+        if (settings.resolutionInvariant) {
+            _effectMaterial.EnableKeyword(resolutionInvariantKeyword);
+        } else {
+            _effectMaterial.DisableKeyword(resolutionInvariantKeyword);
+        }
 
-        _material.SetFloat(DepthThresholdMin, settings.minDepthThreshold);
-        _material.SetFloat(DepthThresholdMax, settings.maxDepthThreshold);
+        _effectMaterial.SetColor(EdgeColor, settings.edgeColor);
+        _effectMaterial.SetFloat(Thickness, settings.thickness);
 
-        _material.SetFloat(NormalThresholdMin, settings.minNormalsThreshold);
-        _material.SetFloat(NormalThresholdMax, settings.maxNormalsThreshold);
+        _effectMaterial.SetFloat(DepthThresholdMin, settings.minDepthThreshold);
+        _effectMaterial.SetFloat(DepthThresholdMax, settings.maxDepthThreshold);
 
-        _material.SetFloat(ColorThresholdMin, settings.minColorThreshold);
-        _material.SetFloat(ColorThresholdMax, settings.maxColorThreshold);
+        _effectMaterial.SetFloat(NormalThresholdMin, settings.minNormalsThreshold);
+        _effectMaterial.SetFloat(NormalThresholdMax, settings.maxNormalsThreshold);
+
+        _effectMaterial.SetFloat(ColorThresholdMin, settings.minColorThreshold);
+        _effectMaterial.SetFloat(ColorThresholdMax, settings.maxColorThreshold);
     }
 }
 }
+#endif

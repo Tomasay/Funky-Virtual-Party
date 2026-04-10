@@ -17,13 +17,9 @@ public class KaijuGameManager : MonoBehaviour
     KaijuBehavior kaiju;
 
 
-#if UNITY_EDITOR
     [SerializeField] private Transform[] debugWaypoints;
     private Vector3[] currentWaypoints;
     private float[] currentWaypointDistances;
-
-
-#endif
 
     protected void Start()
     {

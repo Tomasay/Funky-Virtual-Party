@@ -41,7 +41,6 @@ public class CustomizationMirror : MonoBehaviour
         {
             GeometryUtility.CalculateFrustumPlanes(Camera.main, frustumPlanes);
             mirrorCam.enabled = GeometryUtility.TestPlanesAABB(frustumPlanes, mirrorRenderer.bounds);
-            Debug.Log("mirrorCam.enabled: " + mirrorCam.enabled);
         }
 
         if (avatar && mirrorCam.enabled)

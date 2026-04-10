@@ -15,25 +15,20 @@ MonoBehaviour:
   version: 1
 --- !u!21 &2100000
 Material:
-  serializedVersion: 8
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: OceanScene-Water-Preset 2
   m_Shader: {fileID: 4800000, guid: efcaf526ceb1f4efd9eb4e4c30c6ade6, type: 3}
-  m_ValidKeywords:
-  - _COLORMODE_LINEAR
-  - _FOAMMODE_GRADIENT_NOISE
-  - _WAVEMODE_GRID
-  m_InvalidKeywords:
-  - _ALLOWALPHAOVERFLOW_OFF
+  m_ShaderKeywords: _ALLOWALPHAOVERFLOW_OFF _COLORMODE_LINEAR _FOAMMODE_GRADIENT_NOISE
+    _WAVEMODE_GRID
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2999
-  stringTagMap:
-    RenderType: Opaque
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
@@ -74,7 +69,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Ints: []
     m_Floats:
     - _AllowAlphaOverflow: 0
     - _AlphaClip: 0
@@ -85,15 +79,15 @@ Material:
     - _CameraDistanceFadeClose: 0
     - _CameraDistanceFadeFar: 10
     - _ColorMode: 0
-    - _CrestSharpness: 0.401
-    - _CrestSize: 0.789
+    - _CrestSharpness: 0.32
+    - _CrestSize: 0.76
     - _Cull: 2
     - _Cutoff: 0.5
     - _Depth: 100
     - _DstBlend: 0
     - _EnvironmentReflections: 1
-    - _FadeDistance: -1.09
-    - _FoamAmount: 0.175
+    - _FadeDistance: 0.07
+    - _FoamAmount: 0.15
     - _FoamDepth: 0.09
     - _FoamDirection: -0.12
     - _FoamFromTexture: 1
@@ -110,12 +104,10 @@ Material:
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _LightContribution: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _Opaque: 1
     - _ProceduralFoam: 1
-    - _QueueOffset: -1
+    - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _RefractionAmplitude: 0.001
     - _RefractionFrequency: 9.52
@@ -131,9 +123,9 @@ Material:
     - _Surface: 0
     - _UvFadeX: 0.1
     - _UvFadeY: 0.1
-    - _WaterClearness: 0.05
+    - _WaterClearness: 0.15
     - _WaterDepth: 2.88
-    - _WaveAmplitude: 0
+    - _WaveAmplitude: 0.25
     - _WaveDirection: 0
     - _WaveFrequency: 50
     - _WaveMode: 2
@@ -144,11 +136,11 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 0, g: 1, b: 0.7287984, a: 1}
-    - _ColorDeep: {r: 0.36477983, g: 0.4628647, b: 1, a: 1}
-    - _ColorShallow: {r: 0.6839622, g: 0.7327335, b: 1, a: 1}
-    - _CrestColor: {r: 0.80817604, g: 0.98256147, b: 1, a: 0.21176471}
+    - _ColorDeep: {r: 0.6273585, g: 0.98567843, b: 1, a: 1}
+    - _ColorShallow: {r: 0.38823533, g: 0.40784317, b: 0.5764706, a: 1}
+    - _CrestColor: {r: 0.70354223, g: 0.9354157, b: 0.9622641, a: 0.21176471}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FoamColor: {r: 0.7421383, g: 0.9082123, b: 1, a: 0.7176471}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 0.7176471}
     - _FoamStretch: {r: 1, g: 1, b: 1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

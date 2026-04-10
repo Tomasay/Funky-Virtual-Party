@@ -9,6 +9,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Mesh_sphere_1
   m_Shader: {fileID: -6465566751694194690, guid: 7cb1ce795879ba64bbd631b023271ce8, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -17,6 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -42,6 +45,8 @@ Material:
     - Vector1_B878A941: 1
     - Vector1_C1A01A97: 5
     - Vector1_F80F88AE: 10
+    - _QueueControl: 0
+    - _QueueOffset: 0
     - fresnel_power: 6
     - voronoi_dissolve: 3
     m_Colors:
@@ -66,4 +71,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 5
+  version: 7

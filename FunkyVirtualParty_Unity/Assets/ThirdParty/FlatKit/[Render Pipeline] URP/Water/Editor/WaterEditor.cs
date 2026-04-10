@@ -1,13 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using FlatKit.Water;
+using FlatKit.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class FlatKitWaterEditor : ShaderGUI {
     private Gradient _gradient;
+
+    private const string RenderingOptionsName = "Rendering Options";
+    private GUIStyle _foldoutStyle;
+    private static readonly Dictionary<string, bool> FoldoutStates =
+        new Dictionary<string, bool> { { RenderingOptionsName, false } };
 
     public override void OnGUI(MaterialEditor materialEditor, MaterialProperty[] properties) {
         Material targetMaterial = materialEditor.target as Material;
@@ -20,6 +27,19 @@ public class FlatKitWaterEditor : ShaderGUI {
 
         bool isColorModeGradient = targetMaterial.IsKeywordEnabled("_COLORMODE_GRADIENT_TEXTURE");
 
+        int originalIntentLevel = EditorGUI.indentLevel;
+        int foldoutRemainingItems = 0;
+        bool latestFoldoutState = false;
+        _foldoutStyle ??= new GUIStyle(EditorStyles.foldout) {
+            fontStyle = FontStyle.Bold,
+            margin = {
+                left = -10
+            },
+            padding = {
+                left = 20
+            },
+        };
+
         foreach (MaterialProperty property in properties) {
             bool skipProperty = false;
 
@@ -30,15 +50,14 @@ public class FlatKitWaterEditor : ShaderGUI {
             {
                 var brackets = property.displayName.Split('[', ']');
                 foreach (var bracket in brackets) {
-                    if (!property.displayName.Contains('[' + bracket + ']')) {
+                    if (bracket.Contains("FOLDOUT") || !property.displayName.Contains('[' + bracket + ']')) {
                         continue;
                     }
 
-                    var param = bracket;
                     bool isNegative = bracket.StartsWith("!");
                     bool isPositive = !isNegative;
-                    param = bracket.TrimStart('!');
-                    bool keywordOn = ArrayUtility.Contains(keywords, param);
+                    var param = bracket.TrimStart('!');
+                    bool keywordOn = Array.IndexOf(keywords, param) != -1;
 
                     if (isPositive && !keywordOn) {
                         skipProperty = true;
@@ -54,20 +73,41 @@ public class FlatKitWaterEditor : ShaderGUI {
                 }
             }
 
-            bool hideInInspector = (property.flags & MaterialProperty.PropFlags.HideInInspector) != 0;
+            // Foldouts.
+            {
+                string displayName = property.displayName;
+                if (displayName.Contains("FOLDOUT")) {
+                    string foldoutName = displayName.Split('(', ')')[1];
+                    string foldoutItemCount = displayName.Split('{', '}')[1];
+                    foldoutRemainingItems = Convert.ToInt32(foldoutItemCount);
+                    FoldoutStates.TryAdd(property.name, false);
+                    EditorGUILayout.Space();
+                    FoldoutStates[property.name] =
+                        EditorGUILayout.Foldout(FoldoutStates[property.name], foldoutName, true, _foldoutStyle);
+                    latestFoldoutState = FoldoutStates[property.name];
+                }
+
+                if (foldoutRemainingItems > 0) {
+                    skipProperty = skipProperty || !latestFoldoutState;
+                    EditorGUI.indentLevel += 1;
+                    --foldoutRemainingItems;
+                }
+            }
+
+            bool hideInInspector = (property.GetShaderPropertyFlags() & ShaderPropertyFlags.HideInInspector) != 0;
             if (!skipProperty && !hideInInspector) {
                 DrawStandard(materialEditor, property);
             }
 
             if (targetMaterial.IsKeywordEnabled("_COLORMODE_GRADIENT_TEXTURE") &&
-                property.type == MaterialProperty.PropType.Texture &&
+                property.GetShaderPropertyType() == ShaderPropertyType.Texture &&
                 property.displayName.StartsWith("[_COLORMODE_GRADIENT_TEXTURE]") &&
                 property.textureValue != null) {
                 GUILayout.Space(-50);
                 using (new EditorGUILayout.HorizontalScope()) {
                     GUILayout.Space(15);
                     if (GUILayout.Button("Reset", EditorStyles.miniButtonLeft,
-                        GUILayout.Width(60f), GUILayout.ExpandWidth(false))) {
+                            GUILayout.Width(60f), GUILayout.ExpandWidth(false))) {
                         property.textureValue = null;
                     }
 
@@ -76,20 +116,47 @@ public class FlatKitWaterEditor : ShaderGUI {
 
                 EditorGUILayout.Space(60);
             }
+
+            EditorGUI.indentLevel = originalIntentLevel;
         }
 
-        int opaque = targetMaterial.GetInt("_Opaque");
-        if (opaque == 1) {
-            targetMaterial.SetOverrideTag("RenderType", "Opaque");
-            targetMaterial.SetInt("_ZWrite", 1);
-            targetMaterial.renderQueue = (int) RenderQueue.Geometry;
+        EditorGUILayout.Space();
+        FoldoutStates[RenderingOptionsName] =
+            EditorGUILayout.Foldout(FoldoutStates[RenderingOptionsName], RenderingOptionsName, true, _foldoutStyle);
+        if (FoldoutStates[RenderingOptionsName]) {
+            EditorGUI.indentLevel += 1;
+            DrawOpaqueField(targetMaterial);
+            DrawQueueOffsetField(properties, targetMaterial);
+        }
+    }
+
+    private void DrawOpaqueField(Material material) {
+        var opaque = EditorGUILayout.Toggle("Opaque", material.GetTag("RenderType", false) == "Opaque");
+        if (opaque) {
+            material.SetOverrideTag("RenderType", "Opaque");
+            material.SetInt("_ZWrite", 1);
+            material.renderQueue = (int)RenderQueue.Geometry;
         } else {
-            targetMaterial.SetOverrideTag("RenderType", "Transparent");
-            targetMaterial.SetInt("_ZWrite", 0);
-            targetMaterial.renderQueue = (int) RenderQueue.Transparent;
+            material.SetOverrideTag("RenderType", "Transparent");
+            material.SetInt("_ZWrite", 0);
+            material.renderQueue = (int)RenderQueue.Transparent;
         }
+    }
 
-        DrawQueueOffsetField(properties, targetMaterial);
+    private void DrawQueueOffsetField(MaterialProperty[] properties, Material material) {
+        GUIContent queueSlider = new GUIContent("Priority",
+            "Determines the chronological rendering order for a Material. High values are rendered first.");
+        const int queueOffsetRange = 50;
+        MaterialProperty queueOffsetProp = FindProperty("_QueueOffset", properties, false);
+        if (queueOffsetProp == null) return;
+        EditorGUI.BeginChangeCheck();
+        EditorGUI.showMixedValue = queueOffsetProp.hasMixedValue;
+        var queue = EditorGUILayout.IntSlider(queueSlider, (int)queueOffsetProp.floatValue, -queueOffsetRange,
+            queueOffsetRange);
+        if (EditorGUI.EndChangeCheck())
+            queueOffsetProp.floatValue = queue;
+        EditorGUI.showMixedValue = false;
+        material.renderQueue += queue;
     }
 
     private void DrawStandard(MaterialEditor materialEditor, MaterialProperty property) {
@@ -102,11 +169,16 @@ public class FlatKitWaterEditor : ShaderGUI {
         displayName = Regex.Replace(displayName, @" ?\{.*?\}", string.Empty);
 
         var guiContent = new GUIContent(displayName, tooltip);
-        materialEditor.ShaderProperty(property, guiContent);
+
+        if (property.GetShaderPropertyType() == ShaderPropertyType.Texture) {
+            materialEditor.TexturePropertySingleLine(guiContent, property);
+        } else {
+            materialEditor.ShaderProperty(property, guiContent);
+        }
     }
 
     private bool ShowColorGradientExportBox(MaterialEditor materialEditor, MaterialProperty property) {
-        bool isGradientTexture = property.type == MaterialProperty.PropType.Texture &&
+        bool isGradientTexture = property.GetShaderPropertyType() == ShaderPropertyType.Texture &&
                                  property.displayName.StartsWith("[_COLORMODE_GRADIENT_TEXTURE]");
         if (isGradientTexture) {
             if (property.textureValue != null) {
@@ -163,8 +235,8 @@ public class FlatKitWaterEditor : ShaderGUI {
             filterMode = FilterMode.Point
         };
         for (float x = 0;
-            x < width;
-            x++) {
+             x < width;
+             x++) {
             Color32 color = g.Evaluate(x / (width - 1));
             texture.SetPixel(Mathf.CeilToInt(x), 0, color);
         }
@@ -210,7 +282,7 @@ public class FlatKitWaterEditor : ShaderGUI {
             Debug.LogWarning($"Could not save the texture to {fullPath}.");
         }
 
-        TextureImporter importer = (TextureImporter) TextureImporter.GetAtPath(pathRelativeToAssets);
+        TextureImporter importer = (TextureImporter)TextureImporter.GetAtPath(pathRelativeToAssets);
         Debug.Assert(importer != null,
             $"[FlatKit] Could not create importer at {pathRelativeToAssets}.");
         if (importer != null) {
@@ -248,28 +320,7 @@ public class FlatKitWaterEditor : ShaderGUI {
     }
 
     private static string ConvertFullPathToAssetPath(string fullPath) {
-        int count = (Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar).Length;
-        if (count < 0) {
-            return String.Empty;
-        }
-
+        int count = (Directory.GetCurrentDirectory() + System.IO.Path.DirectorySeparatorChar).Length;
         return fullPath.Remove(0, count);
-    }
-
-    private void DrawQueueOffsetField(MaterialProperty[] properties, Material material) {
-        GUIContent queueSlider = new GUIContent("     Priority",
-            "Determines the chronological rendering order for a Material. High values are rendered first.");
-        const int queueOffsetRange = 50;
-        MaterialProperty queueOffsetProp = FindProperty("_QueueOffset", properties, false);
-        if (queueOffsetProp == null) return;
-        EditorGUI.BeginChangeCheck();
-        EditorGUI.showMixedValue = queueOffsetProp.hasMixedValue;
-        var queue = EditorGUILayout.IntSlider(queueSlider, (int) queueOffsetProp.floatValue, -queueOffsetRange,
-            queueOffsetRange);
-        if (EditorGUI.EndChangeCheck())
-            queueOffsetProp.floatValue = queue;
-        EditorGUI.showMixedValue = false;
-
-        material.renderQueue = (int)RenderQueue.Transparent + queue;
     }
 }

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Reflection;
 using System.IO;
-using System.Linq;
 using System;
+using UnityEditor.SceneManagement;
 
 namespace Kamgam.ExcludeFromBuild
 {
@@ -82,12 +82,12 @@ namespace Kamgam.ExcludeFromBuild
         [MenuItem("Window/Exclude From Build")]
         static ExcludeFromBuildWindow openWindow()
         {
-            return openWindow(focus: true);
+            return openWindow(utility: false);
         }
 
-        static ExcludeFromBuildWindow openWindow(bool focus)
+        static ExcludeFromBuildWindow openWindow(bool utility)
         {
-            ExcludeFromBuildWindow window = (ExcludeFromBuildWindow)EditorWindow.GetWindow(typeof(ExcludeFromBuildWindow), focus);
+            ExcludeFromBuildWindow window = (ExcludeFromBuildWindow)EditorWindow.GetWindow(typeof(ExcludeFromBuildWindow), utility);
             window.titleContent = new GUIContent("Exclude From Build");
             window.Initialize();
             window.Show();
@@ -98,7 +98,7 @@ namespace Kamgam.ExcludeFromBuild
         {
             if (!HasOpenInstances<ExcludeFromBuildWindow>())
             {
-                var window = openWindow(focus);
+                var window = openWindow(utility: false);
                 if (focus)
                     window.Focus();
                 return window;
@@ -110,6 +110,16 @@ namespace Kamgam.ExcludeFromBuild
                     window.Focus();
                 return window;
             }
+        }
+
+        public static void ForceRepaint()
+        {
+            if (!HasOpenInstances<ExcludeFromBuildWindow>())
+                return;
+
+            var window = GetOrOpen(focus: false);
+            if (window != null)
+                window.Repaint();
         }
 
         public void OnEnable()
@@ -245,14 +255,14 @@ namespace Kamgam.ExcludeFromBuild
                 }
                 if (!isEditingGroups)
                 {
-                    if (DrawButton(" edit ", options: GUILayout.MaxWidth(100)))
+                    if (DrawButton(" Edit ", options: GUILayout.MaxWidth(100)))
                     {
                         isEditingGroups = true;
                     }
                 }
                 else
                 {
-                    if (DrawButton(" back ", options: GUILayout.MaxWidth(100)))
+                    if (DrawButton(" < Back ", options: GUILayout.MaxWidth(100)))
                     {
                         isEditingGroups = false;
                         EditorUtility.SetDirty(data);
@@ -261,15 +271,15 @@ namespace Kamgam.ExcludeFromBuild
                 }
                 GUI.enabled = true;
                 GUILayout.EndHorizontal();
-                if (!data.CurrentGroup.MatchesAllCtriteria(EditorUserBuildSettings.activeBuildTarget))
+                if (!data.CurrentGroup.MatchesAllCriteria(EditorUserBuildSettings.activeBuildTarget))
                 {
                     var newGroupForBuild = data.GetFirstGroupMatchingTarget(EditorUserBuildSettings.activeBuildTarget);
                     if (newGroupForBuild == null)
                     {
                         DrawLabel(
                                 "<b>Huston, we have a problem!</b>\n" +
-                                "No group matches the current build settings. Please make sure at least one group matches.",
-                                wordwrap: true, color: WarningTextColor, richText: true);
+                                "No group matches the current build settings. Please make sure at least one group matches or no exclusions will happen.",
+                                wordwrap: true, color: new Color(0.7f, 0.4f, 0.2f), richText: true);
                     }
                     else
                     {
@@ -353,7 +363,7 @@ namespace Kamgam.ExcludeFromBuild
                     GUILayout.EndHorizontal();
 
                     GUILayout.BeginVertical(EditorStyles.helpBox);
-                    DrawLabel("Scan for GameObjects that are excluded (have an 'ExcludeFromBuild' component).\nNOTICE: Prefabs which are not used in any scene (i.e. they just exist as assets files) are ignored.", wordwrap: true);
+                    DrawLabel("Scan for GameObjects that are excluded (have an 'ExcludeFromBuild' component).\nNOTICE: Prefabs which are not used in any scene (i.e. they just exist as assets files) are ignored because they are not part of the build anyways.", wordwrap: true);
                     GUILayout.EndVertical();
 
                     DrawScanResults(data, settings.ScanAllGroups);
@@ -405,10 +415,10 @@ namespace Kamgam.ExcludeFromBuild
 
             // show list of excluded folders
             GUILayout.BeginHorizontal();
-            DrawLabel("<b>Excluded files and directories</b> in '" + data.CurrentGroup.Name + "'" + (IsTesting ? " (Testing)" : ""), richText: true, color: (IsTesting ? (Nullable<Color>)Color.red : null));
+            DrawLabel("<b>Excluded files and directories</b> in '" + data.CurrentGroup.Name + "'" + (IsTesting ? " (Testing)" : ""), richText: true, color: (IsTesting ? (Nullable<Color>)Color.red : null), wordwrap: false);
             GUILayout.FlexibleSpace();
             GUI.enabled = !IsTesting;
-            if (DrawButton(" Start test ", tooltip: "Hides all excludes files and folders from unity by adding '~' to the end of their path. If you are excluding scripts then this will trigger a recompile.\n\nIMPORTANT NOTICE:\nDon't forget to stop the test before commiting any changes!"))
+            if (DrawButton(" Start test ", tooltip: "Hides all excludes files and folders from unity by adding '~' to the end of their path. If you are excluding scripts then this will trigger a recompile.\n\nIMPORTANT NOTICE:\nDon't forget to stop the test before committing any changes!"))
             {
                 StartTest();
             }
@@ -419,10 +429,14 @@ namespace Kamgam.ExcludeFromBuild
             }
             GUILayout.Space(4);
             bool _previousTestAwareBuildValue = settings.TestAwareBuild;
-            settings.TestAwareBuild = GUILayout.Toggle(settings.TestAwareBuild, new GUIContent("Test aware build", ExcludeFromBuildSettings._TestAwareBuildTooltip));
+            settings.TestAwareBuild = GUILayout.Toggle(settings.TestAwareBuild, new GUIContent("Test aware build,", ExcludeFromBuildSettings._TestAwareBuildTooltip));
+            var _previousAutoExcludeValue = settings.AutoExcludeAfterBuildConfigChange;
+            GUILayout.Space(4);
+            settings.AutoExcludeAfterBuildConfigChange = (ExcludeFromBuildSettings.AutoExcludeAfterBuildConfigChangeBehaviour) EditorGUILayout.EnumPopup(settings.AutoExcludeAfterBuildConfigChange, GUILayout.Width(70));
+            DrawLabel("Auto Test,", tooltip: ExcludeFromBuildSettings._AutoExcludeAfterBuildConfigChange);
             GUILayout.Space(4);
             bool _previousDelayBuildStartValue = settings.DelayBuildStart;
-            settings.DelayBuildStart = GUILayout.Toggle(settings.DelayBuildStart, new GUIContent("Delay Build Start", ExcludeFromBuildSettings._DelayBuildStartTooltip));
+            settings.DelayBuildStart = GUILayout.Toggle(settings.DelayBuildStart, new GUIContent("Delay Build Start,", ExcludeFromBuildSettings._DelayBuildStartTooltip));
             bool _previousPreProcessPrefabsValue = settings.PreProcessPrefabs;
             settings.PreProcessPrefabs = GUILayout.Toggle(settings.PreProcessPrefabs, new GUIContent("Prefabs", ExcludeFromBuildSettings._PreProcessPrefabsTooltip));
             GUILayout.Space(4);
@@ -441,8 +455,10 @@ namespace Kamgam.ExcludeFromBuild
                         var fileName = Path.GetFileName(excludedObj.AssetPath);
                         var filePath = excludedObj.AssetPath.Replace(fileName, "");
                         var exists = !excludedObj.IsAsset || (excludedObj.AssetExists() && !IsTesting);
+                        // var missingColor = IsTesting ? "ff9c00" : "ff6666";
+                        var missingText = IsTesting ? "Excluded" : "Missing";
                         DrawLabel(
-                            WrapInRichTextColor(filePath, new Color(0.6f, 0.6f, 0.6f)) + fileName + (exists ? "" : " <color=#ff6666>(Missing)</color>"),
+                            WrapInRichTextColor(filePath, new Color(0.6f, 0.6f, 0.6f)) + fileName + (exists ? "" : " <color=#ff6666>(" + missingText + ")</color>"),
                             wordwrap: true, icon: excludedObj.MiniThumbnail,
                             tooltip: exists ? "" : "This asset is missing. Did you delete it?");
 
@@ -484,6 +500,7 @@ namespace Kamgam.ExcludeFromBuild
 
             // save settings if change
             if (   _previousTestAwareBuildValue != settings.TestAwareBuild
+                || _previousAutoExcludeValue != settings.AutoExcludeAfterBuildConfigChange
                 || _previousDelayBuildStartValue != settings.DelayBuildStart
                 || _previousPreProcessPrefabsValue != settings.PreProcessPrefabs)
             {
@@ -583,11 +600,29 @@ namespace Kamgam.ExcludeFromBuild
                     }
                     DrawLabel(compGroups, tooltip: "Is active for groups: " + compGroups, bold: true, options: new GUILayoutOption[] { GUILayout.MaxWidth(100) });
                     DrawLabel(sceneName + " <b>:</b> " + compPath + "<b>" + compName + "</b>", tooltip: "Is active for groups: " + compGroups);
-                    if (DrawButton(" Scene ", icon: "Animation.Play", options: GUILayout.Width(70)))
+                    if (DrawButton(" Ping ", icon: "Animation.Play", options: GUILayout.Width(70)))
                     {
-                        var path = AssetDatabase.GUIDToAssetPath(excludedObj.ComponentSceneGUID);
-                        var obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+                        // Ping Scene
+                        var scenePath = AssetDatabase.GUIDToAssetPath(excludedObj.ComponentSceneGUID);
+                        var obj = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(scenePath);
                         EditorGUIUtility.PingObject(obj);
+                        
+                        // If Scene is opened then try to ping component
+                        var activeScene = EditorSceneManager.GetActiveScene();
+                        for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+                        {
+                            var scene = EditorSceneManager.GetSceneAt(i);
+                            if (scene.path == scenePath)
+                            {
+                                EditorSceneManager.SetActiveScene(scene);
+                                var go = GameObject.Find(excludedObj.Path);
+                                if(go != null)
+                                    EditorGUIUtility.PingObject(go);
+                                break;
+                            }
+                        }
+                        EditorSceneManager.SetActiveScene(activeScene);
+
                     }
 
                     GUILayout.EndHorizontal();
@@ -613,8 +648,11 @@ namespace Kamgam.ExcludeFromBuild
             {
                 GUILayout.BeginHorizontal();
                 DrawUtils.DrawLabel(new GUIContent("Name"), null, GUILayout.Width(185));
-                DrawUtils.DrawLabel(new GUIContent("Build Target"), null, GUILayout.Width(160));
+                DrawUtils.DrawLabel(new GUIContent("Platform (Build Target)"), null, GUILayout.Width(160));
                 DrawUtils.DrawLabel(new GUIContent("Sub Target", "Select which standalone sub target (useful for headless builds). 'Any' means the sub target will not be checked."), null, GUILayout.Width(80));
+#if UNITY_6000_0_OR_NEWER
+                DrawUtils.DrawLabel(new GUIContent("Profile", "The build profiles. 'Any' means that the profile will not be checked."), null, GUILayout.Width(80));
+#endif
                 DrawUtils.DrawLabel(new GUIContent("Debug", "Choose whether this group should only be used for a certain build configuration (release or development/debug)."), null, GUILayout.Width(70));
                 DrawUtils.DrawLabel(new GUIContent("Actions"), null);
                 GUILayout.EndHorizontal();
@@ -652,6 +690,14 @@ namespace Kamgam.ExcludeFromBuild
                     group.StandaloneSubTarget = DrawUtils.DrawStandaloneSubTargetMultiSelect(group.StandaloneSubTarget, null , standaloneMultiSelectLabelColor, drawLabel: false, GUILayout.Width(80));
                     GUI.backgroundColor = col;
 
+#if UNITY_6000_0_OR_NEWER
+                    // Profile
+                    var profileLabelColor = group.MatchesBuildProfiles() ? new Color(0.7f, 1f, 0.7f) : new Color(1f, 0.7f, 0.7f);
+                    GUI.backgroundColor = profileLabelColor;
+                    DrawUtils.DrawBuildProfilesMultiSelect(group, "", "Select which profiles this group should be used for (choose Any if you don't care)." , profileLabelColor, drawLabel: false, GUILayout.Width(80));
+                    GUI.backgroundColor = col;
+#endif
+                    
                     // Debug or Release?
                     var configMultiSelectLabelColor = group.MatchesBuildConfiguration() ? new Color(0.7f, 1f, 0.7f) : new Color(1f, 0.7f, 0.7f);
                     GUI.backgroundColor = configMultiSelectLabelColor;
@@ -669,7 +715,7 @@ namespace Kamgam.ExcludeFromBuild
                         continue;
                     }
                     GUI.enabled = true;
-                    if (DrawButton(" Copy "))
+                    if (DrawButton(" Duplicate "))
                     {
                         Undo.RegisterCompleteObjectUndo(data, "Copy platform");
                         var newGroup = new ExcludeFromBuildData.Group(data.GetNextGroupId(), group);
@@ -698,7 +744,7 @@ namespace Kamgam.ExcludeFromBuild
                     // Defines
                     var definesLabelColor = group.MatchesDefines() ? new Color(0.7f, 1f, 0.7f) : new Color(1f, 0.7f, 0.7f);
                     GUI.backgroundColor = definesLabelColor;
-                    DrawUtils.DrawLabel(new GUIContent("Defines:", "Defines are combined with AND logic. All specified defines need to exists for this to be a positive match."), definesLabelColor, GUILayout.Width(55));
+                    DrawUtils.DrawLabel(new GUIContent("Defines:", "Defines are combined with AND logic (separate with a comma). All specified defines need to exists for this to be a positive match."), definesLabelColor, GUILayout.Width(55));
                     group.Defines = GUILayout.TextField(group.Defines, GUILayout.ExpandWidth(true));
                     GUI.backgroundColor = col;
                     GUILayout.EndHorizontal();
@@ -734,7 +780,7 @@ namespace Kamgam.ExcludeFromBuild
 
         public static void OpenManual()
         {
-            EditorUtility.OpenWithDefaultApp("Assets/ExcludeFromBuild/ExcludeFromBuildManual.pdf");
+            EditorUtility.OpenWithDefaultApp("Assets/ExcludeFromBuild/ExcludeFromBuild2Manual.pdf");
         }
 
         public void OpenSettings()
@@ -754,8 +800,13 @@ namespace Kamgam.ExcludeFromBuild
             if (!succeeded)
             {
                 IsTesting = false;
-                EditorUtility.DisplayDialog("Starting TEST FAILED", "Errors will be logged in the console.\n\nIf you need more detailed information then please set the 'Log Level' to 'Log' in the settings and try again.", "Damn");
+                ShowStartTextFailedMessage();
             }
+        }
+
+        public static void ShowStartTextFailedMessage()
+        {
+            EditorUtility.DisplayDialog("Starting TEST FAILED", "Errors will be logged in the console.\n\nIf you need more detailed information then please set the 'Log Level' to 'Log' in the settings and try again.", "Damn");
         }
 
         public void StopTest()
