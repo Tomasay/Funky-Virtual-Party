@@ -530,7 +530,7 @@ public class VRtistryGameManager : MonoBehaviour
 
                     //Display text that players are answering
                     string clientChosenName = ClientPlayer.GetClientByCurrentOwnerID(VRtistrySyncer.instance.ChosenClientToRoast).syncer.Name;
-                    headerText.text = "<u>Client Themed Round</u>\n\n" +
+                    headerText.text = "<u>Player Themed Round</u>\n\n" +
                        "Players are typing their answers about " + clientChosenName + "\n" +
                                 "Use this time to practice painting!";
                 }
@@ -634,7 +634,7 @@ public class VRtistryGameManager : MonoBehaviour
                 vrPlayer.rightUIPointer.enabled = true;
 
                 //Display all answers
-                headerText.text = "Clients are guessing what your art is";
+                headerText.text = "Players are guessing what your art is";
                 timerText.enabled = false;
                 playerNamesIconParent.SetActive(true);
 
@@ -1248,7 +1248,7 @@ public class VRtistryGameManager : MonoBehaviour
 
         if (!VRtistrySyncer.instance.State.Equals("results"))
         {
-            headerText.text = "Waiting for clients to submit guesses";
+            headerText.text = "Waiting for players to submit guesses";
 
             //If all clients have also guessed, move to results phase
             int playerGuessCount = ClientPlayer.clients.Count(cp => cp.syncer.VrtistryPlayerGuess != -1);

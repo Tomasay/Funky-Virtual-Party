@@ -1979,7 +1979,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 18
+          m_IntArgument: 25
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -8931,7 +8931,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 18
+          m_IntArgument: 25
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -17178,7 +17178,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa153ef0d821a74998c4a6c5600a884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forwardDirection: 0
+  forwardDirection: 3
+  customForwardTransform: {fileID: 1409201371}
+  inheritParentRotationX: 1
+  inheritParentRotationY: 0
+  inheritParentRotationZ: 1
 --- !u!1 &1239402230
 GameObject:
   m_ObjectHideFlags: 0
@@ -22451,6 +22455,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   forwardDirection: 0
+  customForwardTransform: {fileID: 0}
+  inheritParentRotationX: 0
+  inheritParentRotationY: 0
+  inheritParentRotationZ: 0
 --- !u!1 &1544919493
 GameObject:
   m_ObjectHideFlags: 0
@@ -26775,9 +26783,9 @@ MonoBehaviour:
   m_fontSize: 200
   m_fontSizeBase: 200
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 140
+  m_fontSizeMax: 200
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
