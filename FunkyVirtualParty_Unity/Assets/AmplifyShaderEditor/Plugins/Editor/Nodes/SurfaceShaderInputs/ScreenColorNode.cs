@@ -60,18 +60,15 @@ namespace AmplifyShaderEditor
 		private const string OpaqueTextureDefine = "REQUIRE_OPAQUE_TEXTURE 1";
 		private const string FetchVarName = "fetchOpaqueVal";
 
-		//private string LWFetchOpaqueTexture = "SAMPLE_TEXTURE2D( _CameraOpaqueTexture, sampler_CameraOpaqueTexture, {0})";
+		private string URPFetchOpaqueTexture = "float4( SHADERGRAPH_SAMPLE_SCENE_COLOR( {0}.xy ), 1.0 )";
 
-		private string LWFetchOpaqueTexture = "float4( SHADERGRAPH_SAMPLE_SCENE_COLOR( {0} ), 1.0 )";
-
-#if UNITY_2021_1_OR_NEWER
 		private const string URP2DHelpBox = "For the Grab Screen Color to properly work a proper setup is required:" +
 											"\n- On the 2D Asset Renderer the \"Foremost Sorting Layer\" must be set to the last layer which is going to be caught by the Grab Screen Color" +
 											"\n- The \"Sorting Layer\" of the sprite itself which will be using the shader with the Grab Screen Color must be set to one which is above the one specified on the previous step";
 
 		private readonly string[] URP2DDeclaration = {  "TEXTURE2D_X( _CameraSortingLayerTexture );",
 														"SAMPLER( sampler_CameraSortingLayerTexture );" };
-		private readonly string URP2DFunctionHeader = "float4( ASESample2DSortingLayer({0}), 1.0 )";
+		private readonly string URP2DFunctionHeader = "float4( ASESample2DSortingLayer({0}.xy), 1.0 )";
 		private readonly string[] URP2DFunctionBody =
 		{
 			"float3 ASESample2DSortingLayer( float2 uv )\n" +
@@ -79,9 +76,8 @@ namespace AmplifyShaderEditor
 			"\treturn SAMPLE_TEXTURE2D_X(_CameraSortingLayerTexture, sampler_CameraSortingLayerTexture, UnityStereoTransformScreenSpaceTex(uv)).rgb;\n"+
 			"}\n"
 		};
-#endif
 
-		private const string HDSampleSceneColorHeader5 = "ASEHDSampleSceneColor({0}, {1}, {2})";
+		private const string HDSampleSceneColorHeader5 = "ASEHDSampleSceneColor({0}.xy, {1}, {2})";
 		private readonly string[] HDSampleSceneColorFunc5 =
 		{
 			"float4 ASEHDSampleSceneColor(float2 uv, float lod, float exposureMultiplier)\n",
@@ -93,7 +89,7 @@ namespace AmplifyShaderEditor
 			"}\n",
 		};
 
-		private const string HDSampleSceneColorHeader4 = "ASEHDSampleSceneColor({0})";
+		private const string HDSampleSceneColorHeader4 = "ASEHDSampleSceneColor({0}.xy)";
 		private readonly string[] HDSampleSceneColorFunc4 =
 		{
 			"float4 ASEHDSampleSceneColor( float2 uv )\n",
@@ -130,7 +126,7 @@ namespace AmplifyShaderEditor
 			m_globalDefaultBehavior = false;
 			m_showVariableMode = true;
 		}
-		
+
 		protected override void OnUniqueIDAssigned()
 		{
 			base.OnUniqueIDAssigned();
@@ -279,7 +275,7 @@ namespace AmplifyShaderEditor
 				}
 				UpdateHeaderColor();
 			}
-			
+
 			if( m_referenceType == TexReferenceType.Object )
 			{
 				EditorGUI.BeginDisabledGroup( m_containerGraph.IsSRP );
@@ -336,8 +332,7 @@ namespace AmplifyShaderEditor
 				m_exposure = EditorGUILayoutToggle( "Exposure", m_exposure );
 			}
 
-#if UNITY_2021_1_OR_NEWER
-			if( ( ContainerGraph.IsLWRP || ContainerGraph.ParentWindow.IsShaderFunctionWindow ) && ASEPackageManagerHelper.CurrentHDRPBaseline >= ASESRPBaseline.ASE_SRP_11 )
+			if ( ContainerGraph.IsURP || ContainerGraph.ParentWindow.IsShaderFunctionWindow )
 			{
 				m_isURP2D = EditorGUILayoutToggle( "2D Renderer" , m_isURP2D);
 				if( m_isURP2D )
@@ -345,7 +340,6 @@ namespace AmplifyShaderEditor
 					EditorGUILayout.HelpBox( URP2DHelpBox , MessageType.Info );
 				}
 			}
-#endif
 		}
 
 		private void UpdatePort()
@@ -399,10 +393,8 @@ namespace AmplifyShaderEditor
 				valueName = FetchVarName + OutputId;
 				dataCollector.AddToDirectives( OpaqueTextureDefine, -1 , AdditionalLineType.Define);
 				string uvCoords = GetUVCoords( ref dataCollector, ignoreLocalVar, false );
-				if( dataCollector.TemplateDataCollectorInstance.IsLWRP )
+				if( dataCollector.TemplateDataCollectorInstance.IsURP )
 				{
-
-#if UNITY_2021_1_OR_NEWER
 					if( m_isURP2D )
 					{
 						dataCollector.AddToUniforms( UniqueId , URP2DDeclaration[ 0 ] );
@@ -411,9 +403,8 @@ namespace AmplifyShaderEditor
 						dataCollector.AddLocalVariable( UniqueId , CurrentPrecisionType , WirePortDataType.FLOAT4 , valueName , string.Format( URP2DFunctionHeader , uvCoords ) );
 					}
 					else
-#endif
 					{
-						dataCollector.AddLocalVariable( UniqueId , CurrentPrecisionType , WirePortDataType.FLOAT4 , valueName , string.Format( LWFetchOpaqueTexture , uvCoords ) );
+						dataCollector.AddLocalVariable( UniqueId , CurrentPrecisionType , WirePortDataType.FLOAT4 , valueName , string.Format( URPFetchOpaqueTexture , uvCoords ) );
 					}
 				}
 				else
@@ -421,7 +412,7 @@ namespace AmplifyShaderEditor
 					string lod = m_inputPorts[ 1 ].GeneratePortInstructions( ref dataCollector );
 					dataCollector.AddFunction( HDSampleSceneColorFunc5[ 0 ], HDSampleSceneColorFunc5, false );
 					string exposureValue = m_exposure ? "1.0" : "GetInverseCurrentExposureMultiplier()";
-					dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, WirePortDataType.FLOAT4, valueName, string.Format( HDSampleSceneColorHeader5, uvCoords, lod, exposureValue ) );					
+					dataCollector.AddLocalVariable( UniqueId, m_currentPrecisionType, WirePortDataType.FLOAT4, valueName, string.Format( HDSampleSceneColorHeader5, uvCoords, lod, exposureValue ) );
 				}
 			}
 			else
@@ -487,7 +478,7 @@ namespace AmplifyShaderEditor
 				string customScreenPos = null;
 
 				if( dataCollector.IsTemplate )
-					customScreenPos = dataCollector.TemplateDataCollectorInstance.GetScreenPos( CurrentPrecisionType );
+					customScreenPos = dataCollector.TemplateDataCollectorInstance.GetScreenPosRaw( CurrentPrecisionType );
 
 				if( isProjecting )
 					result = GeneratorUtils.GenerateGrabScreenPosition( ref dataCollector, UniqueId, CurrentPrecisionType, !dataCollector.UsingCustomScreenPos, customScreenPos );
@@ -649,6 +640,17 @@ namespace AmplifyShaderEditor
 				else
 					m_normalize = false;
 			}
+		}
+
+		public override void ReconnectClipboardReferences( Clipboard clipboard )
+		{
+			// validate node first
+			int newId = clipboard.GeNewNodeId( m_referenceNodeId );
+			if ( ContainerGraph.GetNode( newId ) != null )
+			{
+				m_referenceNodeId = newId;
+			}
+			RefreshExternalReferences();
 		}
 
 		public override string PropertyName

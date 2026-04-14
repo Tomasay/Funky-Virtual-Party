@@ -4,9 +4,9 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using System.IO;
-
-using System.Globalization;
+using System;
+using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace AmplifyShaderEditor
@@ -29,8 +29,8 @@ namespace AmplifyShaderEditor
 		WORLD_POS,
 		WORLD_REFL,
 		WORLD_NORMAL,
-		FRONT_FACING,
-		FRONT_FACING_VFACE,
+		FRONT_FACE,
+		FRONT_FACE_VFACE,
 		INTERNALDATA
 	}
 
@@ -215,7 +215,8 @@ namespace AmplifyShaderEditor
 		World,
 		View,
 		Tangent,
-		Clip
+		Clip,
+		Screen
 	}
 
 	public class UIUtils
@@ -575,7 +576,8 @@ namespace AmplifyShaderEditor
 			{ "Master",                             new Color( 0.6f, 0.52f, 0.43f, 1.0f )},
 			{ "Default",                            new Color( 0.26f, 0.35f, 0.44f, 1.0f )},
 			{ "Vertex Data",                        new Color( 0.8f, 0.07f, 0.18f, 1.0f)},
-			{ "Primitive",							new Color( 0.8f, 0.07f, 0.18f, 1.0f)},
+			{ "Primitive",                          new Color( 0.8f, 0.07f, 0.18f, 1.0f)},
+			{ "Object",                             new Color( 0.8f, 0.07f, 0.18f, 1.0f)},
 			{ "Math Operators",                     new Color( 0.26f, 0.35f, 0.44f, 1.0f )},
 			{ "Logical Operators",                  new Color( 0.0f, 0.55f, 0.45f, 1.0f)},
 			{ "Trigonometry Operators",             new Color( 0.1f, 0.20f, 0.35f, 1.0f)},
@@ -623,6 +625,7 @@ namespace AmplifyShaderEditor
 			{ WirePortDataType.FLOAT2,      new Color(1f,1f,0f,1f)},
 			{ WirePortDataType.FLOAT3,      new Color(0.5f,0.5f,1f,1f)},
 			{ WirePortDataType.FLOAT4,      new Color(1f,0,1f,1f)},
+			{ WirePortDataType.FLOAT2x2,    new Color(0.5f,1f,0.5f,1f)},
 			{ WirePortDataType.FLOAT3x3,    new Color(0.5f,1f,0.5f,1f)},
 			{ WirePortDataType.FLOAT4x4,    new Color(0.5f,1f,0.5f,1f)},
 			{ WirePortDataType.COLOR,       new Color(1f,0,1f,1f)},
@@ -641,6 +644,7 @@ namespace AmplifyShaderEditor
 			{ WirePortDataType.FLOAT2,      "Vector2"},
 			{ WirePortDataType.FLOAT3,      "Vector3"},
 			{ WirePortDataType.FLOAT4,      "Vector4"},
+			{ WirePortDataType.FLOAT2x2,    "2x2 Matrix"},
 			{ WirePortDataType.FLOAT3x3,    "3x3 Matrix"},
 			{ WirePortDataType.FLOAT4x4,    "4x4 Matrix"},
 			{ WirePortDataType.COLOR,       "Color"},
@@ -664,8 +668,8 @@ namespace AmplifyShaderEditor
 			{ SurfaceInputs.WORLD_POS, "{0}3 worldPos"},
 			{ SurfaceInputs.WORLD_REFL, "{0}3 worldRefl"},
 			{ SurfaceInputs.WORLD_NORMAL,"{0}3 worldNormal"},
-			{ SurfaceInputs.FRONT_FACING, Constants.IsFrontFacingInput},
-			{ SurfaceInputs.FRONT_FACING_VFACE, Constants.IsFrontFacingInputVFACE},
+			{ SurfaceInputs.FRONT_FACE, Constants.IsFrontFaceInput},
+			{ SurfaceInputs.FRONT_FACE_VFACE, Constants.IsFrontFaceInput},
 			{ SurfaceInputs.INTERNALDATA, Constants.InternalData}
 		};
 
@@ -680,7 +684,7 @@ namespace AmplifyShaderEditor
 			{ SurfaceInputs.WORLD_POS, "worldPos"},
 			{ SurfaceInputs.WORLD_REFL, "worldRefl"},
 			{ SurfaceInputs.WORLD_NORMAL, "worldNormal"},
-			{ SurfaceInputs.FRONT_FACING, Constants.IsFrontFacingVariable},
+			{ SurfaceInputs.FRONT_FACE, Constants.IsFrontFaceVariable},
 		};
 
 		private static Dictionary<PrecisionType , string> m_precisionTypeToCg = new Dictionary<PrecisionType , string>()
@@ -703,6 +707,7 @@ namespace AmplifyShaderEditor
 			{WirePortDataType.FLOAT2,       "{0}2"},
 			{WirePortDataType.FLOAT3,       "{0}3"},
 			{WirePortDataType.FLOAT4,       "{0}4"},
+			{WirePortDataType.FLOAT2x2,     "{0}2x2"},
 			{WirePortDataType.FLOAT3x3,     "{0}3x3"},
 			{WirePortDataType.FLOAT4x4,     "{0}4x4"},
 			{WirePortDataType.COLOR,        "{0}4"},
@@ -721,6 +726,7 @@ namespace AmplifyShaderEditor
 			{WirePortDataType.FLOAT2,       "{0}2"},
 			{WirePortDataType.FLOAT3,       "{0}3"},
 			{WirePortDataType.FLOAT4,       "{0}4"},
+			{WirePortDataType.FLOAT2x2,     "{0}2x2"},
 			{WirePortDataType.FLOAT3x3,     "{0}3x3"},
 			{WirePortDataType.FLOAT4x4,     "{0}4x4"},
 			{WirePortDataType.COLOR,        "{0}4"},
@@ -739,6 +745,7 @@ namespace AmplifyShaderEditor
 			{WirePortDataType.FLOAT2,       "{0}2"},
 			{WirePortDataType.FLOAT3,       "{0}3"},
 			{WirePortDataType.FLOAT4,       "{0}4"},
+			{WirePortDataType.FLOAT2x2,     "{0}2x2"},
 			{WirePortDataType.FLOAT3x3,     "{0}3x3"},
 			{WirePortDataType.FLOAT4x4,     "{0}4x4"},
 			{WirePortDataType.COLOR,        "{0}4"},
@@ -757,6 +764,7 @@ namespace AmplifyShaderEditor
 			{WirePortDataType.FLOAT2,       "float2"},
 			{WirePortDataType.FLOAT3,       "float3"},
 			{WirePortDataType.FLOAT4,       "float4"},
+			{WirePortDataType.FLOAT2x2,     "float2x2"},
 			{WirePortDataType.FLOAT3x3,     "float3x3"},
 			{WirePortDataType.FLOAT4x4,     "float4x4"},
 			{WirePortDataType.COLOR,        "float4"},
@@ -815,15 +823,16 @@ namespace AmplifyShaderEditor
 			{WirePortDataType.SAMPLER3D,        0},
 			{WirePortDataType.SAMPLERCUBE,      0},
 			{WirePortDataType.SAMPLER2DARRAY,   0},
-			{WirePortDataType.FLOAT3x3,         1},
-			{WirePortDataType.FLOAT4x4,         2},
-			{WirePortDataType.INT,              3},
-			{WirePortDataType.UINT,             3},
-			{WirePortDataType.FLOAT,            4},
-			{WirePortDataType.FLOAT2,           5},
-			{WirePortDataType.FLOAT3,           6},
-			{WirePortDataType.FLOAT4,           7},
-			{WirePortDataType.COLOR,            7}
+			{WirePortDataType.FLOAT2x2,         1},
+			{WirePortDataType.FLOAT3x3,         2},
+			{WirePortDataType.FLOAT4x4,         3},
+			{WirePortDataType.INT,              4},
+			{WirePortDataType.UINT,             4},
+			{WirePortDataType.FLOAT,            5},
+			{WirePortDataType.FLOAT2,           6},
+			{WirePortDataType.FLOAT3,           7},
+			{WirePortDataType.FLOAT4,           8},
+			{WirePortDataType.COLOR,            8}
 		};
 
 		private static readonly string IncorrectInputConnectionErrorMsg = "Input Port {0} from node {1} has type {2}\nwhich is incompatible with connection of type {3} from port {4} on node {5}";
@@ -837,11 +846,11 @@ namespace AmplifyShaderEditor
 		private static RectOffset SwitchNodeOverflow;
 		private static RectOffset SwitchNodePadding;
 
-		private static RenderTexture m_dummyPreviewRT;
+		private static RenderTexture m_previewDisabledRT;
+
 		public static void ForceExampleShaderCompilation()
 		{
 			CurrentWindow.ForceMaterialsToUpdate( ref m_exampleMaterialIDs );
-
 		}
 
 		public static void Destroy()
@@ -859,12 +868,7 @@ namespace AmplifyShaderEditor
 
 			Initialized = false;
 
-			if( m_dummyPreviewRT != null )
-				m_dummyPreviewRT.Release();
-
-			ScriptableObject.DestroyImmediate( m_dummyPreviewRT );
-
-			m_dummyPreviewRT = null;
+			m_previewDisabledRT = null;
 			PlusStyle = null;
 			MinusStyle = null;
 			m_textInfo = null;
@@ -985,7 +989,7 @@ namespace AmplifyShaderEditor
 				m_undoHelper.Clear();
 				m_undoHelper = null;
 			}
-			ASEMaterialInspector.Instance = null;
+			MaterialInspector.Instance = null;
 		}
 
 		public static void ResetMainSkin()
@@ -1062,12 +1066,15 @@ namespace AmplifyShaderEditor
 
 			BoldErrorStyle = new GUIStyle( (GUIStyle)"BoldLabel" );
 			BoldErrorStyle.normal.textColor = Color.red;
+			BoldErrorStyle.hover.textColor = Color.red;
 			BoldErrorStyle.alignment = TextAnchor.MiddleCenter;
 			BoldWarningStyle = new GUIStyle( (GUIStyle)"BoldLabel" );
 			BoldWarningStyle.normal.textColor = Color.yellow;
+			BoldWarningStyle.hover.textColor = Color.yellow;
 			BoldWarningStyle.alignment = TextAnchor.MiddleCenter;
 			BoldInfoStyle = new GUIStyle( (GUIStyle)"BoldLabel" );
 			BoldInfoStyle.normal.textColor = Color.white;
+			BoldInfoStyle.hover.textColor = Color.white;
 			BoldInfoStyle.alignment = TextAnchor.MiddleCenter;
 
 			ToolbarMainTitle = new GUIStyle( MainSkin.customStyles[ (int)CustomStyle.MainCanvasTitle ] );
@@ -1193,6 +1200,29 @@ namespace AmplifyShaderEditor
 				Texture2DShader = AssetDatabase.LoadAssetAtPath<Shader>( AssetDatabase.GUIDToAssetPath( "13bd295c44d04e1419f20f792d331e33" ) ); //texture2d shader
 		}
 
+		public static void SetPreviewShaderConstants()
+		{
+			var worldCameraPos = new Vector3( 0, 0, -5 );
+			var objectToWorldMatrix = Matrix4x4.identity;
+			var worldToObjectMatrix = Matrix4x4.identity;
+			var viewMatrix = new Matrix4x4(
+				new Vector4( 1, 0, 0, 0 ),
+				new Vector4( 0, 1, 0, 0 ),
+				new Vector4( 0, 0,-1,-1 ),
+				new Vector4( 0, 0, 0, 1 ) );
+			var viewMatrixInv = new Matrix4x4(
+				new Vector4( 1, 0, 0, 0 ),
+				new Vector4( 0, 1, 0, 0 ),
+				new Vector4( 0, 0,-1, 0 ),
+				new Vector4( 0, 0,-1, 1 ) );
+
+			Shader.SetGlobalVector( "preview_WorldSpaceCameraPos", worldCameraPos ); ;
+			Shader.SetGlobalMatrix( "preview_WorldToObject", worldToObjectMatrix );
+			Shader.SetGlobalMatrix( "preview_ObjectToWorld", objectToWorldMatrix );
+			Shader.SetGlobalMatrix( "preview_MatrixV", viewMatrix );
+			Shader.SetGlobalMatrix( "preview_MatrixInvV", viewMatrixInv );
+		}
+
 		private static void FetchMenuItemStyles()
 		{
 			ObjectFieldThumb = new GUIStyle( (GUIStyle)"ObjectFieldThumb" );
@@ -1221,14 +1251,18 @@ namespace AmplifyShaderEditor
 			MinusStyle.imagePosition = ImagePosition.ImageOnly;
 			MinusStyle.overflow = new RectOffset( -2 , 0 , -4 , 0 );
 
-		#if UNITY_2021_3_OR_NEWER
-			ToolbarSearchTextfield = new GUIStyle((GUIStyle)"ToolbarSearchTextField");
-			ToolbarSearchCancelButton = new GUIStyle((GUIStyle)"ToolbarSearchCancelButton");
-		#else
-			ToolbarSearchTextfield = new GUIStyle( ( GUIStyle )"ToolbarSeachTextField" );
-			ToolbarSearchCancelButton = new GUIStyle( ( GUIStyle )"ToolbarSeachCancelButton" );
-		#endif
-
+			if ( GUI.skin.FindStyle( "ToolbarSearchTextField" ) != null )
+			{
+				// @diogo: new, fixed
+				ToolbarSearchTextfield = new GUIStyle( ( GUIStyle )"ToolbarSearchTextField" );
+				ToolbarSearchCancelButton = new GUIStyle( ( GUIStyle )"ToolbarSearchCancelButton" );
+			}
+			else
+			{
+				// @diogo: old, typo
+				ToolbarSearchTextfield = new GUIStyle( ( GUIStyle )"ToolbarSeachTextField" );
+				ToolbarSearchCancelButton = new GUIStyle( ( GUIStyle )"ToolbarSeachCancelButton" );
+			}
 		}
 
 		public static void UpdateMainSkin( DrawInfo drawInfo )
@@ -1405,6 +1439,7 @@ namespace AmplifyShaderEditor
 				case WirePortDataType.FLOAT2:
 				case WirePortDataType.FLOAT3:
 				case WirePortDataType.FLOAT4:
+				case WirePortDataType.FLOAT2x2:
 				case WirePortDataType.FLOAT3x3:
 				case WirePortDataType.FLOAT4x4:
 				case WirePortDataType.COLOR:
@@ -1467,6 +1502,7 @@ namespace AmplifyShaderEditor
 				case WirePortDataType.FLOAT2:
 				case WirePortDataType.FLOAT3:
 				case WirePortDataType.FLOAT4:
+				case WirePortDataType.FLOAT2x2:
 				case WirePortDataType.FLOAT3x3:
 				case WirePortDataType.FLOAT4x4:
 				case WirePortDataType.COLOR:
@@ -1491,7 +1527,7 @@ namespace AmplifyShaderEditor
 		public static string GetInputValueFromType( SurfaceInputs inputType ) { return m_inputTypeName[ inputType ]; }
 		private static string CreateLocalValueName( PrecisionType precision , WirePortDataType dataType , string localOutputValue , string value ) { return string.Format( Constants.LocalValueDecWithoutIdent , PrecisionWirePortToCgType( precision , dataType ) , localOutputValue , value ); }
 
-		public static string CastPortType( ref MasterNodeDataCollector dataCollector , PrecisionType nodePrecision , NodeCastInfo castInfo , object value , WirePortDataType oldType , WirePortDataType newType , string parameterName = null )
+		public static string CastPortType( ref MasterNodeDataCollector dataCollector , PrecisionType nodePrecision , object value , WirePortDataType oldType , WirePortDataType newType , string parameterName = null )
 		{
 			if( oldType == newType || newType == WirePortDataType.OBJECT )
 			{
@@ -1503,7 +1539,7 @@ namespace AmplifyShaderEditor
 			string newTypeStr = m_wirePortToCgType[ newType ];
 			newTypeStr = m_textInfo.ToTitleCase( newTypeStr );
 			int castId = ( dataCollector.PortCategory == MasterNodePortCategory.Vertex || dataCollector.PortCategory == MasterNodePortCategory.Tessellation ) ? dataCollector.AvailableVertexTempId : dataCollector.AvailableFragTempId;
-			string localVarName = "temp_cast_" + castId;//m_wirePortToCgType[ oldType ] + "To" + newTypeStr + "_" + castInfo.ToString();
+			string localVarName = "temp_cast_" + castId;
 			string result = string.Empty;
 			bool useRealValue = ( parameterName == null );
 
@@ -1542,17 +1578,12 @@ namespace AmplifyShaderEditor
 							result = localVarName;
 						}
 						break;
+						case WirePortDataType.FLOAT2x2:
 						case WirePortDataType.FLOAT3x3:
-						{
-							string localVal = CreateLocalValueName( currentPrecision , newType , localVarName , ( ( useRealValue ) ? value.ToString() : parameterName ) );
-							dataCollector.AddToLocalVariables( dataCollector.PortCategory , -1 , localVal );
-							result = localVarName;
-						}
-						break;
 						case WirePortDataType.FLOAT4x4:
 						{
-							string localVal = CreateLocalValueName( currentPrecision , newType , localVarName , ( ( useRealValue ) ? value.ToString() : parameterName ) );
-							dataCollector.AddToLocalVariables( dataCollector.PortCategory , -1 , localVal );
+							string localVal = CreateLocalValueName( currentPrecision, newType, localVarName, ( ( useRealValue ) ? value.ToString() : parameterName ) );
+							dataCollector.AddToLocalVariables( dataCollector.PortCategory, -1, localVal );
 							result = localVarName;
 						}
 						break;
@@ -1706,22 +1737,8 @@ namespace AmplifyShaderEditor
 					}
 				}
 				break;
+				case WirePortDataType.FLOAT2x2:
 				case WirePortDataType.FLOAT3x3:
-				{
-					//Matrix4x4 matrixVal = useRealValue ? ( Matrix4x4 ) value : Matrix4x4.identity;
-					//switch ( newType )
-					//{
-					//	case WirePortDataType.OBJECT:
-					//	case WirePortDataType.FLOAT4x4:
-					//	{
-					//		result = ( useRealValue ) ? precisionStr + "4x4(" + matrixVal.m00 + " , " + matrixVal.m01 + " , " + matrixVal.m02 + " , " + matrixVal.m03 + " , " +
-					//													matrixVal.m10 + " , " + matrixVal.m11 + " , " + matrixVal.m12 + " , " + matrixVal.m10 + " , " +
-					//													matrixVal.m20 + " , " + matrixVal.m21 + " , " + matrixVal.m22 + " , " + matrixVal.m20 + " , " +
-					//													matrixVal.m30 + " , " + matrixVal.m31 + " , " + matrixVal.m32 + " , " + matrixVal.m30 + " )" : precisionStr + "4x4(" + parameterName + ")";
-					//	}
-					//	break;
-					//}
-				}
 				break;
 				case WirePortDataType.FLOAT4x4:
 				{
@@ -1804,13 +1821,8 @@ namespace AmplifyShaderEditor
 							result = localVarName;
 						}
 						break;
+						case WirePortDataType.FLOAT2x2:
 						case WirePortDataType.FLOAT3x3:
-						{
-							string localVal = CreateLocalValueName( currentPrecision , oldType , localVarName , ( ( useRealValue ) ? value.ToString() : parameterName ) );
-							dataCollector.AddToLocalVariables( dataCollector.PortCategory , -1 , localVal );
-							result = localVarName;
-						}
-						break;
 						case WirePortDataType.FLOAT4x4:
 						{
 							string localVal = CreateLocalValueName( currentPrecision , oldType , localVarName , ( ( useRealValue ) ? value.ToString() : parameterName ) );
@@ -1846,13 +1858,8 @@ namespace AmplifyShaderEditor
 							result = localVarName;
 						}
 						break;
+						case WirePortDataType.FLOAT2x2:
 						case WirePortDataType.FLOAT3x3:
-						{
-							string localVal = CreateLocalValueName( currentPrecision , oldType , localVarName , ( ( useRealValue ) ? value.ToString() : parameterName ) );
-							dataCollector.AddToLocalVariables( dataCollector.PortCategory , -1 , localVal );
-							result = localVarName;
-						}
-						break;
 						case WirePortDataType.FLOAT4x4:
 						{
 							string localVal = CreateLocalValueName( currentPrecision , oldType , localVarName , ( ( useRealValue ) ? value.ToString() : parameterName ) );
@@ -1919,15 +1926,24 @@ namespace AmplifyShaderEditor
 						return true;
 				}
 				break;
+				case WirePortDataType.FLOAT2x2:
+				{
+					if( to == WirePortDataType.FLOAT3x3 ||
+						to == WirePortDataType.FLOAT4x4 )
+						return true;
+				}
+				break;
 				case WirePortDataType.FLOAT3x3:
 				{
-					if( to == WirePortDataType.FLOAT4x4 )
+					if( to == WirePortDataType.FLOAT2x2 ||
+						to == WirePortDataType.FLOAT4x4 )
 						return true;
 				}
 				break;
 				case WirePortDataType.FLOAT4x4:
 				{
-					if( to == WirePortDataType.FLOAT3x3 )
+					if( to == WirePortDataType.FLOAT2x2 ||
+						to == WirePortDataType.FLOAT3x3 )
 						return true;
 				}
 				break;
@@ -2073,7 +2089,16 @@ namespace AmplifyShaderEditor
 			return originalString;
 		}
 
-		public static string RemoveShaderInvalidCharacters( string originalString )
+        public static string RemoveRegisterInvalidCharacters(string originalString)
+        {
+            for (int i = 0; i < Constants.RegisterInvalidChars.Length; i++)
+            {
+                originalString = originalString.Replace(Constants.RegisterInvalidChars[i], string.Empty);
+            }
+            return originalString;
+        }
+
+        public static string RemoveShaderInvalidCharacters( string originalString )
 		{
 			originalString = originalString.Replace( '\\' , '/' );
 			for( int i = 0 ; i < Constants.ShaderInvalidChars.Length ; i++ )
@@ -2361,6 +2386,14 @@ namespace AmplifyShaderEditor
 			float labelWidth = EditorGUIUtility.labelWidth;
 			EditorGUIUtility.labelWidth = newLabelWidth;
 			value = owner.EditorGUIFloatField( propertyDrawPos , "  " , value , UIUtils.MainSkin.textField );
+			EditorGUIUtility.labelWidth = labelWidth;
+		}
+
+		public static void DrawInt( UndoParentNode owner , ref Rect propertyDrawPos , ref int value , float newLabelWidth = 8 )
+		{
+			float labelWidth = EditorGUIUtility.labelWidth;
+			EditorGUIUtility.labelWidth = newLabelWidth;
+			value = owner.EditorGUIIntField( propertyDrawPos , "  " , value , UIUtils.MainSkin.textField );
 			EditorGUIUtility.labelWidth = labelWidth;
 		}
 
@@ -3124,21 +3157,190 @@ namespace AmplifyShaderEditor
 			return body;
 		}
 
-		public static RenderTexture DummyRT
+		public static RenderTexture PreviewDisabledRT
 		{
 			get
 			{
-				if( m_dummyPreviewRT == null )
+				if( m_previewDisabledRT == null )
 				{
-					m_dummyPreviewRT = new RenderTexture( 128 , 128 , 0 , RenderTextureFormat.ARGB32 );
+					Texture2D previewDisabledTex = AssetDatabase.LoadAssetAtPath<Texture2D>( AssetDatabase.GUIDToAssetPath( "ecc13992716d1174aa27e126e4e9b66e" ) );
+					m_previewDisabledRT = new RenderTexture( 128 , 128 , 0 , RenderTextureFormat.ARGB32 );
 					RenderTexture temp = RenderTexture.active;
-					RenderTexture.active = m_dummyPreviewRT;
-					Graphics.Blit( Texture2D.blackTexture , m_dummyPreviewRT );
+					RenderTexture.active = m_previewDisabledRT;
+					Graphics.Blit( previewDisabledTex, m_previewDisabledRT );
 					RenderTexture.active = temp;
 				}
-				return m_dummyPreviewRT;
+				return m_previewDisabledRT;
 			}
 		}
 
+		static EditorGUIUtility obj = new EditorGUIUtility();
+		static MethodInfo drawColorSwatchMI = null;
+
+		public static void DrawColorSwatch( Rect position, Color color, bool showAlpha, bool hdr )
+		{
+			if ( drawColorSwatchMI == null )
+			{
+				MethodInfo[] methods = typeof( EditorGUIUtility ).GetMethods( BindingFlags.NonPublic | BindingFlags.Static );
+				foreach ( MethodInfo mi in methods )
+				{
+					if ( mi.Name == "DrawColorSwatch" && mi.GetParameters().Length == 4 )
+					{
+						drawColorSwatchMI = mi;
+						break;
+					}
+				}
+			}
+
+			if ( drawColorSwatchMI != null )
+			{
+				drawColorSwatchMI.Invoke( obj, new object[] { position, color, showAlpha, hdr } );
+			}
+			else
+			{
+				Debug.LogError( "[AmplifyShaderEditor] Method EditorGUIUtility.DrawColorSwatch(Rect, Color, bool, bool) not found. Please contact support." );
+			}
+		}
+
+		private static void AddShaderPassesToList( string shaderName, List<string> list )
+		{
+			Shader shader = Shader.Find( shaderName );
+			if ( shader != null )
+			{
+				ShaderData shaderData = ShaderUtil.GetShaderData( shader );
+				var passes = new HashSet<string>();
+
+				for ( int s = 0; s < shaderData.SubshaderCount; s++ )
+				{
+					ShaderData.Subshader subShader = shaderData.GetSubshader( s );
+					if ( subShader != null )
+					{
+						for ( int p = 0; p < subShader.PassCount; p++ )
+						{
+							ShaderData.Pass pass = subShader.GetPass( p );
+							if ( pass != null )
+							{
+								passes.Add( shaderName + "/" + pass.Name.ToUpper() );
+							}
+						}
+					}
+				}
+
+				list.AddRange( passes );
+			}
+		}
+
+		private static List<string> ReplaceShaderNamesWithPassNames( List<string> list )
+		{
+			var newList = new List<string>();
+			foreach ( var shaderName in list )
+			{
+				if ( shaderName == "-" ) // separator
+				{
+					newList.Add( shaderName );
+
+				}
+				else
+				{
+					AddShaderPassesToList( shaderName, newList );
+				}
+			}
+			return newList;
+		}
+
+		private static List<string> BuildShaderSelectionList()
+		{
+			ShaderInfo[] shaders = UnityEditor.ShaderUtil.GetAllShaderInfo();
+
+			var final = new List<string>();
+			var legacy = new List<string>();
+			var unsupported = new List<string>();
+			var failed = new List<string>();
+
+			foreach ( var shader in shaders )
+			{
+				if ( shader.name.StartsWith( "Deprecated" ) || shader.name.StartsWith( "Hidden" ) )
+				{
+					continue;
+				}
+				if ( shader.hasErrors )
+				{
+					failed?.Add( shader.name );
+					continue;
+				}
+				if ( !shader.supported )
+				{
+					unsupported?.Add( shader.name );
+					continue;
+				}
+				if ( shader.name.StartsWith( "Legacy Shaders/" ) )
+				{
+					legacy?.Add( shader.name );
+					continue;
+				}
+				final.Add( shader.name );
+			}
+
+			var unnested = final.Where( s => s.Count( c => c == '/' ) == 0 ).ToList();
+			var nested = final.Where( s => s.Count( c => c == '/' ) > 0 ).ToList();
+
+			unnested.Sort();
+			nested.Sort();
+
+			final.Clear();
+			final.AddRange( nested );
+			final.AddRange( unnested );
+
+			legacy.Sort();
+			unsupported.Sort();
+			failed.Sort();
+
+			final.Add( "-" );
+
+			legacy.ForEach( s => final.Add( s ) );
+			unsupported.ForEach( s => final.Add( "Not supported/" + s ) );
+			failed.ForEach( s => final.Add( "Failed to compile/" + s ) );
+
+			return final;
+		}
+
+		private static GenericMenu BuildShaderSelectionMenu( List<string> list, GenericMenu.MenuFunction2 onSelected, Func<string,string> displayNameFormatter )
+		{
+			var menu = new GenericMenu();
+			foreach ( var name in list )
+			{
+				if ( name == "-" )
+				{
+					menu.AddSeparator( string.Empty );
+				}
+				else
+				{
+					menu.AddItem( new GUIContent( displayNameFormatter( name ) ), false, onSelected, name );
+				}
+			}
+			return menu;
+		}
+
+		public static GenericMenu BuildShaderSelectionMenu( GenericMenu.MenuFunction2 onSelected )
+		{
+			return BuildShaderSelectionMenu( BuildShaderSelectionList(), onSelected, name =>
+			{
+				var parts = name.Split( '/' );
+				for ( int i = 0; i < parts.Length - 1; i++ )
+					parts[ i ] = $"<{parts[ i ]}>";
+				return string.Join( "/", parts );
+			} );
+		}
+
+		public static GenericMenu BuildShaderPassSelectionMenu( GenericMenu.MenuFunction2 onSelected )
+		{
+			return BuildShaderSelectionMenu( ReplaceShaderNamesWithPassNames( BuildShaderSelectionList() ), onSelected, name =>
+			{
+				var parts = name.Split( '/' );
+				for ( int i = 0; i < parts.Length - 2; i++ )
+					parts[ i ] = $"<{parts[ i ]}>";
+				return string.Join( "/", parts );
+			} );
+		}
 	}
 }

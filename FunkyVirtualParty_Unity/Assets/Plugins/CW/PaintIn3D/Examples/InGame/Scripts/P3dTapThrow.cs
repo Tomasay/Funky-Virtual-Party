@@ -93,7 +93,7 @@ namespace PaintIn3D
 
 					if (cloneRigidbody != null)
 					{
-						cloneRigidbody.velocity = clone.transform.forward * Speed;
+						cloneRigidbody.linearVelocity = clone.transform.forward * Speed;
 					}
 				}
 			}

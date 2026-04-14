@@ -21,7 +21,7 @@ namespace AmplifyShaderEditor
 		private bool m_saturate = false;
 
 		[SerializeField]
-		private bool m_mirror = true;
+		private bool m_mirror = false;
 
 		protected override void CommonInit( int uniqueId )
 		{
@@ -52,24 +52,29 @@ namespace AmplifyShaderEditor
 			{
 				if( dataCollector.IsTemplate && dataCollector.CurrentSRPType == TemplateSRPType.URP )
 				{
-					//dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureSRPVar );
-					//dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureSRPSampler );
 					dataCollector.AddToDirectives( Constants.CameraDepthTextureLWEnabler, -1, AdditionalLineType.Define );
 				}
 				else
 				{
 					dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureValue );
+					dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureTexelSize );
 				}
-
-				dataCollector.AddToUniforms( UniqueId, Constants.CameraDepthTextureTexelSize );
 			}
 
-			string screenPosNorm = string.Empty;
+			string screenPosNorm;
 			InputPort vertexPosPort = GetInputPortByUniqueId( 1 );
 			if( vertexPosPort.IsConnected )
 			{
 				string vertexPosVar = "vertexPos" + OutputId;
-				GenerateInputInVertex( ref dataCollector, 1, vertexPosVar, false );
+				if ( dataCollector.IsTemplate || !dataCollector.TesselationActive )
+				{
+					GenerateInputInVertex( ref dataCollector, 1, vertexPosVar, false );
+				}
+				else
+				{
+					// @diogo: surface shader + tessellation? can't add interpolators, so generate everything in fragment
+					vertexPosVar = vertexPosPort.GeneratePortInstructions( ref dataCollector );
+				}
 				screenPosNorm = GeneratorUtils.GenerateScreenPositionNormalizedForValue( vertexPosVar, OutputId, ref dataCollector, UniqueId, CurrentPrecisionType, !dataCollector.UsingCustomScreenPos );
 			}
 			else

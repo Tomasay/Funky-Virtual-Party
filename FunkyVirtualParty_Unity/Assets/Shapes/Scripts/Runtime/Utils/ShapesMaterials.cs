@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 // Website & Documentation - https://acegikmo.com/shapes/
 namespace Shapes {
 
-	public class ShapesMaterials {
+	internal class ShapesMaterials {
 
 		const bool USE_INSTANCING = true;
 		public const string SHAPES_SHADER_PATH_PREFIX = "Shapes/";
@@ -55,10 +55,8 @@ namespace Shapes {
 			// in editor, we want to use the material *assets*, not create any materials
 			string path = $"{ShapesIO.GeneratedMaterialsFolder}/{GetMaterialName( shaderName, blendModeSuffix, keywords )}.mat";
 			Material mat = AssetDatabase.LoadAssetAtPath<Material>( path );
-			if (mat == null)
-			{
-				//Debug.LogWarning( "Failed to load material " + path );
-			}
+			if( mat == null )
+				Debug.LogWarning( "Failed to load material " + path );
 			return mat;
 
 			#else
@@ -66,7 +64,7 @@ namespace Shapes {
 				shaderName = SHAPES_SHADER_PATH_PREFIX + shaderName + " " + blendModeSuffix;
 				Shader shaderObj = Shader.Find( shaderName );
 				if( shaderObj == null ) {
-					//Debug.LogError( "Could not find shader " + shaderName );
+					Debug.LogError( "Could not find shader " + shaderName );
 					return null;
 				}
 

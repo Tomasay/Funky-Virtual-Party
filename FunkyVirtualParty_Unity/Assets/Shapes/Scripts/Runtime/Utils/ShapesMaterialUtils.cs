@@ -6,7 +6,7 @@ using UnityEngine;
 // Website & Documentation - https://acegikmo.com/shapes/
 namespace Shapes {
 
-	public static class ShapesMaterialUtils {
+	internal static class ShapesMaterialUtils {
 
 		// properties. CodegenMpbs expect all of these to match "*public static readonly int prop"
 		public static readonly int propZTest = Shader.PropertyToID( "_ZTest" ); // used for all shapes
@@ -179,11 +179,7 @@ namespace Shapes {
 			}
 		}
 
-		//Empty method to be called to prewarm shaders
-		public static void Prewarm()
-        {
 
-        }
 	}
 
 }

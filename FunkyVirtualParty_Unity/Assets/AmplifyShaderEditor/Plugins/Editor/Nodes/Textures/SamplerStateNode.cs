@@ -64,10 +64,10 @@ namespace AmplifyShaderEditor
 
 		private readonly string[] m_wrapModeStr = {
 			"Repeat",
-			"Clamp", 
+			"Clamp",
 			"Mirror",
 			"Mirror Once",
-			"Per-axis" 
+			"Per-axis"
 		};
 
 		protected override void CommonInit( int uniqueId )
@@ -195,9 +195,8 @@ namespace AmplifyShaderEditor
 
 			m_filterMode = (FilterMode)EditorGUILayoutEnumPopup( FilterModeStr, m_filterMode );
 
-#if UNITY_2021_2_OR_NEWER
 			m_anisoMode = (AnisoModes)EditorGUILayoutEnumPopup( AnisotropicFilteringStr , m_anisoMode );
-#endif
+
 			EditorGUI.EndDisabledGroup();
 
 			if( !UIUtils.CurrentWindow.OutsideGraph.SamplingMacros )
@@ -324,7 +323,7 @@ namespace AmplifyShaderEditor
 				}
 				break;
 			}
-#if UNITY_2021_2_OR_NEWER
+
 			switch( m_anisoMode )
 			{
 				default:
@@ -334,8 +333,6 @@ namespace AmplifyShaderEditor
 				case AnisoModes.X8: result += "_Aniso8"; break;
 				case AnisoModes.X16: result += "_Aniso16"; break;
 			}
-#endif
-
 			return result;
 		}
 
@@ -372,6 +369,17 @@ namespace AmplifyShaderEditor
 			m_referenceNode = UIUtils.GetNode( m_referenceNodeId ) as TexturePropertyNode;
 			m_referenceSamplerId = UIUtils.GetTexturePropertyNodeRegisterId( m_referenceNodeId );
 			UpdateTitle();
+		}
+
+		public override void ReconnectClipboardReferences( Clipboard clipboard )
+		{
+			// validate node first
+			int newId = clipboard.GeNewNodeId( m_referenceNodeId );
+			if ( ContainerGraph.GetNode( newId ) != null )
+			{
+				m_referenceNodeId = newId;
+			}
+			RefreshExternalReferences();
 		}
 
 		public override void ReadFromString( ref string[] nodeParams )

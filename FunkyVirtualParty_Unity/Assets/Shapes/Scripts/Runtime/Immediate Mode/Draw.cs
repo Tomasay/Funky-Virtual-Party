@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 #if SHAPES_URP
 using UnityEngine.Rendering.Universal;
+
 #elif SHAPES_HDRP
 using UnityEngine.Rendering.HighDefinition;
 #else
@@ -366,7 +367,7 @@ namespace Shapes {
 
 		static MpbText mpbText = new MpbText();
 
-		[OvldGenCallTarget] static void TextRect_Internal( string content,
+		[OvldGenCallTarget] static void TextRect_Internal( [OvldDefault( "null" )] string content,
 														   [OvldDefault( "null" )] TextElement element,
 														   Rect rect,
 														   [OvldDefault( nameof(Font) )] TMP_FontAsset font,
@@ -380,7 +381,7 @@ namespace Shapes {
 		}
 
 		[OvldGenCallTarget] static void Text_Internal( bool isRect,
-													   string content,
+													   [OvldDefault( "null" )] string content,
 													   [OvldDefault( "null" )] TextElement element,
 													   [OvldDefault( "default" )] Vector2 pivot, // ignored for simple text
 													   [OvldDefault( "default" )] Vector2 size, // ignored for simple text
@@ -389,7 +390,7 @@ namespace Shapes {
 													   [OvldDefault( nameof(TextAlign) )] TextAlign align,
 													   [OvldDefault( nameof(Color) )] Color color ) {
 			int id;
-			TextMeshPro tmp;
+			TextMeshProShapes tmp;
 			IMDrawer.DrawType drawType;
 			if( element == null ) {
 				id = TextElement.GetNextId(); // auto-pooling
@@ -405,7 +406,7 @@ namespace Shapes {
 			Text_Internal( tmp, drawType, id );
 		}
 
-		delegate void OnPreRenderTmpDelegate( TextMeshPro tmp );
+		delegate void OnPreRenderTmpDelegate( TextMeshProShapes tmp );
 
 		static OnPreRenderTmpDelegate onPreRenderTmp;
 		static OnPreRenderTmpDelegate OnPreRenderTmp {
@@ -419,7 +420,7 @@ namespace Shapes {
 			}
 		}
 
-		static void ApplyTextValuesToInstance( TextMeshPro tmp, bool isRect, string content, TMP_FontAsset font, float fontSize, TextAlign align, Vector2 pivot, Vector2 size, Color color ) {
+		static void ApplyTextValuesToInstance( TextMeshProShapes tmp, bool isRect, string content, TMP_FontAsset font, float fontSize, TextAlign align, Vector2 pivot, Vector2 size, Color color ) {
 			// globals
 			tmp.fontStyle = FontStyle;
 			tmp.characterSpacing = TextCharacterSpacing;
@@ -433,17 +434,20 @@ namespace Shapes {
 			tmp.color = color;
 			tmp.fontSize = fontSize;
 			tmp.alignment = align.GetTMPAlignment();
-			tmp.text = content;
+			if( content != null )
+				tmp.text = content;
+			tmp.Curvature = TextCurvature;
+			tmp.CurvaturePivot = TextCurvaturePivot;
 
 			// positioning & wrapping
 			if( isRect ) {
-				tmp.enableWordWrapping = TextWrap;
+				tmp.textWrappingMode = TextWrap;
 				tmp.overflowMode = TextOverflow;
 				tmp.rectTransform.pivot = pivot;
 				tmp.rectTransform.sizeDelta = size;
 			} else {
 				// when we're drawing text without a rectangle, we just always overflow and ignore pivots/sizing/wrapping
-				tmp.enableWordWrapping = false;
+				tmp.textWrappingMode = TextWrappingModes.NoWrap;
 				tmp.overflowMode = TextOverflowModes.Overflow;
 				// tmp.rectTransform.pivot not set, since pivot is ignored when size = 0 anyway
 				tmp.rectTransform.sizeDelta = default;
@@ -506,6 +510,8 @@ namespace Shapes {
 		// public static void Mesh( Mesh mesh, Material mat, DrawCallProperties properties ) => CustomMesh_Internal( mesh, mat, null );
 
 		static void CustomMesh_Internal( Mesh mesh, Material mat, MaterialPropertyBlock mpb /*, DrawCallProperties properties*/ ) {
+			if( mesh == null )
+				throw new NullReferenceException( "null mesh passed into Draw.Mesh" );
 			using( IMDrawer drawer = new IMDrawer( mpbCustomMesh, mat, mesh, drawType: IMDrawer.DrawType.Custom, allowInstancing: false ) ) {
 				// will draw on dispose
 				mpbCustomMesh.mpbOverride = mpb;

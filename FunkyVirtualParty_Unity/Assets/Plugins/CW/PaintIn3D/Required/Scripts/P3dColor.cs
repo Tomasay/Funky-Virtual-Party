@@ -10,7 +10,6 @@ namespace PaintIn3D
 	[AddComponentMenu(P3dCommon.ComponentMenuPrefix + "Color")]
 	public class P3dColor : MonoBehaviour
 	{
-		[SerializeField]
 		private class Contribution
 		{
 			public P3dColorCounter Counter;

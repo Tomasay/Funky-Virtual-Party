@@ -40,7 +40,7 @@ namespace AmplifyShaderEditor
 		private string[] m_fieldText = new string[] { "0", "0", "0" };
 
 		public RangedFloatNode() : base() { }
-		public RangedFloatNode( int uniqueId, float x, float y, float width, float height ) : base( uniqueId, x, y, width, height ) { }
+		public RangedFloatNode( int uniqueId, float x, float y, float width, float height ) : base( uniqueId, x, y, width, height ) {}
 
 		protected override void CommonInit( int uniqueId )
 		{
@@ -73,6 +73,7 @@ namespace AmplifyShaderEditor
 
 		public override void OnDirtyProperty()
 		{
+			base.OnDirtyProperty();
 			UIUtils.UpdateFloatIntDataNode( UniqueId, PropertyInspectorName );
 		}
 
@@ -172,9 +173,9 @@ namespace AmplifyShaderEditor
 				PreviewMaterial.SetFloat( m_cachedPropertyId, m_defaultValue );
 		}
 
-		public override void OnNodeLayout( DrawInfo drawInfo )
+		public override void OnNodeLayout( DrawInfo drawInfo, NodeUpdateCache cache )
 		{
-			base.OnNodeLayout( drawInfo );
+			base.OnNodeLayout( drawInfo, cache );
 
 			if ( m_floatMode )
 			{
@@ -438,14 +439,20 @@ namespace AmplifyShaderEditor
 			string value = UIUtils.PropertyFloatToString( m_defaultValue );
 			if ( m_floatMode )
 			{
-				return PropertyAttributes + m_propertyName + "(\"" + m_propertyInspectorName + "\", Float) = " + value;
+				return PropertyAttributes + PropertyAttributesSeparator + m_propertyName + "( \"" + m_propertyInspectorName + "\", Float ) = " + value;
 			}
 			else
 			{
 				string min = UIUtils.PropertyFloatToString( m_min );
 				string max = UIUtils.PropertyFloatToString( m_max );
-				return PropertyAttributes + m_propertyName + "(\"" + m_propertyInspectorName + "\", Range( " + min + " , " + max + ")) = " + value;
+				return PropertyAttributes + PropertyAttributesSeparator + m_propertyName + "( \"" + m_propertyInspectorName +
+					"\", Range( " + min + ", " + max + " ) ) = " + value;
 			}
+		}
+
+		public override string GetDefaultValue()
+		{
+			return UIUtils.PropertyFloatToString( m_defaultValue );
 		}
 
 		public override void UpdateMaterial( Material mat )

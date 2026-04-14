@@ -19,7 +19,7 @@ namespace AmplifyShaderEditor
 			m_inputPorts[ 0 ].FloatInternalData = 1;
 			m_useInternalPortData = true;
 			m_previewShaderGUID = "45b7107d5d11f124fad92bcb1fa53661";
-			m_continuousPreviewRefresh = true;
+			ContinuousPreviewRefresh = true;
 		}
 
 		public override string GenerateShaderForOutput( int outputId, ref MasterNodeDataCollector dataCollector, bool ignoreLocalvar )
@@ -30,7 +30,7 @@ namespace AmplifyShaderEditor
 
 			if( dataCollector.IsTemplate )
 			{
-				if( dataCollector.TemplateDataCollectorInstance.IsHDRP || dataCollector.TemplateDataCollectorInstance.IsLWRP )
+				if( dataCollector.TemplateDataCollectorInstance.IsHDRP || dataCollector.TemplateDataCollectorInstance.IsURP )
 					timeGlobalVar = TimeSRP;
 			}
 

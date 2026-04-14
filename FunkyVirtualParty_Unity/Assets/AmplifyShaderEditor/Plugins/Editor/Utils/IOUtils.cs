@@ -38,7 +38,7 @@ namespace AmplifyShaderEditor
 					lock( locker )
 					{
 						IOUtils.SaveInThreadShaderBody = string.Format( IOUtils.ShaderCopywriteMessage, VersionInfo.StaticToString() ) + IOUtils.SaveInThreadShaderBody;
-						// Add checksum 
+						// Add checksum
 						string checksum = IOUtils.CreateChecksum( IOUtils.SaveInThreadShaderBody );
 						IOUtils.SaveInThreadShaderBody += IOUtils.CHECKSUM + IOUtils.VALUE_SEPARATOR + checksum;
 
@@ -89,24 +89,7 @@ namespace AmplifyShaderEditor
 		public static readonly string InstancedPropertiesData = "UNITY_ACCESS_INSTANCED_PROP({0})";
 
 		public static readonly string DotsInstancedPropertiesData = "\tUNITY_DOTS_INSTANCED_PROP({0}, {1})";
-		public static string DotsInstancedDefinesData
-		{ 
-			get
-			{
-				if ( ASEPackageManagerHelper.PackageSRPVersion >= ( int )ASESRPBaseline.ASE_SRP_13 )
-				{
-					return "#define {1} UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT({0} , {1})";
-				}
-				else if ( ASEPackageManagerHelper.PackageSRPVersion >= ( int )ASESRPBaseline.ASE_SRP_12 )
-				{
-					return "#define {1} UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO({0} , Metadata{1})";
-				}
-				else
-				{
-					return "#define {1} UNITY_ACCESS_DOTS_INSTANCED_PROP_FROM_MACRO({0} , Metadata_{1})";
-				}
-			}
-		}
+		public static readonly string DotsInstancedDefinesData = "#define {1} UNITY_ACCESS_DOTS_INSTANCED_PROP_WITH_DEFAULT( {0}, {1} )";
 
 		public static readonly string LWSRPInstancedPropertiesBegin = "UNITY_INSTANCING_BUFFER_START({0})";
 		public static readonly string LWSRPInstancedPropertiesEnd = "UNITY_INSTANCING_BUFFER_END({0})";
@@ -176,7 +159,7 @@ namespace AmplifyShaderEditor
 
 		public static int DefaultASEDirtyCheckId;
 
-		// this is to be used in combination with AssetDatabase.GetAssetPath, both of these include the Assets/ path so we need to remove from one of them 
+		// this is to be used in combination with AssetDatabase.GetAssetPath, both of these include the Assets/ path so we need to remove from one of them
 		public static string dataPath;
 
 
@@ -381,21 +364,13 @@ namespace AmplifyShaderEditor
 		////////////////////////////////////////////////////////////////////////////
 		public static void SetAmplifyDefineSymbolOnBuildTargetGroup( BuildTargetGroup targetGroup )
 		{
-		#if UNITY_2021_2_OR_NEWER
 			var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup( targetGroup );
 			string currData = PlayerSettings.GetScriptingDefineSymbols( namedBuildTarget );
-		#else
-			string currData = PlayerSettings.GetScriptingDefineSymbolsForGroup( targetGroup );
-		#endif
 			if( !currData.Contains( AmplifyShaderEditorDefineSymbol ) )
 			{
 				if( string.IsNullOrEmpty( currData ) )
 				{
-				#if UNITY_2021_2_OR_NEWER
 					PlayerSettings.SetScriptingDefineSymbols( namedBuildTarget, AmplifyShaderEditorDefineSymbol );
-				#else
-					PlayerSettings.SetScriptingDefineSymbolsForGroup( targetGroup, AmplifyShaderEditorDefineSymbol );
-				#endif
 				}
 				else
 				{
@@ -405,38 +380,26 @@ namespace AmplifyShaderEditor
 					}
 					currData += AmplifyShaderEditorDefineSymbol;
 
-				#if UNITY_2021_2_OR_NEWER
 					PlayerSettings.SetScriptingDefineSymbols( namedBuildTarget, currData );
-				#else
-					PlayerSettings.SetScriptingDefineSymbolsForGroup( targetGroup, currData );
-				#endif
 				}
 			}
 		}
 
 		public static void RemoveAmplifyDefineSymbolOnBuildTargetGroup( BuildTargetGroup targetGroup )
 		{
-		#if UNITY_2021_2_OR_NEWER
 			var namedBuildTarget = NamedBuildTarget.FromBuildTargetGroup( targetGroup );
 			string currData = PlayerSettings.GetScriptingDefineSymbols( namedBuildTarget );
-		#else
-			string currData = PlayerSettings.GetScriptingDefineSymbolsForGroup( targetGroup );
-		#endif
 			if( currData.Contains( AmplifyShaderEditorDefineSymbol ) )
 			{
 				currData = currData.Replace( AmplifyShaderEditorDefineSymbol + ";" , "" );
 				currData = currData.Replace( ";" + AmplifyShaderEditorDefineSymbol , "" );
 				currData = currData.Replace( AmplifyShaderEditorDefineSymbol , "" );
-				
-			#if UNITY_2021_2_OR_NEWER			
+
 				PlayerSettings.SetScriptingDefineSymbols( namedBuildTarget, currData );
-			#else
-				PlayerSettings.SetScriptingDefineSymbolsForGroup( targetGroup, currData );
-			#endif
 			}
 		}
 
-		//Adding this attribute so scripting defining symbol can be registered right away so custom nodes using ASE ( under that symbol ) can be caught 
+		//Adding this attribute so scripting defining symbol can be registered right away so custom nodes using ASE ( under that symbol ) can be caught
 		// the first time ASE opens
 		[InitializeOnLoadMethod]
 		public static void Init()
@@ -444,48 +407,18 @@ namespace AmplifyShaderEditor
 			if( !Initialized )
 			{
 				Initialized = true;
-				if( EditorPrefs.GetBool( Preferences.PrefDefineSymbol , true ) )
+				Preferences.Initialize();
+				if ( Preferences.Project.DefineSymbol )
+				{
 					SetAmplifyDefineSymbolOnBuildTargetGroup( EditorUserBuildSettings.selectedBuildTargetGroup );
-				//Array BuildTargetGroupValues = Enum.GetValues( typeof(  BuildTargetGroup ));
-				//for ( int i = 0; i < BuildTargetGroupValues.Length; i++ )
-				//{
-				//	if( i != 0 && i != 15 && i != 16 )
-				//		SetAmplifyDefineSymbolOnBuildTargetGroup( ( BuildTargetGroup ) BuildTargetGroupValues.GetValue( i ) );
-				//}
+				}
 
 				DefaultASEDirtyCheckId = Shader.PropertyToID( DefaultASEDirtyCheckName );
 				dataPath = Application.dataPath.Remove( Application.dataPath.Length - 6 );
 
-
-				//ASEFolderPath = AssetDatabase.GUIDToAssetPath( ASEFolderGUID );
-				//ASEResourcesPath = ASEFolderPath + ASEResourcesPath;
-			}
-		}
-
-
-		public static void DumpTemplateManagers()
-		{
-			for( int i = 0 ; i < AllOpenedWindows.Count ; i++ )
-			{
-				if( AllOpenedWindows[ i ].TemplatesManagerInstance != null )
-				{
-					Debug.Log( AllOpenedWindows[ i ].titleContent.text + ": " + AllOpenedWindows[ i ].TemplatesManagerInstance.GetInstanceID() );
-				}
-			}
-		}
-
-		public static TemplatesManager FirstValidTemplatesManager
-		{
-			get
-			{
-				for( int i = 0 ; i < AllOpenedWindows.Count ; i++ )
-				{
-					if( AllOpenedWindows[ i ].TemplatesManagerInstance != null )
-					{
-						return AllOpenedWindows[ i ].TemplatesManagerInstance;
-					}
-				}
-				return null;
+				ASEPackageManagerHelper.Initialize();
+				TemplatesManager.CheckCreateInstance();
+				TemplateTracker.Initialize();
 			}
 		}
 
@@ -554,7 +487,7 @@ namespace AmplifyShaderEditor
 				string[] subStr = shaderName.Split( '/' );
 				if( subStr.Length > 0 )
 				{
-					shaderName = subStr[ subStr.Length - 1 ]; // Remove pathname 
+					shaderName = subStr[ subStr.Length - 1 ]; // Remove pathname
 				}
 			}
 			else
@@ -598,25 +531,14 @@ namespace AmplifyShaderEditor
 			if( addAdditionalInfo )
 			{
 				shaderBody = string.Format( ShaderCopywriteMessage, VersionInfo.StaticToString() ) + shaderBody;
-				// Add checksum 
+				// Add checksum
 				string checksum = CreateChecksum( shaderBody );
 				shaderBody += CHECKSUM + VALUE_SEPARATOR + checksum;
 			}
 
+
 			// Write to disk
-			StreamWriter fileWriter = new StreamWriter( pathName );
-			try
-			{
-				fileWriter.Write( shaderBody );
-			}
-			catch( Exception e )
-			{
-				Debug.LogException( e );
-			}
-			finally
-			{
-				fileWriter.Close();
-			}
+			File.WriteAllText( pathName, shaderBody );
 		}
 
 		public static string AddAdditionalInfo( string shaderBody )
@@ -709,17 +631,17 @@ namespace AmplifyShaderEditor
 
 		public static void AddFunctionHeader( ref string function , string header )
 		{
-			function += "\t\t" + header + "\n\t\t{\n";
+			function += string.Format( "\t\t{0}\n\t\t{{\n", header );
 		}
 
 		public static void AddSingleLineFunction( ref string function , string header )
 		{
-			function += "\t\t" + header;
+			function += string.Format( "\t\t{0}", header );
 		}
 
 		public static void AddFunctionLine( ref string function , string line )
 		{
-			function += "\t\t\t" + line + "\n";
+			function += string.Format( "\t\t\t{0}\n", line );
 		}
 
 		public static void CloseFunctionBody( ref string function )
@@ -825,16 +747,22 @@ namespace AmplifyShaderEditor
 			return data.r.ToString() + VECTOR_SEPARATOR + data.g.ToString() + VECTOR_SEPARATOR + data.b.ToString() + VECTOR_SEPARATOR + data.a.ToString();
 		}
 
+		public static string Matrix2x2ToString( Matrix4x4 matrix )
+		{
+			return  matrix[ 0, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0, 1 ].ToString() + IOUtils.VECTOR_SEPARATOR +
+					matrix[ 1, 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 1, 1 ].ToString();
+		}
+
 		public static string Matrix3x3ToString( Matrix4x4 matrix )
 		{
-			return matrix[ 0 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR +
+			return  matrix[ 0 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR +
 					matrix[ 1 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 1 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 1 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR +
 					matrix[ 2 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 2 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 2 , 2 ].ToString();
 		}
 
 		public static string Matrix4x4ToString( Matrix4x4 matrix )
 		{
-			return matrix[ 0 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
+			return  matrix[ 0 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 0 , 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
 					matrix[ 1 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 1 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 1 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 1 , 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
 					matrix[ 2 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 2 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 2 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 2 , 3 ].ToString() + IOUtils.VECTOR_SEPARATOR +
 					matrix[ 3 , 0 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 3 , 1 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 3 , 2 ].ToString() + IOUtils.VECTOR_SEPARATOR + matrix[ 3 , 3 ].ToString();
@@ -889,23 +817,37 @@ namespace AmplifyShaderEditor
 			return Color.white;
 		}
 
+		public static Matrix4x4 StringToMatrix2x2( string data )
+		{
+			string[] parsedData = data.Split( VECTOR_SEPARATOR );
+			if ( parsedData.Length == 4 )
+			{
+				Matrix4x4 matrix = Matrix4x4.identity;
+				matrix[ 0, 0 ] = Convert.ToSingle( parsedData[ 0 ] );
+				matrix[ 0, 1 ] = Convert.ToSingle( parsedData[ 1 ] );
+				matrix[ 1, 0 ] = Convert.ToSingle( parsedData[ 2 ] );
+				matrix[ 1, 1 ] = Convert.ToSingle( parsedData[ 3 ] );
+				matrix[ 1, 1 ] = Convert.ToSingle( parsedData[ 3 ] );
+				return matrix;
+			}
+			return Matrix4x4.identity;
+		}
+
 		public static Matrix4x4 StringToMatrix3x3( string data )
 		{
 			string[] parsedData = data.Split( VECTOR_SEPARATOR );
 			if( parsedData.Length == 9 )
 			{
-				Matrix4x4 matrix = new Matrix4x4();
-				matrix[ 0 , 0 ] = Convert.ToSingle( parsedData[ 0 ] );
-				matrix[ 0 , 1 ] = Convert.ToSingle( parsedData[ 1 ] );
-				matrix[ 0 , 2 ] = Convert.ToSingle( parsedData[ 2 ] );
-
-				matrix[ 1 , 0 ] = Convert.ToSingle( parsedData[ 3 ] );
-				matrix[ 1 , 1 ] = Convert.ToSingle( parsedData[ 4 ] );
-				matrix[ 1 , 2 ] = Convert.ToSingle( parsedData[ 5 ] );
-
-				matrix[ 2 , 0 ] = Convert.ToSingle( parsedData[ 6 ] );
-				matrix[ 2 , 1 ] = Convert.ToSingle( parsedData[ 7 ] );
-				matrix[ 2 , 2 ] = Convert.ToSingle( parsedData[ 8 ] );
+				Matrix4x4 matrix = Matrix4x4.identity;
+				matrix[ 0, 0 ] = Convert.ToSingle( parsedData[ 0 ] );
+				matrix[ 0, 1 ] = Convert.ToSingle( parsedData[ 1 ] );
+				matrix[ 0, 2 ] = Convert.ToSingle( parsedData[ 2 ] );
+				matrix[ 1, 0 ] = Convert.ToSingle( parsedData[ 3 ] );
+				matrix[ 1, 1 ] = Convert.ToSingle( parsedData[ 4 ] );
+				matrix[ 1, 2 ] = Convert.ToSingle( parsedData[ 5 ] );
+				matrix[ 2, 0 ] = Convert.ToSingle( parsedData[ 6 ] );
+				matrix[ 2, 1 ] = Convert.ToSingle( parsedData[ 7 ] );
+				matrix[ 2, 2 ] = Convert.ToSingle( parsedData[ 8 ] );
 				return matrix;
 			}
 			return Matrix4x4.identity;
@@ -917,25 +859,22 @@ namespace AmplifyShaderEditor
 			if( parsedData.Length == 16 )
 			{
 				Matrix4x4 matrix = new Matrix4x4();
-				matrix[ 0 , 0 ] = Convert.ToSingle( parsedData[ 0 ] );
-				matrix[ 0 , 1 ] = Convert.ToSingle( parsedData[ 1 ] );
-				matrix[ 0 , 2 ] = Convert.ToSingle( parsedData[ 2 ] );
-				matrix[ 0 , 3 ] = Convert.ToSingle( parsedData[ 3 ] );
-
-				matrix[ 1 , 0 ] = Convert.ToSingle( parsedData[ 4 ] );
-				matrix[ 1 , 1 ] = Convert.ToSingle( parsedData[ 5 ] );
-				matrix[ 1 , 2 ] = Convert.ToSingle( parsedData[ 6 ] );
-				matrix[ 1 , 3 ] = Convert.ToSingle( parsedData[ 7 ] );
-
-				matrix[ 2 , 0 ] = Convert.ToSingle( parsedData[ 8 ] );
-				matrix[ 2 , 1 ] = Convert.ToSingle( parsedData[ 9 ] );
-				matrix[ 2 , 2 ] = Convert.ToSingle( parsedData[ 10 ] );
-				matrix[ 2 , 3 ] = Convert.ToSingle( parsedData[ 11 ] );
-
-				matrix[ 3 , 0 ] = Convert.ToSingle( parsedData[ 12 ] );
-				matrix[ 3 , 1 ] = Convert.ToSingle( parsedData[ 13 ] );
-				matrix[ 3 , 2 ] = Convert.ToSingle( parsedData[ 14 ] );
-				matrix[ 3 , 3 ] = Convert.ToSingle( parsedData[ 15 ] );
+				matrix[ 0, 0 ] = Convert.ToSingle( parsedData[ 0 ] );
+				matrix[ 0, 1 ] = Convert.ToSingle( parsedData[ 1 ] );
+				matrix[ 0, 2 ] = Convert.ToSingle( parsedData[ 2 ] );
+				matrix[ 0, 3 ] = Convert.ToSingle( parsedData[ 3 ] );
+				matrix[ 1, 0 ] = Convert.ToSingle( parsedData[ 4 ] );
+				matrix[ 1, 1 ] = Convert.ToSingle( parsedData[ 5 ] );
+				matrix[ 1, 2 ] = Convert.ToSingle( parsedData[ 6 ] );
+				matrix[ 1, 3 ] = Convert.ToSingle( parsedData[ 7 ] );
+				matrix[ 2, 0 ] = Convert.ToSingle( parsedData[ 8 ] );
+				matrix[ 2, 1 ] = Convert.ToSingle( parsedData[ 9 ] );
+				matrix[ 2, 2 ] = Convert.ToSingle( parsedData[ 10 ] );
+				matrix[ 2, 3 ] = Convert.ToSingle( parsedData[ 11 ] );
+				matrix[ 3, 0 ] = Convert.ToSingle( parsedData[ 12 ] );
+				matrix[ 3, 1 ] = Convert.ToSingle( parsedData[ 13 ] );
+				matrix[ 3, 2 ] = Convert.ToSingle( parsedData[ 14 ] );
+				matrix[ 3, 3 ] = Convert.ToSingle( parsedData[ 15 ] );
 				return matrix;
 			}
 			return Matrix4x4.identity;

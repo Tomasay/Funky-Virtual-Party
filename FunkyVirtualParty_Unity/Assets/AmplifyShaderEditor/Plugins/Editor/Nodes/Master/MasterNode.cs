@@ -60,7 +60,7 @@ namespace AmplifyShaderEditor
 		protected int m_shaderLOD = 0;
 
 		[SerializeField]
-		protected int m_shaderModelIdx = 2;
+		protected int m_shaderModelIdx = 3;
 
 		[SerializeField]
 		protected Shader m_currentShader;
@@ -147,7 +147,7 @@ namespace AmplifyShaderEditor
 
 		void InitAvailableCategories()
 		{
-			int templateCount = m_containerGraph.ParentWindow.TemplatesManagerInstance.TemplateCount;
+			int templateCount = TemplatesManager.Instance.TemplateCount;
 			m_availableCategories = new MasterNodeCategoriesData[ templateCount + 1 ];
 			m_availableCategoryLabels = new GUIContent[ templateCount + 1 ];
 
@@ -157,7 +157,7 @@ namespace AmplifyShaderEditor
 			for( int i = 0; i < templateCount; i++ )
 			{
 				int idx = i + 1;
-				TemplateDataParent templateData = m_containerGraph.ParentWindow.TemplatesManagerInstance.GetTemplate( i );
+				TemplateDataParent templateData = TemplatesManager.Instance.GetTemplate( i );
 				m_availableCategories[ idx ] = new MasterNodeCategoriesData( AvailableShaderTypes.Template, templateData.GUID );
 				m_availableCategoryLabels[ idx ] = new GUIContent( templateData.Name );
 			}
@@ -230,11 +230,44 @@ namespace AmplifyShaderEditor
 			if( m_availableCategories == null )
 				InitAvailableCategories();
 
-			int oldType = m_masterNodeCategory;
-			m_masterNodeCategory = EditorGUILayoutPopup( m_categoryLabel, m_masterNodeCategory, m_availableCategoryLabels );
-			if( oldType != m_masterNodeCategory )
+			// Handle bridge templates
+			var remapOriginalToFiltered = new int[ m_availableCategories.Length ];
+			var remapFilteredToOriginal = new List<int>();
+			var filteredLabels = new List<GUIContent>();
+
+			for ( int i = 0; i < m_availableCategoryLabels.Length; i++ )
 			{
-				m_containerGraph.ParentWindow.ReplaceMasterNode( m_availableCategories[ m_masterNodeCategory ], false );
+				if ( m_availableCategoryLabels[ i ].text.Contains( "/ASEBridgeTemplates/" ) )
+				{
+					// Bridges are invisible
+					remapOriginalToFiltered[ i ] = -1;
+					continue;
+				}
+
+				remapFilteredToOriginal.Add( i );
+				remapOriginalToFiltered[ i ] = filteredLabels.Count;
+				filteredLabels.Add( m_availableCategoryLabels[ i ] );
+			}
+
+			int filteredIndex = remapOriginalToFiltered[ m_masterNodeCategory ];
+			if ( filteredIndex >= 0 )
+			{
+				int oldType = m_masterNodeCategory;
+
+				filteredIndex = EditorGUILayoutPopup( m_categoryLabel, filteredIndex, filteredLabels.ToArray() );
+				m_masterNodeCategory = remapFilteredToOriginal[ filteredIndex ];
+
+				if( oldType != m_masterNodeCategory )
+				{
+					m_containerGraph.ParentWindow.ReplaceMasterNode( m_availableCategories[ m_masterNodeCategory ], false );
+				}
+			}
+			else
+			{
+				// Show a disabled popup => This is temporary and only happens during bridge template swaps
+				GUI.enabled = false;
+				EditorGUILayoutPopup( m_categoryLabel, 0, new GUIContent [] { new GUIContent( "Please wait..." ) } );
+				GUI.enabled = true;
 			}
 		}
 
@@ -260,7 +293,7 @@ namespace AmplifyShaderEditor
 					GenericMenu menu = new GenericMenu();
 					AddMenuItem( menu, Constants.DefaultCustomInspector );
 
-					ASESRPBaseline version = ASESRPBaseline.ASE_SRP_INVALID;
+					SRPBaseline version = SRPBaseline.ASE_SRP_INVALID;
 					bool foundHDRP = ASEPackageManagerHelper.FoundHDRPVersion;
 					bool foundURP = ASEPackageManagerHelper.FoundURPVersion;
 
@@ -279,47 +312,18 @@ namespace AmplifyShaderEditor
 
 					if( foundHDRP )
 					{
-						if( version >= ASESRPBaseline.ASE_SRP_11 )
-						{
-							AddMenuItem( menu , "Rendering.HighDefinition.DecalShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.LightingShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.LitShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.HDUnlitGUI" );
-						}
-						else
-						if( version >= ASESRPBaseline.ASE_SRP_10 )
-						{
-							AddMenuItem( menu , "Rendering.HighDefinition.DecalGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.LitShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.LightingShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.HDUnlitGUI" );
-						}
-						else if( version >= ASESRPBaseline.ASE_SRP_12 )
-						{
-							AddMenuItem( menu , "Rendering.HighDefinition.DecalGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.LitShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.LightingShaderGraphGUI" );
-							AddMenuItem( menu , "Rendering.HighDefinition.HDUnlitGUI" );
-						}
-						else
-						{
-							AddMenuItem( menu , "UnityEditor.Rendering.HighDefinition.HDLitGUI" );
-						}
+						AddMenuItem( menu , "Rendering.HighDefinition.LitShaderGraphGUI" );
+						AddMenuItem( menu , "Rendering.HighDefinition.UnlitShaderGraphGUI" );
+						AddMenuItem( menu , "Rendering.HighDefinition.DecalShaderGraphGUI" );
+						AddMenuItem( menu , "Rendering.HighDefinition.LightingShaderGraphGUI" );
+
 					}
 
 					if( foundURP )
 					{
-						if( version >= ASESRPBaseline.ASE_SRP_12 )
-						{
-							AddMenuItem( menu , "UnityEditor.ShaderGraphLitGUI" );
-							AddMenuItem( menu , "UnityEditor.ShaderGraphUnlitGUI" );
-							AddMenuItem( menu , "UnityEditor.Rendering.Universal.DecalShaderGraphGUI" );
-							AddMenuItem( menu , "UnityEditor.ShaderGraphLitGUI" );
-						}
-						else
-						{
-							AddMenuItem( menu , "UnityEditor.ShaderGraph.PBRMasterGUI" );
-						}
+						AddMenuItem( menu , "UnityEditor.ShaderGraphLitGUI" );
+						AddMenuItem( menu , "UnityEditor.ShaderGraphUnlitGUI" );
+						AddMenuItem( menu , "UnityEditor.Rendering.Universal.DecalShaderGraphGUI" );
 					}
 					menu.ShowAsContext();
 				}
@@ -537,6 +541,10 @@ namespace AmplifyShaderEditor
 			if( UIUtils.CurrentShaderVersion() > 2404 )
 			{
 				m_customInspectorName = GetCurrentParam( ref nodeParams );
+				if ( m_customInspectorName.Equals( Constants.OldCustomInspector ) )
+				{
+					m_customInspectorName = Constants.DefaultCustomInspector;
+				}
 			}
 
 			if( UIUtils.CurrentShaderVersion() > 6101 )
@@ -638,6 +646,8 @@ namespace AmplifyShaderEditor
 
 		protected void UpdateShaderAsset( ref string pathname, ref string shaderBody, bool isFullPath )
 		{
+			shaderBody = UIUtils.ForceLFLineEnding( shaderBody );
+
 			// Generate Graph info
 			shaderBody += ContainerGraph.ParentWindow.GenerateGraphInfo();
 
@@ -660,7 +670,7 @@ namespace AmplifyShaderEditor
 
 			//else
 			//{
-			//	// need to always get asset datapath because a user can change and asset location from the project window 
+			//	// need to always get asset datapath because a user can change and asset location from the project window
 			//	AssetDatabase.ImportAsset( AssetDatabase.GetAssetPath( m_currentShader ) );
 			//	//ShaderUtil.UpdateShaderAsset( m_currentShader, ShaderBody );
 			//	//ShaderImporter importer = (ShaderImporter)ShaderImporter.GetAtPath( AssetDatabase.GetAssetPath( CurrentShader ) );
@@ -1041,7 +1051,7 @@ namespace AmplifyShaderEditor
 				m_shaderLOD = Mathf.Max( 0, value );
 			}
 		}
-		public bool SamplingMacros 
+		public bool SamplingMacros
 		{
 			get { return m_samplingMacros; }
 			set

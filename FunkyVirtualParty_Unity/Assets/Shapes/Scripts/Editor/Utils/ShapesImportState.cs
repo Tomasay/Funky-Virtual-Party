@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using System.Linq;
+using UnityEditor.Build;
 #if SHAPES_URP
 using UnityEditor.Rendering.Universal;
 #if UNITY_2021_2_OR_NEWER
@@ -118,7 +119,7 @@ namespace Shapes {
 		static void MakeSureSampleMaterialsAreValid() {
 			#if SHAPES_URP || SHAPES_HDRP
 			#if UNITY_2019_1_OR_NEWER
-			Shader targetShader = GraphicsSettings.renderPipelineAsset.defaultShader;
+			Shader targetShader = GraphicsSettings.defaultRenderPipeline.defaultShader;
 			#else
 			Shader targetShader = GraphicsSettings.renderPipelineAsset.GetDefaultShader();
 			#endif
@@ -196,8 +197,14 @@ namespace Shapes {
 
 		#endif
 
-		public static List<string> GetCurrentKeywords() => PlayerSettings.GetScriptingDefineSymbolsForGroup( EditorUserBuildSettings.selectedBuildTargetGroup ).Split( ';' ).ToList();
+		#if UNITY_2023_1_OR_NEWER
+		static NamedBuildTarget CurrentNamedBuildTarget => NamedBuildTarget.FromBuildTargetGroup( BuildPipeline.GetBuildTargetGroup( EditorUserBuildSettings.activeBuildTarget ) );
+		static List<string> GetCurrentKeywords() => PlayerSettings.GetScriptingDefineSymbols( CurrentNamedBuildTarget ).Split( ';' ).ToList();
+		static void SetCurrentKeywords( IEnumerable<string> keywords ) => PlayerSettings.SetScriptingDefineSymbols( CurrentNamedBuildTarget, string.Join( ";", keywords ) );
+		#else
+		static List<string> GetCurrentKeywords() => PlayerSettings.GetScriptingDefineSymbolsForGroup( EditorUserBuildSettings.selectedBuildTargetGroup ).Split( ';' ).ToList();
 		static void SetCurrentKeywords( IEnumerable<string> keywords ) => PlayerSettings.SetScriptingDefineSymbolsForGroup( EditorUserBuildSettings.selectedBuildTargetGroup, string.Join( ";", keywords ) );
+		#endif
 
 		internal static bool TryGetPreprocessorRP( out RenderPipeline rp ) {
 			List<string> keywords = GetCurrentKeywords();

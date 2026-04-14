@@ -55,7 +55,7 @@ namespace PaintIn3D
 
 					if (rigidbody != null)
 					{
-						rigidbody.velocity = rotation * velocity;
+						rigidbody.linearVelocity = rotation * velocity;
 					}
 
 					clone.SetActive(true);

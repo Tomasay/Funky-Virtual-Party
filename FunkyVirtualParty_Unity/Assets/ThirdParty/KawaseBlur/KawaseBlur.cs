@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Rendering.RenderGraphModule;
 
 public class KawaseBlur : ScriptableRendererFeature
 {
@@ -28,83 +28,88 @@ public class KawaseBlur : ScriptableRendererFeature
         public int passes;
         public int downsample;
         public bool copyToFramebuffer;
-        public string targetName;        
+        public string targetName;
         string profilerTag;
-
-        int tmpId1;
-        int tmpId2;
-
-        RenderTargetIdentifier tmpRT1;
-        RenderTargetIdentifier tmpRT2;
-        
-        private RenderTargetIdentifier source { get; set; }
-
-        public void Setup(RenderTargetIdentifier source) {
-            this.source = source;
-        }
 
         public CustomRenderPass(string profilerTag)
         {
             this.profilerTag = profilerTag;
         }
 
-        public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
+        private class PassData
         {
-            var width = cameraTextureDescriptor.width / downsample;
-            var height = cameraTextureDescriptor.height / downsample;
-
-            tmpId1 = Shader.PropertyToID("tmpBlurRT1");
-            tmpId2 = Shader.PropertyToID("tmpBlurRT2");
-            cmd.GetTemporaryRT(tmpId1, width, height, 0, FilterMode.Bilinear, RenderTextureFormat.ARGB32);
-            cmd.GetTemporaryRT(tmpId2, width, height, 0, FilterMode.Bilinear, RenderTextureFormat.ARGB32);
-
-            tmpRT1 = new RenderTargetIdentifier(tmpId1);
-            tmpRT2 = new RenderTargetIdentifier(tmpId2);
-            
-            ConfigureTarget(tmpRT1);
-            ConfigureTarget(tmpRT2);
+            public Material material;
+            public float offset;
+            public TextureHandle source;
         }
 
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        private void AddBlurPass(RenderGraph renderGraph, TextureHandle src, TextureHandle dst, float offset, string passName)
         {
-            CommandBuffer cmd = CommandBufferPool.Get(profilerTag);
+            using var builder = renderGraph.AddRasterRenderPass<PassData>(passName, out var data);
+            data.material = blurMaterial;
+            data.offset = offset;
+            data.source = src;
+            builder.UseTexture(src, AccessFlags.Read);
+            builder.SetRenderAttachment(dst, 0, AccessFlags.Write);
+            builder.AllowGlobalStateModification(true);
+            builder.SetRenderFunc((PassData d, RasterGraphContext ctx) =>
+            {
+                ctx.cmd.SetGlobalFloat("_offset", d.offset);
+                Blitter.BlitTexture(ctx.cmd, d.source, new Vector4(1, 1, 0, 0), d.material, 0);
+            });
+        }
 
-            RenderTextureDescriptor opaqueDesc = renderingData.cameraData.cameraTargetDescriptor;
-            opaqueDesc.depthBufferBits = 0;
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
+        {
+            var resourceData = frameData.Get<UniversalResourceData>();
+            var cameraData = frameData.Get<UniversalCameraData>();
 
-            // first pass
-            // cmd.GetTemporaryRT(tmpId1, opaqueDesc, FilterMode.Bilinear);
-            cmd.SetGlobalFloat("_offset", 1.5f);
-            cmd.Blit(source, tmpRT1, blurMaterial);
+            RenderTextureDescriptor desc = cameraData.cameraTargetDescriptor;
+            desc.depthBufferBits = 0;
+            desc.width /= downsample;
+            desc.height /= downsample;
 
-            for (var i=1; i<passes-1; i++) {
-                cmd.SetGlobalFloat("_offset", 0.5f + i);
-                cmd.Blit(tmpRT1, tmpRT2, blurMaterial);
+            TextureHandle cameraColor = resourceData.activeColorTexture;
+            TextureHandle tmpRT1 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "tmpBlurRT1", false, FilterMode.Bilinear);
+            TextureHandle tmpRT2 = UniversalRenderer.CreateRenderGraphTexture(renderGraph, desc, "tmpBlurRT2", false, FilterMode.Bilinear);
 
-                // pingpong
-                var rttmp = tmpRT1;
-                tmpRT1 = tmpRT2;
-                tmpRT2 = rttmp;
+            // First pass: camera color -> tmpRT1
+            AddBlurPass(renderGraph, cameraColor, tmpRT1, 1.5f, profilerTag + " Pass 0");
+
+            TextureHandle currentSrc = tmpRT1;
+            TextureHandle currentDst = tmpRT2;
+
+            for (int i = 1; i < passes - 1; i++)
+            {
+                AddBlurPass(renderGraph, currentSrc, currentDst, 0.5f + i, profilerTag + $" Pass {i}");
+                (currentSrc, currentDst) = (currentDst, currentSrc);
             }
 
-            // final pass
-            cmd.SetGlobalFloat("_offset", 0.5f + passes - 1f);
-            if (copyToFramebuffer) {
-                cmd.Blit(tmpRT1, source, blurMaterial);
-            } else {
-                cmd.Blit(tmpRT1, tmpRT2, blurMaterial);
-                cmd.SetGlobalTexture(targetName, tmpRT2);
+            // Final pass
+            float finalOffset = 0.5f + passes - 1f;
+            if (copyToFramebuffer)
+            {
+                AddBlurPass(renderGraph, currentSrc, cameraColor, finalOffset, profilerTag + " Final");
             }
-
-            context.ExecuteCommandBuffer(cmd);
-            cmd.Clear();
-
-            CommandBufferPool.Release(cmd);
+            else
+            {
+                using var builder = renderGraph.AddRasterRenderPass<PassData>(profilerTag + " Final", out var data);
+                data.material = blurMaterial;
+                data.offset = finalOffset;
+                data.source = currentSrc;
+                builder.UseTexture(currentSrc, AccessFlags.Read);
+                builder.SetRenderAttachment(currentDst, 0, AccessFlags.Write);
+                builder.SetGlobalTextureAfterPass(currentDst, Shader.PropertyToID(targetName));
+                builder.AllowGlobalStateModification(true);
+                builder.SetRenderFunc((PassData d, RasterGraphContext ctx) =>
+                {
+                    ctx.cmd.SetGlobalFloat("_offset", d.offset);
+                    Blitter.BlitTexture(ctx.cmd, d.source, new Vector4(1, 1, 0, 0), d.material, 0);
+                });
+            }
         }
 
-        public override void FrameCleanup(CommandBuffer cmd)
-        {
-        }
+        public override void FrameCleanup(CommandBuffer cmd) { }
     }
 
     CustomRenderPass scriptablePass;
@@ -117,16 +122,11 @@ public class KawaseBlur : ScriptableRendererFeature
         scriptablePass.downsample = settings.downsample;
         scriptablePass.copyToFramebuffer = settings.copyToFramebuffer;
         scriptablePass.targetName = settings.targetName;
-
         scriptablePass.renderPassEvent = settings.renderPassEvent;
     }
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
-        var src = renderer.cameraColorTarget;
-        scriptablePass.Setup(src);
         renderer.EnqueuePass(scriptablePass);
     }
 }
-
-

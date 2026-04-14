@@ -126,7 +126,7 @@ public class VinylInfo : MonoBehaviour
 
     public void RespawnDisc()
     {
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.position = startingPos;
         transform.rotation = startingRot;
@@ -134,7 +134,7 @@ public class VinylInfo : MonoBehaviour
 
     public void SetDiscOnPlayer()
     {
-        rb.velocity = Vector3.zero;
+        rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
         rb.useGravity = false;

@@ -25,14 +25,14 @@ public class FlameBender : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Velocity: " + handRB.velocity);
+        Debug.Log("Velocity: " + handRB.linearVelocity);
 
         //mat.SetFloat(_FollowThroughID, handRB.velocity.x * 2);
     }
 
     void UpdateFireBend()
     {
-        float t = Mathf.Clamp(handRB.velocity.x * -1, -0.5f, 0.5f);
+        float t = Mathf.Clamp(handRB.linearVelocity.x * -1, -0.5f, 0.5f);
         mat.DOFloat(t, _FollowThroughID, updateInterval);
     }
 }

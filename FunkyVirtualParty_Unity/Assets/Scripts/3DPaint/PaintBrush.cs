@@ -111,8 +111,6 @@ public class PaintBrush : ImmediateModeShapeDrawer
         Draw.DetailLevel = DetailLevel.Minimal;
         Draw.PolylineJoins = PolylineJoins.Round;
 
-        ShapesMaterialUtils.Prewarm();
-
         VRtistrySyncer.instance.brushColorChanged.AddListener(ChangeColor);
 
 #if !UNITY_WEBGL
@@ -182,7 +180,7 @@ public class PaintBrush : ImmediateModeShapeDrawer
             paintHitBetween.enabled = !outOfBounds;
         }
 
-        if (!outOfBounds && isPaintingAir && (rb.velocity.magnitude > 0.025f || (playerRb != null && playerRb.velocity.magnitude > 1)) && currentPointCount < maxPointCount)
+        if (!outOfBounds && isPaintingAir && (rb.linearVelocity.magnitude > 0.025f || (playerRb != null && playerRb.linearVelocity.magnitude > 1)) && currentPointCount < maxPointCount)
         {
             AddNewLinePoint();
             OnDraw.Invoke();
